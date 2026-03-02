@@ -43,6 +43,8 @@ pub enum IconName {
     User,
     Pencil,
     Trash,
+    File,
+    Folder,
 }
 
 impl From<IconName> for SharedString {
@@ -66,6 +68,8 @@ impl From<IconName> for SharedString {
             IconName::User => "user".into(),
             IconName::Pencil => "pencil".into(),
             IconName::Trash => "trash".into(),
+            IconName::File => "file".into(),
+            IconName::Folder => "folder".into(),
         };
         format!("icons/{name}.svg").into()
     }
