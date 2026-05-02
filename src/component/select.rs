@@ -1,41 +1,22 @@
 use std::sync::Arc;
 
 use gpui::{
-    Animation, AnimationExt, ClickEvent, Div, ElementId, Hsla, InteractiveElement, IntoElement,
-    ParentElement, Pixels, Bounds, RenderOnce, SharedString, StatefulInteractiveElement, Styled, div,
-    prelude::FluentBuilder, px,
+    Animation, AnimationExt, Bounds, ClickEvent, Div, ElementId, Hsla, InteractiveElement,
+    IntoElement, ParentElement, Pixels, RenderOnce, SharedString, StatefulInteractiveElement,
+    Styled, div, prelude::FluentBuilder, px,
 };
 
 use crate::{
     animation::constants::duration,
     component::{
         ArrowDirection, BoundsTrackerElement, ChangeCallback, ChangeWithEventCallback, IconName,
-        compute_input_style, create_internal_state, icon, use_internal_state,
+        compute_input_style, create_internal_state, desired_menu_left, icon, use_internal_state,
     },
     i18n::{I18n, I18nContext, TextDirection, defaults::DefaultPlaceholders},
     theme::ActiveTheme,
 };
 
 use crate::rtl;
-
-fn desired_menu_left(
-    trigger_bounds: Bounds<Pixels>,
-    menu_width: Pixels,
-    direction: TextDirection,
-    window: &gpui::Window,
-) -> Pixels {
-    let desired_left = if direction.is_rtl() {
-        trigger_bounds.right() - menu_width
-    } else {
-        trigger_bounds.left()
-    };
-
-    let window_bounds = window.bounds();
-    let min_left = window_bounds.left();
-    let max_left = (window_bounds.right() - menu_width).max(min_left);
-    desired_left.clamp(min_left, max_left)
-}
-
 use crate::animation::ease_out_quint_clamped;
 
 /// Creates a new select option.
@@ -467,7 +448,7 @@ impl RenderOnce for Select {
 
                 let trigger_bounds = *trigger_bounds_state_for_menu.read(cx);
                 let menu_width_px = menu_width.unwrap_or_else(|| trigger_bounds.size.width);
-                let menu_left = desired_menu_left(trigger_bounds, menu_width_px, direction, window);
+                let menu_left = desired_menu_left(trigger_bounds, menu_width_px, direction, false, window);
                 let relative_left = menu_left - trigger_bounds.left();
 
                 let menu = div()

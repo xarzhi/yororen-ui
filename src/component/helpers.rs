@@ -3,9 +3,48 @@
 //! This module provides common utility functions used across multiple components
 //! to reduce code duplication.
 
-use gpui::{App, ElementId, Entity, Window};
+use gpui::{App, Bounds, ElementId, Entity, Pixels, Window};
 
+use crate::i18n::TextDirection;
 use crate::theme::{ActionVariantKind, Theme};
+
+/// Computes the desired left position for a dropdown/popover menu relative to its trigger,
+/// taking into account text direction, alignment preference, and window boundaries.
+///
+/// # Parameters
+/// - `trigger_bounds` - The bounds of the trigger element
+/// - `menu_width` - The width of the menu
+/// - `direction` - The current text direction (LTR or RTL)
+/// - `align_end` - If `true`, align the menu's end edge to the trigger's end edge
+///   (right edge in LTR, left edge in RTL). If `false`, align start to start.
+/// - `window` - The window for boundary clamping
+///
+/// # Returns
+/// The absolute left position of the menu in window coordinates.
+pub fn desired_menu_left(
+    trigger_bounds: Bounds<Pixels>,
+    menu_width: Pixels,
+    direction: TextDirection,
+    align_end: bool,
+    window: &gpui::Window,
+) -> Pixels {
+    let desired_left = if align_end {
+        match direction {
+            TextDirection::Ltr => trigger_bounds.right() - menu_width,
+            TextDirection::Rtl => trigger_bounds.left(),
+        }
+    } else {
+        match direction {
+            TextDirection::Ltr => trigger_bounds.left(),
+            TextDirection::Rtl => trigger_bounds.right() - menu_width,
+        }
+    };
+
+    let window_bounds = window.bounds();
+    let min_left = window_bounds.left();
+    let max_left = (window_bounds.right() - menu_width).max(min_left);
+    desired_left.clamp(min_left, max_left)
+}
 
 /// Input style configuration for input components.
 ///

@@ -347,7 +347,7 @@ fn flatten_tree_recursive<T: TreeNodeData>(
         let is_expanded = expanded_ids.get(&node.id).copied().unwrap_or(node.expanded);
 
         // If not expanded and not including hidden nodes, skip this node's children
-        if !is_expanded && !include_hidden && !node.expanded {
+        if !is_expanded && !include_hidden {
             // Still add the node but mark as not expanded
             result.push(FlatTreeNode {
                 id: node.id.clone(),

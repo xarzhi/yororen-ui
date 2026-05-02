@@ -127,10 +127,16 @@ impl Tree {
             expanded: &mut std::collections::HashMap<ElementId, bool>,
         ) {
             for node in nodes {
-                if node.expanded {
+                // Only seed the initial expanded state from the node if the user
+                // has not already interacted with it (i.e. the id is not in the map).
+                if !expanded.contains_key(&node.id) && node.expanded {
                     expanded.insert(node.id.clone(), true);
                 }
-                collect_expanded(&node.children, expanded);
+                // Only recurse if the node is expanded; collapsed children are hidden
+                // and their descendants don't need to be collected.
+                if node.expanded {
+                    collect_expanded(&node.children, expanded);
+                }
             }
         }
         collect_expanded(&self.nodes, &mut expanded_ids);
@@ -350,16 +356,18 @@ impl Tree {
             expanded_ids.insert(id.clone(), *expanded);
         }
 
-        // Also check the nodes' own expanded field
+        // Also check the nodes' own expanded field, but don't overwrite user state.
         fn collect_expanded<T: super::tree_data::TreeNodeData>(
             nodes: &[super::tree_data::TreeNode<T>],
             expanded: &mut std::collections::HashMap<ElementId, bool>,
         ) {
             for node in nodes {
-                if node.expanded {
+                if !expanded.contains_key(&node.id) && node.expanded {
                     expanded.insert(node.id.clone(), true);
                 }
-                collect_expanded(&node.children, expanded);
+                if node.expanded {
+                    collect_expanded(&node.children, expanded);
+                }
             }
         }
         collect_expanded(&self.nodes, &mut expanded_ids);
@@ -427,9 +435,10 @@ impl Tree {
                 let state_entity = state_entity_for_toggle.clone();
                 row = row.on_click({
                     let node_id = node_id.clone();
+                    let node_expanded = node.expanded;
                     move |_ev, window, cx| {
                         state_entity.update(cx, |state, _cx| {
-                            let expanded_now = state.is_expanded(&node_id);
+                            let expanded_now = state.expanded_nodes.get(&node_id).copied().unwrap_or(node_expanded);
                             state.set_expanded(&node_id, !expanded_now);
                         });
                         window.refresh();
@@ -526,16 +535,18 @@ impl Tree {
             expanded_ids.insert(id.clone(), *expanded);
         }
 
-        // Also check the nodes' own expanded field
+        // Also check the nodes' own expanded field, but don't overwrite user state.
         fn collect_expanded<T: super::tree_data::TreeNodeData>(
             nodes: &[super::tree_data::TreeNode<T>],
             expanded: &mut std::collections::HashMap<ElementId, bool>,
         ) {
             for node in nodes {
-                if node.expanded {
+                if !expanded.contains_key(&node.id) && node.expanded {
                     expanded.insert(node.id.clone(), true);
                 }
-                collect_expanded(&node.children, expanded);
+                if node.expanded {
+                    collect_expanded(&node.children, expanded);
+                }
             }
         }
         collect_expanded(&self.nodes, &mut expanded_ids);
@@ -568,7 +579,7 @@ impl Tree {
                 let label_text = node.data.label().to_string();
                 let disabled = node.data.disabled;
                 let has_children = node.has_children;
-                let expanded = state_snapshot.is_expanded(&node_id);
+                let expanded = node.expanded;
 
                 let on_item_click = on_item_click.clone();
                 let on_click = on_click.clone();
@@ -600,10 +611,11 @@ impl Tree {
                 if has_children && !disabled {
                     row = row.on_click({
                         let node_id = node_id.clone();
+                        let node_expanded = node.expanded;
                         let state_entity = state_entity.clone();
                         move |_ev, window, cx| {
                             state_entity.update(cx, |state, _cx| {
-                                let expanded_now = state.is_expanded(&node_id);
+                                let expanded_now = state.expanded_nodes.get(&node_id).copied().unwrap_or(node_expanded);
                                 state.set_expanded(&node_id, !expanded_now);
                             });
 

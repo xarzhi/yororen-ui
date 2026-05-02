@@ -1,20 +1,19 @@
 use std::sync::Arc;
 
 use gpui::{
-    Animation, AnimationExt, ClickEvent, Div, ElementId, Hsla, InteractiveElement, IntoElement,
-    ParentElement, Pixels, Bounds, RenderOnce, SharedString, StatefulInteractiveElement, Styled, div,
-    prelude::FluentBuilder, px,
+    Animation, AnimationExt, Bounds, ClickEvent, Div, ElementId, Hsla, InteractiveElement,
+    IntoElement, ParentElement, Pixels, RenderOnce, SharedString, StatefulInteractiveElement,
+    Styled, div, prelude::FluentBuilder, px,
 };
 
 use crate::{
     animation::constants::duration,
-    component::{ArrowDirection, BoundsTrackerElement, IconName, compute_input_style, icon, text_input},
+    component::{ArrowDirection, BoundsTrackerElement, IconName, compute_input_style, desired_menu_left, icon, text_input},
     i18n::{I18n, I18nContext, TextDirection, defaults::DefaultPlaceholders},
     theme::ActiveTheme,
 };
 
 use crate::rtl;
-
 use crate::animation::ease_out_quint_clamped;
 
 #[derive(Clone, Debug)]
@@ -58,24 +57,6 @@ impl ComboBoxOption {
 /// - Disabled options are properly marked
 pub fn combo_box(id: impl Into<ElementId>) -> ComboBox {
     ComboBox::new().id(id)
-}
-
-fn desired_menu_left(
-    trigger_bounds: Bounds<Pixels>,
-    menu_width: Pixels,
-    direction: TextDirection,
-    window: &gpui::Window,
-) -> Pixels {
-    let desired_left = if direction.is_rtl() {
-        trigger_bounds.right() - menu_width
-    } else {
-        trigger_bounds.left()
-    };
-
-    let window_bounds = window.bounds();
-    let min_left = window_bounds.left();
-    let max_left = (window_bounds.right() - menu_width).max(min_left);
-    desired_left.clamp(min_left, max_left)
 }
 
 fn menu_width_px(menu_width: Option<Pixels>, default: Pixels) -> Pixels {
@@ -453,7 +434,7 @@ impl RenderOnce for ComboBox {
 
                 let trigger_bounds = *trigger_bounds_state_for_menu.read(cx);
                 let menu_width_px = menu_width_px(menu_width, px(420.));
-                let menu_left = desired_menu_left(trigger_bounds, menu_width_px, direction, window);
+                let menu_left = desired_menu_left(trigger_bounds, menu_width_px, direction, false, window);
                 let relative_left = menu_left - trigger_bounds.left();
 
                 // Check if we need to initialize content
