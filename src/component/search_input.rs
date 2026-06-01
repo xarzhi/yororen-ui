@@ -197,10 +197,12 @@ impl RenderOnce for SearchInput {
 
         let on_submit_for_input = on_submit.clone();
 
+        let direction = cx.theme().text_direction;
         let mut base = self
             .base
             .id(id.clone())
-            .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .gap_1()
             .h(height)

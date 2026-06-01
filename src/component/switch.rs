@@ -175,6 +175,9 @@ impl RenderOnce for Switch {
                 .hover(move |this| this.bg(toggle_style.hover_bg));
         }
 
+        let direction = cx.theme().text_direction;
+        let is_rtl = direction.is_rtl();
+
         // Create animated knob with position transition
         // Initial position: left at 2px (padding), vertically centered
         let knob = div()
@@ -183,8 +186,7 @@ impl RenderOnce for Switch {
             .rounded_full()
             .bg(knob_bg)
             .absolute()
-            .top(px(2.)) // Vertically centered (18 - 14) / 2 = 2px
-            .left(px(2.)); // Initial position at left
+            .top(px(2.)); // Vertically centered (18 - 14) / 2 = 2px
 
         let animated_knob = knob.with_animation(
             format!("ui:switch:knob:{}", checked),
@@ -193,7 +195,12 @@ impl RenderOnce for Switch {
                 // Interpolate between left (2px) and right (18px - 14px - 2px = 2px offset)
                 // Total travel distance: 34 - 2 - 14 - 2 = 16px
                 let position = if checked { value } else { 1.0 - value };
-                this.left(px(2. + position * 16.0))
+                if is_rtl {
+                    // RTL: off = right (逻辑 start), on = left (逻辑 end)
+                    this.left(px(18.0 - position * 16.0))
+                } else {
+                    this.left(px(2.0 + position * 16.0))
+                }
             },
         );
 

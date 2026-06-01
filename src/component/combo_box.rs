@@ -350,6 +350,7 @@ impl RenderOnce for ComboBox {
             .find(|opt| opt.value == value)
             .map(|opt| opt.label.clone());
 
+        let direction = cx.theme().text_direction;
         let theme = cx.theme().clone();
         let hint = theme.content.tertiary;
 
@@ -375,6 +376,8 @@ impl RenderOnce for ComboBox {
             .id(id.clone())
             .relative()
             .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .justify_between()
             .gap_2()
@@ -522,6 +525,8 @@ impl RenderOnce for ComboBox {
                             .px_3()
                             .py_2()
                             .flex()
+                            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+                            .when(!direction.is_rtl(), |this| this.flex_row())
                             .items_center()
                             .justify_between()
                             .gap_2()

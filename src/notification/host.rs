@@ -95,13 +95,17 @@ impl RenderOnce for NotificationHost {
         let items = center.items();
         let theme = cx.theme().clone();
 
+        let direction = cx.theme().text_direction;
+
         self.base
             .id("ui:notification-host")
             .absolute()
             .top_0()
-            .right_0()
+            .when(direction.is_rtl(), |this| this.left_0())
+            .when(!direction.is_rtl(), |this| this.right_0())
             .mt(self.offset)
-            .mr(self.offset)
+            .when(direction.is_rtl(), |this| this.ml(self.offset))
+            .when(!direction.is_rtl(), |this| this.mr(self.offset))
             .flex()
             .flex_col()
             .gap_2()

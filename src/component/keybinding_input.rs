@@ -307,11 +307,14 @@ impl RenderOnce for KeybindingInput {
 
         let mods_for_display = *current_modifiers.read(cx);
 
+        let direction = cx.theme().text_direction;
+
         self.base
             .id(id.clone())
             .h(height)
             .w_full()
-            .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .justify_between()
             .gap_2()

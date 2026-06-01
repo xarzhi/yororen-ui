@@ -1,6 +1,6 @@
 use gpui::{
     Animation, AnimationExt, Div, ElementId, Hsla, IntoElement, ParentElement, Pixels, RenderOnce,
-    Styled, div, px, relative,
+    Styled, div, prelude::FluentBuilder, px, relative,
 };
 
 use gpui::InteractiveElement;
@@ -331,6 +331,9 @@ impl RenderOnce for ProgressBar {
             .border_color(theme.border.muted)
             .overflow_hidden();
 
+        let direction = cx.theme().text_direction;
+        let is_rtl = direction.is_rtl();
+
         if indeterminate {
             base.child(
                 div()
@@ -350,7 +353,11 @@ impl RenderOnce for ProgressBar {
                             // moves, similar to common loading indicators.
                             let width = 0.18 + 0.32 * (1.0 - (2.0 * delta - 1.0).abs());
                             let x = -width + (1.0 + width) * delta;
-                            this.left(relative(x)).w(relative(width))
+                            if is_rtl {
+                                this.right(relative(x)).w(relative(width))
+                            } else {
+                                this.left(relative(x)).w(relative(width))
+                            }
                         },
                     ),
             )
@@ -360,7 +367,8 @@ impl RenderOnce for ProgressBar {
                     .id(fill_id)
                     .absolute()
                     .top_0()
-                    .left_0()
+                    .when(is_rtl, |this| this.right_0())
+                    .when(!is_rtl, |this| this.left_0())
                     .h(height)
                     .rounded_full()
                     .bg(fill)

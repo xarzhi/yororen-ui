@@ -202,6 +202,8 @@ impl RenderOnce for Toast {
         let message = self.message;
         let has_content = content.is_some();
 
+        let direction = cx.theme().text_direction;
+
         base.id(element_id)
             .px_3()
             .py_2()
@@ -209,7 +211,8 @@ impl RenderOnce for Toast {
             .bg(bg)
             .text_color(fg)
             .shadow_md()
-            .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .gap_2()
             .when_some(width, |this, width| this.w(width))

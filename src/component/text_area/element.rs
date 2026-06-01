@@ -76,6 +76,8 @@ impl Element for TextAreaElement {
         let mut scroll_y = input.scroll_y;
         let wrap = input.wrap;
         let style = window.text_style();
+        let direction = cx.theme().text_direction;
+        let is_rtl = direction.is_rtl();
 
         let (display_text, text_color) = if content.is_empty() {
             (placeholder, cx.theme().content.tertiary)
@@ -143,15 +145,23 @@ impl Element for TextAreaElement {
             if let Some((row, x)) = layout.position_for_index(cursor) {
                 let line = &layout.lines[row];
                 cursor_row = Some(row);
+                let raw_cursor_pos = x;
+                let cursor_pos = if is_rtl {
+                    line.shaped.width - raw_cursor_pos
+                } else {
+                    raw_cursor_pos
+                };
                 cursor_x = x;
                 cursor_y = line.y;
+                let cursor_paint_x = if is_rtl {
+                    bounds.right() - cursor_pos + scroll_x
+                } else {
+                    bounds.left() + cursor_pos - scroll_x
+                };
                 cursor_quad = input.cursor_visible.then(|| {
                     fill(
                         Bounds::new(
-                            point(
-                                bounds.left() + x - scroll_x,
-                                bounds.top() + line.y - scroll_y,
-                            ),
+                            point(cursor_paint_x, bounds.top() + line.y - scroll_y),
                             size(cursor_width, line_height),
                         ),
                         cx.theme().border.focus,
@@ -165,18 +175,30 @@ impl Element for TextAreaElement {
                 if start >= end {
                     continue;
                 }
-                let start_x = line.shaped.x_for_index(start - line.range.start);
-                let end_x = line.shaped.x_for_index(end - line.range.start);
+                let raw_start_x = line.shaped.x_for_index(start - line.range.start);
+                let raw_end_x = line.shaped.x_for_index(end - line.range.start);
+                let (start_x, end_x) = if is_rtl {
+                    (
+                        line.shaped.width - raw_start_x,
+                        line.shaped.width - raw_end_x,
+                    )
+                } else {
+                    (raw_start_x, raw_end_x)
+                };
+                let selection_start_x = if is_rtl {
+                    bounds.right() - start_x + scroll_x
+                } else {
+                    bounds.left() + start_x - scroll_x
+                };
+                let selection_end_x = if is_rtl {
+                    bounds.right() - end_x + scroll_x
+                } else {
+                    bounds.left() + end_x - scroll_x
+                };
                 selection.push(fill(
                     Bounds::from_corners(
-                        point(
-                            bounds.left() + start_x - scroll_x,
-                            bounds.top() + layout.lines[row].y - scroll_y,
-                        ),
-                        point(
-                            bounds.left() + end_x - scroll_x,
-                            bounds.top() + layout.lines[row].y + line_height - scroll_y,
-                        ),
+                        point(selection_start_x.min(selection_end_x), bounds.top() + layout.lines[row].y - scroll_y),
+                        point(selection_start_x.max(selection_end_x), bounds.top() + layout.lines[row].y + line_height - scroll_y),
                     ),
                     cx.theme().border.focus.alpha(0.25),
                 ));
@@ -222,6 +244,8 @@ impl Element for TextAreaElement {
         cx: &mut App,
     ) {
         let focus_handle = self.input.read(cx).focus_handle.clone();
+        let direction = cx.theme().text_direction;
+        let is_rtl = direction.is_rtl();
         if !self.disabled {
             window.handle_input(
                 &focus_handle,
@@ -242,9 +266,15 @@ impl Element for TextAreaElement {
                 continue;
             }
 
+            let origin_x = if is_rtl {
+                bounds.right() - line.shaped.width + prepaint.scroll_x
+            } else {
+                bounds.left() - prepaint.scroll_x
+            };
+
             line.shaped
                 .paint(
-                    point(bounds.left() - prepaint.scroll_x, y_top),
+                    point(origin_x, y_top),
                     line_height,
                     window,
                     cx,

@@ -7,6 +7,7 @@ use gpui::{
 };
 
 use crate::component::{Radio, radio};
+use crate::theme::ActiveTheme;
 
 #[derive(Clone, Debug)]
 pub struct RadioOption {
@@ -236,9 +237,12 @@ impl RenderOnce for RadioGroup {
                 if let Some(render_option) = &render_option {
                     render_option(&option, radio)
                 } else {
+                    let direction = cx.theme().text_direction;
                     div()
                         .id((group_id.clone(), format!("option:{}", value_for_id)))
                         .flex()
+                        .when(direction.is_rtl(), |this| this.flex_row_reverse())
+                        .when(!direction.is_rtl(), |this| this.flex_row())
                         .items_center()
                         .gap_2()
                         .when(!option_disabled, |this| this.cursor_pointer())

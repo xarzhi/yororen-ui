@@ -68,6 +68,8 @@ impl Element for PasswordLineElement {
         let cursor = input.cursor_offset();
         let marked_range = input.marked_range.clone();
         let style = window.text_style();
+        let direction = cx.theme().text_direction;
+        let is_rtl = direction.is_rtl();
 
         let display_text = input.display_text();
         let text_color = if content.is_empty() {
@@ -124,7 +126,12 @@ impl Element for PasswordLineElement {
             .text_system()
             .shape_line(display_text, font_size, &runs, None);
 
-        let cursor_pos = line.x_for_index(cursor_display_index);
+        let raw_cursor_pos = line.x_for_index(cursor_display_index);
+        let cursor_pos = if is_rtl {
+            line.width - raw_cursor_pos
+        } else {
+            raw_cursor_pos
+        };
 
         let cursor_width = px(2.);
         let max_cursor_x = (bounds.size.width - cursor_width).max(Pixels::ZERO);
@@ -139,12 +146,17 @@ impl Element for PasswordLineElement {
         scroll_x = scroll_x.clamp(Pixels::ZERO, max_scroll_x);
 
         let (selection, cursor) = if selected_range.is_empty() {
+            let cursor_paint_x = if is_rtl {
+                bounds.right() - cursor_pos + scroll_x
+            } else {
+                bounds.left() + cursor_pos - scroll_x
+            };
             (
                 None,
                 input.cursor_visible.then(|| {
                     fill(
                         Bounds::new(
-                            point(bounds.left() + cursor_pos - scroll_x, bounds.top()),
+                            point(cursor_paint_x, bounds.top()),
                             size(cursor_width, bounds.bottom() - bounds.top()),
                         ),
                         cx.theme().border.focus,
@@ -152,19 +164,31 @@ impl Element for PasswordLineElement {
                 }),
             )
         } else {
+            let raw_start_x = line.x_for_index(selection_display_range.start);
+            let raw_end_x = line.x_for_index(selection_display_range.end);
+            let (start_x, end_x) = if is_rtl {
+                (
+                    line.width - raw_start_x,
+                    line.width - raw_end_x,
+                )
+            } else {
+                (raw_start_x, raw_end_x)
+            };
+            let selection_start_x = if is_rtl {
+                bounds.right() - start_x + scroll_x
+            } else {
+                bounds.left() + start_x - scroll_x
+            };
+            let selection_end_x = if is_rtl {
+                bounds.right() - end_x + scroll_x
+            } else {
+                bounds.left() + end_x - scroll_x
+            };
             (
                 Some(fill(
                     Bounds::from_corners(
-                        point(
-                            bounds.left() + line.x_for_index(selection_display_range.start)
-                                - scroll_x,
-                            bounds.top(),
-                        ),
-                        point(
-                            bounds.left() + line.x_for_index(selection_display_range.end)
-                                - scroll_x,
-                            bounds.bottom(),
-                        ),
+                        point(selection_start_x.min(selection_end_x), bounds.top()),
+                        point(selection_start_x.max(selection_end_x), bounds.bottom()),
                     ),
                     cx.theme().border.focus.alpha(0.25),
                 )),
@@ -191,6 +215,8 @@ impl Element for PasswordLineElement {
         cx: &mut App,
     ) {
         let focus_handle = self.input.read(cx).focus_handle.clone();
+        let direction = cx.theme().text_direction;
+        let is_rtl = direction.is_rtl();
         if !self.disabled {
             window.handle_input(
                 &focus_handle,
@@ -204,8 +230,14 @@ impl Element for PasswordLineElement {
         }
         let line = prepaint.line.take().expect("line should exist");
 
+        let origin_x = if is_rtl {
+            bounds.right() - line.width + prepaint.scroll_x
+        } else {
+            bounds.left() - prepaint.scroll_x
+        };
+
         line.paint(
-            point(bounds.left() - prepaint.scroll_x, bounds.top()),
+            point(origin_x, bounds.top()),
             window.line_height(),
             window,
             cx,

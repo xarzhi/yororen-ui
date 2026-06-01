@@ -310,6 +310,9 @@ impl RenderOnce for Slider {
                 Bounds::default()
             });
 
+        let direction = cx.theme().text_direction;
+        let is_rtl = direction.is_rtl();
+
         let set_from_mouse_x = {
             let internal_value = internal_value.clone();
             let on_change = on_change.clone();
@@ -324,6 +327,9 @@ impl RenderOnce for Slider {
                 let width: f32 = bounds.size.width.into();
                 let mut ratio = (x - left) / width;
                 ratio = clamp(ratio, 0.0, 1.0);
+                if is_rtl {
+                    ratio = 1.0 - ratio;
+                }
 
                 let mut new_value = min + (max - min) * ratio;
                 if let Some(step) = step.filter(|s| *s > 0.0) {
@@ -439,7 +445,8 @@ impl RenderOnce for Slider {
                     gpui::div()
                         .absolute()
                         .top_0()
-                        .left_0()
+                        .when(is_rtl, |this| this.right_0())
+                        .when(!is_rtl, |this| this.left_0())
                         .h(px(track_height))
                         .rounded_full()
                         .bg(fill)
@@ -449,10 +456,22 @@ impl RenderOnce for Slider {
                     gpui::div()
                         .absolute()
                         .top(px(-(knob_diameter - track_height) / 2.0))
-                        // Use left with percentage to position knob correctly
+                        // Use left/right with percentage to position knob correctly
                         // This ensures knob is visible even when t=0
-                        .when(t > 0.0, |this| this.left(relative(t)))
-                        .when(t <= 0.0, |this| this.left_0())
+                        .when(t > 0.0, |this| {
+                            if is_rtl {
+                                this.right(relative(t))
+                            } else {
+                                this.left(relative(t))
+                            }
+                        })
+                        .when(t <= 0.0, |this| {
+                            if is_rtl {
+                                this.right_0()
+                            } else {
+                                this.left_0()
+                            }
+                        })
                         .h(px(knob_diameter))
                         .w(px(knob_diameter))
                         .child(

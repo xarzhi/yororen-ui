@@ -10,6 +10,7 @@ use gpui::{
 };
 
 use crate::component::{checkbox, disclosure};
+use crate::rtl;
 use crate::theme::ActiveTheme;
 
 use super::tree_data::TreeCheckedState;
@@ -214,15 +215,18 @@ impl RenderOnce for TreeItem {
         let disclosure_id: ElementId = (element_id.clone(), "ui:tree-item:disclosure").into();
         let checkbox_id: ElementId = (element_id.clone(), "ui:tree-item:checkbox").into();
 
-        self.base
-            .id(element_id.to_string())
+        let direction = cx.theme().text_direction;
+        let mut temp = self.base;
+        rtl::padding_start(temp.style(), direction, indent * depth as f32);
+        rtl::padding_end(temp.style(), direction, px(12.));
+
+        temp.id(element_id.to_string())
             .w_full()
             .min_h(px(32.))
-            .pl(indent * depth as f32)
-            .pr_3()
             .py_1()
             .rounded_md()
-            .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .gap_2()
             .when(selected, |this| this.bg(selected_bg))

@@ -10,6 +10,7 @@ use gpui::{
 use unicode_segmentation::UnicodeSegmentation;
 
 use crate::constants::CURSOR_BLINK_INTERVAL;
+use crate::theme::ActiveTheme;
 
 pub type PasswordInputHandler = Arc<dyn Fn(SharedString, &mut gpui::Window, &mut App)>;
 
@@ -238,10 +239,11 @@ impl PasswordInputState {
         self.is_selecting = true;
         self.reset_cursor_blink(window, cx);
 
+        let is_rtl = cx.theme().is_rtl();
         if event.modifiers.shift {
-            self.select_to(self.index_for_mouse_position(event.position), window, cx);
+            self.select_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
         } else {
-            self.move_to(self.index_for_mouse_position(event.position), window, cx)
+            self.move_to(self.index_for_mouse_position(event.position, is_rtl), window, cx)
         }
     }
 
@@ -262,7 +264,8 @@ impl PasswordInputState {
     ) {
         if self.is_selecting {
             self.reset_cursor_blink(window, cx);
-            self.select_to(self.index_for_mouse_position(event.position), window, cx);
+            let is_rtl = cx.theme().is_rtl();
+            self.select_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
         }
     }
 
@@ -324,7 +327,7 @@ impl PasswordInputState {
         }
     }
 
-    pub fn index_for_mouse_position(&self, position: gpui::Point<gpui::Pixels>) -> usize {
+    pub fn index_for_mouse_position(&self, position: gpui::Point<gpui::Pixels>, is_rtl: bool) -> usize {
         if self.content.is_empty() {
             return 0;
         }
@@ -340,8 +343,13 @@ impl PasswordInputState {
         if position.y > bounds.bottom() {
             return self.content.len();
         }
+        let local_x = if is_rtl {
+            position.x - bounds.right() + line.width - self.scroll_x
+        } else {
+            position.x - bounds.left() + self.scroll_x
+        };
         self.content_offset_for_display_index(
-            line.closest_index_for_x(position.x - bounds.left() + self.scroll_x),
+            line.closest_index_for_x(local_x),
         )
     }
 

@@ -160,13 +160,15 @@ impl RenderOnce for Button {
         let bg = self.bg;
         let hover_bg = self.hover_bg;
         let variant = self.variant;
+        let direction = cx.theme().text_direction;
 
         let action_style = compute_action_style(cx.theme(), variant, disabled, bg, hover_bg);
 
         self.base
             .id(self.element_id)
             .rounded_md()
-            .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .justify_center()
             .bg(action_style.bg)

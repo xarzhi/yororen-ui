@@ -6,6 +6,7 @@ use gpui::{
 
 use crate::{
     component::{HeadingLevel, IconName, button, heading, icon, icon_button, label},
+    i18n::TextDirection,
     theme::{ActionVariantKind, ActiveTheme},
 };
 
@@ -197,6 +198,8 @@ impl RenderOnce for Modal {
             header_children.push(close_button.into_any_element());
         }
 
+        let direction = cx.theme().text_direction;
+
         self.base
             .id(element_id_for_base)
             .w(self.width)
@@ -210,7 +213,8 @@ impl RenderOnce for Modal {
                 div()
                     .px_4()
                     .py_3()
-                    .flex()
+                    .when(direction.is_rtl(), |this| this.flex_row_reverse())
+                    .when(!direction.is_rtl(), |this| this.flex_row())
                     .items_center()
                     .justify_between()
                     .gap_2()
@@ -220,14 +224,26 @@ impl RenderOnce for Modal {
             .child(div().px_4().py_4().child(content))
             .when_some(actions, |this, actions| {
                 this.child(div().h(px(1.)).w_full().bg(theme.border.divider))
-                    .child(div().px_4().py_3().child(actions))
+                    .child(
+                        div()
+                            .px_4()
+                            .py_3()
+                            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+                            .when(!direction.is_rtl(), |this| this.flex_row())
+                            .child(actions),
+                    )
             })
     }
 }
 
-pub fn modal_actions_row(children: impl IntoIterator<Item = gpui::AnyElement>) -> impl IntoElement {
+pub fn modal_actions_row(
+    direction: TextDirection,
+    children: impl IntoIterator<Item = gpui::AnyElement>,
+) -> impl IntoElement {
     div()
         .flex()
+        .when(direction.is_rtl(), |this| this.flex_row_reverse())
+        .when(!direction.is_rtl(), |this| this.flex_row())
         .items_center()
         .justify_end()
         .gap_2()

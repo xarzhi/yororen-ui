@@ -7,6 +7,7 @@ use gpui::{App, Context, FocusHandle, ParentElement, SharedString, UTF16Selectio
 
 use crate::component::TextEditState;
 use crate::constants::CURSOR_BLINK_INTERVAL;
+use crate::theme::ActiveTheme;
 
 pub type TextAreaHandler = Arc<dyn Fn(SharedString, &mut gpui::Window, &mut App)>;
 
@@ -416,10 +417,11 @@ impl TextAreaState {
         self.is_selecting = true;
         self.preferred_x = None;
         self.reset_cursor_blink(window, cx);
+        let is_rtl = cx.theme().is_rtl();
         if event.modifiers.shift {
-            self.select_to(self.index_for_mouse_position(event.position), window, cx);
+            self.select_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
         } else {
-            self.move_to(self.index_for_mouse_position(event.position), window, cx);
+            self.move_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
         }
     }
 
@@ -440,7 +442,8 @@ impl TextAreaState {
     ) {
         if self.is_selecting {
             self.reset_cursor_blink(window, cx);
-            self.select_to(self.index_for_mouse_position(event.position), window, cx);
+            let is_rtl = cx.theme().is_rtl();
+            self.select_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
         }
     }
 
@@ -473,7 +476,7 @@ impl TextAreaState {
         }
     }
 
-    pub fn index_for_mouse_position(&self, position: gpui::Point<gpui::Pixels>) -> usize {
+    pub fn index_for_mouse_position(&self, position: gpui::Point<gpui::Pixels>, is_rtl: bool) -> usize {
         if self.edit.content().is_empty() {
             return 0;
         }
@@ -481,18 +484,22 @@ impl TextAreaState {
         else {
             return 0;
         };
-        let mut local_x = position.x - bounds.left() + self.scroll_x;
         let mut local_y = position.y - bounds.top() + self.scroll_y;
         if local_y < gpui::Pixels::ZERO {
             local_y = gpui::Pixels::ZERO;
-        }
-        if local_x < gpui::Pixels::ZERO {
-            local_x = gpui::Pixels::ZERO;
         }
         let row = layout
             .row_for_y(local_y)
             .unwrap_or_else(|| layout.lines.len().saturating_sub(1));
         let line = &layout.lines[row];
+        let mut local_x = if is_rtl {
+            position.x - bounds.right() + line.shaped.width - self.scroll_x
+        } else {
+            position.x - bounds.left() + self.scroll_x
+        };
+        if local_x < gpui::Pixels::ZERO {
+            local_x = gpui::Pixels::ZERO;
+        }
         let idx_in_line = line.shaped.closest_index_for_x(local_x);
         line.range.start + idx_in_line
     }

@@ -105,11 +105,14 @@ impl RenderOnce for Avatar {
             base.child("?")
         };
 
+        let direction = cx.theme().text_direction;
+
         base.when_some(self.status, |this, color| {
             this.child(
                 div()
                     .absolute()
-                    .right(px(2.))
+                    .when(direction.is_rtl(), |this| this.left(px(2.)))
+                    .when(!direction.is_rtl(), |this| this.right(px(2.)))
                     .bottom(px(2.))
                     .size_3()
                     .rounded_full()

@@ -1,8 +1,9 @@
 use gpui::{
     Div, ElementId, FontWeight, Hsla, InteractiveElement, IntoElement, ParentElement, RenderOnce,
-    SharedString, Styled, div,
+    SharedString, Styled, div, prelude::FluentBuilder,
 };
 
+use crate::rtl;
 use crate::theme::ActiveTheme;
 
 /// Creates a new badge element.
@@ -58,6 +59,7 @@ impl Styled for Badge {
 
 impl RenderOnce for Badge {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
+        let direction = cx.theme().text_direction;
         let element_id = self.element_id;
 
         let default_bg = cx.theme().status.info.bg;
@@ -68,8 +70,16 @@ impl RenderOnce for Badge {
             cx.theme().status.info.fg
         };
 
-        self.base
-            .id(element_id)
+        let mut temp = self.base;
+        let has_custom_align = temp
+            .style()
+            .text
+            .as_ref()
+            .map_or(false, |t| t.text_align.is_some());
+        temp.id(element_id)
+            .when(!has_custom_align, |this| {
+                this.text_align(rtl::text_align_start(direction))
+            })
             .px_2()
             .h_5()
             .rounded_full()

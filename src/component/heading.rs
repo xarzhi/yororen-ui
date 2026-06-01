@@ -1,8 +1,9 @@
 use gpui::{
     Div, ElementId, FontWeight, InteractiveElement, IntoElement, ParentElement, RenderOnce,
-    SharedString, Styled, div, px,
+    SharedString, Styled, div, prelude::FluentBuilder, px,
 };
 
+use crate::rtl;
 use crate::theme::ActiveTheme;
 
 pub fn heading(text: impl Into<SharedString>) -> Heading {
@@ -64,14 +65,23 @@ impl Styled for Heading {
 
 impl RenderOnce for Heading {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
+        let direction = cx.theme().text_direction;
         let (size, weight) = match self.level {
             HeadingLevel::H1 => (32., FontWeight::BOLD),
             HeadingLevel::H2 => (24., FontWeight::SEMIBOLD),
             HeadingLevel::H3 => (18., FontWeight::SEMIBOLD),
         };
 
-        self.base
-            .id(self.element_id)
+        let mut temp = self.base;
+        let has_custom_align = temp
+            .style()
+            .text
+            .as_ref()
+            .map_or(false, |t| t.text_align.is_some());
+        temp.id(self.element_id)
+            .when(!has_custom_align, |this| {
+                this.text_align(rtl::text_align_start(direction))
+            })
             .text_size(px(size))
             .font_weight(weight)
             .text_color(cx.theme().content.primary)

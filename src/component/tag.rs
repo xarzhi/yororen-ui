@@ -1,6 +1,6 @@
 use gpui::{
     ClickEvent, Div, FontWeight, Hsla, InteractiveElement, IntoElement, ParentElement, RenderOnce,
-    StatefulInteractiveElement, Styled, div, px,
+    StatefulInteractiveElement, Styled, div, prelude::FluentBuilder, px,
 };
 
 use crate::{
@@ -74,6 +74,7 @@ impl Styled for Tag {
 
 impl RenderOnce for Tag {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
+        let direction = cx.theme().text_direction;
         let bg = self.tone.unwrap_or_else(|| cx.theme().action.neutral.bg);
         let tone_fg = if self.tone.is_some() {
             cx.theme().content.on_status
@@ -99,6 +100,8 @@ impl RenderOnce for Tag {
             .text_xs()
             .font_weight(FontWeight::MEDIUM)
             .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .gap_1()
             .child(self.text);

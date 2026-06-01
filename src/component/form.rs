@@ -228,12 +228,14 @@ impl Styled for InlineError {
 
 impl RenderOnce for InlineError {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
+        let direction = cx.theme().text_direction;
         let bg = cx.theme().status.error.bg;
         let fg = cx.theme().status.error.fg;
 
         self.base
             .id(self.element_id)
-            .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .gap_2()
             .text_sm()
@@ -345,6 +347,7 @@ impl Styled for FormRow {
 
 impl RenderOnce for FormRow {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
+        let direction = cx.theme().text_direction;
         let label_color = self
             .label_color
             .unwrap_or_else(|| cx.theme().content.secondary);
@@ -368,6 +371,8 @@ impl RenderOnce for FormRow {
             .id(self.element_id)
             .w_full()
             .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_start()
             .gap_3()
             .child(
@@ -388,6 +393,8 @@ impl RenderOnce for FormRow {
                     .child(
                         div()
                             .flex()
+                            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+                            .when(!direction.is_rtl(), |this| this.flex_row())
                             .items_center()
                             .gap_2()
                             .child(self.control)

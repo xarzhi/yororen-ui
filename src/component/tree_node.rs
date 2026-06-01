@@ -2,7 +2,7 @@
 
 use gpui::{
     Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, Pixels, RenderOnce,
-    StatefulInteractiveElement, Styled, div, px,
+    StatefulInteractiveElement, Styled, div, prelude::FluentBuilder, px,
 };
 
 use crate::theme::ActiveTheme;
@@ -138,6 +138,7 @@ impl RenderOnce for TreeNodeComponent {
         let id_str = element_id.to_string();
         let label_text = node.data.label().to_string();
 
+        let direction = cx.theme().text_direction;
         let bg_color = if selected { selected_bg } else { hover_bg };
 
         div()
@@ -148,6 +149,8 @@ impl RenderOnce for TreeNodeComponent {
             .py_1()
             .rounded_md()
             .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .gap_2()
             .bg(bg_color)

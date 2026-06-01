@@ -129,6 +129,8 @@ impl RenderOnce for Navigator {
         let prev = self.navigator_state.read(cx).prev;
         let items = self.items;
         let item_widths = self.item_widths;
+        let direction = cx.theme().text_direction;
+        let is_rtl = direction.is_rtl();
 
         // Default width if no custom widths provided
         let default_width: f32 = 96.0;
@@ -160,8 +162,8 @@ impl RenderOnce for Navigator {
         div()
             .id("navigator")
             .mr_3()
-            .flex()
-            .flex_row()
+            .when(is_rtl, |this| this.flex_row_reverse())
+            .when(!is_rtl, |this| this.flex_row())
             .items_center()
             .relative()
             // Slider background - renders behind the items
@@ -178,10 +180,14 @@ impl RenderOnce for Navigator {
                         Animation::new(duration::NAVIGATOR_SLIDER)
                             .with_easing(ease_out_quint_clamped),
                         move |this, delta| {
-                            let target_left = positions.get(current).copied().unwrap_or(0.0);
-                            let current_left = positions.get(prev).copied().unwrap_or(0.0);
-                            let new_left = current_left + (target_left - current_left) * delta;
-                            this.left(px(new_left))
+                            let target_offset = positions.get(current).copied().unwrap_or(0.0);
+                            let current_offset = positions.get(prev).copied().unwrap_or(0.0);
+                            let new_offset = current_offset + (target_offset - current_offset) * delta;
+                            if is_rtl {
+                                this.right(px(new_offset))
+                            } else {
+                                this.left(px(new_offset))
+                            }
                         },
                     ),
             )
@@ -191,7 +197,8 @@ impl RenderOnce for Navigator {
                     .id("menu-items")
                     .text_sm()
                     .flex()
-                    .flex_row()
+                    .when(is_rtl, |this| this.flex_row_reverse())
+                    .when(!is_rtl, |this| this.flex_row())
                     .gap_1()
                     .children(items.into_iter().enumerate().map(move |(i, t)| {
                         let state = state.clone();
@@ -298,18 +305,22 @@ impl Render for TitleBar {
 
         let window_is_maximized = is_tiled;
 
+        let direction = cx.theme().text_direction;
+
         let drag_area = div()
             .id("titlebar:drag-area")
             .window_control_area(gpui::WindowControlArea::Drag)
             .h_full()
             .flex()
-            .flex_row()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             // Occupy remaining space so nav items stay on the right.
             // (Also keeps the empty area draggable on Windows.)
             .flex_grow()
             .min_w(px(0.0))
-            .pl_3()
+            .when(direction.is_rtl(), |this| this.pr_3())
+            .when(!direction.is_rtl(), |this| this.pl_3())
             .when(
                 !window.is_fullscreen() && cfg!(target_os = "macos"),
                 |this| this.child(div().id("traffic-light-pos").w(px(TRAFFIC_LIGHT_WIDTH))),

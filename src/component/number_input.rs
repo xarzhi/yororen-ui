@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use gpui::{
     ClickEvent, Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, RenderOnce,
-    SharedString, StatefulInteractiveElement, Styled, div, px,
+    SharedString, StatefulInteractiveElement, Styled, div, prelude::FluentBuilder, px,
 };
 
 use crate::{
@@ -253,11 +253,14 @@ impl RenderOnce for NumberInput {
         // This prevents non-numeric characters from staying visible in the text field.
         let controlled_text = SharedString::from(format_number(value_state));
 
+        let direction = cx.theme().text_direction;
+
         self.base
             .id(id.clone())
             .h(height)
             .w_full()
-            .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .gap_2()
             .child(

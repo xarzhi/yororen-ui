@@ -3,6 +3,7 @@ use gpui::{
     SharedString, Styled, div, prelude::FluentBuilder,
 };
 
+use crate::rtl;
 use crate::theme::ActiveTheme;
 
 pub fn label(text: impl Into<SharedString>) -> Label {
@@ -120,9 +121,18 @@ impl Styled for Label {
 
 impl RenderOnce for Label {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
-        let mut base = self
-            .base
+        let direction = cx.theme().text_direction;
+        let mut temp = self.base;
+        let has_custom_align = temp
+            .style()
+            .text
+            .as_ref()
+            .map_or(false, |t| t.text_align.is_some());
+        let mut base = temp
             .id(self.element_id)
+            .when(!has_custom_align, |this| {
+                this.text_align(rtl::text_align_start(direction))
+            })
             .when(self.strong, |this| this.font_weight(FontWeight::SEMIBOLD))
             .when(self.mono, |this| this.font_family("monospace"))
             .when(self.ellipsis, |this| this.truncate())

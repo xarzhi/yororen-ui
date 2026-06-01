@@ -196,10 +196,12 @@ impl RenderOnce for PasswordInput {
         let height = self.height.unwrap_or_else(|| gpui::px(36.).into());
         let inset = if disabled { gpui::px(6.) } else { gpui::px(5.) };
 
+        let direction = cx.theme().text_direction;
         let mut base = self
             .base
             .id(id.clone())
-            .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .w_full()
             .h(height)

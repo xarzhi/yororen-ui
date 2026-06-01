@@ -256,10 +256,11 @@ impl TextInputState {
         self.is_selecting = true;
         self.reset_cursor_blink(window, cx);
 
+        let is_rtl = cx.theme().is_rtl();
         if event.modifiers.shift {
-            self.select_to(self.index_for_mouse_position(event.position), window, cx);
+            self.select_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
         } else {
-            self.move_to(self.index_for_mouse_position(event.position), window, cx)
+            self.move_to(self.index_for_mouse_position(event.position, is_rtl), window, cx)
         }
     }
 
@@ -275,7 +276,8 @@ impl TextInputState {
     ) {
         if self.is_selecting {
             self.reset_cursor_blink(window, cx);
-            self.select_to(self.index_for_mouse_position(event.position), window, cx);
+            let is_rtl = cx.theme().is_rtl();
+            self.select_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
         }
     }
 
@@ -318,7 +320,7 @@ impl TextInputState {
         cx.notify();
     }
 
-    fn index_for_mouse_position(&self, position: Point<Pixels>) -> usize {
+    fn index_for_mouse_position(&self, position: Point<Pixels>, is_rtl: bool) -> usize {
         if self.edit.content().is_empty() {
             return 0;
         }
@@ -333,7 +335,12 @@ impl TextInputState {
         if position.y > bounds.bottom() {
             return self.edit.content().len();
         }
-        line.closest_index_for_x(position.x - bounds.left() + self.scroll_x)
+        let local_x = if is_rtl {
+            position.x - bounds.right() + line.width - self.scroll_x
+        } else {
+            position.x - bounds.left() + self.scroll_x
+        };
+        line.closest_index_for_x(local_x)
     }
 
     fn select_to(&mut self, offset: usize, window: &mut gpui::Window, cx: &mut Context<Self>) {
@@ -519,6 +526,8 @@ impl Element for TextLineElement {
         let cursor = input.edit.cursor_offset();
         let marked_range = input.edit.marked_range().cloned();
         let style = window.text_style();
+        let direction = cx.theme().text_direction;
+        let is_rtl = direction.is_rtl();
 
         let (display_text, text_color) = if content.is_empty() {
             (placeholder, cx.theme().content.tertiary)
@@ -566,7 +575,12 @@ impl Element for TextLineElement {
             .text_system()
             .shape_line(display_text, font_size, &runs, None);
 
-        let cursor_pos = line.x_for_index(cursor);
+        let raw_cursor_pos = line.x_for_index(cursor);
+        let cursor_pos = if is_rtl {
+            line.width - raw_cursor_pos
+        } else {
+            raw_cursor_pos
+        };
 
         let cursor_width = px(2.);
         let max_cursor_x = (bounds.size.width - cursor_width).max(Pixels::ZERO);
@@ -581,12 +595,17 @@ impl Element for TextLineElement {
         scroll_x = scroll_x.clamp(Pixels::ZERO, max_scroll_x);
 
         let (selection, cursor) = if selected_range.is_empty() {
+            let cursor_paint_x = if is_rtl {
+                bounds.right() - cursor_pos + scroll_x
+            } else {
+                bounds.left() + cursor_pos - scroll_x
+            };
             (
                 None,
                 input.cursor_visible.then(|| {
                     fill(
                         Bounds::new(
-                            point(bounds.left() + cursor_pos - scroll_x, bounds.top()),
+                            point(cursor_paint_x, bounds.top()),
                             size(px(2.), bounds.bottom() - bounds.top()),
                         ),
                         cx.theme().border.focus,
@@ -594,17 +613,31 @@ impl Element for TextLineElement {
                 }),
             )
         } else {
+            let raw_start_x = line.x_for_index(selected_range.start);
+            let raw_end_x = line.x_for_index(selected_range.end);
+            let (start_x, end_x) = if is_rtl {
+                (
+                    line.width - raw_start_x,
+                    line.width - raw_end_x,
+                )
+            } else {
+                (raw_start_x, raw_end_x)
+            };
+            let selection_start_x = if is_rtl {
+                bounds.right() - start_x + scroll_x
+            } else {
+                bounds.left() + start_x - scroll_x
+            };
+            let selection_end_x = if is_rtl {
+                bounds.right() - end_x + scroll_x
+            } else {
+                bounds.left() + end_x - scroll_x
+            };
             (
                 Some(fill(
                     Bounds::from_corners(
-                        point(
-                            bounds.left() + line.x_for_index(selected_range.start) - scroll_x,
-                            bounds.top(),
-                        ),
-                        point(
-                            bounds.left() + line.x_for_index(selected_range.end) - scroll_x,
-                            bounds.bottom(),
-                        ),
+                        point(selection_start_x.min(selection_end_x), bounds.top()),
+                        point(selection_start_x.max(selection_end_x), bounds.bottom()),
                     ),
                     cx.theme().border.focus.alpha(0.25),
                 )),
@@ -631,6 +664,8 @@ impl Element for TextLineElement {
         cx: &mut App,
     ) {
         let focus_handle = self.input.read(cx).focus_handle.clone();
+        let direction = cx.theme().text_direction;
+        let is_rtl = direction.is_rtl();
         if !self.disabled {
             window.handle_input(
                 &focus_handle,
@@ -643,8 +678,14 @@ impl Element for TextLineElement {
         }
         let line = prepaint.line.take().expect("line should exist");
 
+        let origin_x = if is_rtl {
+            bounds.right() - line.width + prepaint.scroll_x
+        } else {
+            bounds.left() - prepaint.scroll_x
+        };
+
         line.paint(
-            point(bounds.left() - prepaint.scroll_x, bounds.top()),
+            point(origin_x, bounds.top()),
             window.line_height(),
             window,
             cx,
@@ -911,11 +952,13 @@ impl RenderOnce for TextInput {
         let height = self.height.unwrap_or_else(|| px(36.).into());
         let inset = if disabled { px(6.) } else { px(5.) };
 
+        let direction = cx.theme().text_direction;
         let on_submit = self.on_submit;
         let mut base = self
             .base
             .id(id.clone())
-            .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .w_full()
             .h(height)

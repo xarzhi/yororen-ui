@@ -331,6 +331,7 @@ impl RenderOnce for Select {
         let menu_open = window.use_keyed_state((id.clone(), "ui:select:open"), cx, |_, _| false);
         let is_open = *menu_open.read(cx);
 
+        let direction = cx.theme().text_direction;
         let has_on_change =
             on_change.is_some() || on_change_simple.is_some() || on_change_with_event.is_some();
         let use_internal = use_internal_state(self.value.is_some(), has_on_change);
@@ -394,6 +395,8 @@ impl RenderOnce for Select {
             .id(id.clone())
             .relative()
             .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .justify_between()
             .gap_2()
@@ -493,6 +496,8 @@ impl RenderOnce for Select {
                             .px_3()
                             .py_2()
                             .flex()
+                            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+                            .when(!direction.is_rtl(), |this| this.flex_row())
                             .items_center()
                             .justify_between()
                             .gap_2()

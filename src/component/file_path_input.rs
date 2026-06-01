@@ -257,9 +257,12 @@ impl RenderOnce for FilePathInput {
         let input_id: ElementId = (id.clone(), "ui:file-path:input").into();
         let button_id: ElementId = (id.clone(), "ui:file-path:button").into();
 
+        let direction = cx.theme().text_direction;
+
         self.base
             .id(id.clone())
-            .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .gap_2()
             .child(

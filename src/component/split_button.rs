@@ -205,10 +205,14 @@ impl RenderOnce for SplitButton {
 
         let text_color = action_variant.fg;
 
+        let direction = cx.theme().text_direction;
+        let is_rtl = direction.is_rtl();
+
         self.base
             .id(id.clone())
             .relative()
-            .flex()
+            .when(is_rtl, |this| this.flex_row_reverse())
+            .when(!is_rtl, |this| this.flex_row())
             .items_center()
             .rounded_lg()
             .border_1()
@@ -223,7 +227,8 @@ impl RenderOnce for SplitButton {
                     .id("ui:split-button:menu")
                     .absolute()
                     .top_full()
-                    .right_0()
+                    .when(is_rtl, |this| this.left_0())
+                    .when(!is_rtl, |this| this.right_0())
                     .mt(px(10.))
                     .rounded_md()
                     .border_1()
@@ -277,7 +282,8 @@ impl RenderOnce for SplitButton {
                     .px_4()
                     .py_2()
                     .rounded_lg()
-                    .rounded_r_none()
+                    .when(is_rtl, |this| this.rounded_l_none())
+                    .when(!is_rtl, |this| this.rounded_r_none())
                     .bg(neutral_bg)
                     .hover_bg(hover_bg)
                     .when(disabled, |this| this.cursor_not_allowed())
@@ -304,7 +310,8 @@ impl RenderOnce for SplitButton {
                             .w(px(40.))
                             .h(px(36.))
                             .rounded_lg()
-                            .rounded_l_none()
+                            .when(is_rtl, |this| this.rounded_r_none())
+                            .when(!is_rtl, |this| this.rounded_l_none())
                             .flex()
                             .items_center()
                             .justify_center()

@@ -80,6 +80,7 @@ impl RenderOnce for Disclosure {
         let element_id = self.element_id;
         let expanded = self.expanded;
         let size = self.size;
+        let direction = cx.theme().text_direction;
 
         self.base
             .id(element_id)
@@ -92,6 +93,8 @@ impl RenderOnce for Disclosure {
             .child(
                 icon(IconName::Arrow(if expanded {
                     ArrowDirection::Down
+                } else if direction.is_rtl() {
+                    ArrowDirection::Left
                 } else {
                     ArrowDirection::Right
                 }))

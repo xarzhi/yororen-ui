@@ -130,6 +130,8 @@ impl RenderOnce for ListItem {
         let secondary = self.secondary;
         let trailing = self.trailing;
 
+        let direction = cx.theme().text_direction;
+
         self.base
             .id(self.element_id)
             .w_full()
@@ -137,7 +139,8 @@ impl RenderOnce for ListItem {
             .px_3()
             .py_2()
             .rounded_md()
-            .flex()
+            .when(direction.is_rtl(), |this| this.flex_row_reverse())
+            .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .gap_2()
             .when(selected, move |this| this.bg(selected_bg))
