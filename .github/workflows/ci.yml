@@ -26,6 +26,18 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
+      - name: Install Linux system dependencies (X11/Wayland for GPUI)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libxkbcommon-dev \
+            libxkbcommon-x11-dev \
+            libxcb1-dev \
+            libxcb-render0-dev \
+            libxcb-shape0-dev \
+            libxcb-xfixes0-dev
+
       - name: Cache cargo registry & build
         uses: Swatinem/rust-cache@v2
 
@@ -49,6 +61,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - name: Install Linux system dependencies (X11/Wayland for GPUI)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libxkbcommon-dev \
+            libxkbcommon-x11-dev \
+            libxcb1-dev \
+            libxcb-render0-dev \
+            libxcb-shape0-dev \
+            libxcb-xfixes0-dev
       - name: cargo publish --dry-run for each crate in order
         run: |
           for crate in crates/yororen-ui-core crates/yororen-ui-theme-system crates/yororen-ui; do
