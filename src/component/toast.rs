@@ -211,6 +211,7 @@ impl RenderOnce for Toast {
             .bg(bg)
             .text_color(fg)
             .shadow_md()
+            .flex()
             .when(direction.is_rtl(), |this| this.flex_row_reverse())
             .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()

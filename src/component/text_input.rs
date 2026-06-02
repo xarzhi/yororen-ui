@@ -963,6 +963,7 @@ impl RenderOnce for TextInput {
             .base
             .id(id.clone())
             .h(height)
+            .flex()
             .when(direction.is_rtl(), |this| this.flex_row_reverse())
             .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()

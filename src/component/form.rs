@@ -245,6 +245,7 @@ impl RenderOnce for InlineError {
 
         self.base
             .id(self.element_id)
+            .flex()
             .when(direction.is_rtl(), |this| this.flex_row_reverse())
             .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()

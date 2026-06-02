@@ -222,6 +222,7 @@ impl RenderOnce for Modal {
                 div()
                     .px_4()
                     .py_3()
+                    .flex()
                     .when(direction.is_rtl(), |this| this.flex_row_reverse())
                     .when(!direction.is_rtl(), |this| this.flex_row())
                     .items_center()
@@ -237,6 +238,7 @@ impl RenderOnce for Modal {
                         div()
                             .px_4()
                             .py_3()
+                            .flex()
                             .when(direction.is_rtl(), |this| this.flex_row_reverse())
                             .when(!direction.is_rtl(), |this| this.flex_row())
                             .child(actions),

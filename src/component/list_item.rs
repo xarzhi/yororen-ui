@@ -139,6 +139,7 @@ impl RenderOnce for ListItem {
             .px_3()
             .py_2()
             .rounded_md()
+            .flex()
             .when(direction.is_rtl(), |this| this.flex_row_reverse())
             .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()

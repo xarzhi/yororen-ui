@@ -211,6 +211,7 @@ impl RenderOnce for SplitButton {
         self.base
             .id(id.clone())
             .relative()
+            .flex()
             .when(is_rtl, |this| this.flex_row_reverse())
             .when(!is_rtl, |this| this.flex_row())
             .items_center()

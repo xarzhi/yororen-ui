@@ -203,6 +203,7 @@ impl RenderOnce for SearchInput {
         let mut base = self
             .base
             .id(id.clone())
+            .flex()
             .when(direction.is_rtl(), |this| this.flex_row_reverse())
             .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()

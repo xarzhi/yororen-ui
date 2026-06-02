@@ -162,6 +162,7 @@ impl RenderOnce for Navigator {
         div()
             .id("navigator")
             .mr_3()
+            .flex()
             .when(is_rtl, |this| this.flex_row_reverse())
             .when(!is_rtl, |this| this.flex_row())
             .items_center()

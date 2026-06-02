@@ -168,6 +168,7 @@ impl RenderOnce for Button {
             .id(self.element_id)
             .h(cx.theme().tokens.control.button.min_height)
             .rounded_md()
+            .flex()
             .when(direction.is_rtl(), |this| this.flex_row_reverse())
             .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
