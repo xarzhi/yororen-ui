@@ -25,9 +25,6 @@ impl Display for ArrowDirection {
 }
 
 pub enum IconName {
-    Microsoft,
-    Minecraft,
-
     Search,
 
     Arrow(ArrowDirection),
@@ -37,9 +34,6 @@ pub enum IconName {
     Close,
     Maximize(bool),
     Minimize,
-    Modpack,
-    PingIndicator(usize),
-    Server,
     User,
     Pencil,
     Trash,
@@ -50,9 +44,6 @@ pub enum IconName {
 impl From<IconName> for SharedString {
     fn from(value: IconName) -> SharedString {
         let name: Cow<str> = match value {
-            IconName::Microsoft => "microsoft".into(),
-            IconName::Minecraft => "minecraft".into(),
-
             IconName::Search => "search".into(),
 
             IconName::Arrow(direction) => format!("arrow-{direction}").into(),
@@ -62,9 +53,6 @@ impl From<IconName> for SharedString {
             IconName::Close => "close".into(),
             IconName::Maximize(i) => format!("maximize-{}", if i { "on" } else { "off" }).into(),
             IconName::Minimize => "minimize".into(),
-            IconName::Modpack => "modpack".into(),
-            IconName::PingIndicator(i) => format!("ping-indicator-{i}").into(),
-            IconName::Server => "server".into(),
             IconName::User => "user".into(),
             IconName::Pencil => "pencil".into(),
             IconName::Trash => "trash".into(),

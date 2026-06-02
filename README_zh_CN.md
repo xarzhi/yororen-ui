@@ -367,10 +367,13 @@ let app = Application::new().with_assets(CompositeAssetSource::new(MyAsset, UiAs
 ```rust
 use yororen_ui::component::{icon, IconName};
 
-let _ = icon(IconName::Minecraft);
+let _ = icon(IconName::Search);
 ```
 
-图标路径映射到嵌入的 SVG 资源，如 <code>icons/minecraft.svg</code>。
+图标路径映射到嵌入的 SVG 资源，如 <code>icons/search.svg</code>。13 个通用
+图标覆盖常见 UI 元素（搜索、勾选、关闭、箭头、文件/文件夹、用户、警告、
+信息等）。业务专属图标（品牌 logo、自定义字形）请使用
+<code>IconPath::External("icons/your.svg")</code> 并随应用一起发布 SVG。
 
 ---
 

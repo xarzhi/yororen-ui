@@ -1,12 +1,22 @@
 //! Default placeholder translations helper.
 //!
-//! This module provides functions to get default placeholders for components.
+//! **Deprecated since v0.3**: the 9-language hardcoded table is being phased
+//! out in favor of (a) passing an explicit placeholder via the component's
+//! `.placeholder(...)` builder, or (b) shipping a `yororen-ui-locale-*`
+//! crate that calls `cx.i18n().t("ui.select.placeholder")` for translated
+//! text. This module is kept only as a temporary fallback so existing v0.2
+//! users can migrate gradually. It will be removed in v0.4.
 
 use crate::i18n::Locale;
 
 /// Default placeholders for UI components.
+#[deprecated(
+    since = "0.3.0",
+    note = "Pass `.placeholder(...)` explicitly on the component, or use a `yororen-ui-locale-*` package. Will be removed in v0.4."
+)]
 pub struct DefaultPlaceholders;
 
+#[allow(deprecated)]
 impl DefaultPlaceholders {
     /// Get the default placeholder for a Select component.
     pub fn select_placeholder(locale: &Locale) -> &'static str {

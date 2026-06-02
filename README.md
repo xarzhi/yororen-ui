@@ -367,10 +367,14 @@ The component icon API uses strongly-typed names:
 ```rust
 use yororen_ui::component::{icon, IconName};
 
-let _ = icon(IconName::Minecraft);
+let _ = icon(IconName::Search);
 ```
 
-Icon paths map to embedded SVG assets like `icons/minecraft.svg`.
+Icon paths map to embedded SVG assets like `icons/search.svg`. The 13
+universal icons cover general UI affordances (search, check, close, arrows,
+file/folder, user, warning, info, etc.). For app-specific icons (brand
+logos, custom glyphs), use `IconPath::External("icons/your.svg")` and ship
+the SVG with your app's `AssetSource`.
 
 ---
 

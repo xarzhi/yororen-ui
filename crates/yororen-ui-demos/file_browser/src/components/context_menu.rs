@@ -8,7 +8,7 @@ use std::sync::Arc;
 use gpui::{AnyElement, InteractiveElement, IntoElement, ParentElement, Pixels, Styled, div, px};
 
 use yororen_ui::component::{
-    IconName, PopoverPlacement, button, divider, icon, label, popover,
+    IconName, IconPath, PopoverPlacement, button, divider, icon, label, popover,
 };
 use yororen_ui::theme::{ActionVariantKind, Theme};
 
@@ -89,7 +89,11 @@ pub fn render(
                         .flex()
                         .items_center()
                         .gap(px(8.))
-                        .child(icon(IconName::Modpack).size(px(14.)).color(theme.content.primary))
+                        .child(
+                            icon(IconPath::External("icons/clipboard-paste.svg".into()))
+                                .size(px(14.))
+                                .color(theme.content.primary),
+                        )
                         .child("Paste"),
                 )
                 .on_click(move |_ev, window, cx| {

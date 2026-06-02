@@ -68,9 +68,9 @@ fn read_dir_nodes(dir: &Path) -> Vec<(TreeNode, Option<PathBuf>)> {
 
         let mut data = ArcTreeNode::new(file_name);
         data.icon = Some(if is_dir {
-            "icons/server.svg".to_string()
+            "icons/folder.svg".to_string()
         } else {
-            "icons/user.svg".to_string()
+            "icons/file.svg".to_string()
         });
 
         let id = path.to_string_lossy().to_string();
