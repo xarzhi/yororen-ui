@@ -12,7 +12,7 @@ use gpui::{
 };
 
 use yororen_ui::component::{PopoverPlacement, button, label, popover};
-use yororen_ui::i18n::{I18n, Locale};
+use yororen_ui::i18n::{I18nContext, Locale};
 use yororen_ui::theme::ActiveTheme;
 
 pub struct PopoverPlacementApp;
@@ -32,8 +32,7 @@ impl Render for PopoverPlacementApp {
             window.use_keyed_state("demo:popover:end:open", cx, |_, _| false);
 
         let theme = cx.theme();
-        let i18n = cx.try_global::<I18n>();
-        let is_rtl = i18n.map(|i| i.text_direction().is_rtl()).unwrap_or(false);
+        let is_rtl = cx.i18n().text_direction().is_rtl();
         let dir_label = if is_rtl { "RTL (ar)" } else { "LTR (en)" };
 
         let title = div()
@@ -53,14 +52,17 @@ impl Render for PopoverPlacementApp {
         let dir_btn = button("toggle-dir")
             .child(format!("Switch to {}", if is_rtl { "LTR" } else { "RTL" }))
             .on_click(move |_ev, _window, cx| {
-                let i18n = cx.try_global::<I18n>();
-                let is_rtl = i18n.map(|i| i.text_direction().is_rtl()).unwrap_or(false);
-                let locale = if is_rtl {
+                let is_rtl = cx
+                    .i18n()
+                    .text_direction()
+                    .is_rtl();
+                let mut next = cx.i18n().clone();
+                next.set_locale(if is_rtl {
                     Locale::new("en").unwrap()
                 } else {
                     Locale::new("ar").unwrap()
-                };
-                cx.set_global(I18n::with_embedded(locale));
+                });
+                cx.set_global(next);
                 cx.notify(entity_id);
             });
 

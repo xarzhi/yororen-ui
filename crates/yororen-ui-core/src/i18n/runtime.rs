@@ -5,10 +5,10 @@ use std::sync::Arc;
 
 use gpui::{App, Global, SharedString};
 
-use super::loader::{EmbeddedLoader, TranslationLoader};
 use super::locale::{Locale, SupportedLocale, TextDirection};
 
 /// Global i18n state that stores the current locale and available translations.
+#[derive(Clone)]
 pub struct I18n {
     /// Current active locale.
     pub current_locale: Locale,
@@ -24,56 +24,6 @@ impl I18n {
     /// Create a new i18n instance with default English locale.
     pub fn new() -> Self {
         Self::with_locale(Locale::default())
-    }
-
-    /// Create an i18n instance with embedded translations loaded.
-    pub fn with_embedded(locale: Locale) -> Self {
-        let mut i18n = Self::with_locale(locale);
-        i18n.load_all_embedded();
-        i18n
-    }
-
-    /// Load all embedded translations for supported locales.
-    ///
-    /// Missing locale files are skipped.
-    pub fn load_all_embedded(&mut self) {
-        let loader = EmbeddedLoader::new();
-
-        // Always try to load the current locale (with fallback) even if it's not in SupportedLocale.
-        // This matters for language-only tags like "en" when `SupportedLocale` prefers region tags.
-        let current = self.current_locale.clone();
-        self.load_one_embedded_with_fallback(&loader, &current);
-
-        for supported in SupportedLocale::all() {
-            let locale = supported.to_locale();
-            self.load_one_embedded_with_fallback(&loader, &locale);
-        }
-    }
-
-    fn load_one_embedded_with_fallback(&mut self, loader: &EmbeddedLoader, locale: &Locale) {
-        if let Some(map) = Self::load_embedded_with_language_fallback(loader, locale) {
-            self.load_translations(locale.clone(), map);
-        }
-    }
-
-    fn load_embedded_with_language_fallback(
-        loader: &EmbeddedLoader,
-        locale: &Locale,
-    ) -> Option<TranslationMap> {
-        if loader.is_available(locale)
-            && let Ok(map) = loader.load(locale)
-        {
-            return Some(map);
-        }
-
-        // Fallback from e.g. "en-US" to "en" if a language-only map is embedded.
-        // Also helps when callers use language-only tags and only language maps exist.
-        let lang_only = Locale::new(locale.language()).ok()?;
-        if loader.is_available(&lang_only) {
-            return loader.load(&lang_only).ok();
-        }
-
-        None
     }
 
     /// Create a new i18n instance with a specific locale.
@@ -276,18 +226,6 @@ fn replace_placeholders(template: &str, args: &HashMap<&str, &str>) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn with_embedded_loads_language_only_locale() {
-        let i18n = I18n::with_embedded(Locale::new("en").unwrap());
-        assert_eq!(i18n.t("common.save"), Some("Save"));
-    }
-
-    #[test]
-    fn with_embedded_falls_back_from_region_to_language() {
-        let i18n = I18n::with_embedded(Locale::new("en-US").unwrap());
-        assert_eq!(i18n.t("common.save"), Some("Save"));
-    }
 
     #[test]
     fn test_translation_map_nested() {

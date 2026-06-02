@@ -44,7 +44,7 @@ use gpui::{App, AppContext, Application, WindowOptions, px, size};
 // These are the foundation of every yororen-ui application
 use yororen_ui::assets::UiAsset;
 use yororen_ui::component;
-use yororen_ui::i18n::{I18n, Locale};
+use yororen_ui::locale_en;
 use yororen_ui_theme_system as theme_system;
 
 /// Standard yororen-ui application entry point
@@ -69,8 +69,8 @@ fn main() {
         // theme_system handles light/dark mode based on system preferences
         theme_system::install(cx, cx.window_appearance());
 
-        // RECOMMENDED: Set up i18n with embedded translations
-        cx.set_global(I18n::with_embedded(Locale::new("en").unwrap()));
+        // RECOMMENDED: Set up i18n with bundled English translations
+        locale_en::install(cx);
 
         // Step 3: Create main window
         let options = WindowOptions {

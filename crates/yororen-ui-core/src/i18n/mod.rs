@@ -63,7 +63,8 @@ pub use format::{
     I18nFormatter, NumberFormatOptions, NumberFormatter,
 };
 pub use loader::{
-    EmbeddedLoader, FallbackLoader, FileLoader, LoadError, LocaleFiles, TranslationLoader,
+    FallbackLoader, FileLoader, LoadError, TranslationLoader, filename_for_locale,
+    parse_translation_value,
 };
 pub use locale::{Locale, SupportedLocale, TextDirection};
 pub use placeholder::{

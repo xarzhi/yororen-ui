@@ -20,7 +20,7 @@ use gpui::{App, AppContext, Application, WindowOptions, px, size};
 
 use yororen_ui::assets::UiAsset;
 use yororen_ui::component;
-use yororen_ui::i18n::{I18n, Locale};
+use yororen_ui::locale_en;
 use yororen_ui_theme_system as theme_system;
 
 fn main() {
@@ -29,7 +29,7 @@ fn main() {
     app.run(|cx: &mut App| {
         component::init(cx);
         theme_system::install(cx, cx.window_appearance());
-        cx.set_global(I18n::with_embedded(Locale::new("en").unwrap()));
+        locale_en::install(cx);
 
         let options = WindowOptions {
             window_bounds: Some(gpui::WindowBounds::Windowed(gpui::Bounds::centered(
