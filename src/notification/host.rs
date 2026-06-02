@@ -1,6 +1,6 @@
 use gpui::{
     App, ClickEvent, Hsla, InteractiveElement, IntoElement, ParentElement, RenderOnce,
-    StatefulInteractiveElement, Styled, Window, div, px,
+    StatefulInteractiveElement, Styled, Window, div,
 };
 
 use gpui::prelude::FluentBuilder;
@@ -36,8 +36,8 @@ impl NotificationHost {
     pub fn new() -> Self {
         Self {
             base: div(),
-            max_width: px(420.),
-            offset: px(16.),
+            max_width: gpui::px(0.),
+            offset: gpui::px(0.),
         }
     }
 
@@ -96,6 +96,18 @@ impl RenderOnce for NotificationHost {
         let theme = cx.theme().clone();
 
         let direction = cx.theme().text_direction;
+        let offset_value: f32 = self.offset.into();
+        let resolved_offset = if offset_value > 0.0 {
+            self.offset
+        } else {
+            theme.tokens.control.notification.host_padding
+        };
+        let max_w_value: f32 = self.max_width.into();
+        let resolved_max_w = if max_w_value > 0.0 {
+            self.max_width
+        } else {
+            theme.tokens.control.notification.max_width
+        };
 
         self.base
             .id("ui:notification-host")
@@ -103,9 +115,9 @@ impl RenderOnce for NotificationHost {
             .top_0()
             .when(direction.is_rtl(), |this| this.left_0())
             .when(!direction.is_rtl(), |this| this.right_0())
-            .mt(self.offset)
-            .when(direction.is_rtl(), |this| this.ml(self.offset))
-            .when(!direction.is_rtl(), |this| this.mr(self.offset))
+            .mt(resolved_offset)
+            .when(direction.is_rtl(), |this| this.ml(resolved_offset))
+            .when(!direction.is_rtl(), |this| this.mr(resolved_offset))
             .flex()
             .flex_col()
             .gap_2()
@@ -150,8 +162,8 @@ impl RenderOnce for NotificationHost {
                     .flex()
                     .items_center()
                     .justify_center()
-                    .w(px(26.))
-                    .h(px(26.))
+                    .w(theme.tokens.control.tag.close_button_size)
+                    .h(theme.tokens.control.tag.close_button_size)
                     .rounded_sm()
                     .cursor_pointer()
                     .text_color(fg)
@@ -166,7 +178,11 @@ impl RenderOnce for NotificationHost {
                         center_for_dismiss.dismiss_from_ui(id, window, cx);
                         window.refresh();
                     })
-                    .child(Icon::new(IconName::Close).size(px(12.)).color(fg));
+                    .child(
+                        Icon::new(IconName::Close)
+                            .size(theme.tokens.control.tag.close_icon_size)
+                            .color(fg),
+                    );
 
                 let mut body = div()
                     .flex()
@@ -189,7 +205,7 @@ impl RenderOnce for NotificationHost {
                 let toast_el = toast()
                     .kind(n.kind)
                     .wrap(true)
-                    .max_width(self.max_width)
+                    .max_width(resolved_max_w)
                     .content(body)
                     .trailing(close);
 
