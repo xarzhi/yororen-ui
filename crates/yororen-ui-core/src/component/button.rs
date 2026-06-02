@@ -5,7 +5,8 @@ use gpui::{
     StatefulInteractiveElement, Styled, div, prelude::FluentBuilder,
 };
 
-use crate::component::{ClickCallback, HoverCallback, compute_action_style};
+use crate::component::{ClickCallback, HoverCallback};
+use crate::renderer::{ButtonRenderState, Edges};
 use crate::theme::{ActionVariantKind, ActiveTheme};
 
 /// Creates a new button element.
@@ -162,19 +163,44 @@ impl RenderOnce for Button {
         let variant = self.variant;
         let direction = cx.theme().text_direction;
 
-        let action_style = compute_action_style(cx.theme(), variant, disabled, bg, hover_bg);
+        // Phase B spike: button visuals go through ButtonRenderer.
+        let theme = cx.theme();
+        let r = &theme.renderers.button;
+        let state = ButtonRenderState {
+            variant,
+            disabled,
+            is_rtl: direction.is_rtl(),
+            has_custom_bg: bg.is_some(),
+            has_custom_hover_bg: hover_bg.is_some(),
+        };
+        let bg_color = r.bg(&state, theme);
+        let fg_color = r.fg(&state, theme);
+        let padding: Edges<gpui::Pixels> = r.padding(&state, theme);
+        let radius = r.border_radius(&state, theme);
+        let min_height = r.min_height(&state, theme);
+
+        // For hover, prefer the user's custom hover_bg; otherwise let the
+        // theme's hover palette win via `hover_bg` (we re-read it from
+        // the action variant for now, mirroring v0.3 behavior).
+        let hover_bg_color = hover_bg.unwrap_or(if disabled {
+            theme.action_variant(variant).disabled_bg
+        } else {
+            theme.action_variant(variant).hover_bg
+        });
 
         self.base
             .id(self.element_id)
-            .h(cx.theme().tokens.control.button.min_height)
-            .rounded_md()
+            .h(min_height)
+            .rounded(radius)
+            .px(padding.left)
+            .py(padding.top)
             .flex()
             .when(direction.is_rtl(), |this| this.flex_row_reverse())
             .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()
             .justify_center()
-            .bg(action_style.bg)
-            .text_color(action_style.fg)
+            .bg(bg_color)
+            .text_color(fg_color)
             .when(clickable && !disabled, |this| this.cursor_pointer())
             .when(disabled, |this| this.cursor_not_allowed())
             .on_click(move |ev, window, cx| {
@@ -193,6 +219,6 @@ impl RenderOnce for Button {
                     }
                 })
             })
-            .hover(move |this| this.bg(action_style.hover_bg))
+            .hover(move |this| this.bg(hover_bg_color))
     }
 }

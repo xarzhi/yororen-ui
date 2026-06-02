@@ -7,6 +7,7 @@ use crate::i18n::TextDirection;
 pub mod tokens;
 pub mod validate;
 
+pub use crate::renderer::RendererRegistry;
 pub use tokens::{
     DesignTokens, EasingFn, MotionTokens, RadiiTokens, SizeTokens, SpacingTokens, TypographyTokens,
 };
@@ -26,9 +27,12 @@ pub struct Theme {
     /// spacing, radii, and motion. Themes override these to reshape the UI
     /// without touching component logic.
     pub tokens: DesignTokens,
+    /// Per-component renderers. Phase B spike: only `button`. Phase C
+    /// generalizes this to 30+ components.
+    pub renderers: RendererRegistry,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct SurfaceTheme {
     pub canvas: Hsla,
     pub base: Hsla,
@@ -37,7 +41,7 @@ pub struct SurfaceTheme {
     pub hover: Hsla,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct ContentTheme {
     pub primary: Hsla,
     pub secondary: Hsla,
@@ -47,7 +51,7 @@ pub struct ContentTheme {
     pub on_status: Hsla,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct BorderTheme {
     pub default: Hsla,
     pub muted: Hsla,
@@ -55,14 +59,14 @@ pub struct BorderTheme {
     pub divider: Hsla,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct ActionTheme {
     pub neutral: ActionVariant,
     pub primary: ActionVariant,
     pub danger: ActionVariant,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct ActionVariant {
     pub bg: Hsla,
     pub hover_bg: Hsla,
@@ -72,14 +76,15 @@ pub struct ActionVariant {
     pub disabled_fg: Hsla,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
 pub enum ActionVariantKind {
+    #[default]
     Neutral,
     Primary,
     Danger,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct StatusTheme {
     pub success: StatusVariant,
     pub warning: StatusVariant,
@@ -87,13 +92,13 @@ pub struct StatusTheme {
     pub info: StatusVariant,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct StatusVariant {
     pub bg: Hsla,
     pub fg: Hsla,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct ShadowTheme {
     pub elevation_1: Hsla,
     pub elevation_2: Hsla,
@@ -296,6 +301,7 @@ mod tests {
             },
             text_direction: TextDirection::Ltr,
             tokens: DesignTokens::default(),
+            renderers: RendererRegistry::token_based(),
         }
     }
 
@@ -373,6 +379,7 @@ mod tests {
             },
             text_direction: TextDirection::Ltr,
             tokens: DesignTokens::default(),
+            renderers: RendererRegistry::token_based(),
         }
     }
 

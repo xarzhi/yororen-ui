@@ -196,7 +196,10 @@ fn contrast_ratio(a: Hsla, b: Hsla) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::theme::{ActionTheme, ActionVariant, BorderTheme, ContentTheme, DesignTokens, ShadowTheme, StatusTheme, StatusVariant, SurfaceTheme, Theme};
+    use crate::theme::{
+        ActionTheme, ActionVariant, BorderTheme, ContentTheme, DesignTokens, RendererRegistry,
+        ShadowTheme, StatusTheme, StatusVariant, SurfaceTheme, Theme,
+    };
     use crate::i18n::TextDirection;
     use gpui::{hsla, rgb};
 
@@ -285,6 +288,7 @@ mod tests {
             },
             text_direction: TextDirection::Ltr,
             tokens: DesignTokens::default(),
+            renderers: RendererRegistry::token_based(),
         }
     }
 
@@ -362,6 +366,7 @@ mod tests {
             },
             text_direction: TextDirection::Ltr,
             tokens: DesignTokens::default(),
+            renderers: RendererRegistry::token_based(),
         }
     }
 
