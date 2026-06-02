@@ -8,3 +8,5 @@ demo/**/target
 crates/yororen-ui-demos/*/target
 
 yororen-ui.wiki
+
+/tmp
