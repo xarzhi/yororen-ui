@@ -82,11 +82,10 @@ impl Render for TreeExpandedApp {
             .child(reset_btn);
 
         // Read current generation from global state
-        let current_gen = cx
+        let current_gen = *cx
             .global::<crate::state::TreeDemoState>()
             .generation
-            .read(cx)
-            .clone();
+            .read(cx);
 
         // Refresh nodes if generation changed
         if self.last_generation != current_gen {

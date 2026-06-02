@@ -49,16 +49,11 @@ pub struct TodoModel {
 
 impl Default for TodoModel {
     fn default() -> Self {
-        let mut todos = Vec::new();
-        todos.push(Todo::new(
-            "Complete project report".to_string(),
-            TodoCategory::Work,
-        ));
-        todos.push(Todo::new(
-            "Buy groceries".to_string(),
-            TodoCategory::Shopping,
-        ));
-        todos.push(Todo::new("Go to gym".to_string(), TodoCategory::Health));
+        let mut todos = vec![
+            Todo::new("Complete project report".to_string(), TodoCategory::Work),
+            Todo::new("Buy groceries".to_string(), TodoCategory::Shopping),
+            Todo::new("Go to gym".to_string(), TodoCategory::Health),
+        ];
         todos[0].completed = true;
 
         Self {

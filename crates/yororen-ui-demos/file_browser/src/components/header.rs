@@ -2,7 +2,7 @@
 //!
 //! Displays the application title and action buttons.
 
-use std::path::PathBuf;
+use std::path::Path;
 
 use gpui::{IntoElement, ParentElement, Styled, div, px};
 
@@ -16,7 +16,7 @@ pub struct FileBrowserHeader;
 
 impl FileBrowserHeader {
     /// Renders the header with title, root path, and action buttons
-    pub fn render(root: &PathBuf) -> impl IntoElement {
+    pub fn render(root: &Path) -> impl IntoElement {
         let root_label = root.to_string_lossy().to_string();
 
         div()

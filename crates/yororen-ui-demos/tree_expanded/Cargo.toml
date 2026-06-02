@@ -7,3 +7,4 @@ edition.workspace = true
 gpui = { package = "gpui-ce", version = "0.3" }
 yororen-ui = { package = "yororen_ui", path = "../../yororen-ui" }
 yororen-ui-theme-system = { package = "yororen_ui_theme_system", path = "../../yororen-ui-theme-system" }
+

@@ -40,9 +40,6 @@ fn main() {
             ..Default::default()
         };
 
-        cx.open_window(options, |_, cx| {
-            cx.new(|cx| popover_app::PopoverPlacementApp::new(cx))
-        })
-        .unwrap();
+        let _ = cx.open_window(options, |_, cx| cx.new(popover_app::PopoverPlacementApp::new));
     });
 }

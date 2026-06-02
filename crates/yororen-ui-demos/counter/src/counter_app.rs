@@ -48,7 +48,7 @@ impl Render for CounterApp {
             .p(px(32.))
             // Counter display
             .child(
-                label(&count.to_string())
+                label(count.to_string())
                     .text_size(px(64.))
                     .font_weight(gpui::FontWeight::SEMIBOLD),
             )

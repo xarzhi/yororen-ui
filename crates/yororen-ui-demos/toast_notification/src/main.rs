@@ -84,8 +84,6 @@ fn main() {
 
         // Open window and render root component
         // cx.new() creates a new entity with the given closure as its impl
-        cx.open_window(options, |_, cx| {
-            cx.new(|cx| toast_demo_app::ToastDemoApp::new(cx))
-        }).unwrap();
+        let _ = cx.open_window(options, |_, cx| cx.new(toast_demo_app::ToastDemoApp::new));
     });
 }

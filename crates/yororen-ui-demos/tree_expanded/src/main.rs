@@ -44,9 +44,6 @@ fn main() {
             ..Default::default()
         };
 
-        cx.open_window(options, |_, cx| {
-            cx.new(|cx| tree_app::TreeExpandedApp::new(cx))
-        })
-        .unwrap();
+        let _ = cx.open_window(options, |_, cx| cx.new(tree_app::TreeExpandedApp::new));
     });
 }

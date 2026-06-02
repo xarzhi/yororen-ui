@@ -12,15 +12,9 @@
 
 use gpui::{App, AppContext, Entity, Global};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct Counter {
     pub value: i32,
-}
-
-impl Default for Counter {
-    fn default() -> Self {
-        Self { value: 0 }
-    }
 }
 
 /// Global wrapper so components can access the same `Entity<Counter>` via `cx.global::<CounterState>()`.

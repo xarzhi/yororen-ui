@@ -54,8 +54,6 @@ fn main() {
         };
 
         // Open window with counter component
-        cx.open_window(options, |_, cx| {
-            cx.new(|cx| counter_app::CounterApp::new(cx))
-        }).unwrap();
+        let _ = cx.open_window(options, |_, cx| cx.new(counter_app::CounterApp::new));
     });
 }

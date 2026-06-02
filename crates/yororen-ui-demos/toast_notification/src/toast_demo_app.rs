@@ -70,17 +70,6 @@ impl Render for ToastDemoApp {
         // Clone for use in closures (Arc-based for thread safety)
         let center = cx.global::<NotificationCenter>().clone();
 
-        let title = div()
-            .text_xl()
-            .font_weight(FontWeight::BOLD)
-            .text_color(theme.content.primary)
-            .child("Toast Notification Demo");
-
-        let description = div()
-            .text_sm()
-            .text_color(theme.content.secondary)
-            .child("Toast variants and options (static display)");
-
         // Step 3: Build UI sections
 
         // Section 1: Demo title
@@ -259,8 +248,7 @@ impl Render for ToastDemoApp {
                     .on_click({
                         let center = center.clone();
                         move |_ev, _window, cx| {
-                            // Clone center for use in callback closure
-                            let center_for_cb = center.clone();
+                            // Reference center via cx.global inside the inner callback below.
                             center.notify_with_callbacks(
                                 Notification::new("Click this toast to read payload")
                                     .kind(ToastKind::Info)
@@ -271,8 +259,15 @@ impl Render for ToastDemoApp {
                                         "message": "hello from payload"
                                     }))
                                     .dismiss(DismissStrategy::Manual),
-                                // on_action callback - triggered when action button clicked
-                                Some(Arc::new(move |n, _ev, window, cx| {
+                                // on_action callback - triggered when action button clicked.
+                                // The Arc<NotificationCenter> clone is fine here because
+                                // the callback runs on the main thread (we never send it
+                                // across threads). Clippy's `arc_with_non_send_sync` is a
+                                // false positive for this single-threaded UI callback.
+                                #[allow(clippy::arc_with_non_send_sync)]
+                                Some(Arc::new({
+                                    let center_for_cb = center.clone();
+                                    move |n, _ev, window, cx| {
                                     // Extract payload data
                                     let payload = n
                                         .payload
@@ -282,13 +277,12 @@ impl Render for ToastDemoApp {
                                         .unwrap_or("<missing>");
 
                                     // Display result in new notification
-                                    center_for_cb.notify(
-                                        Notification::new(format!("payload.message = {payload}"))
-                                            .kind(ToastKind::Success),
-                                        cx,
-                                    );
+                                    let next = Notification::new(format!("payload.message = {payload}"))
+                                        .kind(ToastKind::Success);
+                                    center_for_cb.notify(next, cx);
                                     // Refresh window to update UI
                                     window.refresh();
+                                }
                                 })),
                                 // on_dismiss callback - triggered when notification dismissed (None here)
                                 None,

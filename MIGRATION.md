@@ -88,26 +88,25 @@ icon(IconPath::External("icons/your-icon.svg"))   // app-specific
 
 ---
 
-## 4. Placeholder strings are no longer auto-localized
+## 4. Placeholder strings — opt-in explicit overrides
 
-The `i18n::defaults::DefaultPlaceholders` 9-language hardcoded table is
-**deprecated** in v0.3 and will be **removed in v0.4**. Components
-(`Select`, `ComboBox`, `FilePathInput`, `KeybindingInput`) already expose
-a `.placeholder(...)` builder — pass an explicit string (or your own
-localized lookup) instead of relying on the auto-magic.
+The `i18n::defaults::DefaultPlaceholders` 9-language hardcoded table
+continues to ship in v0.3 — no action required. Components (`Select`,
+`ComboBox`, `FilePathInput`, `KeybindingInput`) keep their auto-localization
+behavior when `.localized(true)` is set and no explicit `.placeholder(...)`
+is provided.
+
+If you want full control, pass an explicit placeholder:
 
 ```rust
-// Before
-select("my-select").localized(true)  // shows "Select…" in en, "请选择…" in zh, ...
+// Default behavior (unchanged from v0.2)
+select("my-select").localized(true)  // "Select…" in en, "请选择…" in zh, ...
 
-// After
-select("my-select").placeholder("Select…")  // whatever you want, in any language
-// Or, when using a yororen-ui-locale-* package:
+// Explicit override
+select("my-select").placeholder("Pick one…")  // whatever you want, any language
+// Or via a yororen-ui-locale-* package:
 select("my-select").placeholder(cx.i18n().t("ui.select.placeholder"))
 ```
-
-For backward compatibility the auto-magic still works in v0.3 but emits a
-`#[deprecated]` warning. Fix the warnings now and you're ready for v0.4.
 
 ---
 
@@ -157,6 +156,6 @@ text and out-of-range tokens before shipping your theme.
 - [ ] Bump `yororen-ui` to `0.3` in your `Cargo.toml`
 - [ ] Replace `GlobalTheme::new(...)` with `yororen_ui::theme_system::install(cx, appearance)` (or your own custom install)
 - [ ] Remove the 5 business `IconName` usages and switch to `IconPath::External`
-- [ ] Pass `.placeholder(...)` explicitly on `Select` / `ComboBox` / `FilePathInput` / `KeybindingInput` (clear the `#[deprecated]` warning)
+- [ ] (Optional) Pass `.placeholder(...)` explicitly on `Select` / `ComboBox` / `FilePathInput` / `KeybindingInput` to override the auto-localized defaults
 - [ ] (Optional) Drop the `yororen-ui` meta-crate dep and depend on `yororen-ui-core` + your own theme package
 - [ ] (Optional) Tweak `theme.tokens` for compact/dense modes

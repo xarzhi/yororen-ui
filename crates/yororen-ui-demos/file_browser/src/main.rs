@@ -46,9 +46,6 @@ fn main() {
             ..Default::default()
         };
 
-        cx.open_window(options, |_, cx| {
-            cx.new(|cx| file_browser_app::FileBrowserApp::new(cx))
-        })
-        .unwrap();
+        let _ = cx.open_window(options, |_, cx| cx.new(file_browser_app::FileBrowserApp::new));
     });
 }

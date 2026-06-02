@@ -20,3 +20,6 @@ version = "0.3.0"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/MeowLynxSea/yororen-ui"
+
+# Demos inherit workspace lints via `[lints] workspace = true` in each demo
+# Cargo.toml. Strict clippy is enforced — fix issues instead of disabling.
