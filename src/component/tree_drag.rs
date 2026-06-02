@@ -145,8 +145,8 @@ impl TreeDragPreview {
     pub fn new(text: impl Into<String>) -> Self {
         Self {
             text: text.into(),
-            width: px(200.),
-            height: px(32.),
+            width: gpui::px(0.),
+            height: gpui::px(0.),
         }
     }
 
@@ -164,10 +164,22 @@ impl TreeDragPreview {
 impl RenderOnce for TreeDragPreview {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl gpui::IntoElement {
         let theme = cx.theme();
+        let w: f32 = self.width.into();
+        let h: f32 = self.height.into();
+        let width = if w > 0.0 {
+            self.width
+        } else {
+            theme.tokens.control.tree_item.indent * 12.5
+        };
+        let height = if h > 0.0 {
+            self.height
+        } else {
+            theme.tokens.sizes.control_h_md
+        };
 
         div()
-            .w(self.width)
-            .h(self.height)
+            .w(width)
+            .h(height)
             .bg(theme.surface.raised)
             .border_1()
             .border_color(theme.border.default)

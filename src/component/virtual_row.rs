@@ -99,7 +99,12 @@ impl RenderOnce for VirtualRow {
                 .w_full()
                 .child(self.base)
                 .when(show_divider, move |this| {
-                    this.child(div().h(px(1.)).w_full().bg(divider_color))
+                    this.child(
+                        div()
+                            .h(cx.theme().tokens.control.divider.thickness)
+                            .w_full()
+                            .bg(divider_color),
+                    )
                 })
                 .when(gap_below > px(0.), move |this| {
                     this.child(div().h(gap_below))

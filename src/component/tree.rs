@@ -21,11 +21,12 @@ use std::sync::Arc;
 
 use gpui::{
     ClickEvent, Div, ElementId, IntoElement, ListAlignment, ListSizingBehavior, ListState,
-    ParentElement, Pixels, RenderOnce, StatefulInteractiveElement, Styled, Window, div, list, px,
+    ParentElement, Pixels, RenderOnce, StatefulInteractiveElement, Styled, Window, div, list,
 };
 
 use crate::component::ElementMouseDownCallback;
 use crate::component::{ClickCallback, ElementCallback, ElementClickCallback};
+use crate::theme::ActiveTheme;
 
 use super::tree_data::{
     ArcTreeNode, FlatTreeNode, SelectionMode, TreeCheckedState, TreeNode, TreeNodeData, TreeState,
@@ -93,8 +94,8 @@ impl Tree {
             selection_mode: SelectionMode::Multiple,
             show_checkbox: false,
             draggable: false,
-            indent: px(20.),
-            row_height: px(32.),
+            indent: gpui::px(0.),
+            row_height: gpui::px(0.),
             virtualized: false,
             list_state: None,
             on_click: None,
@@ -339,10 +340,11 @@ impl Tree {
         let id = self.element_id.clone();
 
         // Use keyed state to persist list state across renders
+        let default_row_h = cx.theme().tokens.sizes.control_h_md;
         let list_state = window.use_keyed_state((id.clone(), "ui:tree:list-state"), cx, |_, _| {
             self.list_state
                 .clone()
-                .unwrap_or_else(|| ListState::new(0, ListAlignment::Top, px(32.)))
+                .unwrap_or_else(|| ListState::new(0, ListAlignment::Top, default_row_h))
         });
 
         // Recalculate flattened nodes

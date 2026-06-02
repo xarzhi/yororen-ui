@@ -2,7 +2,7 @@
 
 use gpui::{
     Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, Pixels, RenderOnce,
-    StatefulInteractiveElement, Styled, div, prelude::FluentBuilder, px,
+    StatefulInteractiveElement, Styled, div, prelude::FluentBuilder,
 };
 
 use crate::theme::ActiveTheme;
@@ -41,7 +41,7 @@ impl TreeNodeComponent {
             base: div(),
             node: None,
             show_checkbox: false,
-            indent: px(20.),
+            indent: gpui::px(0.),
             draggable: false,
             selected: false,
             hover_bg: None,
@@ -144,7 +144,7 @@ impl RenderOnce for TreeNodeComponent {
         div()
             .id(id_str)
             .w_full()
-            .min_h(px(32.))
+            .min_h(cx.theme().tokens.sizes.control_h_md)
             .px_3()
             .py_1()
             .rounded_md()

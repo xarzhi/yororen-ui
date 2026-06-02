@@ -6,7 +6,7 @@
 use gpui::{
     AnyElement, Div, ElementId, Hsla, InteractiveElement, IntoElement, MouseButton, MouseDownEvent,
     ParentElement, Pixels, RenderOnce, StatefulInteractiveElement, Styled, div,
-    prelude::FluentBuilder, px,
+    prelude::FluentBuilder,
 };
 
 use crate::component::{checkbox, disclosure};
@@ -67,7 +67,7 @@ impl TreeItem {
             label_element: None,
             secondary: None,
             trailing: None,
-            indent: px(20.),
+            indent: gpui::px(0.),
             hover_bg: None,
             selected_bg: None,
             on_context_menu: None,
@@ -217,12 +217,26 @@ impl RenderOnce for TreeItem {
 
         let direction = cx.theme().text_direction;
         let mut temp = self.base;
-        rtl::padding_start(temp.style(), direction, indent * depth as f32);
-        rtl::padding_end(temp.style(), direction, px(12.));
+        let indent_px: f32 = indent.into();
+        let resolved_indent = if indent_px > 0.0 {
+            indent
+        } else {
+            cx.theme().tokens.control.tree_item.indent
+        };
+        rtl::padding_start(
+            temp.style(),
+            direction,
+            resolved_indent * depth as f32,
+        );
+        rtl::padding_end(
+            temp.style(),
+            direction,
+            cx.theme().tokens.spacing.inset_sm,
+        );
 
         temp.id(element_id.to_string())
             .w_full()
-            .min_h(px(32.))
+            .min_h(cx.theme().tokens.sizes.control_h_md)
             .py_1()
             .rounded_md()
             .flex()
