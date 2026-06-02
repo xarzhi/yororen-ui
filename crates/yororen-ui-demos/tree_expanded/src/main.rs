@@ -22,14 +22,14 @@ use gpui::{App, AppContext, Application, WindowOptions, px, size};
 use yororen_ui::assets::UiAsset;
 use yororen_ui::component;
 use yororen_ui::i18n::{I18n, Locale};
-use yororen_ui::theme::GlobalTheme;
+use yororen_ui_theme_system as theme_system;
 
 fn main() {
     let app = Application::new().with_assets(UiAsset);
 
     app.run(|cx: &mut App| {
         component::init(cx);
-        cx.set_global(GlobalTheme::new(cx.window_appearance()));
+        theme_system::install(cx, cx.window_appearance());
         cx.set_global(I18n::with_embedded(Locale::new("en").unwrap()));
 
         let tree_state = state::TreeDemoState::new(cx);

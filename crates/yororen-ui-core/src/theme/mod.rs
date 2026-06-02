@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use gpui::{App, Global, Hsla, WindowAppearance, hsla, rgb};
+use gpui::{App, Global, Hsla, WindowAppearance};
 
 use crate::i18n::TextDirection;
 
@@ -100,162 +100,6 @@ pub struct ShadowTheme {
 }
 
 impl Theme {
-    pub fn default_dark() -> Self {
-        let content = ContentTheme {
-            primary: rgb(0xF2F2F3).into(),
-            secondary: rgb(0xC8C8CC).into(),
-            tertiary: rgb(0x9B9BA1).into(),
-            disabled: rgb(0x6F6F76).into(),
-            on_primary: rgb(0x0B0B0D).into(),
-            on_status: rgb(0x0B0B0D).into(),
-        };
-
-        Self {
-            surface: SurfaceTheme {
-                canvas: rgb(0x0F0F11).into(),
-                base: rgb(0x151518).into(),
-                raised: rgb(0x1D1D21).into(),
-                sunken: rgb(0x111113).into(),
-                hover: rgb(0x232327).into(),
-            },
-            content: content.clone(),
-            border: BorderTheme {
-                default: rgb(0x2A2A2F).into(),
-                muted: rgb(0x1E1E22).into(),
-                focus: rgb(0x8BB0FF).into(),
-                divider: rgb(0x1E1E22).into(),
-            },
-            action: ActionTheme {
-                neutral: ActionVariant {
-                    bg: rgb(0x1D1D21).into(),
-                    hover_bg: rgb(0x24242A).into(),
-                    active_bg: rgb(0x2A2A31).into(),
-                    fg: content.primary,
-                    disabled_bg: rgb(0x1A1A1D).into(),
-                    disabled_fg: content.disabled,
-                },
-                primary: ActionVariant {
-                    bg: rgb(0xF4F4F6).into(),
-                    hover_bg: rgb(0xFFFFFF).into(),
-                    active_bg: rgb(0xE9E9EC).into(),
-                    fg: content.on_primary,
-                    disabled_bg: rgb(0xE0E0E4).into(),
-                    disabled_fg: rgb(0x5B5B61).into(),
-                },
-                danger: ActionVariant {
-                    bg: rgb(0xFFB4AE).into(),
-                    hover_bg: rgb(0xFFA099).into(),
-                    active_bg: rgb(0xFF8A82).into(),
-                    fg: content.on_status,
-                    disabled_bg: rgb(0xE0B3AF).into(),
-                    disabled_fg: rgb(0x5B5B61).into(),
-                },
-            },
-            status: StatusTheme {
-                success: StatusVariant {
-                    bg: rgb(0xB9F5C9).into(),
-                    fg: content.on_status,
-                },
-                warning: StatusVariant {
-                    bg: rgb(0xFFE1A6).into(),
-                    fg: content.on_status,
-                },
-                error: StatusVariant {
-                    bg: rgb(0xFFB4AE).into(),
-                    fg: content.on_status,
-                },
-                info: StatusVariant {
-                    bg: rgb(0xB6D9FF).into(),
-                    fg: content.on_status,
-                },
-            },
-            shadow: ShadowTheme {
-                elevation_1: hsla(0.0, 0.0, 0.0, 0.3),
-                elevation_2: hsla(0.0, 0.0, 0.0, 0.45),
-            },
-            text_direction: TextDirection::Ltr,
-            tokens: DesignTokens::default(),
-        }
-    }
-
-    pub fn default_light() -> Self {
-        let content = ContentTheme {
-            primary: rgb(0x141416).into(),
-            secondary: rgb(0x3E3E45).into(),
-            tertiary: rgb(0x6B6B73).into(),
-            disabled: rgb(0x9A9AA2).into(),
-            on_primary: rgb(0xFFFFFF).into(),
-            on_status: rgb(0x0B0B0D).into(),
-        };
-
-        Self {
-            surface: SurfaceTheme {
-                canvas: rgb(0xF4F4F6).into(),
-                base: rgb(0xFFFFFF).into(),
-                raised: rgb(0xFBFBFD).into(),
-                sunken: rgb(0xEFEFF2).into(),
-                hover: rgb(0xE6E6EA).into(),
-            },
-            content: content.clone(),
-            border: BorderTheme {
-                default: rgb(0xD8D8DD).into(),
-                muted: rgb(0xE3E3E8).into(),
-                focus: rgb(0x2F63FF).into(),
-                divider: rgb(0xE3E3E8).into(),
-            },
-            action: ActionTheme {
-                neutral: ActionVariant {
-                    bg: rgb(0xF1F1F3).into(),
-                    hover_bg: rgb(0xE6E6EA).into(),
-                    active_bg: rgb(0xDADADF).into(),
-                    fg: content.primary,
-                    disabled_bg: rgb(0xE7E7EA).into(),
-                    disabled_fg: content.disabled,
-                },
-                primary: ActionVariant {
-                    bg: rgb(0x121214).into(),
-                    hover_bg: rgb(0x0C0C0D).into(),
-                    active_bg: rgb(0x000000).into(),
-                    fg: content.on_primary,
-                    disabled_bg: rgb(0x2A2A2E).into(),
-                    disabled_fg: rgb(0xD0D0D6).into(),
-                },
-                danger: ActionVariant {
-                    bg: rgb(0xFFB4AE).into(),
-                    hover_bg: rgb(0xFFA099).into(),
-                    active_bg: rgb(0xFF8A82).into(),
-                    fg: content.on_status,
-                    disabled_bg: rgb(0xF0CBC7).into(),
-                    disabled_fg: content.disabled,
-                },
-            },
-            status: StatusTheme {
-                success: StatusVariant {
-                    bg: rgb(0xB9F5C9).into(),
-                    fg: content.on_status,
-                },
-                warning: StatusVariant {
-                    bg: rgb(0xFFE1A6).into(),
-                    fg: content.on_status,
-                },
-                error: StatusVariant {
-                    bg: rgb(0xFFB4AE).into(),
-                    fg: content.on_status,
-                },
-                info: StatusVariant {
-                    bg: rgb(0xB6D9FF).into(),
-                    fg: content.on_status,
-                },
-            },
-            shadow: ShadowTheme {
-                elevation_1: hsla(0.0, 0.0, 0.0, 0.18),
-                elevation_2: hsla(0.0, 0.0, 0.0, 0.3),
-            },
-            text_direction: TextDirection::Ltr,
-            tokens: DesignTokens::default(),
-        }
-    }
-
     /// Check if RTL mode is enabled.
     pub fn is_rtl(&self) -> bool {
         self.text_direction.is_rtl()
@@ -282,13 +126,11 @@ pub struct GlobalTheme {
 impl Global for GlobalTheme {}
 
 impl GlobalTheme {
-    pub fn new(appearance: WindowAppearance) -> Self {
-        Self::new_with_themes(
-            appearance,
-            ThemeSet::new(Theme::default_light()).dark(Theme::default_dark()),
-        )
-    }
-
+    /// Construct a `GlobalTheme` from a caller-supplied `ThemeSet`.
+    ///
+    /// `core` is headless: it does not ship a default palette. Use a
+    /// theme package (e.g. `yororen_ui_theme_system::install`) to obtain a
+    /// `ThemeSet` and pass it here.
     pub fn new_with_themes(appearance: WindowAppearance, themes: ThemeSet) -> Self {
         Self {
             theme: themes.resolve(appearance),
@@ -367,7 +209,172 @@ impl ActiveTheme for App {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use gpui::Rgba;
+    use gpui::{Rgba, hsla, rgb};
+
+    /// Internal test fixtures for theme-contrast tests. `core` is headless
+    /// and does not export a default palette; these fixtures are used only
+    /// to exercise the contrast helper. The real, exposed default themes
+    /// live in `yororen_ui_theme_system`.
+    fn fixture_themes() -> [(&'static str, Theme); 2] {
+        [
+            ("dark", fixture_dark()),
+            ("light", fixture_light()),
+        ]
+    }
+
+    fn fixture_dark() -> Theme {
+        let content = ContentTheme {
+            primary: rgb(0xF2F2F3).into(),
+            secondary: rgb(0xC8C8CC).into(),
+            tertiary: rgb(0x9B9BA1).into(),
+            disabled: rgb(0x6F6F76).into(),
+            on_primary: rgb(0x0B0B0D).into(),
+            on_status: rgb(0x0B0B0D).into(),
+        };
+        Theme {
+            surface: SurfaceTheme {
+                canvas: rgb(0x0F0F11).into(),
+                base: rgb(0x151518).into(),
+                raised: rgb(0x1D1D21).into(),
+                sunken: rgb(0x111113).into(),
+                hover: rgb(0x232327).into(),
+            },
+            content: content.clone(),
+            border: BorderTheme {
+                default: rgb(0x2A2A2F).into(),
+                muted: rgb(0x1E1E22).into(),
+                focus: rgb(0x8BB0FF).into(),
+                divider: rgb(0x1E1E22).into(),
+            },
+            action: ActionTheme {
+                neutral: ActionVariant {
+                    bg: rgb(0x1D1D21).into(),
+                    hover_bg: rgb(0x24242A).into(),
+                    active_bg: rgb(0x2A2A31).into(),
+                    fg: content.primary,
+                    disabled_bg: rgb(0x1A1A1D).into(),
+                    disabled_fg: content.disabled,
+                },
+                primary: ActionVariant {
+                    bg: rgb(0xF4F4F6).into(),
+                    hover_bg: rgb(0xFFFFFF).into(),
+                    active_bg: rgb(0xE9E9EC).into(),
+                    fg: content.on_primary,
+                    disabled_bg: rgb(0xE0E0E4).into(),
+                    disabled_fg: rgb(0x5B5B61).into(),
+                },
+                danger: ActionVariant {
+                    bg: rgb(0xFFB4AE).into(),
+                    hover_bg: rgb(0xFFA099).into(),
+                    active_bg: rgb(0xFF8A82).into(),
+                    fg: content.on_status,
+                    disabled_bg: rgb(0xE0B3AF).into(),
+                    disabled_fg: rgb(0x5B5B61).into(),
+                },
+            },
+            status: StatusTheme {
+                success: StatusVariant {
+                    bg: rgb(0xB9F5C9).into(),
+                    fg: content.on_status,
+                },
+                warning: StatusVariant {
+                    bg: rgb(0xFFE1A6).into(),
+                    fg: content.on_status,
+                },
+                error: StatusVariant {
+                    bg: rgb(0xFFB4AE).into(),
+                    fg: content.on_status,
+                },
+                info: StatusVariant {
+                    bg: rgb(0xB6D9FF).into(),
+                    fg: content.on_status,
+                },
+            },
+            shadow: ShadowTheme {
+                elevation_1: hsla(0.0, 0.0, 0.0, 0.3),
+                elevation_2: hsla(0.0, 0.0, 0.0, 0.45),
+            },
+            text_direction: TextDirection::Ltr,
+            tokens: DesignTokens::default(),
+        }
+    }
+
+    fn fixture_light() -> Theme {
+        let content = ContentTheme {
+            primary: rgb(0x141416).into(),
+            secondary: rgb(0x3E3E45).into(),
+            tertiary: rgb(0x6B6B73).into(),
+            disabled: rgb(0x9A9AA2).into(),
+            on_primary: rgb(0xFFFFFF).into(),
+            on_status: rgb(0x0B0B0D).into(),
+        };
+        Theme {
+            surface: SurfaceTheme {
+                canvas: rgb(0xF4F4F6).into(),
+                base: rgb(0xFFFFFF).into(),
+                raised: rgb(0xFBFBFD).into(),
+                sunken: rgb(0xEFEFF2).into(),
+                hover: rgb(0xE6E6EA).into(),
+            },
+            content: content.clone(),
+            border: BorderTheme {
+                default: rgb(0xD8D8DD).into(),
+                muted: rgb(0xE3E3E8).into(),
+                focus: rgb(0x2F63FF).into(),
+                divider: rgb(0xE3E3E8).into(),
+            },
+            action: ActionTheme {
+                neutral: ActionVariant {
+                    bg: rgb(0xF1F1F3).into(),
+                    hover_bg: rgb(0xE6E6EA).into(),
+                    active_bg: rgb(0xDADADF).into(),
+                    fg: content.primary,
+                    disabled_bg: rgb(0xE7E7EA).into(),
+                    disabled_fg: content.disabled,
+                },
+                primary: ActionVariant {
+                    bg: rgb(0x121214).into(),
+                    hover_bg: rgb(0x0C0C0D).into(),
+                    active_bg: rgb(0x000000).into(),
+                    fg: content.on_primary,
+                    disabled_bg: rgb(0x2A2A2E).into(),
+                    disabled_fg: rgb(0xD0D0D6).into(),
+                },
+                danger: ActionVariant {
+                    bg: rgb(0xFFB4AE).into(),
+                    hover_bg: rgb(0xFFA099).into(),
+                    active_bg: rgb(0xFF8A82).into(),
+                    fg: content.on_status,
+                    disabled_bg: rgb(0xF0CBC7).into(),
+                    disabled_fg: content.disabled,
+                },
+            },
+            status: StatusTheme {
+                success: StatusVariant {
+                    bg: rgb(0xB9F5C9).into(),
+                    fg: content.on_status,
+                },
+                warning: StatusVariant {
+                    bg: rgb(0xFFE1A6).into(),
+                    fg: content.on_status,
+                },
+                error: StatusVariant {
+                    bg: rgb(0xFFB4AE).into(),
+                    fg: content.on_status,
+                },
+                info: StatusVariant {
+                    bg: rgb(0xB6D9FF).into(),
+                    fg: content.on_status,
+                },
+            },
+            shadow: ShadowTheme {
+                elevation_1: hsla(0.0, 0.0, 0.0, 0.18),
+                elevation_2: hsla(0.0, 0.0, 0.0, 0.3),
+            },
+            text_direction: TextDirection::Ltr,
+            tokens: DesignTokens::default(),
+        }
+    }
 
     fn relative_luminance(color: Hsla) -> f32 {
         let rgb = Rgba::from(color);
@@ -398,10 +405,7 @@ mod tests {
 
     #[test]
     fn theme_contrast_requirements() {
-        for (name, theme) in [
-            ("dark", Theme::default_dark()),
-            ("light", Theme::default_light()),
-        ] {
+        for (name, theme) in fixture_themes() {
             assert_contrast_at_least(
                 &format!("{name}: surface.base/content.primary"),
                 theme.surface.base,
