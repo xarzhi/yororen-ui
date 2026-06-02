@@ -3,6 +3,7 @@ use gpui::{
     Styled, div, prelude::FluentBuilder,
 };
 
+use crate::renderer::LabelRenderState;
 use crate::rtl;
 use crate::theme::ActiveTheme;
 
@@ -122,6 +123,17 @@ impl Styled for Label {
 impl RenderOnce for Label {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let direction = cx.theme().text_direction;
+        let theme = cx.theme();
+        let r = &theme.renderers.label;
+        let state = LabelRenderState {
+            muted: self.muted,
+            strong: self.strong,
+            mono: self.mono,
+            inherit_color: self.inherit_color,
+        };
+        let color = r.color(&state, theme);
+        let strong_weight = r.strong_weight(&state, theme);
+        let mono_family = r.family_mono(&state, theme);
         let mut temp = self.base;
         let has_custom_align = temp
             .style()
@@ -133,12 +145,8 @@ impl RenderOnce for Label {
             .when(!has_custom_align, |this| {
                 this.text_align(rtl::text_align_start(direction))
             })
-            .when(self.strong, |this| {
-                this.font_weight(cx.theme().tokens.typography.weight_semibold)
-            })
-            .when(self.mono, |this| {
-                this.font_family(cx.theme().tokens.typography.family_mono.clone())
-            })
+            .when(self.strong, |this| this.font_weight(strong_weight))
+            .when(self.mono, |this| this.font_family(mono_family))
             .when(self.ellipsis, |this| this.truncate())
             // If wrap is enabled and ellipsis is not, allow text to wrap naturally
             .when(self.wrap && !self.ellipsis, |this| {
@@ -176,11 +184,7 @@ impl RenderOnce for Label {
         if self.inherit_color {
             base
         } else {
-            base.text_color(if self.muted {
-                cx.theme().content.secondary
-            } else {
-                cx.theme().content.primary
-            })
+            base.text_color(color)
         }
     }
 }

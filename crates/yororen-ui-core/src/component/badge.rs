@@ -1,8 +1,9 @@
 use gpui::{
-    Div, ElementId, FontWeight, Hsla, InteractiveElement, IntoElement, ParentElement, RenderOnce,
-    SharedString, Styled, div, prelude::FluentBuilder,
+    Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, RenderOnce, SharedString,
+    Styled, div, prelude::FluentBuilder,
 };
 
+use crate::renderer::BadgeRenderState;
 use crate::rtl;
 use crate::theme::ActiveTheme;
 
@@ -61,14 +62,20 @@ impl RenderOnce for Badge {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let direction = cx.theme().text_direction;
         let element_id = self.element_id;
+        let user_tone = self.tone;
 
-        let default_bg = cx.theme().status.info.bg;
-        let bg = self.tone.unwrap_or(default_bg);
-        let fg = if self.tone.is_some() {
-            cx.theme().content.on_status
-        } else {
-            cx.theme().status.info.fg
+        let theme = cx.theme();
+        let r = &theme.renderers.badge;
+        let state = BadgeRenderState {
+            has_custom_tone: user_tone.is_some(),
         };
+        let bg = user_tone.unwrap_or_else(|| r.bg(&state, theme));
+        let fg = r.fg(&state, theme);
+        let padding_x = r.padding_x(&state, theme);
+        let height = r.height(&state, theme);
+        let font_size = r.font_size(&state, theme);
+        let font_weight = r.font_weight(&state, theme);
+        let radius = r.border_radius(&state, theme);
 
         let mut temp = self.base;
         let has_custom_align = temp
@@ -80,13 +87,13 @@ impl RenderOnce for Badge {
             .when(!has_custom_align, |this| {
                 this.text_align(rtl::text_align_start(direction))
             })
-            .px_2()
-            .h_5()
-            .rounded_full()
+            .px(padding_x)
+            .h(height)
+            .rounded(radius)
             .bg(bg)
             .text_color(fg)
-            .text_xs()
-            .font_weight(FontWeight::MEDIUM)
+            .text_size(font_size)
+            .font_weight(font_weight)
             .flex()
             .items_center()
             .child(self.text)

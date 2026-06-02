@@ -2,6 +2,7 @@ use gpui::{
     Div, ElementId, InteractiveElement, IntoElement, ParentElement, RenderOnce, Styled, div,
 };
 
+use crate::renderer::DividerRenderState;
 use crate::theme::ActiveTheme;
 
 /// Creates a new divider element.
@@ -62,17 +63,18 @@ impl Styled for Divider {
 impl RenderOnce for Divider {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let element_id = self.element_id;
+        let theme = cx.theme();
+        let r = &theme.renderers.divider;
+        let state = DividerRenderState { vertical: self.vertical };
+        let color = r.color(&state, theme);
+        let thickness = r.thickness(&state, theme);
 
         let base = self.base.id(element_id);
 
         if self.vertical {
-            base.w(cx.theme().tokens.control.divider.thickness)
-                .h_full()
-                .bg(cx.theme().border.divider)
+            base.w(thickness).h_full().bg(color)
         } else {
-            base.h(cx.theme().tokens.control.divider.thickness)
-                .w_full()
-                .bg(cx.theme().border.divider)
+            base.h(thickness).w_full().bg(color)
         }
     }
 }

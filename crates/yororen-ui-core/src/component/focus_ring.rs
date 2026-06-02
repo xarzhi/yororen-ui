@@ -3,6 +3,7 @@ use gpui::{
     RenderOnce, StatefulInteractiveElement, Styled, div, prelude::FluentBuilder,
 };
 
+use crate::renderer::FocusRingRenderState;
 use crate::theme::ActiveTheme;
 
 pub fn focus_ring() -> FocusRing {
@@ -75,18 +76,32 @@ impl InteractiveElement for FocusRing {
 impl StatefulInteractiveElement for FocusRing {}
 
 impl RenderOnce for FocusRing {
-    fn render(self, _window: &mut gpui::Window, _cx: &mut gpui::App) -> impl IntoElement {
-        let color = self.color;
+    fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
+        let user_color = self.color;
         let radius = self.radius;
-
         let id = self.element_id.clone();
 
-        let ring_color = color.unwrap_or_else(|| _cx.theme().border.focus);
+        let theme = cx.theme();
+        let r = &theme.renderers.focus_ring;
+        let state = FocusRingRenderState {
+            has_custom_color: user_color.is_some(),
+        };
+        let ring_color = user_color.unwrap_or_else(|| r.color(&state, theme));
+        let ring_width = r.width(&state, theme);
 
         self.base
             .id(id)
             .focusable()
             .when_some(radius, |this, radius| this.rounded(radius))
-            .focus_visible(|style| style.border_2().border_color(ring_color))
+            .focus_visible(move |style| {
+                // BorderSpec is a single uniform value; map to gpui's
+                // border_1 / border_2 helpers from the renderer's width.
+                let w: f32 = ring_width.into();
+                if w >= 2.0 {
+                    style.border_2().border_color(ring_color)
+                } else {
+                    style.border_1().border_color(ring_color)
+                }
+            })
     }
 }

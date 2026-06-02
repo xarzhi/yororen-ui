@@ -3,6 +3,7 @@ use gpui::{
     Styled, div, prelude::FluentBuilder,
 };
 
+use crate::renderer::HeadingRenderState;
 use crate::rtl;
 use crate::theme::ActiveTheme;
 
@@ -10,7 +11,7 @@ pub fn heading(text: impl Into<SharedString>) -> Heading {
     Heading::new(text)
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum HeadingLevel {
     H1,
     H2,
@@ -66,21 +67,12 @@ impl Styled for Heading {
 impl RenderOnce for Heading {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let direction = cx.theme().text_direction;
-        let tokens = &cx.theme().tokens;
-        let (size, weight) = match self.level {
-            HeadingLevel::H1 => (
-                tokens.typography.font_size_2xl,
-                tokens.typography.weight_bold,
-            ),
-            HeadingLevel::H2 => (
-                tokens.typography.font_size_xl,
-                tokens.typography.weight_semibold,
-            ),
-            HeadingLevel::H3 => (
-                tokens.typography.font_size_lg,
-                tokens.typography.weight_semibold,
-            ),
-        };
+        let theme = cx.theme();
+        let r = &theme.renderers.heading;
+        let state = HeadingRenderState { level: self.level };
+        let size = r.size(&state, theme);
+        let weight = r.weight(&state, theme);
+        let color = r.color(&state, theme);
 
         let mut temp = self.base;
         let has_custom_align = temp
@@ -94,7 +86,7 @@ impl RenderOnce for Heading {
             })
             .text_size(size)
             .font_weight(weight)
-            .text_color(cx.theme().content.primary)
+            .text_color(color)
             .child(self.text)
     }
 }

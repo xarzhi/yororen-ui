@@ -3,6 +3,7 @@ use gpui::{
     RenderOnce, Styled, div,
 };
 
+use crate::renderer::TooltipRenderState;
 use crate::theme::ActiveTheme;
 
 /// Defines the placement position of a tooltip relative to its trigger element.
@@ -118,14 +119,25 @@ impl Render for TooltipView {
         cx: &mut gpui::Context<Self>,
     ) -> impl IntoElement {
         let theme = cx.theme();
+        let r = &theme.renderers.tooltip;
+        let state = TooltipRenderState {
+            has_custom_bg: self.bg.is_some(),
+            has_custom_fg: self.text_color.is_some(),
+        };
+        let bg = self.bg.unwrap_or_else(|| r.bg(&state, theme));
+        let fg = self.text_color.unwrap_or_else(|| r.fg(&state, theme));
+        let padding = r.padding(&state, theme);
+        let font_size = r.font_size(&state, theme);
+        let radius = r.border_radius(&state, theme);
+
         div()
             .id(self.element_id.clone())
-            .px_3()
-            .py_2()
-            .rounded_sm()
-            .text_sm()
-            .bg(self.bg.unwrap_or_else(|| theme.action.neutral.bg))
-            .text_color(self.text_color.unwrap_or_else(|| theme.action.neutral.fg))
+            .px(padding.left)
+            .py(padding.top)
+            .rounded(radius)
+            .text_size(font_size)
+            .bg(bg)
+            .text_color(fg)
             .child(self.content.clone())
     }
 }

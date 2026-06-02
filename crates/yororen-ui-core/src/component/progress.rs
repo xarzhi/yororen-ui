@@ -5,7 +5,11 @@ use gpui::{
 
 use gpui::InteractiveElement;
 
-use crate::{animation::constants::duration, theme::ActiveTheme};
+use crate::{
+    animation::constants::duration,
+    renderer::ProgressBarRenderState,
+    theme::ActiveTheme,
+};
 
 use crate::animation::ease_in_out_clamped;
 
@@ -316,17 +320,28 @@ impl RenderOnce for ProgressBar {
         let element_id = self.element_id.clone();
 
         let theme = cx.theme();
-        let track = self.track_color.unwrap_or(theme.surface.hover);
-        let fill = self.fill_color.unwrap_or(theme.action.primary.bg);
-
+        let r = &theme.renderers.progress_bar;
+        let state = ProgressBarRenderState {
+            indeterminate: self.indeterminate,
+            has_custom_height: {
+                let h: f32 = self.height.into();
+                h > 0.0
+            },
+        };
+        let user_track = self.track_color;
+        let user_fill = self.fill_color;
+        let track = user_track.unwrap_or_else(|| r.track(&state, theme));
+        let fill = user_fill.unwrap_or_else(|| r.fill(&state, theme));
         let height = {
             let h: f32 = self.height.into();
             if h > 0.0 {
                 self.height
             } else {
-                theme.tokens.control.progress.bar_default_h
+                r.height(&state, theme)
             }
         };
+        let border_color = r.border_color(&state, theme);
+        let border_radius = r.border_radius(&state, theme);
         let t = self.value.clamp(0.0, 1.0);
         let indeterminate = self.indeterminate;
 
@@ -339,10 +354,10 @@ impl RenderOnce for ProgressBar {
             .id(element_id)
             .relative()
             .h(height)
-            .rounded_full()
+            .rounded(border_radius)
             .bg(track)
             .border_1()
-            .border_color(theme.border.muted)
+            .border_color(border_color)
             .overflow_hidden();
 
         let direction = cx.theme().text_direction;
@@ -355,7 +370,7 @@ impl RenderOnce for ProgressBar {
                     .absolute()
                     .top_0()
                     .h(height)
-                    .rounded_full()
+                    .rounded(border_radius)
                     .bg(fill)
                     .with_animation(
                         "ui:progress-bar:indeterminate:anim",
@@ -384,7 +399,7 @@ impl RenderOnce for ProgressBar {
                     .when(is_rtl, |this| this.right_0())
                     .when(!is_rtl, |this| this.left_0())
                     .h(height)
-                    .rounded_full()
+                    .rounded(border_radius)
                     .bg(fill)
                     .w(relative(t)),
             )

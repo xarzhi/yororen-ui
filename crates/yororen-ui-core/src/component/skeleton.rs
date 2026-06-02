@@ -6,7 +6,7 @@ use gpui::{
 use gpui::InteractiveElement;
 use gpui::prelude::FluentBuilder;
 
-use crate::{animation::constants::duration, theme::ActiveTheme};
+use crate::{animation::constants::duration, renderer::SkeletonRenderState, theme::ActiveTheme};
 
 use crate::animation::ease_in_out_clamped;
 
@@ -83,14 +83,22 @@ impl RenderOnce for SkeletonLine {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let id = self.element_id.clone();
         let theme = cx.theme();
+        let r = &theme.renderers.skeleton;
+        let state = SkeletonRenderState {
+            block: false,
+            block_sharp: false,
+        };
+        let user_tone = self.tone;
         let height = {
             let h: f32 = self.height.into();
             if h > 0.0 {
                 self.height
             } else {
-                theme.tokens.control.skeleton.line_h
+                r.min_height(&state, theme)
             }
         };
+        let radius = r.border_radius(&state, theme);
+        let bg = user_tone.unwrap_or_else(|| r.bg(&state, theme));
         let motion = &theme.tokens.motion;
         let pulse_min = motion.pulse_min_opacity;
         let pulse_max = motion.pulse_max_opacity;
@@ -99,8 +107,8 @@ impl RenderOnce for SkeletonLine {
             .base
             .id(self.element_id)
             .h(height)
-            .rounded_full()
-            .bg(self.tone.unwrap_or(theme.surface.hover))
+            .rounded(radius)
+            .bg(bg)
             .when_some(self.width, |this, w| this.w(w))
             .when(self.width.is_none(), |this| this.w_full());
 
@@ -197,14 +205,22 @@ impl RenderOnce for SkeletonBlock {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let id = self.element_id.clone();
         let theme = cx.theme();
+        let r = &theme.renderers.skeleton;
+        let state = SkeletonRenderState {
+            block: true,
+            block_sharp: !self.rounded,
+        };
+        let user_tone = self.tone;
         let height = {
             let h: f32 = self.height.into();
             if h > 0.0 {
                 self.height
             } else {
-                theme.tokens.control.skeleton.block_min_h
+                r.min_height(&state, theme)
             }
         };
+        let radius = r.border_radius(&state, theme);
+        let bg = user_tone.unwrap_or_else(|| r.bg(&state, theme));
         let pulse_min = theme.tokens.motion.pulse_min_opacity;
         let pulse_max = theme.tokens.motion.pulse_max_opacity;
 
@@ -212,9 +228,8 @@ impl RenderOnce for SkeletonBlock {
             .base
             .id(self.element_id)
             .h(height)
-            .when(self.rounded, |this| this.rounded_md())
-            .when(!self.rounded, |this| this.rounded_none())
-            .bg(self.tone.unwrap_or(theme.surface.hover))
+            .rounded(radius)
+            .bg(bg)
             .when_some(self.width, |this, w| this.w(w))
             .when(self.width.is_none(), |this| this.w_full());
 
