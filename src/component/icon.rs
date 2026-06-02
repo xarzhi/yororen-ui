@@ -1,7 +1,7 @@
 mod name;
 
 use gpui::{
-    ElementId, Hsla, InteractiveElement, IntoElement, Pixels, RenderOnce, SharedString, Styled, px,
+    ElementId, Hsla, InteractiveElement, IntoElement, Pixels, RenderOnce, SharedString, Styled,
     svg,
 };
 pub use name::*;
@@ -54,7 +54,7 @@ impl From<IconPath> for SharedString {
 pub struct Icon {
     element_id: ElementId,
     path: IconPath,
-    size: Pixels,
+    size: Option<Pixels>,
     color: Option<Hsla>,
     inherit_color: bool,
 }
@@ -64,7 +64,7 @@ impl Icon {
         Self {
             element_id: "ui:icon".into(),
             path: path.into(),
-            size: px(14.),
+            size: None,
             color: None,
             inherit_color: false,
         }
@@ -81,7 +81,7 @@ impl Icon {
     }
 
     pub fn size(mut self, size: Pixels) -> Self {
-        self.size = size;
+        self.size = Some(size);
         self
     }
 
@@ -98,7 +98,8 @@ impl Icon {
 
 impl RenderOnce for Icon {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
-        let base = svg().path(self.path).size(self.size).id(self.element_id);
+        let size = self.size.unwrap_or(cx.theme().tokens.sizes.icon_md);
+        let base = svg().path(self.path).size(size).id(self.element_id);
         if let Some(color) = self.color {
             base.text_color(color)
         } else if self.inherit_color {

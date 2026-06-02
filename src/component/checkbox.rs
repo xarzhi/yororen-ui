@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use gpui::{
     Animation, AnimationExt, ClickEvent, Div, ElementId, Hsla, InteractiveElement, IntoElement,
-    ParentElement, RenderOnce, StatefulInteractiveElement, Styled, div, prelude::FluentBuilder, px,
+    ParentElement, RenderOnce, StatefulInteractiveElement, Styled, div, prelude::FluentBuilder,
 };
 
 use crate::{
@@ -54,7 +54,7 @@ impl Checkbox {
     pub fn new() -> Self {
         Self {
             element_id: "ui:checkbox".into(),
-            base: div().w(px(18.)).h(px(18.)),
+            base: div(),
             checked: false,
             disabled: false,
             on_toggle: None,
@@ -146,6 +146,8 @@ impl RenderOnce for Checkbox {
         let mut base = self
             .base
             .id(id.clone())
+            .w(theme.tokens.control.checkbox.box_size)
+            .h(theme.tokens.control.checkbox.box_size)
             .rounded_sm()
             .border_1()
             .border_color(toggle_style.border)
@@ -167,7 +169,11 @@ impl RenderOnce for Checkbox {
         }
 
         // Animate check icon with opacity effect (wrap in div for animation support)
-        let check_wrapper = div().child(icon(IconName::Check).size(px(12.)).color(toggle_style.fg));
+        let check_wrapper = div().child(
+            icon(IconName::Check)
+                .size(theme.tokens.control.checkbox.check_size)
+                .color(toggle_style.fg),
+        );
         let animated_check = check_wrapper.with_animation(
             format!("ui:checkbox:check:{}", checked),
             Animation::new(animation::duration::FAST).with_easing(ease_in_out_clamped),

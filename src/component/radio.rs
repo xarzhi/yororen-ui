@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use gpui::{
     Animation, AnimationExt, ClickEvent, Div, ElementId, Hsla, InteractiveElement, IntoElement,
-    ParentElement, RenderOnce, StatefulInteractiveElement, Styled, div, prelude::FluentBuilder, px,
+    ParentElement, RenderOnce, StatefulInteractiveElement, Styled, div, prelude::FluentBuilder,
 };
 
 use crate::{
@@ -54,7 +54,7 @@ impl Radio {
     pub fn new() -> Self {
         Self {
             element_id: "ui:radio".into(),
-            base: div().w(px(18.)).h(px(18.)),
+            base: div(),
             checked: false,
             disabled: false,
             on_toggle: None,
@@ -146,6 +146,8 @@ impl RenderOnce for Radio {
         let mut base = self
             .base
             .id(id.clone())
+            .w(theme.tokens.control.radio.ring_size)
+            .h(theme.tokens.control.radio.ring_size)
             .rounded_full()
             .border_1()
             .border_color(toggle_style.border)
@@ -167,7 +169,11 @@ impl RenderOnce for Radio {
         }
 
         // Add animated inner dot for checked state
-        let inner_dot = div().w(px(8.)).h(px(8.)).rounded_full().bg(toggle_style.fg);
+        let inner_dot = div()
+            .w(theme.tokens.control.radio.dot_size)
+            .h(theme.tokens.control.radio.dot_size)
+            .rounded_full()
+            .bg(toggle_style.fg);
 
         let animated_dot = inner_dot.with_animation(
             format!("ui:radio:dot:{}", checked),

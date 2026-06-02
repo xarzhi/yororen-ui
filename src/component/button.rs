@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use gpui::{
     ClickEvent, Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, RenderOnce,
-    StatefulInteractiveElement, Styled, div, prelude::FluentBuilder, px,
+    StatefulInteractiveElement, Styled, div, prelude::FluentBuilder,
 };
 
 use crate::component::{ClickCallback, HoverCallback, compute_action_style};
@@ -68,7 +68,7 @@ impl Button {
     pub fn new() -> Self {
         Self {
             element_id: "ui:button".into(),
-            base: div().h(px(36.)).px_4().py_2(),
+            base: div().px_4().py_2(),
             click_fn: None,
             hover_fn: None,
             clickable: true,
@@ -166,6 +166,7 @@ impl RenderOnce for Button {
 
         self.base
             .id(self.element_id)
+            .h(cx.theme().tokens.control.button.min_height)
             .rounded_md()
             .when(direction.is_rtl(), |this| this.flex_row_reverse())
             .when(!direction.is_rtl(), |this| this.flex_row())

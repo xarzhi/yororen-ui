@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use gpui::{
     ClickEvent, Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, Pixels,
-    RenderOnce, StatefulInteractiveElement, Styled, div, prelude::FluentBuilder, px,
+    RenderOnce, StatefulInteractiveElement, Styled, div, prelude::FluentBuilder,
 };
 
 use crate::{
@@ -52,7 +52,7 @@ impl IconButton {
     pub fn new() -> Self {
         Self {
             element_id: "ui:icon-button".into(),
-            base: div().w(px(36.)).h(px(36.)),
+            base: div(),
             icon: None,
 
             click_fn: None,
@@ -172,6 +172,8 @@ impl RenderOnce for IconButton {
 
         self.base
             .id(self.element_id)
+            .w(cx.theme().tokens.control.icon_button.min_size)
+            .h(cx.theme().tokens.control.icon_button.min_size)
             .rounded_md()
             .flex()
             .items_center()
@@ -203,7 +205,7 @@ impl RenderOnce for IconButton {
                 this.child(
                     self.icon
                         .unwrap()
-                        .size(icon_size.unwrap_or(px(14.)))
+                        .size(icon_size.unwrap_or(cx.theme().tokens.sizes.icon_md))
                         .color(action_style.fg),
                 )
             })

@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use gpui::{
     ClickEvent, Div, ElementId, FontWeight, Hsla, InteractiveElement, IntoElement, ParentElement,
-    RenderOnce, StatefulInteractiveElement, Styled, div, prelude::FluentBuilder, px,
+    RenderOnce, StatefulInteractiveElement, Styled, div, prelude::FluentBuilder,
 };
 
 use crate::{
@@ -37,7 +37,7 @@ impl ToggleButton {
     pub fn new(label: impl Into<String>) -> Self {
         Self {
             element_id: "ui:toggle-button".into(),
-            base: div().h(px(36.)).px_4().py_2(),
+            base: div().px_4().py_2(),
             label: label.into(),
             selected: false,
             disabled: false,
@@ -198,6 +198,7 @@ impl RenderOnce for ToggleButton {
         let mut base = self
             .base
             .id(id.clone())
+            .h(cx.theme().tokens.control.button.min_height)
             .rounded_md()
             .text_sm()
             .font_weight(FontWeight::MEDIUM)

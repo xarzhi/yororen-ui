@@ -1,5 +1,5 @@
 use gpui::{
-    ElementId, InteractiveElement, IntoElement, ParentElement, RenderOnce, Styled, div, px,
+    ElementId, InteractiveElement, IntoElement, ParentElement, RenderOnce, Styled, div,
 };
 
 use crate::component::{ArrowDirection, IconName, icon};
@@ -32,7 +32,7 @@ impl Disclosure {
             element_id: "ui:disclosure".into(),
             base: div(),
             expanded: false,
-            size: px(14.),
+            size: gpui::px(0.),
         }
     }
 
@@ -81,11 +81,17 @@ impl RenderOnce for Disclosure {
         let expanded = self.expanded;
         let size = self.size;
         let direction = cx.theme().text_direction;
+        let size_f: f32 = size.into();
+        let resolved_size = if size_f > 0.0 {
+            size
+        } else {
+            cx.theme().tokens.control.disclosure.icon_size
+        };
 
         self.base
             .id(element_id)
-            .w(size)
-            .h(size)
+            .w(resolved_size)
+            .h(resolved_size)
             .flex()
             .items_center()
             .justify_center()
@@ -98,7 +104,7 @@ impl RenderOnce for Disclosure {
                 } else {
                     ArrowDirection::Right
                 }))
-                .size(size),
+                .size(resolved_size),
             )
     }
 }

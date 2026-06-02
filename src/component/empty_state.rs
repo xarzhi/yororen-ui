@@ -1,7 +1,6 @@
-use gpui::prelude::FluentBuilder;
 use gpui::{
     Div, ElementId, InteractiveElement, IntoElement, ParentElement, Pixels, RenderOnce, Styled,
-    div, px,
+    div,
 };
 
 use crate::component::{Heading, HeadingLevel, Icon, IconName, Label, button, heading, label};
@@ -34,11 +33,11 @@ impl EmptyState {
         Self {
             element_id: "ui:empty-state".into(),
             base: div(),
-            icon: Some(crate::component::icon(IconName::Info).size(px(20.))),
+            icon: None,
             title: None,
             description: None,
             action: None,
-            max_width: Some(px(420.)),
+            max_width: None,
         }
     }
 
@@ -101,7 +100,12 @@ impl RenderOnce for EmptyState {
 
         let icon = self
             .icon
-            .unwrap_or_else(|| crate::component::icon(IconName::Info));
+            .unwrap_or_else(|| {
+                crate::component::icon(IconName::Info).size(theme.tokens.sizes.icon_xl)
+            });
+        let max_width = self
+            .max_width
+            .unwrap_or(theme.tokens.control.empty_state.action_gap * 35.0);
 
         self.base
             .id(self.element_id.clone())
@@ -116,11 +120,11 @@ impl RenderOnce for EmptyState {
             .bg(theme.surface.raised)
             .border_1()
             .border_color(theme.border.default)
-            .when_some(self.max_width, |this, w| this.max_w(w))
+            .max_w(max_width)
             .child(
                 div()
-                    .w(px(44.))
-                    .h(px(44.))
+                    .w(theme.tokens.sizes.avatar_lg)
+                    .h(theme.tokens.sizes.avatar_lg)
                     .rounded_full()
                     .bg(theme.surface.base)
                     .border_1()
