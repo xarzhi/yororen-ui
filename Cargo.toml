@@ -4,6 +4,7 @@ members = [
     "crates/yororen-ui",
     "crates/yororen-ui-core",
     "crates/yororen-ui-theme-system",
+    "crates/yororen-ui-theme-mini",
     "crates/yororen-ui-locale-en",
     "crates/yororen-ui-locale-zh-CN",
     "crates/yororen-ui-locale-ar",

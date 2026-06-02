@@ -1,0 +1,12 @@
+[package]
+name = "yororen_ui_theme_mini"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Phase D mini theme for yororen-ui — proves Renderer trait-driven skinning. Uses a bold indigo / cyan accent palette to make 'the same UI, different skin' visually obvious."
+repository.workspace = true
+
+[dependencies]
+yororen-ui-core = { package = "yororen_ui_core", path = "../yororen-ui-core", version = "0.3" }
+yororen-ui-theme-system = { package = "yororen_ui_theme_system", path = "../yororen-ui-theme-system", version = "0.3" }
+gpui = { package = "gpui-ce", version = "0.3" }
