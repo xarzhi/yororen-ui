@@ -589,7 +589,7 @@ impl gpui::EntityInputHandler for TextAreaState {
                 bounds.left() + x - self.scroll_x,
                 bounds.top() + y - self.scroll_y,
             ),
-            gpui::size(gpui::px(2.), layout.line_height),
+            gpui::size(gpui::px(2.), layout.line_height), // cursor width — intentionally literal; covered by input.focus_ring_thickness (2px)
         ))
     }
 

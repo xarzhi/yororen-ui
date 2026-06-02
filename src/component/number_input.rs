@@ -187,7 +187,9 @@ impl RenderOnce for NumberInput {
         let validate = self.validate;
 
         let theme = cx.theme().clone();
-        let height = self.height.unwrap_or_else(|| px(36.).into());
+        let height = self
+            .height
+            .unwrap_or_else(|| cx.theme().tokens.control.button.min_height.into());
 
         let input_style = compute_input_style(
             &theme,
@@ -291,7 +293,7 @@ impl RenderOnce for NumberInput {
                     .gap_1()
                     .child(
                         button(format!("{}:decrement", id))
-                            .h(px(36.))
+                            .h(cx.theme().tokens.control.button.min_height)
                             .px_3()
                             .rounded_md()
                             .variant(ActionVariantKind::Neutral)
@@ -326,7 +328,7 @@ impl RenderOnce for NumberInput {
                     )
                     .child(
                         button(format!("{}:increment", id))
-                            .h(px(36.))
+                            .h(cx.theme().tokens.control.button.min_height)
                             .px_3()
                             .rounded_md()
                             .variant(ActionVariantKind::Neutral)

@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use gpui::{
     App, Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, RenderOnce,
-    SharedString, StatefulInteractiveElement, Styled, div, prelude::FluentBuilder, px,
+    SharedString, StatefulInteractiveElement, Styled, div, prelude::FluentBuilder,
 };
 
 use crate::{
@@ -157,7 +157,9 @@ impl RenderOnce for SearchInput {
         let id = self.element_id.clone();
         let placeholder = self.placeholder;
         let disabled = self.disabled;
-        let height = self.height.unwrap_or_else(|| px(36.).into());
+        let height = self
+            .height
+            .unwrap_or_else(|| cx.theme().tokens.control.button.min_height.into());
         let bg = self.bg;
         let border = self.border;
         let focus_border = self.focus_border;
@@ -215,7 +217,11 @@ impl RenderOnce for SearchInput {
                 this.focus_visible(|style| style.border_2().border_color(focus_border))
             })
             .when(disabled, |this| this.opacity(0.6).cursor_not_allowed())
-            .child(icon(IconName::Search).size(px(14.)).color(hint))
+            .child(
+                icon(IconName::Search)
+                    .size(cx.theme().tokens.sizes.icon_md)
+                    .color(hint),
+            )
             .child(
                 div().flex_1().h(height).child(
                     text_input(input_id)
@@ -241,19 +247,20 @@ impl RenderOnce for SearchInput {
 
         // Conditionally add clear button
         if clear_visible && !disabled {
+            let clear_size = cx.theme().tokens.sizes.control_h_xs;
             base = base.child(
                 div()
-                    .w(px(24.))
-                    .h(px(24.))
+                    .w(clear_size)
+                    .h(clear_size)
                     .flex()
                     .items_center()
                     .justify_center()
                     .child(
                         icon_button(clear_id)
                             .icon(icon(IconName::Close))
-                            .icon_size(px(14.))
-                            .w(px(24.))
-                            .h(px(24.))
+                            .icon_size(cx.theme().tokens.sizes.icon_md)
+                            .w(clear_size)
+                            .h(clear_size)
                             .rounded_md()
                             .bg(action_variant.bg.alpha(0.0))
                             .hover_bg(action_variant.hover_bg)

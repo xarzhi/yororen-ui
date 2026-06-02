@@ -199,7 +199,9 @@ impl RenderOnce for FilePathInput {
 
         let disabled = self.disabled;
         let theme = cx.theme().clone();
-        let height = self.height.unwrap_or_else(|| px(36.).into());
+        let height = self
+            .height
+            .unwrap_or_else(|| cx.theme().tokens.control.button.min_height.into());
         let border = self.border;
         let focus_border = self.focus_border;
         let bg = self.bg;
@@ -281,7 +283,7 @@ impl RenderOnce for FilePathInput {
             )
             .child(
                 button(button_id)
-                    .h(px(36.))
+                    .h(cx.theme().tokens.control.button.min_height)
                     .px_3()
                     .rounded_md()
                     .variant(ActionVariantKind::Neutral)

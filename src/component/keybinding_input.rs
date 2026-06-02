@@ -1,7 +1,7 @@
 use gpui::{
     Div, ElementId, Hsla, InteractiveElement, IntoElement, KeyDownEvent, Keystroke,
     ModifiersChangedEvent, ParentElement, RenderOnce, SharedString, StatefulInteractiveElement,
-    Styled, div, prelude::FluentBuilder, px,
+    Styled, div, prelude::FluentBuilder,
 };
 
 use crate::{
@@ -186,7 +186,9 @@ impl RenderOnce for KeybindingInput {
         let input_style =
             compute_input_style(&theme, disabled, bg, border, focus_border, text_color);
 
-        let height = self.height.unwrap_or_else(|| px(36.).into());
+        let height = self
+            .height
+            .unwrap_or_else(|| cx.theme().tokens.control.button.min_height.into());
 
         let on_change = self.on_change;
         let use_internal_value = on_change.is_none();

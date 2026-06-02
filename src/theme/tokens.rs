@@ -425,6 +425,7 @@ pub struct InputTokens {
     pub focus_ring_thickness: Pixels, // 2
     pub icon_gap: Pixels,           // 8
     pub spinner_size: Pixels,       // 14
+    pub text_area_min_h: Pixels,    // 120
 }
 
 impl Default for InputTokens {
@@ -437,6 +438,7 @@ impl Default for InputTokens {
             focus_ring_thickness: px(2.),
             icon_gap: px(8.),
             spinner_size: px(14.),
+            text_area_min_h: px(120.),
         }
     }
 }

@@ -519,6 +519,9 @@ impl Element for TextLineElement {
         window: &mut gpui::Window,
         cx: &mut App,
     ) -> Self::PrepaintState {
+        let theme = cx.theme();
+        let cursor_thickness: gpui::Pixels = theme.tokens.control.input.cursor_thickness;
+        let _cursor_width: gpui::Pixels = theme.tokens.control.input.focus_ring_thickness;
         let input = self.input.read(cx);
         let content = input.edit.content().clone();
         let placeholder = input.placeholder.clone();
@@ -553,7 +556,7 @@ impl Element for TextLineElement {
                     len: marked_range.end - marked_range.start,
                     underline: Some(UnderlineStyle {
                         color: Some(run.color),
-                        thickness: px(1.0),
+                        thickness: cursor_thickness,
                         wavy: false,
                     }),
                     ..run.clone()
@@ -582,7 +585,7 @@ impl Element for TextLineElement {
             raw_cursor_pos
         };
 
-        let cursor_width = px(2.);
+        let cursor_width: gpui::Pixels = theme.tokens.control.input.focus_ring_thickness;
         let max_cursor_x = (bounds.size.width - cursor_width).max(Pixels::ZERO);
         let max_scroll_x = (line.width - max_cursor_x).max(Pixels::ZERO);
         let mut scroll_x = input.scroll_x.clamp(Pixels::ZERO, max_scroll_x);
@@ -606,7 +609,7 @@ impl Element for TextLineElement {
                     fill(
                         Bounds::new(
                             point(cursor_paint_x, bounds.top()),
-                            size(px(2.), bounds.bottom() - bounds.top()),
+                            size(cursor_width, bounds.bottom() - bounds.top()),
                         ),
                         cx.theme().border.focus,
                     )
@@ -737,7 +740,7 @@ impl TextInput {
     pub fn new() -> Self {
         Self {
             element_id: "ui:text-input".into(),
-            base: div().h(px(36.)).px_3(),
+            base: div().px_3(),
             placeholder: "".into(),
 
             disabled: false,
@@ -949,7 +952,9 @@ impl RenderOnce for TextInput {
             self.text_color,
         );
 
-        let height = self.height.unwrap_or_else(|| px(36.).into());
+        let height = self
+            .height
+            .unwrap_or_else(|| cx.theme().tokens.control.button.min_height.into());
         let inset = if disabled { px(6.) } else { px(5.) };
 
         let direction = cx.theme().text_direction;
@@ -957,6 +962,7 @@ impl RenderOnce for TextInput {
         let mut base = self
             .base
             .id(id.clone())
+            .h(height)
             .when(direction.is_rtl(), |this| this.flex_row_reverse())
             .when(!direction.is_rtl(), |this| this.flex_row())
             .items_center()

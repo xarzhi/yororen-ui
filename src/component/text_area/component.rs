@@ -37,7 +37,7 @@ impl TextArea {
     pub fn new() -> Self {
         Self {
             element_id: "ui:text-area".into(),
-            base: div().h(gpui::px(120.)).px_3(),
+            base: div().px_3(),
             placeholder: "".into(),
 
             disabled: false,
@@ -184,7 +184,9 @@ impl RenderOnce for TextArea {
         } else {
             self.text_color.unwrap_or_else(|| theme.content.primary)
         };
-        let height = self.height.unwrap_or_else(|| gpui::px(120.).into());
+        let height = self
+            .height
+            .unwrap_or_else(|| cx.theme().tokens.control.input.text_area_min_h.into());
         let inset = if disabled { gpui::px(6.) } else { gpui::px(5.) };
 
         let mut base = self

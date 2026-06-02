@@ -4,7 +4,7 @@
 
 use gpui::{
     App, Bounds, Element, ElementId, ElementInputHandler, Entity, GlobalElementId, IntoElement,
-    LayoutId, PaintQuad, Pixels, Style, TextRun, fill, point, px, relative, size,
+    LayoutId, PaintQuad, Pixels, Style, TextRun, fill, point, relative, size,
 };
 
 use super::layout::{LineLayout, TextAreaLayout};
@@ -66,6 +66,8 @@ impl Element for TextAreaElement {
         window: &mut gpui::Window,
         cx: &mut App,
     ) -> Self::PrepaintState {
+        let theme = cx.theme();
+        let _cursor_thickness: gpui::Pixels = theme.tokens.control.input.cursor_thickness;
         let input = self.input.read(cx);
         let content = input.edit.content().clone();
         let placeholder = input.placeholder.clone();
@@ -135,7 +137,8 @@ impl Element for TextAreaElement {
         scroll_x = scroll_x.clamp(Pixels::ZERO, max_scroll_x);
 
         let mut selection = Vec::new();
-        let cursor_width = px(2.);
+        let cursor_width: gpui::Pixels = theme.tokens.control.input.focus_ring_thickness;
+        let _ = cursor_width;
         let mut cursor_quad = None;
         let mut cursor_row = None;
         let mut cursor_x = Pixels::ZERO;

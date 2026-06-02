@@ -37,7 +37,7 @@ impl PasswordInput {
     pub fn new() -> Self {
         Self {
             element_id: "ui:password-input".into(),
-            base: div().h(gpui::px(36.)).px_3(),
+            base: div().px_3(),
             placeholder: "".into(),
 
             disabled: false,
@@ -193,7 +193,9 @@ impl RenderOnce for PasswordInput {
         } else {
             self.text_color.unwrap_or_else(|| theme.content.primary)
         };
-        let height = self.height.unwrap_or_else(|| gpui::px(36.).into());
+        let height = self
+            .height
+            .unwrap_or_else(|| cx.theme().tokens.control.button.min_height.into());
         let inset = if disabled { gpui::px(6.) } else { gpui::px(5.) };
 
         let direction = cx.theme().text_direction;

@@ -275,8 +275,12 @@ fn call_on_change(
 impl RenderOnce for ComboBox {
     fn render(self, window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let disabled = self.disabled;
-        let height = self.height.unwrap_or_else(|| px(36.).into());
+        let height = self
+            .height
+            .unwrap_or_else(|| cx.theme().tokens.control.button.min_height.into());
         let menu_width = self.menu_width;
+        let popover_offset: f32 = cx.theme().tokens.control.popover.offset.into();
+        let popover_slide: f32 = cx.theme().tokens.motion.slide_distance;
         let options = self.options;
         let localized = self.localized;
         let placeholder = if localized {
@@ -414,7 +418,7 @@ impl RenderOnce for ComboBox {
             )
             .child(
                 icon(IconName::Arrow(ArrowDirection::Down))
-                    .size(px(14.))
+                    .size(cx.theme().tokens.sizes.icon_md)
                     .color(hint),
             );
 
@@ -436,7 +440,7 @@ impl RenderOnce for ComboBox {
                     .unwrap_or(TextDirection::Ltr);
 
                 let trigger_bounds = *trigger_bounds_state_for_menu.read(cx);
-                let menu_width_px = menu_width_px(menu_width, px(420.));
+                let menu_width_px = menu_width_px(menu_width, cx.theme().tokens.control.combo_box.menu_width);
                 let menu_left = desired_menu_left(trigger_bounds, menu_width_px, direction, false, window);
                 let relative_left = menu_left - trigger_bounds.left();
 
@@ -469,7 +473,7 @@ impl RenderOnce for ComboBox {
                     .left_0()
                     // Horizontal overflow protection: shift within window bounds.
                     .when(relative_left != Pixels::ZERO, |this| this.left(relative_left))
-                    .mt(px(10.))
+                    .mt(theme.tokens.control.popover.offset)
                     .rounded_md()
                     .border_1()
                     .border_color(theme.border.default)
@@ -540,7 +544,7 @@ impl RenderOnce for ComboBox {
                             .when(is_selected, |this| {
                                 this.child(
                                     icon(IconName::Check)
-                                        .size(px(12.))
+                                        .size(cx.theme().tokens.sizes.icon_sm)
                                         .color(theme.action.primary.bg),
                                 )
                             })
@@ -571,7 +575,10 @@ impl RenderOnce for ComboBox {
                 let animated_menu = menu.with_animation(
                     format!("combo-box-menu-{}", is_open),
                     Animation::new(duration::MENU_OPEN).with_easing(ease_out_quint_clamped),
-                    |this, value| this.opacity(value).mt(px(10.0 - 6.0 * value)),
+                    move |this, value| {
+                        this.opacity(value)
+                            .mt(gpui::px(popover_offset - popover_slide * value))
+                    },
                 );
 
                 this.child(gpui::deferred(animated_menu).with_priority(100))

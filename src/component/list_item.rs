@@ -1,6 +1,6 @@
 use gpui::{
     Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, RenderOnce, Styled, div,
-    prelude::FluentBuilder, px,
+    prelude::FluentBuilder,
 };
 
 use crate::theme::ActiveTheme;
@@ -135,7 +135,7 @@ impl RenderOnce for ListItem {
         self.base
             .id(self.element_id)
             .w_full()
-            .min_h(px(32.))
+            .min_h(cx.theme().tokens.sizes.control_h_md)
             .px_3()
             .py_2()
             .rounded_md()

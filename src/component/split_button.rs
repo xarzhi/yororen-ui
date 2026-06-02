@@ -3,7 +3,7 @@ use std::sync::Arc;
 use gpui::{
     Animation, AnimationExt, ClickEvent, Div, ElementId, Hsla, InteractiveElement, IntoElement,
     ParentElement, Pixels, RenderOnce, StatefulInteractiveElement, Styled, div,
-    prelude::FluentBuilder, px,
+    prelude::FluentBuilder,
 };
 
 use crate::animation::constants::duration;
@@ -229,7 +229,7 @@ impl RenderOnce for SplitButton {
                     .top_full()
                     .when(is_rtl, |this| this.left_0())
                     .when(!is_rtl, |this| this.right_0())
-                    .mt(px(10.))
+                    .mt(cx.theme().tokens.control.popover.offset)
                     .rounded_md()
                     .border_1()
                     .border_color(border_default)
@@ -268,17 +268,22 @@ impl RenderOnce for SplitButton {
                             .child(option_label)
                     }));
 
+                let popover_offset: f32 = cx.theme().tokens.control.popover.offset.into();
+                let popover_slide: f32 = cx.theme().tokens.motion.slide_distance;
                 let animated_menu = menu.with_animation(
                     format!("ui:split-button:menu-{}", is_open),
                     Animation::new(duration::MENU_OPEN).with_easing(ease_out_quint_clamped),
-                    |this, value| this.opacity(value).mt(px(10.0 - 6.0 * value)),
+                    move |this, value| {
+                        this.opacity(value)
+                            .mt(gpui::px(popover_offset - popover_slide * value))
+                    },
                 );
 
                 this.child(gpui::deferred(animated_menu).with_priority(100))
             })
             .child(
                 button(primary_id)
-                    .h(px(36.))
+                    .h(cx.theme().tokens.control.button.min_height)
                     .px_4()
                     .py_2()
                     .rounded_lg()
@@ -304,11 +309,16 @@ impl RenderOnce for SplitButton {
                     .child(label),
             )
             .when(has_options, |this| {
-                this.child(div().w(px(1.)).h_full().bg(border_divider))
+                this.child(
+                    div()
+                        .w(cx.theme().tokens.control.split_button.separator_w)
+                        .h_full()
+                        .bg(border_divider),
+                )
                     .child(
                         button(toggle_id)
-                            .w(px(40.))
-                            .h(px(36.))
+                            .w(cx.theme().tokens.control.split_button.chevron_width)
+                            .h(cx.theme().tokens.control.button.min_height)
                             .rounded_lg()
                             .when(is_rtl, |this| this.rounded_r_none())
                             .when(!is_rtl, |this| this.rounded_l_none())
@@ -328,7 +338,7 @@ impl RenderOnce for SplitButton {
                             })
                             .child(
                                 Icon::new(IconName::Arrow(ArrowDirection::Down))
-                                    .size(px(12.))
+                                    .size(cx.theme().tokens.sizes.icon_sm)
                                     .color(text_color),
                             ),
                     )

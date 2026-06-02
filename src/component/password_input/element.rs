@@ -2,7 +2,7 @@
 
 use gpui::{
     App, Bounds, Element, ElementId, ElementInputHandler, Entity, GlobalElementId, PaintQuad,
-    Pixels, ShapedLine, Style, TextRun, UnderlineStyle, fill, point, px, relative, size,
+    Pixels, ShapedLine, Style, TextRun, UnderlineStyle, fill, point, relative, size,
 };
 
 use super::state::PasswordInputState;
@@ -62,6 +62,8 @@ impl Element for PasswordLineElement {
         window: &mut gpui::Window,
         cx: &mut App,
     ) -> Self::PrepaintState {
+        let theme = cx.theme();
+        let cursor_thickness: gpui::Pixels = theme.tokens.control.input.cursor_thickness;
         let input = self.input.read(cx);
         let content = input.content.clone();
         let selected_range = input.selected_range.clone();
@@ -104,7 +106,7 @@ impl Element for PasswordLineElement {
                     len: marked_range.end - marked_range.start,
                     underline: Some(UnderlineStyle {
                         color: Some(run.color),
-                        thickness: px(1.0),
+                        thickness: cursor_thickness,
                         wavy: false,
                     }),
                     ..run.clone()
@@ -133,7 +135,8 @@ impl Element for PasswordLineElement {
             raw_cursor_pos
         };
 
-        let cursor_width = px(2.);
+        let cursor_width: gpui::Pixels = theme.tokens.control.input.focus_ring_thickness;
+        let _ = cursor_width;
         let max_cursor_x = (bounds.size.width - cursor_width).max(Pixels::ZERO);
         let max_scroll_x = (line.width - max_cursor_x).max(Pixels::ZERO);
         let mut scroll_x = input.scroll_x.clamp(Pixels::ZERO, max_scroll_x);

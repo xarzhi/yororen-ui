@@ -87,7 +87,7 @@ impl ValidationStateIcon {
             element_id: "ui:validation-state-icon".into(),
             base: div(),
             state,
-            size: px(22.),
+            size: gpui::px(0.),
         }
     }
 
@@ -128,10 +128,21 @@ impl RenderOnce for ValidationStateIcon {
             .flex()
             .items_center()
             .justify_center()
-            .size(self.size)
+            .size({
+                let v: f32 = self.size.into();
+                if v > 0.0 {
+                    self.size
+                } else {
+                    cx.theme().tokens.sizes.control_h_sm
+                }
+            })
             .rounded_sm()
             .bg(bg)
-            .child(icon(icon_name).size(px(14.)).color(fg))
+            .child(
+                icon(icon_name)
+                    .size(cx.theme().tokens.sizes.icon_md)
+                    .color(fg),
+            )
     }
 }
 
@@ -245,7 +256,11 @@ impl RenderOnce for InlineError {
             .bg(bg)
             .text_color(fg)
             .when(self.icon, |this| {
-                this.child(icon(IconName::Close).size(px(14.)).color(fg))
+                this.child(
+                    icon(IconName::Close)
+                        .size(cx.theme().tokens.sizes.icon_md)
+                        .color(fg),
+                )
             })
             .child(self.text)
     }
@@ -282,7 +297,7 @@ impl FormRow {
             control: control.into_any_element(),
             help: None,
             error: None,
-            label_width: px(140.),
+            label_width: gpui::px(0.),
             label_color: None,
             validation: None,
             validation_icon_size: None,
@@ -375,14 +390,20 @@ impl RenderOnce for FormRow {
             .when(!direction.is_rtl(), |this| this.flex_row())
             .items_start()
             .gap_3()
-            .child(
+            .child({
+                let label_w: f32 = self.label_width.into();
+                let label_w = if label_w > 0.0 {
+                    self.label_width
+                } else {
+                    cx.theme().tokens.control.form.horizontal_label_width
+                };
                 div()
-                    .w(self.label_width)
-                    .pt(px(8.))
+                    .w(label_w)
+                    .pt(cx.theme().tokens.control.form.label_gap)
                     .text_sm()
                     .text_color(label_color)
-                    .child(label(self.label).inherit_color(true).ellipsis(true)),
-            )
+                    .child(label(self.label).inherit_color(true).ellipsis(true))
+            })
             .child(
                 div()
                     .flex_1()
