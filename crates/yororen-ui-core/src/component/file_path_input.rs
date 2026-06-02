@@ -7,7 +7,7 @@ use gpui::{
 
 use crate::{
     component::{button, label, text_input},
-    i18n::{I18nContext, defaults::DefaultPlaceholders},
+    i18n::{PlaceholderContext, PlaceholderKey},
     theme::{ActionVariantKind, ActiveTheme},
 };
 
@@ -35,8 +35,6 @@ pub struct FilePathInput {
     placeholder: SharedString,
     button_label: SharedString,
     dialog_prompt: SharedString,
-    /// Whether to use localized placeholders from i18n
-    localized: bool,
     disabled: bool,
 
     status: Option<FilePathStatus>,
@@ -65,7 +63,6 @@ impl FilePathInput {
             placeholder: "Select a path…".into(),
             button_label: "Select…".into(),
             dialog_prompt: "Select a path".into(),
-            localized: false,
             disabled: false,
             status: None,
             bg: None,
@@ -77,12 +74,6 @@ impl FilePathInput {
         }
     }
 
-    /// Use localized placeholders from i18n.
-    /// The placeholder text will be determined by the current locale.
-    pub fn localized(mut self) -> Self {
-        self.localized = true;
-        self
-    }
 
     pub fn id(mut self, id: impl Into<ElementId>) -> Self {
         self.element_id = id.into();
@@ -187,12 +178,9 @@ impl RenderOnce for FilePathInput {
     fn render(self, window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         // Extract all values from self
         let id = self.element_id.clone();
-        let localized = self.localized;
-        let placeholder = if localized {
-            DefaultPlaceholders::file_path_placeholder(cx.i18n().locale()).into()
-        } else {
-            self.placeholder
-        };
+        let placeholder = cx
+            .placeholder(PlaceholderKey::FilePath)
+            .unwrap_or(self.placeholder);
 
         // FilePathInput requires an element ID for keyed state management.
         // Use `.id()` to provide a stable ID, or a unique ID will be generated automatically.

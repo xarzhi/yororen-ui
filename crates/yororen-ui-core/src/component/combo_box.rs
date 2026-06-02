@@ -12,7 +12,7 @@ use crate::{
         ArrowDirection, BoundsTrackerElement, IconName, compute_input_style, desired_menu_left,
         icon, text_input,
     },
-    i18n::{I18n, I18nContext, TextDirection, defaults::DefaultPlaceholders},
+    i18n::{I18n, PlaceholderContext, PlaceholderKey, TextDirection},
     theme::ActiveTheme,
 };
 
@@ -78,8 +78,6 @@ pub struct ComboBox {
     value: Option<String>,
     placeholder: SharedString,
     search_placeholder: SharedString,
-    /// Whether to use localized placeholders from i18n
-    localized: bool,
     disabled: bool,
 
     bg: Option<Hsla>,
@@ -109,7 +107,6 @@ impl ComboBox {
             value: None,
             placeholder: "Select…".into(),
             search_placeholder: "Search…".into(),
-            localized: false,
             disabled: false,
             bg: None,
             border: None,
@@ -121,13 +118,6 @@ impl ComboBox {
             on_change: None,
             on_change_simple: None,
         }
-    }
-
-    /// Use localized placeholders from i18n.
-    /// The placeholder text will be determined by the current locale.
-    pub fn localized(mut self) -> Self {
-        self.localized = true;
-        self
     }
 
     pub fn id(mut self, id: impl Into<ElementId>) -> Self {
@@ -285,17 +275,12 @@ impl RenderOnce for ComboBox {
         let popover_offset: f32 = cx.theme().tokens.control.popover.offset.into();
         let popover_slide: f32 = cx.theme().tokens.motion.slide_distance;
         let options = self.options;
-        let localized = self.localized;
-        let placeholder = if localized {
-            DefaultPlaceholders::select_placeholder(cx.i18n().locale()).into()
-        } else {
-            self.placeholder
-        };
-        let search_placeholder = if localized {
-            DefaultPlaceholders::combobox_search_placeholder(cx.i18n().locale()).into()
-        } else {
-            self.search_placeholder
-        };
+        let placeholder = cx
+            .placeholder(PlaceholderKey::Select)
+            .unwrap_or(self.placeholder);
+        let search_placeholder = cx
+            .placeholder(PlaceholderKey::ComboBoxSearch)
+            .unwrap_or(self.search_placeholder);
         let on_change = self.on_change;
         let on_change_simple = self.on_change_simple;
         let max_results = self.max_results;

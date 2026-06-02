@@ -12,7 +12,7 @@ use crate::{
         ArrowDirection, BoundsTrackerElement, ChangeCallback, ChangeWithEventCallback, IconName,
         compute_input_style, create_internal_state, desired_menu_left, icon, use_internal_state,
     },
-    i18n::{I18n, I18nContext, TextDirection, defaults::DefaultPlaceholders},
+    i18n::{I18n, PlaceholderContext, PlaceholderKey, TextDirection},
     theme::ActiveTheme,
 };
 
@@ -101,8 +101,6 @@ pub struct Select {
 
     value: Option<String>,
     placeholder: SharedString,
-    /// Whether to use localized placeholder from i18n
-    localized: bool,
     disabled: bool,
 
     bg: Option<Hsla>,
@@ -131,7 +129,6 @@ impl Select {
             options: Vec::new(),
             value: None,
             placeholder: "Select…".into(),
-            localized: false,
             disabled: false,
             bg: None,
             border: None,
@@ -143,13 +140,6 @@ impl Select {
             on_change_simple: None,
             on_change_with_event: None,
         }
-    }
-
-    /// Use localized placeholder from i18n.
-    /// The placeholder text will be determined by the current locale.
-    pub fn localized(mut self) -> Self {
-        self.localized = true;
-        self
     }
 
     pub fn id(mut self, id: impl Into<ElementId>) -> Self {
@@ -311,12 +301,9 @@ impl RenderOnce for Select {
             .unwrap_or_else(|| cx.theme().tokens.control.button.min_height.into());
         let menu_width = self.menu_width;
         let options = self.options;
-        let localized = self.localized;
-        let placeholder = if localized {
-            DefaultPlaceholders::select_placeholder(cx.i18n().locale()).into()
-        } else {
-            self.placeholder
-        };
+        let placeholder = cx
+            .placeholder(PlaceholderKey::Select)
+            .unwrap_or(self.placeholder);
         let on_change = self.on_change;
         let on_change_simple = self.on_change_simple;
         let on_change_with_event = self.on_change_with_event;

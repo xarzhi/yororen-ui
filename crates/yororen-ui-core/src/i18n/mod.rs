@@ -51,7 +51,6 @@
 //! let text = cx.tn("items", n = 5);
 //! ```
 
-pub mod defaults;
 pub mod format;
 pub mod loader;
 pub mod locale;

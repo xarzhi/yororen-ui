@@ -6,7 +6,7 @@ use gpui::{
 
 use crate::{
     component::{compute_input_style, format_keybinding_ui, shortcut_hint},
-    i18n::{I18nContext, defaults::DefaultPlaceholders},
+    i18n::{PlaceholderContext, PlaceholderKey},
     theme::ActiveTheme,
 };
 
@@ -26,8 +26,6 @@ pub struct KeybindingInput {
     value: Option<SharedString>,
     placeholder: SharedString,
     waiting_hint: SharedString,
-    /// Whether to use localized placeholders from i18n
-    localized: bool,
     disabled: bool,
 
     bg: Option<Hsla>,
@@ -53,7 +51,6 @@ impl KeybindingInput {
             value: None,
             placeholder: "Press keys…".into(),
             waiting_hint: "Waiting for keys…".into(),
-            localized: false,
             disabled: false,
             bg: None,
             border: None,
@@ -64,12 +61,6 @@ impl KeybindingInput {
         }
     }
 
-    /// Use localized placeholders from i18n.
-    /// The placeholder text will be determined by the current locale.
-    pub fn localized(mut self) -> Self {
-        self.localized = true;
-        self
-    }
 
     pub fn id(mut self, id: impl Into<ElementId>) -> Self {
         self.element_id = id.into();
@@ -164,17 +155,12 @@ impl RenderOnce for KeybindingInput {
     fn render(self, window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         // Extract element_id
         let id = self.element_id.clone();
-        let localized = self.localized;
-        let placeholder = if localized {
-            DefaultPlaceholders::keybinding_press_keys(cx.i18n().locale()).into()
-        } else {
-            self.placeholder
-        };
-        let waiting_hint = if localized {
-            DefaultPlaceholders::keybinding_waiting(cx.i18n().locale()).into()
-        } else {
-            self.waiting_hint
-        };
+        let placeholder = cx
+            .placeholder(PlaceholderKey::KeybindingPressKeys)
+            .unwrap_or(self.placeholder);
+        let waiting_hint = cx
+            .placeholder(PlaceholderKey::KeybindingWaiting)
+            .unwrap_or(self.waiting_hint);
 
         let disabled = self.disabled;
         let theme = cx.theme().clone();
