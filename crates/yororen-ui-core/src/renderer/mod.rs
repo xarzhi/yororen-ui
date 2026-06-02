@@ -41,6 +41,7 @@ pub mod toast;
 pub mod toggle_button;
 pub mod tooltip;
 pub mod tree_item;
+pub mod variant;
 
 pub use avatar::{AvatarRenderState, AvatarRenderer, TokenAvatarRenderer};
 pub use badge::{BadgeRenderState, BadgeRenderer, TokenBadgeRenderer};
@@ -100,3 +101,7 @@ pub use toggle_button::{
 };
 pub use tooltip::{TooltipRenderState, TooltipRenderer, TokenTooltipRenderer};
 pub use tree_item::{TreeItemRenderState, TreeItemRenderer, TokenTreeItemRenderer};
+pub use variant::{
+    BuiltinVariantKey, ButtonVariant, GlobalVariantRegistry, TokenVariantStyle, VariantKey,
+    VariantRegistry, VariantState, VariantStyle, variant_compose,
+};

@@ -84,6 +84,18 @@ pub enum ActionVariantKind {
     Danger,
 }
 
+impl ActionVariantKind {
+    /// Canonical lowercase string used in diagnostics and as the
+    /// legacy `VariantRegistry` builtin key.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Neutral => "neutral",
+            Self::Primary => "primary",
+            Self::Danger => "danger",
+        }
+    }
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct StatusTheme {
     pub success: StatusVariant,
