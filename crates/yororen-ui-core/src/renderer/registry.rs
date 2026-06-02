@@ -9,27 +9,39 @@ use super::badge::{BadgeRenderer, TokenBadgeRenderer};
 use super::button::{ButtonRenderer, TokenButtonRenderer};
 use super::card::{CardRenderer, TokenCardRenderer};
 use super::checkbox::{CheckboxRenderer, TokenCheckboxRenderer};
+use super::combo_box::{ComboBoxRenderer, TokenComboBoxRenderer};
 use super::divider::{DividerRenderer, TokenDividerRenderer};
+use super::disclosure::{DisclosureRenderer, TokenDisclosureRenderer};
 use super::dropdown_menu::{DropdownMenuRenderer, TokenDropdownMenuRenderer};
+use super::empty_state::{EmptyStateRenderer, TokenEmptyStateRenderer};
+use super::file_path_input::{FilePathInputRenderer, TokenFilePathInputRenderer};
 use super::focus_ring::{FocusRingRenderer, TokenFocusRingRenderer};
 use super::form::{FormRenderer, TokenFormRenderer};
 use super::heading::{HeadingRenderer, TokenHeadingRenderer};
 use super::icon::{IconRenderer, TokenIconRenderer};
 use super::icon_button::{IconButtonRenderer, TokenIconButtonRenderer};
+use super::keybinding_input::{KeybindingInputRenderer, TokenKeybindingInputRenderer};
 use super::label::{LabelRenderer, TokenLabelRenderer};
 use super::list_item::{ListItemRenderer, TokenListItemRenderer};
 use super::modal::{ModalRenderer, TokenModalRenderer};
 use super::notification::{NotificationRenderer, TokenNotificationRenderer};
+use super::number_input::{NumberInputRenderer, TokenNumberInputRenderer};
+use super::password_input::{PasswordInputRenderer, TokenPasswordInputRenderer};
 use super::popover::{PopoverRenderer, TokenPopoverRenderer};
 use super::progress::{ProgressBarRenderer, TokenProgressBarRenderer};
 use super::radio::{RadioRenderer, TokenRadioRenderer};
+use super::search_input::{SearchInputRenderer, TokenSearchInputRenderer};
+use super::select::{SelectRenderer, TokenSelectRenderer};
 use super::skeleton::{SkeletonRenderer, TokenSkeletonRenderer};
+use super::split_button::{SplitButtonRenderer, TokenSplitButtonRenderer};
 use super::switch::{SwitchRenderer, TokenSwitchRenderer};
 use super::tag::{TagRenderer, TokenTagRenderer};
+use super::text_area::{TextAreaRenderer, TokenTextAreaRenderer};
 use super::text_input::{TextInputRenderer, TokenTextInputRenderer};
 use super::toast::{ToastRenderer, TokenToastRenderer};
 use super::toggle_button::{ToggleButtonRenderer, TokenToggleButtonRenderer};
 use super::tooltip::{TooltipRenderer, TokenTooltipRenderer};
+use super::tree_item::{TreeItemRenderer, TokenTreeItemRenderer};
 
 #[derive(Clone)]
 pub struct RendererRegistry {
@@ -50,14 +62,26 @@ pub struct RendererRegistry {
     pub checkbox: Arc<dyn CheckboxRenderer>,
     pub radio: Arc<dyn RadioRenderer>,
     pub text_input: Arc<dyn TextInputRenderer>,
+    pub text_area: Arc<dyn TextAreaRenderer>,
+    pub password_input: Arc<dyn PasswordInputRenderer>,
+    pub number_input: Arc<dyn NumberInputRenderer>,
+    pub file_path_input: Arc<dyn FilePathInputRenderer>,
+    pub search_input: Arc<dyn SearchInputRenderer>,
+    pub select: Arc<dyn SelectRenderer>,
+    pub combo_box: Arc<dyn ComboBoxRenderer>,
     pub modal: Arc<dyn ModalRenderer>,
     pub popover: Arc<dyn PopoverRenderer>,
     pub dropdown_menu: Arc<dyn DropdownMenuRenderer>,
+    pub disclosure: Arc<dyn DisclosureRenderer>,
     pub toast: Arc<dyn ToastRenderer>,
     pub notification: Arc<dyn NotificationRenderer>,
     pub card: Arc<dyn CardRenderer>,
     pub form: Arc<dyn FormRenderer>,
     pub list_item: Arc<dyn ListItemRenderer>,
+    pub tree_item: Arc<dyn TreeItemRenderer>,
+    pub keybinding_input: Arc<dyn KeybindingInputRenderer>,
+    pub split_button: Arc<dyn SplitButtonRenderer>,
+    pub empty_state: Arc<dyn EmptyStateRenderer>,
     pub icon: Arc<dyn IconRenderer>,
 }
 
@@ -95,14 +119,26 @@ impl RendererRegistry {
             checkbox: Arc::new(TokenCheckboxRenderer),
             radio: Arc::new(TokenRadioRenderer),
             text_input: Arc::new(TokenTextInputRenderer),
+            text_area: Arc::new(TokenTextAreaRenderer),
+            password_input: Arc::new(TokenPasswordInputRenderer),
+            number_input: Arc::new(TokenNumberInputRenderer),
+            file_path_input: Arc::new(TokenFilePathInputRenderer),
+            search_input: Arc::new(TokenSearchInputRenderer),
+            select: Arc::new(TokenSelectRenderer),
+            combo_box: Arc::new(TokenComboBoxRenderer),
             modal: Arc::new(TokenModalRenderer),
             popover: Arc::new(TokenPopoverRenderer),
             dropdown_menu: Arc::new(TokenDropdownMenuRenderer),
+            disclosure: Arc::new(TokenDisclosureRenderer),
             toast: Arc::new(TokenToastRenderer),
             notification: Arc::new(TokenNotificationRenderer),
             card: Arc::new(TokenCardRenderer),
             form: Arc::new(TokenFormRenderer),
             list_item: Arc::new(TokenListItemRenderer),
+            tree_item: Arc::new(TokenTreeItemRenderer),
+            keybinding_input: Arc::new(TokenKeybindingInputRenderer),
+            split_button: Arc::new(TokenSplitButtonRenderer),
+            empty_state: Arc::new(TokenEmptyStateRenderer),
             icon: Arc::new(TokenIconRenderer),
         }
     }
@@ -209,6 +245,54 @@ impl RendererRegistry {
     }
     pub fn with_icon(mut self, r: Arc<dyn IconRenderer>) -> Self {
         self.icon = r;
+        self
+    }
+    pub fn with_text_area(mut self, r: Arc<dyn TextAreaRenderer>) -> Self {
+        self.text_area = r;
+        self
+    }
+    pub fn with_password_input(mut self, r: Arc<dyn PasswordInputRenderer>) -> Self {
+        self.password_input = r;
+        self
+    }
+    pub fn with_number_input(mut self, r: Arc<dyn NumberInputRenderer>) -> Self {
+        self.number_input = r;
+        self
+    }
+    pub fn with_file_path_input(mut self, r: Arc<dyn FilePathInputRenderer>) -> Self {
+        self.file_path_input = r;
+        self
+    }
+    pub fn with_search_input(mut self, r: Arc<dyn SearchInputRenderer>) -> Self {
+        self.search_input = r;
+        self
+    }
+    pub fn with_select(mut self, r: Arc<dyn SelectRenderer>) -> Self {
+        self.select = r;
+        self
+    }
+    pub fn with_combo_box(mut self, r: Arc<dyn ComboBoxRenderer>) -> Self {
+        self.combo_box = r;
+        self
+    }
+    pub fn with_disclosure(mut self, r: Arc<dyn DisclosureRenderer>) -> Self {
+        self.disclosure = r;
+        self
+    }
+    pub fn with_tree_item(mut self, r: Arc<dyn TreeItemRenderer>) -> Self {
+        self.tree_item = r;
+        self
+    }
+    pub fn with_keybinding_input(mut self, r: Arc<dyn KeybindingInputRenderer>) -> Self {
+        self.keybinding_input = r;
+        self
+    }
+    pub fn with_split_button(mut self, r: Arc<dyn SplitButtonRenderer>) -> Self {
+        self.split_button = r;
+        self
+    }
+    pub fn with_empty_state(mut self, r: Arc<dyn EmptyStateRenderer>) -> Self {
+        self.empty_state = r;
         self
     }
 }
