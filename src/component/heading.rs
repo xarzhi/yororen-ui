@@ -84,7 +84,7 @@ impl RenderOnce for Heading {
             .style()
             .text
             .as_ref()
-            .map_or(false, |t| t.text_align.is_some());
+            .is_some_and(|t| t.text_align.is_some());
         temp.id(self.element_id)
             .when(!has_custom_align, |this| {
                 this.text_align(rtl::text_align_start(direction))

@@ -127,7 +127,7 @@ impl RenderOnce for Label {
             .style()
             .text
             .as_ref()
-            .map_or(false, |t| t.text_align.is_some());
+            .is_some_and(|t| t.text_align.is_some());
         let mut base = temp
             .id(self.element_id)
             .when(!has_custom_align, |this| {

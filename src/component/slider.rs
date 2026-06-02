@@ -305,7 +305,7 @@ impl RenderOnce for Slider {
 
         let knob_diameter: f32 = theme.tokens.control.slider.thumb_size.into();
         let track_height: f32 = theme.tokens.control.slider.track_h.into();
-        let slider_min_w: f32 = 1.0_f32.into();
+        let slider_min_w: f32 = 1.0;
 
         let track_bounds_state =
             window.use_keyed_state((id.clone(), "ui:slider:track-bounds"), cx, |_, _| {

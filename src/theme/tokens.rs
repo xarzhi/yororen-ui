@@ -11,7 +11,7 @@ use std::time::Duration;
 use gpui::{FontWeight, Pixels, SharedString, px};
 
 /// Top-level container for all design tokens.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct DesignTokens {
     pub sizes: SizeTokens,
     pub radii: RadiiTokens,
@@ -314,7 +314,7 @@ pub fn ease_in(t: f32) -> f32 {
 // Control tokens
 // ============================================================================
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct ControlTokens {
     pub button: ButtonTokens,
     pub input: InputTokens,
@@ -350,47 +350,6 @@ pub struct ControlTokens {
     pub form: FormTokens,
     pub notification: NotificationTokens,
     pub focus_ring: FocusRingTokens,
-}
-
-impl Default for ControlTokens {
-    fn default() -> Self {
-        Self {
-            button: ButtonTokens::default(),
-            input: InputTokens::default(),
-            switch: SwitchTokens::default(),
-            checkbox: CheckboxTokens::default(),
-            radio: RadioTokens::default(),
-            select: SelectTokens::default(),
-            combo_box: ComboBoxTokens::default(),
-            slider: SliderTokens::default(),
-            toast: ToastTokens::default(),
-            modal: ModalTokens::default(),
-            popover: PopoverTokens::default(),
-            dropdown: DropdownTokens::default(),
-            badge: BadgeTokens::default(),
-            tag: TagTokens::default(),
-            skeleton: SkeletonTokens::default(),
-            progress: ProgressTokens::default(),
-            avatar: AvatarTokens::default(),
-            tooltip: TooltipTokens::default(),
-            disclosure: DisclosureTokens::default(),
-            keybinding_input: KeybindingInputTokens::default(),
-            split_button: SplitButtonTokens::default(),
-            search_input: SearchInputTokens::default(),
-            number_input: NumberInputTokens::default(),
-            file_path_input: FilePathInputTokens::default(),
-            icon_button: IconButtonTokens::default(),
-            toggle_button: ToggleButtonTokens::default(),
-            empty_state: EmptyStateTokens::default(),
-            list_item: ListItemTokens::default(),
-            tree_item: TreeItemTokens::default(),
-            card: CardTokens::default(),
-            divider: DividerTokens::default(),
-            form: FormTokens::default(),
-            notification: NotificationTokens::default(),
-            focus_ring: FocusRingTokens::default(),
-        }
-    }
 }
 
 // Each control gets its own token struct. Defaults are pinned to the v0.2
@@ -1129,19 +1088,6 @@ impl Default for FocusRingTokens {
         Self {
             thickness: px(2.),
             offset: px(2.),
-        }
-    }
-}
-
-impl Default for DesignTokens {
-    fn default() -> Self {
-        Self {
-            sizes: SizeTokens::default(),
-            radii: RadiiTokens::default(),
-            spacing: SpacingTokens::default(),
-            typography: TypographyTokens::default(),
-            motion: MotionTokens::default(),
-            control: ControlTokens::default(),
         }
     }
 }

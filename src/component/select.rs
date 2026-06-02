@@ -303,6 +303,7 @@ fn call_on_change(
 }
 
 impl RenderOnce for Select {
+    #[allow(clippy::let_and_return)]
     fn render(self, window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let disabled = self.disabled;
         let height = self
@@ -454,7 +455,7 @@ impl RenderOnce for Select {
                     .unwrap_or(TextDirection::Ltr);
 
                 let trigger_bounds = *trigger_bounds_state_for_menu.read(cx);
-                let menu_width_px = menu_width.unwrap_or_else(|| trigger_bounds.size.width);
+                let menu_width_px = menu_width.unwrap_or(trigger_bounds.size.width);
                 let menu_left = desired_menu_left(trigger_bounds, menu_width_px, direction, false, window);
                 let relative_left = menu_left - trigger_bounds.left();
 
@@ -544,8 +545,6 @@ impl RenderOnce for Select {
                             })
                     }));
 
-                let popover_offset = popover_offset;
-                let popover_slide = popover_slide;
                 let animated_menu = menu.with_animation(
                     format!("select-menu-{}", is_open),
                     Animation::new(duration::MENU_OPEN).with_easing(ease_out_quint_clamped),

@@ -168,6 +168,7 @@ impl Styled for Popover {
 }
 
 impl RenderOnce for Popover {
+    #[allow(clippy::let_and_return)]
     fn render(self, window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let element_id = self.element_id;
         let id = element_id.clone();
@@ -263,7 +264,6 @@ impl RenderOnce for Popover {
         trigger
     }
 }
-
 // Keep a stable signature for downstream; on_trigger click handling stays with caller.
 #[allow(dead_code)]
 fn _click_passthrough(_ev: &ClickEvent) {}

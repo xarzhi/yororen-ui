@@ -60,10 +60,10 @@ impl I18n {
         loader: &EmbeddedLoader,
         locale: &Locale,
     ) -> Option<TranslationMap> {
-        if loader.is_available(locale) {
-            if let Ok(map) = loader.load(locale) {
-                return Some(map);
-            }
+        if loader.is_available(locale)
+            && let Ok(map) = loader.load(locale)
+        {
+            return Some(map);
         }
 
         // Fallback from e.g. "en-US" to "en" if a language-only map is embedded.

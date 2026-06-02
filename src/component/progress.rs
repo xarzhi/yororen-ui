@@ -129,7 +129,7 @@ impl RenderOnce for Spinner {
         let theme = cx.theme();
         let stroke_default = self.size.stroke(theme);
         let diameter = self.diameter.unwrap_or_else(|| self.size.pixels(theme));
-        let min_stroke: f32 = 1.0_f32.into();
+        let min_stroke: f32 = 1.0;
         let raw_stroke = self.stroke.unwrap_or(stroke_default);
         let raw_stroke_value: f32 = raw_stroke.into();
         let stroke = if raw_stroke_value < min_stroke {
