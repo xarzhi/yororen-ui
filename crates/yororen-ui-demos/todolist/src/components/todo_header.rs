@@ -60,17 +60,15 @@ impl TodoHeader {
                     .gap(px(8.))
                     // Setting with label and switch
                     .child(label(compact_label))
-                    .child(
-                        switch("compact-mode")
-                            .checked(compact_mode)
-                            .on_toggle(|value, _, _window, cx| {
-                                let model = cx.global::<TodoState>().model.clone();
-                                model.update(cx, |model, cx| {
-                                    model.compact_mode = value;
-                                    cx.notify();
-                                });
-                            }),
-                    ),
+                    .child(switch("compact-mode").checked(compact_mode).on_toggle(
+                        |value, _, _window, cx| {
+                            let model = cx.global::<TodoState>().model.clone();
+                            model.update(cx, |model, cx| {
+                                model.compact_mode = value;
+                                cx.notify();
+                            });
+                        },
+                    )),
             )
     }
 }

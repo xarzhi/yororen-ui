@@ -241,9 +241,17 @@ impl PasswordInputState {
 
         let is_rtl = cx.theme().is_rtl();
         if event.modifiers.shift {
-            self.select_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
+            self.select_to(
+                self.index_for_mouse_position(event.position, is_rtl),
+                window,
+                cx,
+            );
         } else {
-            self.move_to(self.index_for_mouse_position(event.position, is_rtl), window, cx)
+            self.move_to(
+                self.index_for_mouse_position(event.position, is_rtl),
+                window,
+                cx,
+            )
         }
     }
 
@@ -265,7 +273,11 @@ impl PasswordInputState {
         if self.is_selecting {
             self.reset_cursor_blink(window, cx);
             let is_rtl = cx.theme().is_rtl();
-            self.select_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
+            self.select_to(
+                self.index_for_mouse_position(event.position, is_rtl),
+                window,
+                cx,
+            );
         }
     }
 
@@ -327,7 +339,11 @@ impl PasswordInputState {
         }
     }
 
-    pub fn index_for_mouse_position(&self, position: gpui::Point<gpui::Pixels>, is_rtl: bool) -> usize {
+    pub fn index_for_mouse_position(
+        &self,
+        position: gpui::Point<gpui::Pixels>,
+        is_rtl: bool,
+    ) -> usize {
         if self.content.is_empty() {
             return 0;
         }
@@ -348,9 +364,7 @@ impl PasswordInputState {
         } else {
             position.x - bounds.left() + self.scroll_x
         };
-        self.content_offset_for_display_index(
-            line.closest_index_for_x(local_x),
-        )
+        self.content_offset_for_display_index(line.closest_index_for_x(local_x))
     }
 
     pub fn select_to(&mut self, offset: usize, window: &mut gpui::Window, cx: &mut Context<Self>) {

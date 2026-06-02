@@ -200,8 +200,14 @@ impl Element for TextAreaElement {
                 };
                 selection.push(fill(
                     Bounds::from_corners(
-                        point(selection_start_x.min(selection_end_x), bounds.top() + layout.lines[row].y - scroll_y),
-                        point(selection_start_x.max(selection_end_x), bounds.top() + layout.lines[row].y + line_height - scroll_y),
+                        point(
+                            selection_start_x.min(selection_end_x),
+                            bounds.top() + layout.lines[row].y - scroll_y,
+                        ),
+                        point(
+                            selection_start_x.max(selection_end_x),
+                            bounds.top() + layout.lines[row].y + line_height - scroll_y,
+                        ),
                     ),
                     cx.theme().border.focus.alpha(0.25),
                 ));
@@ -276,12 +282,7 @@ impl Element for TextAreaElement {
             };
 
             line.shaped
-                .paint(
-                    point(origin_x, y_top),
-                    line_height,
-                    window,
-                    cx,
-                )
+                .paint(point(origin_x, y_top), line_height, window, cx)
                 .expect("paint should succeed");
         }
 

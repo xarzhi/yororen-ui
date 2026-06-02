@@ -59,41 +59,29 @@ impl Render for CounterApp {
                     .flex()
                     .gap(px(12.))
                     // Decrease button
-                    .child(
-                        button("decrease")
-                            .child("-")
-                            .on_click(|_, _, cx| {
-                                let counter = cx.global::<CounterState>().counter.clone();
-                                counter.update(cx, |counter, cx| {
-                                    counter.value -= 1;
-                                    cx.notify();
-                                });
-                            }),
-                    )
+                    .child(button("decrease").child("-").on_click(|_, _, cx| {
+                        let counter = cx.global::<CounterState>().counter.clone();
+                        counter.update(cx, |counter, cx| {
+                            counter.value -= 1;
+                            cx.notify();
+                        });
+                    }))
                     // Reset button
-                    .child(
-                        button("reset")
-                            .child("Reset")
-                            .on_click(|_, _, cx| {
-                                let counter = cx.global::<CounterState>().counter.clone();
-                                counter.update(cx, |counter, cx| {
-                                    counter.value = 0;
-                                    cx.notify();
-                                });
-                            }),
-                    )
+                    .child(button("reset").child("Reset").on_click(|_, _, cx| {
+                        let counter = cx.global::<CounterState>().counter.clone();
+                        counter.update(cx, |counter, cx| {
+                            counter.value = 0;
+                            cx.notify();
+                        });
+                    }))
                     // Increase button
-                    .child(
-                        button("increase")
-                            .child("+")
-                            .on_click(|_, _, cx| {
-                                let counter = cx.global::<CounterState>().counter.clone();
-                                counter.update(cx, |counter, cx| {
-                                    counter.value += 1;
-                                    cx.notify();
-                                });
-                            }),
-                    ),
+                    .child(button("increase").child("+").on_click(|_, _, cx| {
+                        let counter = cx.global::<CounterState>().counter.clone();
+                        counter.update(cx, |counter, cx| {
+                            counter.value += 1;
+                            cx.notify();
+                        });
+                    })),
             )
     }
 }

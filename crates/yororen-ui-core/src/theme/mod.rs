@@ -7,8 +7,10 @@ use crate::i18n::TextDirection;
 pub mod tokens;
 pub mod validate;
 
-pub use tokens::{DesignTokens, EasingFn, MotionTokens, RadiiTokens, SizeTokens, SpacingTokens, TypographyTokens};
-pub use validate::{validate, Issue, IssueKind};
+pub use tokens::{
+    DesignTokens, EasingFn, MotionTokens, RadiiTokens, SizeTokens, SpacingTokens, TypographyTokens,
+};
+pub use validate::{Issue, IssueKind, validate};
 
 #[derive(Clone, Debug)]
 pub struct Theme {

@@ -16,8 +16,8 @@ use crate::{
     theme::ActiveTheme,
 };
 
-use crate::rtl;
 use crate::animation::ease_out_quint_clamped;
+use crate::rtl;
 
 /// Creates a new select option.
 ///
@@ -325,11 +325,10 @@ impl RenderOnce for Select {
         // Use `.id()` to provide a stable ID, or a unique ID will be generated automatically.
         let id = self.element_id;
 
-        let trigger_bounds_state = window.use_keyed_state(
-            (id.clone(), "ui:select:trigger-bounds"),
-            cx,
-            |_, _| Bounds::default(),
-        );
+        let trigger_bounds_state =
+            window.use_keyed_state((id.clone(), "ui:select:trigger-bounds"), cx, |_, _| {
+                Bounds::default()
+            });
 
         let menu_open = window.use_keyed_state((id.clone(), "ui:select:open"), cx, |_, _| false);
         let is_open = *menu_open.read(cx);
@@ -456,7 +455,8 @@ impl RenderOnce for Select {
 
                 let trigger_bounds = *trigger_bounds_state_for_menu.read(cx);
                 let menu_width_px = menu_width.unwrap_or(trigger_bounds.size.width);
-                let menu_left = desired_menu_left(trigger_bounds, menu_width_px, direction, false, window);
+                let menu_left =
+                    desired_menu_left(trigger_bounds, menu_width_px, direction, false, window);
                 let relative_left = menu_left - trigger_bounds.left();
 
                 let menu = div()
@@ -464,7 +464,9 @@ impl RenderOnce for Select {
                     .absolute()
                     .top_full()
                     .left_0()
-                    .when(relative_left != Pixels::ZERO, |this| this.left(relative_left))
+                    .when(relative_left != Pixels::ZERO, |this| {
+                        this.left(relative_left)
+                    })
                     .mt(theme.tokens.control.popover.offset)
                     .rounded_md()
                     .border_1()

@@ -316,33 +316,33 @@ impl RenderOnce for SplitButton {
                         .h_full()
                         .bg(border_divider),
                 )
-                    .child(
-                        button(toggle_id)
-                            .w(cx.theme().tokens.control.split_button.chevron_width)
-                            .h(cx.theme().tokens.control.button.min_height)
-                            .rounded_lg()
-                            .when(is_rtl, |this| this.rounded_r_none())
-                            .when(!is_rtl, |this| this.rounded_l_none())
-                            .flex()
-                            .items_center()
-                            .justify_center()
-                            .bg(neutral_bg)
-                            .hover_bg(hover_bg)
-                            .when(disabled, |this| this.cursor_not_allowed())
-                            .on_click(move |_ev, _window, cx| {
-                                if disabled {
-                                    return;
-                                }
+                .child(
+                    button(toggle_id)
+                        .w(cx.theme().tokens.control.split_button.chevron_width)
+                        .h(cx.theme().tokens.control.button.min_height)
+                        .rounded_lg()
+                        .when(is_rtl, |this| this.rounded_r_none())
+                        .when(!is_rtl, |this| this.rounded_l_none())
+                        .flex()
+                        .items_center()
+                        .justify_center()
+                        .bg(neutral_bg)
+                        .hover_bg(hover_bg)
+                        .when(disabled, |this| this.cursor_not_allowed())
+                        .on_click(move |_ev, _window, cx| {
+                            if disabled {
+                                return;
+                            }
 
-                                menu_open_for_button.update(cx, |open, _cx| *open = !*open);
-                                cx.stop_propagation();
-                            })
-                            .child(
-                                Icon::new(IconName::Arrow(ArrowDirection::Down))
-                                    .size(cx.theme().tokens.sizes.icon_sm)
-                                    .color(text_color),
-                            ),
-                    )
+                            menu_open_for_button.update(cx, |open, _cx| *open = !*open);
+                            cx.stop_propagation();
+                        })
+                        .child(
+                            Icon::new(IconName::Arrow(ArrowDirection::Down))
+                                .size(cx.theme().tokens.sizes.icon_sm)
+                                .color(text_color),
+                        ),
+                )
             })
     }
 }

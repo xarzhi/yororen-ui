@@ -232,27 +232,25 @@ impl RenderOnce for DropdownMenu {
                 open_for_close.update(cx, |open, _| *open = false);
                 window.refresh();
             })
-            .trigger(
-                {
-                    let direction = cx.theme().text_direction;
-                    button((id.clone(), "ui:dropdown-menu:trigger"))
-                        .variant(ActionVariantKind::Neutral)
-                        .flex()
-                        .when(direction.is_rtl(), |this| this.flex_row_reverse())
-                        .when(!direction.is_rtl(), |this| this.flex_row())
-                        .items_center()
-                        .gap_2()
-                        .on_click(move |_ev, window, cx| {
-                            open_for_trigger.update(cx, |open, _| *open = !*open);
-                            window.refresh();
-                        })
-                        .child(self.label)
-                        .child(
-                            icon(IconName::Arrow(ArrowDirection::Down))
-                                .size(cx.theme().tokens.sizes.icon_sm),
-                        )
-                }
-            )
+            .trigger({
+                let direction = cx.theme().text_direction;
+                button((id.clone(), "ui:dropdown-menu:trigger"))
+                    .variant(ActionVariantKind::Neutral)
+                    .flex()
+                    .when(direction.is_rtl(), |this| this.flex_row_reverse())
+                    .when(!direction.is_rtl(), |this| this.flex_row())
+                    .items_center()
+                    .gap_2()
+                    .on_click(move |_ev, window, cx| {
+                        open_for_trigger.update(cx, |open, _| *open = !*open);
+                        window.refresh();
+                    })
+                    .child(self.label)
+                    .child(
+                        icon(IconName::Arrow(ArrowDirection::Down))
+                            .size(cx.theme().tokens.sizes.icon_sm),
+                    )
+            })
             .content(menu)
     }
 }

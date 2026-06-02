@@ -5,8 +5,8 @@ use std::sync::Arc;
 
 use gpui::{App, Global, SharedString};
 
-use super::locale::{Locale, SupportedLocale, TextDirection};
 use super::loader::{EmbeddedLoader, TranslationLoader};
+use super::locale::{Locale, SupportedLocale, TextDirection};
 
 /// Global i18n state that stores the current locale and available translations.
 pub struct I18n {

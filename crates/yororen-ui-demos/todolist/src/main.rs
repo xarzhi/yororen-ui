@@ -59,15 +59,15 @@
 //! checkbox, switch, tag, text_input, search_input, combo_box, modal, list_item,
 //! icon_button, tooltip, button, and heading.
 
-mod todo;
-mod todo_app;
-mod state;
 mod components;
 mod i18n;
+mod state;
+mod todo;
+mod todo_app;
 
 // Gpui framework imports
 // Core types for building gpui applications
-use gpui::{AppContext, Application, App, WindowOptions, px, size};
+use gpui::{App, AppContext, Application, WindowOptions, px, size};
 
 // yororen-ui framework imports
 // These are the foundation of every yororen-ui application

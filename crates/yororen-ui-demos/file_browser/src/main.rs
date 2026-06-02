@@ -11,10 +11,10 @@
 //! cd demo/file_browser && cargo run
 //! ```
 
-mod file_browser_app;
 mod actions;
 mod clipboard;
 mod components;
+mod file_browser_app;
 mod format;
 mod fs_ops;
 mod scan;
@@ -46,6 +46,8 @@ fn main() {
             ..Default::default()
         };
 
-        let _ = cx.open_window(options, |_, cx| cx.new(file_browser_app::FileBrowserApp::new));
+        let _ = cx.open_window(options, |_, cx| {
+            cx.new(file_browser_app::FileBrowserApp::new)
+        });
     });
 }

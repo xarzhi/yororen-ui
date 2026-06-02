@@ -223,16 +223,8 @@ impl RenderOnce for TreeItem {
         } else {
             cx.theme().tokens.control.tree_item.indent
         };
-        rtl::padding_start(
-            temp.style(),
-            direction,
-            resolved_indent * depth as f32,
-        );
-        rtl::padding_end(
-            temp.style(),
-            direction,
-            cx.theme().tokens.spacing.inset_sm,
-        );
+        rtl::padding_start(temp.style(), direction, resolved_indent * depth as f32);
+        rtl::padding_end(temp.style(), direction, cx.theme().tokens.spacing.inset_sm);
 
         temp.id(element_id.to_string())
             .w_full()

@@ -23,8 +23,9 @@ fn load_demo_translation_map(locale: &Locale) -> Result<TranslationMap, LoadErro
         .join("locales")
         .join(filename);
 
-    let content = std::fs::read_to_string(&path)
-        .map_err(|e| LoadError::EmbedError(format!("Failed to read demo locale file {path:?}: {e}")))?;
+    let content = std::fs::read_to_string(&path).map_err(|e| {
+        LoadError::EmbedError(format!("Failed to read demo locale file {path:?}: {e}"))
+    })?;
 
     let value: Value =
         serde_json::from_str(&content).map_err(|e| LoadError::ParseError(e.to_string()))?;

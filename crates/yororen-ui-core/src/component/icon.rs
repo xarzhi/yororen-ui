@@ -1,8 +1,7 @@
 mod name;
 
 use gpui::{
-    ElementId, Hsla, InteractiveElement, IntoElement, Pixels, RenderOnce, SharedString, Styled,
-    svg,
+    ElementId, Hsla, InteractiveElement, IntoElement, Pixels, RenderOnce, SharedString, Styled, svg,
 };
 pub use name::*;
 

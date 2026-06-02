@@ -170,10 +170,7 @@ impl Element for PasswordLineElement {
             let raw_start_x = line.x_for_index(selection_display_range.start);
             let raw_end_x = line.x_for_index(selection_display_range.end);
             let (start_x, end_x) = if is_rtl {
-                (
-                    line.width - raw_start_x,
-                    line.width - raw_end_x,
-                )
+                (line.width - raw_start_x, line.width - raw_end_x)
             } else {
                 (raw_start_x, raw_end_x)
             };

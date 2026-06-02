@@ -1,6 +1,6 @@
 use gpui::{
-    Div, ElementId, InteractiveElement, IntoElement, ParentElement, RenderOnce,
-    SharedString, Styled, div, prelude::FluentBuilder,
+    Div, ElementId, InteractiveElement, IntoElement, ParentElement, RenderOnce, SharedString,
+    Styled, div, prelude::FluentBuilder,
 };
 
 use crate::rtl;
@@ -68,7 +68,10 @@ impl RenderOnce for Heading {
         let direction = cx.theme().text_direction;
         let tokens = &cx.theme().tokens;
         let (size, weight) = match self.level {
-            HeadingLevel::H1 => (tokens.typography.font_size_2xl, tokens.typography.weight_bold),
+            HeadingLevel::H1 => (
+                tokens.typography.font_size_2xl,
+                tokens.typography.weight_bold,
+            ),
             HeadingLevel::H2 => (
                 tokens.typography.font_size_xl,
                 tokens.typography.weight_semibold,

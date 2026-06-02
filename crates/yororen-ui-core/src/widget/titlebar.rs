@@ -183,7 +183,8 @@ impl RenderOnce for Navigator {
                         move |this, delta| {
                             let target_offset = positions.get(current).copied().unwrap_or(0.0);
                             let current_offset = positions.get(prev).copied().unwrap_or(0.0);
-                            let new_offset = current_offset + (target_offset - current_offset) * delta;
+                            let new_offset =
+                                current_offset + (target_offset - current_offset) * delta;
                             if is_rtl {
                                 this.right(px(new_offset))
                             } else {

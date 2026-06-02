@@ -23,4 +23,3 @@ pub fn clipboard_label(clipboard: &Option<FileClipboard>) -> String {
         ClipboardOp::Copy => format!("copy: {}", clipboard.src.to_string_lossy()),
     }
 }
-

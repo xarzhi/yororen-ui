@@ -217,22 +217,22 @@ pub struct MotionTokens {
     pub duration_slow: Duration,      // 300ms
     pub duration_very_slow: Duration, // 400ms
 
-    pub duration_cursor_blink: Duration,       // 500ms
-    pub duration_skeleton_pulse: Duration,    // 1100ms
-    pub duration_progress_spinner: Duration,  // 850ms
-    pub duration_modal_fade: Duration,        // 200ms
-    pub duration_modal_slide_up: Duration,    // 250ms
-    pub duration_menu_open: Duration,         // 160ms
-    pub duration_menu_open_fast: Duration,    // 100ms
-    pub duration_menu_open_slow: Duration,    // 250ms
-    pub duration_tooltip_show: Duration,      // 150ms
-    pub duration_tooltip_hide: Duration,      // 100ms
-    pub duration_navigator_slider: Duration,  // 200ms
-    pub duration_tab_switch: Duration,        // 150ms
-    pub duration_skeleton_pulse_1: Duration,  // 1100ms
-    pub duration_skeleton_pulse_2: Duration,  // 1200ms
-    pub duration_progress_circle: Duration,   // 900ms
-    pub duration_progress_bar: Duration,      // 1500ms
+    pub duration_cursor_blink: Duration,     // 500ms
+    pub duration_skeleton_pulse: Duration,   // 1100ms
+    pub duration_progress_spinner: Duration, // 850ms
+    pub duration_modal_fade: Duration,       // 200ms
+    pub duration_modal_slide_up: Duration,   // 250ms
+    pub duration_menu_open: Duration,        // 160ms
+    pub duration_menu_open_fast: Duration,   // 100ms
+    pub duration_menu_open_slow: Duration,   // 250ms
+    pub duration_tooltip_show: Duration,     // 150ms
+    pub duration_tooltip_hide: Duration,     // 100ms
+    pub duration_navigator_slider: Duration, // 200ms
+    pub duration_tab_switch: Duration,       // 150ms
+    pub duration_skeleton_pulse_1: Duration, // 1100ms
+    pub duration_skeleton_pulse_2: Duration, // 1200ms
+    pub duration_progress_circle: Duration,  // 900ms
+    pub duration_progress_bar: Duration,     // 1500ms
 
     pub easing_linear: EasingFn,
     pub easing_standard: EasingFn,   // ease_in_out
@@ -243,7 +243,7 @@ pub struct MotionTokens {
     pub pulse_min_opacity: f32, // 0.55
     pub pulse_max_opacity: f32, // 0.95
 
-    pub slide_distance: f32, // 10
+    pub slide_distance: f32,  // 10
     pub bounce_distance: f32, // 8
 }
 
@@ -358,10 +358,10 @@ pub struct ControlTokens {
 
 #[derive(Clone, Debug)]
 pub struct ButtonTokens {
-    pub min_height: Pixels, // 36
+    pub min_height: Pixels,           // 36
     pub icon_button_min_size: Pixels, // 32
-    pub horizontal_padding: Pixels, // 16
-    pub icon_gap: Pixels, // 8
+    pub horizontal_padding: Pixels,   // 16
+    pub icon_gap: Pixels,             // 8
 }
 
 impl Default for ButtonTokens {
@@ -377,14 +377,14 @@ impl Default for ButtonTokens {
 
 #[derive(Clone, Debug)]
 pub struct InputTokens {
-    pub min_height: Pixels,    // 32
-    pub horizontal_padding: Pixels, // 12
-    pub vertical_padding: Pixels,   // 8
-    pub cursor_thickness: Pixels,   // 1
+    pub min_height: Pixels,           // 32
+    pub horizontal_padding: Pixels,   // 12
+    pub vertical_padding: Pixels,     // 8
+    pub cursor_thickness: Pixels,     // 1
     pub focus_ring_thickness: Pixels, // 2
-    pub icon_gap: Pixels,           // 8
-    pub spinner_size: Pixels,       // 14
-    pub text_area_min_h: Pixels,    // 120
+    pub icon_gap: Pixels,             // 8
+    pub spinner_size: Pixels,         // 14
+    pub text_area_min_h: Pixels,      // 120
 }
 
 impl Default for InputTokens {
@@ -431,11 +431,11 @@ impl Default for SwitchTokens {
 
 #[derive(Clone, Debug)]
 pub struct CheckboxTokens {
-    pub box_size: Pixels,        // 16
-    pub check_size: Pixels,      // 12
-    pub border_w: Pixels,        // 1
-    pub focus_border_w: Pixels,  // 2
-    pub border_radius: Pixels,   // 4
+    pub box_size: Pixels,       // 16
+    pub check_size: Pixels,     // 12
+    pub border_w: Pixels,       // 1
+    pub focus_border_w: Pixels, // 2
+    pub border_radius: Pixels,  // 4
 }
 
 impl Default for CheckboxTokens {
@@ -452,9 +452,9 @@ impl Default for CheckboxTokens {
 
 #[derive(Clone, Debug)]
 pub struct RadioTokens {
-    pub ring_size: Pixels,    // 16
-    pub dot_size: Pixels,     // 8
-    pub border_w: Pixels,     // 1
+    pub ring_size: Pixels,     // 16
+    pub dot_size: Pixels,      // 8
+    pub border_w: Pixels,      // 1
     pub border_radius: Pixels, // 9999 (pill)
 }
 
@@ -523,10 +523,10 @@ impl Default for ComboBoxTokens {
 
 #[derive(Clone, Debug)]
 pub struct SliderTokens {
-    pub track_h: Pixels,    // 6
-    pub thumb_size: Pixels, // 16
+    pub track_h: Pixels,     // 6
+    pub thumb_size: Pixels,  // 16
     pub hit_padding: Pixels, // 8
-    pub focus_ring: Pixels, // 2
+    pub focus_ring: Pixels,  // 2
 }
 
 impl Default for SliderTokens {
@@ -542,8 +542,8 @@ impl Default for SliderTokens {
 
 #[derive(Clone, Debug)]
 pub struct ToastTokens {
-    pub min_width: Pixels,       // 220
-    pub max_width: Pixels,       // 420
+    pub min_width: Pixels,          // 220
+    pub max_width: Pixels,          // 420
     pub horizontal_padding: Pixels, // 16
     pub vertical_padding: Pixels,   // 12
     pub gap: Pixels,                // 12
@@ -680,9 +680,9 @@ impl Default for TagTokens {
 
 #[derive(Clone, Debug)]
 pub struct SkeletonTokens {
-    pub line_h: Pixels,    // 12
-    pub line_min_w: Pixels, // 80
-    pub block_min_h: Pixels, // 64
+    pub line_h: Pixels,        // 12
+    pub line_min_w: Pixels,    // 80
+    pub block_min_h: Pixels,   // 64
     pub border_radius: Pixels, // 6
 }
 
@@ -699,10 +699,10 @@ impl Default for SkeletonTokens {
 
 #[derive(Clone, Debug)]
 pub struct ProgressTokens {
-    pub bar_h_sm: Pixels,     // 1.5
-    pub bar_h_md: Pixels,     // 2
-    pub bar_h_lg: Pixels,     // 2.5
-    pub bar_default_h: Pixels, // 10
+    pub bar_h_sm: Pixels,        // 1.5
+    pub bar_h_md: Pixels,        // 2
+    pub bar_h_lg: Pixels,        // 2.5
+    pub bar_default_h: Pixels,   // 10
     pub spinner_size_sm: Pixels, // 12
     pub spinner_size_md: Pixels, // 16
     pub spinner_size_lg: Pixels, // 20
@@ -734,9 +734,9 @@ impl Default for ProgressTokens {
 
 #[derive(Clone, Debug)]
 pub struct AvatarTokens {
-    pub border_w: Pixels,         // 2
-    pub status_inset: Pixels,     // 2
-    pub status_dot_size: Pixels,  // 12
+    pub border_w: Pixels,           // 2
+    pub status_inset: Pixels,       // 2
+    pub status_dot_size: Pixels,    // 12
     pub fallback_font_size: Pixels, // 14
 }
 
@@ -753,11 +753,11 @@ impl Default for AvatarTokens {
 
 #[derive(Clone, Debug)]
 pub struct TooltipTokens {
-    pub padding_x: Pixels, // 8
-    pub padding_y: Pixels, // 6
-    pub max_width: Pixels, // 240
+    pub padding_x: Pixels,  // 8
+    pub padding_y: Pixels,  // 6
+    pub max_width: Pixels,  // 240
     pub arrow_size: Pixels, // 6
-    pub offset: Pixels,    // 6
+    pub offset: Pixels,     // 6
 }
 
 impl Default for TooltipTokens {
@@ -774,7 +774,7 @@ impl Default for TooltipTokens {
 
 #[derive(Clone, Debug)]
 pub struct DisclosureTokens {
-    pub icon_size: Pixels, // 12
+    pub icon_size: Pixels,    // 12
     pub chevron_size: Pixels, // 12
 }
 
@@ -810,9 +810,9 @@ impl Default for KeybindingInputTokens {
 
 #[derive(Clone, Debug)]
 pub struct SplitButtonTokens {
-    pub min_height: Pixels, // 32
+    pub min_height: Pixels,    // 32
     pub chevron_width: Pixels, // 24
-    pub separator_w: Pixels, // 1
+    pub separator_w: Pixels,   // 1
 }
 
 impl Default for SplitButtonTokens {
@@ -827,12 +827,12 @@ impl Default for SplitButtonTokens {
 
 #[derive(Clone, Debug)]
 pub struct SearchInputTokens {
-    pub min_height: Pixels, // 32
+    pub min_height: Pixels,         // 32
     pub horizontal_padding: Pixels, // 12
-    pub icon_size: Pixels,  // 14
-    pub clear_icon_size: Pixels, // 12
-    pub spinner_size: Pixels, // 14
-    pub input_gap: Pixels,  // 8
+    pub icon_size: Pixels,          // 14
+    pub clear_icon_size: Pixels,    // 12
+    pub spinner_size: Pixels,       // 14
+    pub input_gap: Pixels,          // 8
 }
 
 impl Default for SearchInputTokens {
@@ -850,7 +850,7 @@ impl Default for SearchInputTokens {
 
 #[derive(Clone, Debug)]
 pub struct NumberInputTokens {
-    pub min_height: Pixels, // 32
+    pub min_height: Pixels,          // 32
     pub stepper_button_size: Pixels, // 24
     pub stepper_icon_size: Pixels,   // 10
     pub stepper_gap: Pixels,         // 2
@@ -871,11 +871,11 @@ impl Default for NumberInputTokens {
 
 #[derive(Clone, Debug)]
 pub struct FilePathInputTokens {
-    pub min_height: Pixels, // 32
+    pub min_height: Pixels,         // 32
     pub horizontal_padding: Pixels, // 12
-    pub icon_size: Pixels,  // 14
+    pub icon_size: Pixels,          // 14
     pub action_button_size: Pixels, // 24
-    pub action_gap: Pixels, // 6
+    pub action_gap: Pixels,         // 6
 }
 
 impl Default for FilePathInputTokens {
@@ -892,7 +892,7 @@ impl Default for FilePathInputTokens {
 
 #[derive(Clone, Debug)]
 pub struct IconButtonTokens {
-    pub min_size: Pixels, // 32
+    pub min_size: Pixels,  // 32
     pub icon_size: Pixels, // 14
 }
 
@@ -907,9 +907,9 @@ impl Default for IconButtonTokens {
 
 #[derive(Clone, Debug)]
 pub struct ToggleButtonTokens {
-    pub min_height: Pixels, // 32
+    pub min_height: Pixels,         // 32
     pub horizontal_padding: Pixels, // 16
-    pub icon_gap: Pixels,   // 8
+    pub icon_gap: Pixels,           // 8
 }
 
 impl Default for ToggleButtonTokens {
@@ -924,11 +924,11 @@ impl Default for ToggleButtonTokens {
 
 #[derive(Clone, Debug)]
 pub struct EmptyStateTokens {
-    pub icon_size: Pixels, // 40
-    pub title_font_size: Pixels, // 16
+    pub icon_size: Pixels,             // 40
+    pub title_font_size: Pixels,       // 16
     pub description_font_size: Pixels, // 14
-    pub action_gap: Pixels, // 12
-    pub vertical_padding: Pixels, // 24
+    pub action_gap: Pixels,            // 12
+    pub vertical_padding: Pixels,      // 24
 }
 
 impl Default for EmptyStateTokens {
@@ -991,8 +991,8 @@ impl Default for TreeItemTokens {
 
 #[derive(Clone, Debug)]
 pub struct CardTokens {
-    pub padding: Pixels, // 16
-    pub gap: Pixels,     // 12
+    pub padding: Pixels,       // 16
+    pub gap: Pixels,           // 12
     pub border_radius: Pixels, // 12
 }
 
@@ -1009,8 +1009,8 @@ impl Default for CardTokens {
 #[derive(Clone, Debug)]
 pub struct DividerTokens {
     pub thickness: Pixels, // 1
-    pub margin_x: Pixels,   // 0
-    pub margin_y: Pixels,   // 4
+    pub margin_x: Pixels,  // 0
+    pub margin_y: Pixels,  // 4
 }
 
 impl Default for DividerTokens {
@@ -1025,12 +1025,12 @@ impl Default for DividerTokens {
 
 #[derive(Clone, Debug)]
 pub struct FormTokens {
-    pub field_gap: Pixels,           // 12
-    pub label_gap: Pixels,           // 4
-    pub helper_gap: Pixels,          // 4
-    pub error_gap: Pixels,           // 4
-    pub group_gap: Pixels,           // 24
-    pub horizontal_field_gap: Pixels, // 16
+    pub field_gap: Pixels,              // 12
+    pub label_gap: Pixels,              // 4
+    pub helper_gap: Pixels,             // 4
+    pub error_gap: Pixels,              // 4
+    pub group_gap: Pixels,              // 24
+    pub horizontal_field_gap: Pixels,   // 16
     pub horizontal_label_width: Pixels, // 120
 }
 
@@ -1050,8 +1050,8 @@ impl Default for FormTokens {
 
 #[derive(Clone, Debug)]
 pub struct NotificationTokens {
-    pub min_width: Pixels,       // 280
-    pub max_width: Pixels,       // 420
+    pub min_width: Pixels,          // 280
+    pub max_width: Pixels,          // 420
     pub horizontal_padding: Pixels, // 16
     pub vertical_padding: Pixels,   // 12
     pub gap: Pixels,                // 12

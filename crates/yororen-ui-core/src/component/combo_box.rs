@@ -8,13 +8,16 @@ use gpui::{
 
 use crate::{
     animation::constants::duration,
-    component::{ArrowDirection, BoundsTrackerElement, IconName, compute_input_style, desired_menu_left, icon, text_input},
+    component::{
+        ArrowDirection, BoundsTrackerElement, IconName, compute_input_style, desired_menu_left,
+        icon, text_input,
+    },
     i18n::{I18n, I18nContext, TextDirection, defaults::DefaultPlaceholders},
     theme::ActiveTheme,
 };
 
-use crate::rtl;
 use crate::animation::ease_out_quint_clamped;
+use crate::rtl;
 
 #[derive(Clone, Debug)]
 pub struct ComboBoxOption {
@@ -301,11 +304,10 @@ impl RenderOnce for ComboBox {
         // Use `.id()` to provide a stable ID, or a unique ID will be generated automatically.
         let id = self.element_id;
 
-        let trigger_bounds_state = window.use_keyed_state(
-            (id.clone(), "ui:combo-box:trigger-bounds"),
-            cx,
-            |_, _| Bounds::default(),
-        );
+        let trigger_bounds_state =
+            window.use_keyed_state((id.clone(), "ui:combo-box:trigger-bounds"), cx, |_, _| {
+                Bounds::default()
+            });
 
         let menu_open =
             window.use_keyed_state((id.clone(), format!("{}:open", id)), cx, |_, _| false);
@@ -424,165 +426,169 @@ impl RenderOnce for ComboBox {
 
         let trigger_bounds_state_for_menu = trigger_bounds_state.clone();
         let trigger = trigger.when(is_open, move |this| {
-                let text_color = input_style.text_color;
-                let value = value.clone();
-                let options = options.clone();
-                let on_change = on_change_for_select.clone();
-                let on_change_simple = on_change_simple_for_select.clone();
-                let internal_value = internal_value_for_select.clone();
-                let search_text = search_text.clone();
-                let needs_content_init = needs_content_init.clone();
-                let max_results = max_results;
+            let text_color = input_style.text_color;
+            let value = value.clone();
+            let options = options.clone();
+            let on_change = on_change_for_select.clone();
+            let on_change_simple = on_change_simple_for_select.clone();
+            let internal_value = internal_value_for_select.clone();
+            let search_text = search_text.clone();
+            let needs_content_init = needs_content_init.clone();
+            let max_results = max_results;
 
-                let direction = cx
-                    .try_global::<I18n>()
-                    .map(|i18n| i18n.text_direction())
-                    .unwrap_or(TextDirection::Ltr);
+            let direction = cx
+                .try_global::<I18n>()
+                .map(|i18n| i18n.text_direction())
+                .unwrap_or(TextDirection::Ltr);
 
-                let trigger_bounds = *trigger_bounds_state_for_menu.read(cx);
-                let menu_width_px = menu_width_px(menu_width, cx.theme().tokens.control.combo_box.menu_width);
-                let menu_left = desired_menu_left(trigger_bounds, menu_width_px, direction, false, window);
-                let relative_left = menu_left - trigger_bounds.left();
+            let trigger_bounds = *trigger_bounds_state_for_menu.read(cx);
+            let menu_width_px =
+                menu_width_px(menu_width, cx.theme().tokens.control.combo_box.menu_width);
+            let menu_left =
+                desired_menu_left(trigger_bounds, menu_width_px, direction, false, window);
+            let relative_left = menu_left - trigger_bounds.left();
 
-                // Check if we need to initialize content
-                let should_init_content = *needs_content_init.read(cx);
-                if should_init_content {
-                    needs_content_init.update(cx, |v, _| *v = false);
-                }
+            // Check if we need to initialize content
+            let should_init_content = *needs_content_init.read(cx);
+            if should_init_content {
+                needs_content_init.update(cx, |v, _| *v = false);
+            }
 
-                // Read search text for filtering
-                let query = search_text.read(cx).clone();
-                let query_lower = query.to_lowercase();
+            // Read search text for filtering
+            let query = search_text.read(cx).clone();
+            let query_lower = query.to_lowercase();
 
-                let filtered = options
-                    .into_iter()
-                    .filter(move |opt| {
-                        if query_lower.is_empty() {
-                            return true;
-                        }
-                        opt.label.to_string().to_lowercase().contains(&query_lower)
-                            || opt.value.to_lowercase().contains(&query_lower)
-                    })
-                    .take(max_results)
-                    .collect::<Vec<_>>();
+            let filtered = options
+                .into_iter()
+                .filter(move |opt| {
+                    if query_lower.is_empty() {
+                        return true;
+                    }
+                    opt.label.to_string().to_lowercase().contains(&query_lower)
+                        || opt.value.to_lowercase().contains(&query_lower)
+                })
+                .take(max_results)
+                .collect::<Vec<_>>();
 
-                let menu = div()
-                    .id(format!("{}:menu", id))
-                    .absolute()
-                    .top_full()
-                    .left_0()
-                    // Horizontal overflow protection: shift within window bounds.
-                    .when(relative_left != Pixels::ZERO, |this| this.left(relative_left))
-                    .mt(theme.tokens.control.popover.offset)
-                    .rounded_md()
-                    .border_1()
-                    .border_color(theme.border.default)
-                    .bg(theme.surface.raised)
-                    .shadow_md()
-                    .py_1()
-                    .w(menu_width_px)
-                    .occlude()
-                    .text_align(rtl::text_align_start(direction))
-                    .on_mouse_down_out({
-                        let needs_content_init = needs_content_init.clone();
-                        move |_ev, _window, cx| {
-                            menu_open_for_outside.update(cx, |open, _cx| *open = false);
-                            needs_content_init.update(cx, |v, _| *v = true);
-                        }
-                    })
-                    .child(
-                        div().px_2().pb_2().child(
-                            text_input(format!("{}:query", id))
-                                .placeholder(search_placeholder)
-                                .bg(theme.surface.base)
-                                .border(theme.border.default)
-                                .focus_border(theme.border.focus)
-                                .text_color(theme.content.primary)
-                                .when(should_init_content, |this| this.content(query.clone()))
-                                .on_change({
-                                    let search_text = search_text.clone();
-                                    move |value, _window, cx| {
-                                        search_text.update(cx, |text, _| {
-                                            *text = value;
-                                        });
-                                    }
-                                }),
-                        ),
-                    )
-                    .children(filtered.into_iter().map(move |opt| {
-                        let is_selected = opt.value == value;
-                        let is_disabled = disabled || opt.disabled;
-                        let option_value = opt.value.clone();
-                        let menu_open_for_select = menu_open_for_select.clone();
-                        let on_change = on_change.clone();
-                        let on_change_simple = on_change_simple.clone();
-                        let internal_value = internal_value.clone();
-
-                        let row_fg = if is_disabled {
-                            theme.content.disabled
-                        } else {
-                            text_color
-                        };
-
-                        div()
-                            .id((ElementId::from("ui:combo-box:option"), option_value.clone()))
-                            .px_3()
-                            .py_2()
-                            .flex()
-                            .when(direction.is_rtl(), |this| this.flex_row_reverse())
-                            .when(!direction.is_rtl(), |this| this.flex_row())
-                            .items_center()
-                            .justify_between()
-                            .gap_2()
-                            .text_color(row_fg)
-                            .when(!is_disabled, |this| {
-                                this.cursor_pointer()
-                                    .hover(|this| this.bg(theme.surface.hover))
-                            })
-                            .when(is_disabled, |this| this.cursor_not_allowed().opacity(0.6))
-                            .child(opt.label)
-                            .when(is_selected, |this| {
-                                this.child(
-                                    icon(IconName::Check)
-                                        .size(cx.theme().tokens.sizes.icon_sm)
-                                        .color(theme.action.primary.bg),
-                                )
-                            })
-                            .on_click(move |ev, window, cx| {
-                                if is_disabled {
-                                    return;
-                                }
-
-                                if let Some(internal_value) = &internal_value {
-                                    internal_value.update(cx, |state, _| {
-                                        *state = option_value.clone();
+            let menu = div()
+                .id(format!("{}:menu", id))
+                .absolute()
+                .top_full()
+                .left_0()
+                // Horizontal overflow protection: shift within window bounds.
+                .when(relative_left != Pixels::ZERO, |this| {
+                    this.left(relative_left)
+                })
+                .mt(theme.tokens.control.popover.offset)
+                .rounded_md()
+                .border_1()
+                .border_color(theme.border.default)
+                .bg(theme.surface.raised)
+                .shadow_md()
+                .py_1()
+                .w(menu_width_px)
+                .occlude()
+                .text_align(rtl::text_align_start(direction))
+                .on_mouse_down_out({
+                    let needs_content_init = needs_content_init.clone();
+                    move |_ev, _window, cx| {
+                        menu_open_for_outside.update(cx, |open, _cx| *open = false);
+                        needs_content_init.update(cx, |v, _| *v = true);
+                    }
+                })
+                .child(
+                    div().px_2().pb_2().child(
+                        text_input(format!("{}:query", id))
+                            .placeholder(search_placeholder)
+                            .bg(theme.surface.base)
+                            .border(theme.border.default)
+                            .focus_border(theme.border.focus)
+                            .text_color(theme.content.primary)
+                            .when(should_init_content, |this| this.content(query.clone()))
+                            .on_change({
+                                let search_text = search_text.clone();
+                                move |value, _window, cx| {
+                                    search_text.update(cx, |text, _| {
+                                        *text = value;
                                     });
                                 }
+                            }),
+                    ),
+                )
+                .children(filtered.into_iter().map(move |opt| {
+                    let is_selected = opt.value == value;
+                    let is_disabled = disabled || opt.disabled;
+                    let option_value = opt.value.clone();
+                    let menu_open_for_select = menu_open_for_select.clone();
+                    let on_change = on_change.clone();
+                    let on_change_simple = on_change_simple.clone();
+                    let internal_value = internal_value.clone();
 
-                                call_on_change(
-                                    option_value.clone(),
-                                    on_change.as_ref(),
-                                    on_change_simple.as_ref(),
-                                    ev,
-                                    window,
-                                    cx,
-                                );
+                    let row_fg = if is_disabled {
+                        theme.content.disabled
+                    } else {
+                        text_color
+                    };
 
-                                menu_open_for_select.update(cx, |open, _| *open = false);
-                            })
-                    }));
+                    div()
+                        .id((ElementId::from("ui:combo-box:option"), option_value.clone()))
+                        .px_3()
+                        .py_2()
+                        .flex()
+                        .when(direction.is_rtl(), |this| this.flex_row_reverse())
+                        .when(!direction.is_rtl(), |this| this.flex_row())
+                        .items_center()
+                        .justify_between()
+                        .gap_2()
+                        .text_color(row_fg)
+                        .when(!is_disabled, |this| {
+                            this.cursor_pointer()
+                                .hover(|this| this.bg(theme.surface.hover))
+                        })
+                        .when(is_disabled, |this| this.cursor_not_allowed().opacity(0.6))
+                        .child(opt.label)
+                        .when(is_selected, |this| {
+                            this.child(
+                                icon(IconName::Check)
+                                    .size(cx.theme().tokens.sizes.icon_sm)
+                                    .color(theme.action.primary.bg),
+                            )
+                        })
+                        .on_click(move |ev, window, cx| {
+                            if is_disabled {
+                                return;
+                            }
 
-                let animated_menu = menu.with_animation(
-                    format!("combo-box-menu-{}", is_open),
-                    Animation::new(duration::MENU_OPEN).with_easing(ease_out_quint_clamped),
-                    move |this, value| {
-                        this.opacity(value)
-                            .mt(gpui::px(popover_offset - popover_slide * value))
-                    },
-                );
+                            if let Some(internal_value) = &internal_value {
+                                internal_value.update(cx, |state, _| {
+                                    *state = option_value.clone();
+                                });
+                            }
 
-                this.child(gpui::deferred(animated_menu).with_priority(100))
-            });
+                            call_on_change(
+                                option_value.clone(),
+                                on_change.as_ref(),
+                                on_change_simple.as_ref(),
+                                ev,
+                                window,
+                                cx,
+                            );
+
+                            menu_open_for_select.update(cx, |open, _| *open = false);
+                        })
+                }));
+
+            let animated_menu = menu.with_animation(
+                format!("combo-box-menu-{}", is_open),
+                Animation::new(duration::MENU_OPEN).with_easing(ease_out_quint_clamped),
+                move |this, value| {
+                    this.opacity(value)
+                        .mt(gpui::px(popover_offset - popover_slide * value))
+                },
+            );
+
+            this.child(gpui::deferred(animated_menu).with_priority(100))
+        });
 
         BoundsTrackerElement {
             bounds_state: trigger_bounds_state,

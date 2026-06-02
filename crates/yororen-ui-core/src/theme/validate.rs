@@ -46,14 +46,54 @@ pub fn validate(theme: &Theme) -> Vec<Issue> {
 
     // --- contrast checks ---
     let pairs: [(&str, Hsla, Hsla, f32); 8] = [
-        ("surface.base/content.primary", theme.surface.base, theme.content.primary, 4.5),
-        ("action.neutral", theme.action.neutral.bg, theme.action.neutral.fg, 4.5),
-        ("action.primary", theme.action.primary.bg, theme.action.primary.fg, 4.5),
-        ("action.danger", theme.action.danger.bg, theme.action.danger.fg, 4.5),
-        ("status.success", theme.status.success.bg, theme.status.success.fg, 4.5),
-        ("status.warning", theme.status.warning.bg, theme.status.warning.fg, 4.5),
-        ("status.error", theme.status.error.bg, theme.status.error.fg, 4.5),
-        ("status.info", theme.status.info.bg, theme.status.info.fg, 4.5),
+        (
+            "surface.base/content.primary",
+            theme.surface.base,
+            theme.content.primary,
+            4.5,
+        ),
+        (
+            "action.neutral",
+            theme.action.neutral.bg,
+            theme.action.neutral.fg,
+            4.5,
+        ),
+        (
+            "action.primary",
+            theme.action.primary.bg,
+            theme.action.primary.fg,
+            4.5,
+        ),
+        (
+            "action.danger",
+            theme.action.danger.bg,
+            theme.action.danger.fg,
+            4.5,
+        ),
+        (
+            "status.success",
+            theme.status.success.bg,
+            theme.status.success.fg,
+            4.5,
+        ),
+        (
+            "status.warning",
+            theme.status.warning.bg,
+            theme.status.warning.fg,
+            4.5,
+        ),
+        (
+            "status.error",
+            theme.status.error.bg,
+            theme.status.error.fg,
+            4.5,
+        ),
+        (
+            "status.info",
+            theme.status.info.bg,
+            theme.status.info.fg,
+            4.5,
+        ),
     ];
     for (label, bg, fg, min) in pairs {
         let ratio = contrast_ratio(fg, bg);

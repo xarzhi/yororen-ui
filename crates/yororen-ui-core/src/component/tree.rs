@@ -440,7 +440,11 @@ impl Tree {
                     let node_expanded = node.expanded;
                     move |_ev, window, cx| {
                         state_entity.update(cx, |state, _cx| {
-                            let expanded_now = state.expanded_nodes.get(&node_id).copied().unwrap_or(node_expanded);
+                            let expanded_now = state
+                                .expanded_nodes
+                                .get(&node_id)
+                                .copied()
+                                .unwrap_or(node_expanded);
                             state.set_expanded(&node_id, !expanded_now);
                         });
                         window.refresh();
@@ -617,7 +621,11 @@ impl Tree {
                         let state_entity = state_entity.clone();
                         move |_ev, window, cx| {
                             state_entity.update(cx, |state, _cx| {
-                                let expanded_now = state.expanded_nodes.get(&node_id).copied().unwrap_or(node_expanded);
+                                let expanded_now = state
+                                    .expanded_nodes
+                                    .get(&node_id)
+                                    .copied()
+                                    .unwrap_or(node_expanded);
                                 state.set_expanded(&node_id, !expanded_now);
                             });
 

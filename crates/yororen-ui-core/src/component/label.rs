@@ -1,6 +1,6 @@
 use gpui::{
-    Div, ElementId, InteractiveElement, IntoElement, ParentElement, RenderOnce,
-    SharedString, Styled, div, prelude::FluentBuilder,
+    Div, ElementId, InteractiveElement, IntoElement, ParentElement, RenderOnce, SharedString,
+    Styled, div, prelude::FluentBuilder,
 };
 
 use crate::rtl;

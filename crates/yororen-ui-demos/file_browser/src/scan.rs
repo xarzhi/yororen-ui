@@ -60,11 +60,7 @@ fn read_dir_nodes(dir: &Path) -> Vec<(TreeNode, Option<PathBuf>)> {
         let path = entry.path();
         let file_name = entry.file_name().to_string_lossy().to_string();
 
-        let is_dir = entry
-            .file_type()
-            .ok()
-            .map(|t| t.is_dir())
-            .unwrap_or(false);
+        let is_dir = entry.file_type().ok().map(|t| t.is_dir()).unwrap_or(false);
 
         let mut data = ArcTreeNode::new(file_name);
         data.icon = Some(if is_dir {
@@ -154,7 +150,9 @@ pub fn start_scan(root: PathBuf, window: &mut Window, cx: &mut gpui::App) {
                 });
 
                 // Yield between directories so scrolling remains responsive.
-                cx.background_executor().timer(Duration::from_millis(8)).await;
+                cx.background_executor()
+                    .timer(Duration::from_millis(8))
+                    .await;
 
                 for child_dir in next_dirs {
                     stack.push((child_dir, depth + 1));

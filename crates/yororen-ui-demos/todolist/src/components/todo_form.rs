@@ -34,7 +34,7 @@
 //! - `button` - Action button with `ActionVariantKind::Primary` variant for the main submit action
 
 use gpui::{IntoElement, ParentElement, Styled, div, px};
-use yororen_ui::component::{button, combo_box, text_input, ComboBoxOption};
+use yororen_ui::component::{ComboBoxOption, button, combo_box, text_input};
 use yororen_ui::i18n::Translate;
 use yororen_ui::theme::ActionVariantKind;
 
@@ -83,7 +83,9 @@ impl TodoForm {
                     .value(&category_label)
                     .options(category_options.clone())
                     .on_change(|value, _ev, _window, cx| {
-                        if let Some(cat) = TodoCategory::all().into_iter().find(|c| c.code() == value) {
+                        if let Some(cat) =
+                            TodoCategory::all().into_iter().find(|c| c.code() == value)
+                        {
                             let model = cx.global::<TodoState>().model.clone();
                             model.update(cx, |model, cx| {
                                 model.new_todo_category = cat;
@@ -96,7 +98,7 @@ impl TodoForm {
             .child(
                 button("add-btn")
                     .gap_2()
-                    .variant(ActionVariantKind::Primary)  // Use Primary for main action
+                    .variant(ActionVariantKind::Primary) // Use Primary for main action
                     .child(add_label)
                     .on_click(|_ev, _window, cx| {
                         let model = cx.global::<TodoState>().model.clone();

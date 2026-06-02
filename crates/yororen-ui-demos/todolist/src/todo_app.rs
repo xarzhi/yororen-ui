@@ -49,15 +49,13 @@
 //! - Pass the necessary state to child components for rendering
 
 use gpui::{
-    prelude::FluentBuilder,
-    Context, IntoElement, ParentElement,
-    Render, Styled, Window, div, px,
+    Context, IntoElement, ParentElement, Render, Styled, Window, div, prelude::FluentBuilder, px,
 };
 use yororen_ui::theme::ActiveTheme;
 
 use crate::components;
-use crate::todo::Todo;
 use crate::state::TodoState;
+use crate::todo::Todo;
 
 /// Root component - the entry point for your application's UI tree
 ///
@@ -105,7 +103,10 @@ impl Render for TodoApp {
             .into_iter()
             .filter(|todo| {
                 let matches_search = search_query.is_empty()
-                    || todo.title.to_lowercase().contains(&search_query.to_lowercase());
+                    || todo
+                        .title
+                        .to_lowercase()
+                        .contains(&search_query.to_lowercase());
                 let matches_category = selected_category
                     .as_ref()
                     .map(|cat| &todo.category == cat)
@@ -126,13 +127,19 @@ impl Render for TodoApp {
                     .flex_col()
                     .gap(px(16.))
                     // Step 5: Render child components
-                    .child(components::todo_header::TodoHeader::render(app, compact_mode))
+                    .child(components::todo_header::TodoHeader::render(
+                        app,
+                        compact_mode,
+                    ))
                     .child(components::todo_toolbar::TodoToolbar::render(
                         app,
                         &search_query,
                         &selected_category,
                     ))
-                    .child(components::todo_form::TodoForm::render(app, new_todo_category))
+                    .child(components::todo_form::TodoForm::render(
+                        app,
+                        new_todo_category,
+                    ))
                     .child(
                         div()
                             .flex_col()
@@ -146,7 +153,11 @@ impl Render for TodoApp {
             )
             // Conditional rendering: show modal when editing
             .when_some(editing_todo, |this, _| {
-                this.child(components::todo_modal::TodoModal::render(app, edit_title, edit_category))
+                this.child(components::todo_modal::TodoModal::render(
+                    app,
+                    edit_title,
+                    edit_category,
+                ))
             })
     }
 }

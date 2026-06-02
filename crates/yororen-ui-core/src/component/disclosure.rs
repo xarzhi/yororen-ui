@@ -1,6 +1,4 @@
-use gpui::{
-    ElementId, InteractiveElement, IntoElement, ParentElement, RenderOnce, Styled, div,
-};
+use gpui::{ElementId, InteractiveElement, IntoElement, ParentElement, RenderOnce, Styled, div};
 
 use crate::component::{ArrowDirection, IconName, icon};
 use crate::theme::ActiveTheme;

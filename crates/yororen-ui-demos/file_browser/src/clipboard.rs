@@ -44,4 +44,3 @@ pub struct FileClipboard {
     /// Source path of the file/directory
     pub src: PathBuf,
 }
-

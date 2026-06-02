@@ -1,6 +1,5 @@
 use gpui::{
-    Div, ElementId, InteractiveElement, IntoElement, ParentElement, Pixels, RenderOnce, Styled,
-    div,
+    Div, ElementId, InteractiveElement, IntoElement, ParentElement, Pixels, RenderOnce, Styled, div,
 };
 
 use crate::component::{Heading, HeadingLevel, Icon, IconName, Label, button, heading, label};
@@ -98,11 +97,9 @@ impl RenderOnce for EmptyState {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let theme = cx.theme();
 
-        let icon = self
-            .icon
-            .unwrap_or_else(|| {
-                crate::component::icon(IconName::Info).size(theme.tokens.sizes.icon_xl)
-            });
+        let icon = self.icon.unwrap_or_else(|| {
+            crate::component::icon(IconName::Info).size(theme.tokens.sizes.icon_xl)
+        });
         let max_width = self
             .max_width
             .unwrap_or(theme.tokens.control.empty_state.action_gap * 35.0);

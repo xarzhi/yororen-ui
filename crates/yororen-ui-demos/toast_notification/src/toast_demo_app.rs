@@ -29,9 +29,9 @@ use gpui::{
     StatefulInteractiveElement, Styled, Window, div, px,
 };
 use serde_json::json;
-use yororen_ui::component::{button, label, toast, ToastKind};
-use yororen_ui::notification::{DismissStrategy, Notification, NotificationCenter};
+use yororen_ui::component::{ToastKind, button, label, toast};
 use yororen_ui::notification::notification_host;
+use yororen_ui::notification::{DismissStrategy, Notification, NotificationCenter};
 use yororen_ui::theme::ActiveTheme;
 
 /// Root component - displays Toast demo and handles notification interactions
@@ -210,10 +210,7 @@ impl Render for ToastDemoApp {
                     .on_click({
                         let center = center.clone();
                         move |_ev, _window, cx| {
-                            center.notify(
-                                Notification::new("Saved!").kind(ToastKind::Success),
-                                cx,
-                            );
+                            center.notify(Notification::new("Saved!").kind(ToastKind::Success), cx);
                         }
                     }),
             )
@@ -268,21 +265,23 @@ impl Render for ToastDemoApp {
                                 Some(Arc::new({
                                     let center_for_cb = center.clone();
                                     move |n, _ev, window, cx| {
-                                    // Extract payload data
-                                    let payload = n
-                                        .payload
-                                        .as_ref()
-                                        .and_then(|v| v.get("message"))
-                                        .and_then(|v| v.as_str())
-                                        .unwrap_or("<missing>");
+                                        // Extract payload data
+                                        let payload = n
+                                            .payload
+                                            .as_ref()
+                                            .and_then(|v| v.get("message"))
+                                            .and_then(|v| v.as_str())
+                                            .unwrap_or("<missing>");
 
-                                    // Display result in new notification
-                                    let next = Notification::new(format!("payload.message = {payload}"))
+                                        // Display result in new notification
+                                        let next = Notification::new(format!(
+                                            "payload.message = {payload}"
+                                        ))
                                         .kind(ToastKind::Success);
-                                    center_for_cb.notify(next, cx);
-                                    // Refresh window to update UI
-                                    window.refresh();
-                                }
+                                        center_for_cb.notify(next, cx);
+                                        // Refresh window to update UI
+                                        window.refresh();
+                                    }
                                 })),
                                 // on_dismiss callback - triggered when notification dismissed (None here)
                                 None,

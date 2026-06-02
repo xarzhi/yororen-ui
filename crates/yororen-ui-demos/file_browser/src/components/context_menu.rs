@@ -55,7 +55,11 @@ pub fn render(
                         .flex()
                         .items_center()
                         .gap(px(8.))
-                        .child(icon(IconName::Pencil).size(px(14.)).color(theme.content.primary))
+                        .child(
+                            icon(IconName::Pencil)
+                                .size(px(14.))
+                                .color(theme.content.primary),
+                        )
                         .child("Copy"),
                 )
                 .on_click(move |_ev, window, cx| {

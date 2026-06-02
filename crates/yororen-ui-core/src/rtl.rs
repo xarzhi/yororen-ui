@@ -235,22 +235,34 @@ mod tests {
 
     #[test]
     fn text_align_start_returns_left_for_ltr() {
-        assert_eq!(rtl::text_align_start(TextDirection::Ltr), gpui::TextAlign::Left);
+        assert_eq!(
+            rtl::text_align_start(TextDirection::Ltr),
+            gpui::TextAlign::Left
+        );
     }
 
     #[test]
     fn text_align_start_returns_right_for_rtl() {
-        assert_eq!(rtl::text_align_start(TextDirection::Rtl), gpui::TextAlign::Right);
+        assert_eq!(
+            rtl::text_align_start(TextDirection::Rtl),
+            gpui::TextAlign::Right
+        );
     }
 
     #[test]
     fn text_align_end_returns_right_for_ltr() {
-        assert_eq!(rtl::text_align_end(TextDirection::Ltr), gpui::TextAlign::Right);
+        assert_eq!(
+            rtl::text_align_end(TextDirection::Ltr),
+            gpui::TextAlign::Right
+        );
     }
 
     #[test]
     fn text_align_end_returns_left_for_rtl() {
-        assert_eq!(rtl::text_align_end(TextDirection::Rtl), gpui::TextAlign::Left);
+        assert_eq!(
+            rtl::text_align_end(TextDirection::Rtl),
+            gpui::TextAlign::Left
+        );
     }
 
     #[test]
@@ -260,13 +272,22 @@ mod tests {
 
     #[test]
     fn flex_row_returns_row_reverse_for_rtl() {
-        assert_eq!(rtl::flex_row(TextDirection::Rtl), gpui::FlexDirection::RowReverse);
+        assert_eq!(
+            rtl::flex_row(TextDirection::Rtl),
+            gpui::FlexDirection::RowReverse
+        );
     }
 
     #[test]
     fn flip_left_right_returns_correct_value() {
-        assert_eq!(rtl::flip_left_right(TextDirection::Ltr, "left", "right"), "left");
-        assert_eq!(rtl::flip_left_right(TextDirection::Rtl, "left", "right"), "right");
+        assert_eq!(
+            rtl::flip_left_right(TextDirection::Ltr, "left", "right"),
+            "left"
+        );
+        assert_eq!(
+            rtl::flip_left_right(TextDirection::Rtl, "left", "right"),
+            "right"
+        );
     }
 
     #[test]

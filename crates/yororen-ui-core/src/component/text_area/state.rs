@@ -419,9 +419,17 @@ impl TextAreaState {
         self.reset_cursor_blink(window, cx);
         let is_rtl = cx.theme().is_rtl();
         if event.modifiers.shift {
-            self.select_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
+            self.select_to(
+                self.index_for_mouse_position(event.position, is_rtl),
+                window,
+                cx,
+            );
         } else {
-            self.move_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
+            self.move_to(
+                self.index_for_mouse_position(event.position, is_rtl),
+                window,
+                cx,
+            );
         }
     }
 
@@ -443,7 +451,11 @@ impl TextAreaState {
         if self.is_selecting {
             self.reset_cursor_blink(window, cx);
             let is_rtl = cx.theme().is_rtl();
-            self.select_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
+            self.select_to(
+                self.index_for_mouse_position(event.position, is_rtl),
+                window,
+                cx,
+            );
         }
     }
 
@@ -476,7 +488,11 @@ impl TextAreaState {
         }
     }
 
-    pub fn index_for_mouse_position(&self, position: gpui::Point<gpui::Pixels>, is_rtl: bool) -> usize {
+    pub fn index_for_mouse_position(
+        &self,
+        position: gpui::Point<gpui::Pixels>,
+        is_rtl: bool,
+    ) -> usize {
         if self.edit.content().is_empty() {
             return 0;
         }

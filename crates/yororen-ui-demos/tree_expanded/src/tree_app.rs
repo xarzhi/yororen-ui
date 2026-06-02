@@ -50,17 +50,17 @@ impl Render for TreeExpandedApp {
             .text_color(theme.content.primary)
             .child("Tree Expanded State Demo");
 
-        let description = div()
-            .text_sm()
-            .text_color(theme.content.secondary)
-            .child("Collapse a node, then trigger re-render. Your expansion choices should be preserved.");
+        let description = div().text_sm().text_color(theme.content.secondary).child(
+            "Collapse a node, then trigger re-render. Your expansion choices should be preserved.",
+        );
 
         // Action buttons
-        let rerender_btn = button("force-rerender")
-            .child("Force re-render")
-            .on_click(|_ev, window, _cx| {
-                window.refresh();
-            });
+        let rerender_btn =
+            button("force-rerender")
+                .child("Force re-render")
+                .on_click(|_ev, window, _cx| {
+                    window.refresh();
+                });
 
         let reset_btn = button("reset-nodes")
             .child("Reset with new nodes")

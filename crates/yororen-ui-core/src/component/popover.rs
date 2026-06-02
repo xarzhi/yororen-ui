@@ -4,9 +4,9 @@ use gpui::{
     ParentElement, Pixels, RenderOnce, Styled, div,
 };
 
-use crate::{animation::constants::duration, theme::ActiveTheme};
-use crate::i18n::{I18n, TextDirection};
 use crate::component::{BoundsTrackerElement, desired_menu_left};
+use crate::i18n::{I18n, TextDirection};
+use crate::{animation::constants::duration, theme::ActiveTheme};
 
 use crate::animation::ease_out_quint_clamped;
 
@@ -177,11 +177,10 @@ impl RenderOnce for Popover {
         // persists across renders — `BoundsTrackerElement` writes the bounds in `prepaint`
         // (which happens *after* render), so the same `Entity<Bounds<...>>` must be read in
         // render to see the previous frame's layout result.
-        let trigger_bounds_state = window.use_keyed_state(
-            (id.clone(), "ui:popover:trigger-bounds"),
-            cx,
-            |_, _| Bounds::<Pixels>::default(),
-        );
+        let trigger_bounds_state =
+            window.use_keyed_state((id.clone(), "ui:popover:trigger-bounds"), cx, |_, _| {
+                Bounds::<Pixels>::default()
+            });
 
         let theme = cx.theme();
         let bg = self.bg.unwrap_or(theme.surface.raised);
@@ -195,8 +194,7 @@ impl RenderOnce for Popover {
         // Snapshot token values up-front so the closure doesn't borrow `theme`
         // (which keeps a reference to `cx`) while `cx` itself is moved in.
         let menu_width_default = {
-            theme.tokens.control.popover.min_width
-                + theme.tokens.control.popover.max_width / 2.0
+            theme.tokens.control.popover.min_width + theme.tokens.control.popover.max_width / 2.0
         };
         let popover_offset: f32 = theme.tokens.control.popover.offset.into();
         let popover_slide: f32 = theme.tokens.motion.slide_distance;
@@ -206,7 +204,8 @@ impl RenderOnce for Popover {
 
         // Like Select/ComboBox, Popover is a relative container and the menu is an absolute child
         // rendered via `gpui::deferred(...)` so it is painted above.
-        let trigger = self.base
+        let trigger = self
+            .base
             .id(element_id)
             .relative()
             .child(BoundsTrackerElement {
@@ -223,7 +222,8 @@ impl RenderOnce for Popover {
                 let menu_width_px = width.unwrap_or(menu_width_default);
                 let trigger_bounds = *trigger_bounds_state.read(cx);
                 let align_end = placement == PopoverPlacement::BottomEnd;
-                let menu_left = desired_menu_left(trigger_bounds, menu_width_px, direction, align_end, window);
+                let menu_left =
+                    desired_menu_left(trigger_bounds, menu_width_px, direction, align_end, window);
                 let relative_left = menu_left - trigger_bounds.left();
 
                 let menu = div()
@@ -231,7 +231,9 @@ impl RenderOnce for Popover {
                     .absolute()
                     .top_full()
                     .left_0()
-                    .when(relative_left != Pixels::ZERO, |this| this.left(relative_left))
+                    .when(relative_left != Pixels::ZERO, |this| {
+                        this.left(relative_left)
+                    })
                     .mt(gpui::px(popover_offset))
                     .rounded_md()
                     .overflow_hidden()

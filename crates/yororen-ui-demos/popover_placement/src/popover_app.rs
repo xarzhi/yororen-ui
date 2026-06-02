@@ -7,9 +7,11 @@
 //! Also provides controls to toggle text direction.
 
 use gpui::prelude::FluentBuilder;
-use gpui::{Context, Entity, FontWeight, IntoElement, ParentElement, Render, Styled, Window, div, px};
+use gpui::{
+    Context, Entity, FontWeight, IntoElement, ParentElement, Render, Styled, Window, div, px,
+};
 
-use yororen_ui::component::{button, label, popover, PopoverPlacement};
+use yororen_ui::component::{PopoverPlacement, button, label, popover};
 use yororen_ui::i18n::{I18n, Locale};
 use yororen_ui::theme::ActiveTheme;
 
@@ -24,8 +26,10 @@ impl PopoverPlacementApp {
 impl Render for PopoverPlacementApp {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         // Use keyed state to manage popover open/close (must borrow cx mutably first)
-        let start_open: Entity<bool> = window.use_keyed_state("demo:popover:start:open", cx, |_, _| false);
-        let end_open: Entity<bool> = window.use_keyed_state("demo:popover:end:open", cx, |_, _| false);
+        let start_open: Entity<bool> =
+            window.use_keyed_state("demo:popover:start:open", cx, |_, _| false);
+        let end_open: Entity<bool> =
+            window.use_keyed_state("demo:popover:end:open", cx, |_, _| false);
 
         let theme = cx.theme();
         let i18n = cx.try_global::<I18n>();
@@ -38,10 +42,9 @@ impl Render for PopoverPlacementApp {
             .text_color(theme.content.primary)
             .child("Popover Placement Demo");
 
-        let description = div()
-            .text_sm()
-            .text_color(theme.content.secondary)
-            .child("Click the buttons to open/close popovers. Verify BottomStart vs BottomEnd alignment.");
+        let description = div().text_sm().text_color(theme.content.secondary).child(
+            "Click the buttons to open/close popovers. Verify BottomStart vs BottomEnd alignment.",
+        );
 
         // Capture entity id so on_click can notify this component to re-render
         let entity_id = cx.entity_id();

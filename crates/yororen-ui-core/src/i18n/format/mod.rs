@@ -106,9 +106,8 @@ impl NumberFormatter {
     fn format_decimal_with_options(&self, value: f64, options: &NumberFormatOptions) -> String {
         let symbols = NumberSymbols::for_locale(&self.locale);
         let lang = self.locale.language();
-        let use_grouping = options.use_grouping
-            && !matches!(lang, "ja" | "zh" | "ko")
-            && value.is_finite();
+        let use_grouping =
+            options.use_grouping && !matches!(lang, "ja" | "zh" | "ko") && value.is_finite();
 
         if value.is_nan() {
             return "NaN".to_string();

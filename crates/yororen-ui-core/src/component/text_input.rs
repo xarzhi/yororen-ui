@@ -258,9 +258,17 @@ impl TextInputState {
 
         let is_rtl = cx.theme().is_rtl();
         if event.modifiers.shift {
-            self.select_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
+            self.select_to(
+                self.index_for_mouse_position(event.position, is_rtl),
+                window,
+                cx,
+            );
         } else {
-            self.move_to(self.index_for_mouse_position(event.position, is_rtl), window, cx)
+            self.move_to(
+                self.index_for_mouse_position(event.position, is_rtl),
+                window,
+                cx,
+            )
         }
     }
 
@@ -277,7 +285,11 @@ impl TextInputState {
         if self.is_selecting {
             self.reset_cursor_blink(window, cx);
             let is_rtl = cx.theme().is_rtl();
-            self.select_to(self.index_for_mouse_position(event.position, is_rtl), window, cx);
+            self.select_to(
+                self.index_for_mouse_position(event.position, is_rtl),
+                window,
+                cx,
+            );
         }
     }
 
@@ -619,10 +631,7 @@ impl Element for TextLineElement {
             let raw_start_x = line.x_for_index(selected_range.start);
             let raw_end_x = line.x_for_index(selected_range.end);
             let (start_x, end_x) = if is_rtl {
-                (
-                    line.width - raw_start_x,
-                    line.width - raw_end_x,
-                )
+                (line.width - raw_start_x, line.width - raw_end_x)
             } else {
                 (raw_start_x, raw_end_x)
             };
