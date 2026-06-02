@@ -3,7 +3,8 @@
 
 Cargo.lock
 
-# Demo targets
+# Demo targets (legacy and workspace paths)
 demo/**/target
+crates/yororen-ui-demos/*/target
 
 yororen-ui.wiki

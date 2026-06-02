@@ -14,6 +14,8 @@
   <strong>Yororen UI</strong> is a reusable UI Components + Widgets library built on top of <a href="https://github.com/zed-industries/zed"><code>gpui</code></a> (Zed).
 </p>
 
+> ⚠️ **v0.3 is a breaking release.** If you are upgrading from v0.2, see [`MIGRATION.md`](./MIGRATION.md) for the required changes (new workspace layout, removed business icons, deprecated `DefaultPlaceholders`).
+
 <p align="center">
   It is designed to be consumed by a <code>gpui</code> application crate, while keeping the UI layer self-contained (theme, components, widgets, and embedded icon assets).
 </p>
@@ -367,10 +369,14 @@ The component icon API uses strongly-typed names:
 ```rust
 use yororen_ui::component::{icon, IconName};
 
-let _ = icon(IconName::Minecraft);
+let _ = icon(IconName::Search);
 ```
 
-Icon paths map to embedded SVG assets like `icons/minecraft.svg`.
+Icon paths map to embedded SVG assets like `icons/search.svg`. The 13
+universal icons cover general UI affordances (search, check, close, arrows,
+file/folder, user, warning, info, etc.). For app-specific icons (brand
+logos, custom glyphs), use `IconPath::External("icons/your.svg")` and ship
+the SVG with your app's `AssetSource`.
 
 ---
 
