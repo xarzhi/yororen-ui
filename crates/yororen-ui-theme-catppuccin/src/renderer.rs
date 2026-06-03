@@ -29,17 +29,16 @@ use yororen_ui_core::renderer::{
     FocusRingRenderState, FocusRingRenderer, FormRenderState, FormRenderer, HeadingRenderState,
     HeadingRenderer, IconButtonRenderState, IconButtonRenderer, IconRenderState, IconRenderer,
     IconSizePreset, KeybindingInputRenderState, KeybindingInputRenderer, LabelRenderState,
-    PanelRenderState, PanelRenderer,
     LabelRenderer, ListItemRenderState, ListItemRenderer, ModalRenderState, ModalRenderer,
     NotificationRenderState, NotificationRenderer, NumberInputRenderState, NumberInputRenderer,
-    PasswordInputRenderState, PasswordInputRenderer, PopoverRenderState, PopoverRenderer,
-    ProgressBarRenderState, ProgressBarRenderer, RadioRenderState, RadioRenderer, RendererRegistry,
-    SearchInputRenderState, SearchInputRenderer, SelectRenderState, SelectRenderer,
-    SkeletonRenderState, SkeletonRenderer, SplitButtonRenderState, SplitButtonRenderer,
-    SwitchRenderState, SwitchRenderer, TagRenderState, TagRenderer, TextAreaRenderState,
-    TextAreaRenderer, TextInputRenderState, TextInputRenderer, ToastRenderState, ToastRenderer,
-    ToggleButtonRenderState, ToggleButtonRenderer, TooltipRenderState, TooltipRenderer,
-    TreeItemRenderState, TreeItemRenderer,
+    PanelRenderState, PanelRenderer, PasswordInputRenderState, PasswordInputRenderer,
+    PopoverRenderState, PopoverRenderer, ProgressBarRenderState, ProgressBarRenderer,
+    RadioRenderState, RadioRenderer, RendererRegistry, SearchInputRenderState, SearchInputRenderer,
+    SelectRenderState, SelectRenderer, SkeletonRenderState, SkeletonRenderer,
+    SplitButtonRenderState, SplitButtonRenderer, SwitchRenderState, SwitchRenderer, TagRenderState,
+    TagRenderer, TextAreaRenderState, TextAreaRenderer, TextInputRenderState, TextInputRenderer,
+    ToastRenderState, ToastRenderer, ToggleButtonRenderState, ToggleButtonRenderer,
+    TooltipRenderState, TooltipRenderer, TreeItemRenderState, TreeItemRenderer,
 };
 use yororen_ui_core::theme::{ActionVariantKind, Theme};
 
@@ -634,11 +633,7 @@ impl PanelRenderer for CatppuccinPanelRenderer {
     fn border(&self, _state: &PanelRenderState, theme: &Theme) -> Hsla {
         theme.border.default
     }
-    fn padding(
-        &self,
-        _state: &PanelRenderState,
-        _theme: &Theme,
-    ) -> Edges<Pixels> {
+    fn padding(&self, _state: &PanelRenderState, _theme: &Theme) -> Edges<Pixels> {
         // Panel is a generic container; the Modal that uses it
         // overrides padding to 0 because Modal lays out its own
         // title / content / actions spacing. The default 16-px
@@ -1907,7 +1902,6 @@ mod tests {
         let _ = reg.label.color(&LabelRenderState::default(), &theme);
     }
 }
-
 
 #[cfg(test)]
 mod panel_tests {

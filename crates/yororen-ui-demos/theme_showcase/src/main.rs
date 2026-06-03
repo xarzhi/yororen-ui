@@ -136,11 +136,10 @@ mod tests {
         FocusRingRenderState, FormRenderState, HeadingRenderState, IconButtonRenderState,
         IconRenderState, KeybindingInputRenderState, LabelRenderState, ListItemRenderState,
         ModalRenderState, NotificationRenderState, NumberInputRenderState,
-        PasswordInputRenderState, PopoverRenderState, ProgressBarRenderState,
-        RadioRenderState, SearchInputRenderState, SelectRenderState, SkeletonRenderState,
-        SplitButtonRenderState, SwitchRenderState, TagRenderState, TextAreaRenderState,
-        TextInputRenderState, ToastRenderState, ToggleButtonRenderState,
-        TooltipRenderState, TreeItemRenderState,
+        PasswordInputRenderState, PopoverRenderState, ProgressBarRenderState, RadioRenderState,
+        SearchInputRenderState, SelectRenderState, SkeletonRenderState, SplitButtonRenderState,
+        SwitchRenderState, TagRenderState, TextAreaRenderState, TextInputRenderState,
+        ToastRenderState, ToggleButtonRenderState, TooltipRenderState, TreeItemRenderState,
     };
 
     /// F-γ: catppuccin_renderer_only() must cover all 37 renderers.
@@ -150,43 +149,153 @@ mod tests {
     fn catppuccin_renderer_only_covers_all_renderers() {
         use gpui::WindowAppearance;
         let theme = catppuccin_renderer_only(WindowAppearance::Dark);
-        let _ = theme.renderers.button.bg(&ButtonRenderState::default(), &theme);
-        let _ = theme.renderers.icon_button.bg(&IconButtonRenderState::default(), &theme);
-        let _ = theme.renderers.toggle_button.bg(&ToggleButtonRenderState::default(), &theme);
-        let _ = theme.renderers.label.color(&LabelRenderState::default(), &theme);
-        let _ = theme.renderers.heading.size(&HeadingRenderState { level: unsafe { std::mem::zeroed() } }, &theme);
-        let _ = theme.renderers.divider.color(&DividerRenderState::default(), &theme);
-        let _ = theme.renderers.focus_ring.color(&FocusRingRenderState::default(), &theme);
-        let _ = theme.renderers.badge.bg(&BadgeRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .button
+            .bg(&ButtonRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .icon_button
+            .bg(&IconButtonRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .toggle_button
+            .bg(&ToggleButtonRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .label
+            .color(&LabelRenderState::default(), &theme);
+        let _ = theme.renderers.heading.size(
+            &HeadingRenderState {
+                level: unsafe { std::mem::zeroed() },
+            },
+            &theme,
+        );
+        let _ = theme
+            .renderers
+            .divider
+            .color(&DividerRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .focus_ring
+            .color(&FocusRingRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .badge
+            .bg(&BadgeRenderState::default(), &theme);
         let _ = theme.renderers.tag.bg(&TagRenderState::default(), &theme);
-        let _ = theme.renderers.progress_bar.track(&ProgressBarRenderState::default(), &theme);
-        let _ = theme.renderers.skeleton.bg(&SkeletonRenderState::default(), &theme);
-        let _ = theme.renderers.tooltip.bg(&TooltipRenderState::default(), &theme);
-        let _ = theme.renderers.avatar.default_bg(&AvatarRenderState::default(), &theme);
-        let _ = theme.renderers.switch.track_bg(&SwitchRenderState::default(), &theme);
-        let _ = theme.renderers.checkbox.box_bg(&CheckboxRenderState::default(), &theme);
-        let _ = theme.renderers.radio.ring_bg(&RadioRenderState::default(), &theme);
-        let _ = theme.renderers.text_input.bg(&TextInputRenderState::default(), &theme);
-        let _ = theme.renderers.text_area.bg(&TextAreaRenderState::default(), &theme);
-        let _ = theme.renderers.password_input.bg(&PasswordInputRenderState::default(), &theme);
-        let _ = theme.renderers.number_input.bg(&NumberInputRenderState::default(), &theme);
-        let _ = theme.renderers.file_path_input.bg(&FilePathInputRenderState::default(), &theme);
-        let _ = theme.renderers.search_input.bg(&SearchInputRenderState::default(), &theme);
-        let _ = theme.renderers.select.bg(&SelectRenderState::default(), &theme);
-        let _ = theme.renderers.combo_box.bg(&ComboBoxRenderState::default(), &theme);
-        let _ = theme.renderers.modal.panel_bg(&ModalRenderState::default(), &theme);
-        let _ = theme.renderers.popover.bg(&PopoverRenderState::default(), &theme);
-        let _ = theme.renderers.dropdown_menu.trigger_bg(&DropdownMenuRenderState::default(), &theme);
-        let _ = theme.renderers.disclosure.trigger_bg(&DisclosureRenderState::default(), &theme);
-        let _ = theme.renderers.toast.bg(&ToastRenderState::default(), &theme);
-        let _ = theme.renderers.notification.bg(&NotificationRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .progress_bar
+            .track(&ProgressBarRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .skeleton
+            .bg(&SkeletonRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .tooltip
+            .bg(&TooltipRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .avatar
+            .default_bg(&AvatarRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .switch
+            .track_bg(&SwitchRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .checkbox
+            .box_bg(&CheckboxRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .radio
+            .ring_bg(&RadioRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .text_input
+            .bg(&TextInputRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .text_area
+            .bg(&TextAreaRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .password_input
+            .bg(&PasswordInputRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .number_input
+            .bg(&NumberInputRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .file_path_input
+            .bg(&FilePathInputRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .search_input
+            .bg(&SearchInputRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .select
+            .bg(&SelectRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .combo_box
+            .bg(&ComboBoxRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .modal
+            .panel_bg(&ModalRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .popover
+            .bg(&PopoverRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .dropdown_menu
+            .trigger_bg(&DropdownMenuRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .disclosure
+            .trigger_bg(&DisclosureRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .toast
+            .bg(&ToastRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .notification
+            .bg(&NotificationRenderState::default(), &theme);
         let _ = theme.renderers.card.bg(&CardRenderState::default(), &theme);
-        let _ = theme.renderers.form.gap(&FormRenderState::default(), &theme);
-        let _ = theme.renderers.list_item.bg(&ListItemRenderState::default(), &theme);
-        let _ = theme.renderers.tree_item.bg(&TreeItemRenderState::default(), &theme);
-        let _ = theme.renderers.keybinding_input.bg(&KeybindingInputRenderState::default(), &theme);
-        let _ = theme.renderers.split_button.primary_bg(&SplitButtonRenderState::default(), &theme);
-        let _ = theme.renderers.empty_state.icon_color(&EmptyStateRenderState::default(), &theme);
-        let _ = theme.renderers.icon.color(&IconRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .form
+            .gap(&FormRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .list_item
+            .bg(&ListItemRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .tree_item
+            .bg(&TreeItemRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .keybinding_input
+            .bg(&KeybindingInputRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .split_button
+            .primary_bg(&SplitButtonRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .empty_state
+            .icon_color(&EmptyStateRenderState::default(), &theme);
+        let _ = theme
+            .renderers
+            .icon
+            .color(&IconRenderState::default(), &theme);
     }
 }

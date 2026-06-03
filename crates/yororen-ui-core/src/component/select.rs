@@ -595,4 +595,3 @@ mod tests {
         assert!(!s.dismiss_on_escape);
     }
 }
-

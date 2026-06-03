@@ -270,8 +270,7 @@ impl RenderOnce for Modal {
         let divider_thickness = theme.tokens.control.divider.thickness;
 
         // Get child component IDs before moving other fields
-        let close_button_id: ElementId =
-            (self.element_id.clone(), "close-button").into();
+        let close_button_id: ElementId = (self.element_id.clone(), "close-button").into();
         let element_id_for_base = self.element_id.clone();
         let title = self.title;
         let content = self
@@ -347,16 +346,13 @@ impl RenderOnce for Modal {
         // here, but the renderer takes care of it for the default
         // case).
         let panel_id = (element_id_for_base.clone(), "panel");
-        div()
-            .id(element_id_for_base)
-            .w(width)
-            .child(
-                panel(panel_id)
-                    .bg(bg)
-                    .border(border)
-                    .padding(Edges::all(gpui::px(0.0)))
-                    .child(panel_child),
-            )
+        div().id(element_id_for_base).w(width).child(
+            panel(panel_id)
+                .bg(bg)
+                .border(border)
+                .padding(Edges::all(gpui::px(0.0)))
+                .child(panel_child),
+        )
     }
 }
 

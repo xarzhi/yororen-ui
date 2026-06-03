@@ -175,4 +175,3 @@ mod tests {
         assert!(!t.dismiss_on_escape);
     }
 }
-
