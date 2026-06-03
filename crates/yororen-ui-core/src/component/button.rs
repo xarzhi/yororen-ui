@@ -6,13 +6,19 @@ use gpui::{
 };
 
 use crate::component::{ClickCallback, HoverCallback};
-use crate::renderer::{ButtonRenderState, Edges};
+use crate::renderer::{
+    ButtonRenderState, ButtonVariant, Edges, VariantKey, resolve_custom_variant,
+};
+use crate::renderer::variant::VariantState;
 use crate::theme::{ActionVariantKind, ActiveTheme};
 
 /// Creates a new button element.
 ///
-/// Buttons trigger actions or navigation. Use `.variant()` to change visual style
-/// (e.g., `ActionVariantKind::Primary`, `ActionVariantKind::Danger`).
+/// Buttons trigger actions or navigation. Use `.variant()` to change visual
+/// style. Built-in variants come from [`ActionVariantKind`]
+/// (`Primary`, `Danger`); custom variants are resolved through the
+/// global [`crate::renderer::VariantRegistry`] (see also
+/// [`.custom_variant`]).
 ///
 /// # Example
 /// ```rust,ignore
@@ -40,7 +46,7 @@ pub struct Button {
     hover_fn: Option<HoverCallback>,
     clickable: bool,
     disabled: bool,
-    variant: ActionVariantKind,
+    variant: ButtonVariant,
 
     bg: Option<Hsla>,
     hover_bg: Option<Hsla>,
@@ -56,16 +62,7 @@ impl Button {
     /// Creates a new button with default styles.
     ///
     /// Default height is 36px with horizontal and vertical padding.
-    /// Default variant is `ActionVariantKind::Neutral`.
-    ///
-    /// # Example
-    /// ```rust,ignore
-    /// button()
-    ///     .id("my-button")
-    ///     .on_click(|_ev, _window, _cx| { /* ... */ })
-    /// ```
-    ///
-    /// Note: Always provide a unique, stable ID via `.id()` for interactive components.
+    /// Default variant is [`ActionVariantKind::Neutral`].
     pub fn new() -> Self {
         Self {
             element_id: "ui:button".into(),
@@ -74,7 +71,7 @@ impl Button {
             hover_fn: None,
             clickable: true,
             disabled: false,
-            variant: ActionVariantKind::Neutral,
+            variant: ButtonVariant::default(),
             bg: None,
             hover_bg: None,
         }
@@ -100,9 +97,18 @@ impl Button {
         self
     }
 
-    pub fn variant(mut self, variant: ActionVariantKind) -> Self {
-        self.variant = variant;
+    /// Set the visual variant. Accepts a built-in [`ActionVariantKind`]
+    /// (e.g. `.variant(ActionVariantKind::Primary)`) or a
+    /// [`ButtonVariant::Custom`] for variants registered through
+    /// [`crate::renderer::VariantRegistry`].
+    pub fn variant(mut self, variant: impl Into<ButtonVariant>) -> Self {
+        self.variant = variant.into();
         self
+    }
+
+    /// Convenience: set the variant to a custom registry key.
+    pub fn custom_variant(self, key: impl Into<VariantKey>) -> Self {
+        self.variant(ButtonVariant::Custom(key.into()))
     }
 
     pub fn on_click<F>(mut self, listener: F) -> Self
@@ -163,15 +169,26 @@ impl RenderOnce for Button {
         let variant = self.variant;
         let direction = cx.theme().text_direction;
 
+        // Resolve a custom variant up-front so the renderer (and the
+        // inline hover fallback below) can both consult it.
+        let custom_style: Option<Arc<dyn crate::renderer::VariantStyle>> = match &variant {
+            ButtonVariant::Builtin(_) => None,
+            ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
+        };
+        let variant_builtin: ActionVariantKind = variant
+            .as_builtin()
+            .unwrap_or(ActionVariantKind::Neutral);
+
         // Phase B spike: button visuals go through ButtonRenderer.
         let theme = cx.theme();
         let r = &theme.renderers.button;
         let state = ButtonRenderState {
-            variant,
+            variant: variant_builtin,
             disabled,
             is_rtl: direction.is_rtl(),
             has_custom_bg: bg.is_some(),
             has_custom_hover_bg: hover_bg.is_some(),
+            custom_style: custom_style.clone(),
         };
         let bg_color = r.bg(&state, theme);
         let fg_color = r.fg(&state, theme);
@@ -179,13 +196,21 @@ impl RenderOnce for Button {
         let radius = r.border_radius(&state, theme);
         let min_height = r.min_height(&state, theme);
 
-        // For hover, prefer the user's custom hover_bg; otherwise let the
-        // theme's hover palette win via `hover_bg` (we re-read it from
-        // the action variant for now, mirroring v0.3 behavior).
-        let hover_bg_color = hover_bg.unwrap_or(if disabled {
-            theme.action_variant(variant).disabled_bg
-        } else {
-            theme.action_variant(variant).hover_bg
+        // For hover, prefer the user's custom hover_bg; otherwise let
+        // the custom variant provide its base bg as a sensible hover
+        // default, falling back to the built-in theme hover palette
+        // (mirroring v0.3 behavior).
+        let hover_bg_color = hover_bg.unwrap_or_else(|| {
+            if let Some(s) = &custom_style {
+                s.bg(&VariantState { disabled })
+            } else {
+                let av = theme.action_variant(variant_builtin);
+                if disabled {
+                    av.disabled_bg
+                } else {
+                    av.hover_bg
+                }
+            }
         });
 
         self.base

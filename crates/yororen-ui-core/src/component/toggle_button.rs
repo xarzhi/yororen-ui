@@ -7,6 +7,7 @@ use gpui::{
 
 use crate::{
     component::{ToggleCallback, create_internal_state, use_internal_state_simple},
+    renderer::{ButtonVariant, VariantKey, resolve_custom_variant},
     theme::{ActionVariantKind, ActiveTheme},
 };
 
@@ -24,7 +25,7 @@ pub struct ToggleButton {
     selected: bool,
     disabled: bool,
     on_toggle: Option<ToggleCallback>,
-    variant: ActionVariantKind,
+    variant: ButtonVariant,
     default_selected: bool,
     bg: Option<Hsla>,
     selected_bg: Option<Hsla>,
@@ -42,7 +43,7 @@ impl ToggleButton {
             selected: false,
             disabled: false,
             on_toggle: None,
-            variant: ActionVariantKind::Neutral,
+            variant: ButtonVariant::default(),
             default_selected: false,
             bg: None,
             selected_bg: None,
@@ -71,9 +72,14 @@ impl ToggleButton {
         self
     }
 
-    pub fn variant(mut self, variant: ActionVariantKind) -> Self {
-        self.variant = variant;
+    pub fn variant(mut self, variant: impl Into<ButtonVariant>) -> Self {
+        self.variant = variant.into();
         self
+    }
+
+    /// Convenience: set the variant to a custom registry key.
+    pub fn custom_variant(self, key: impl Into<VariantKey>) -> Self {
+        self.variant(ButtonVariant::Custom(key.into()))
     }
 
     pub fn default_selected(mut self, default_selected: bool) -> Self {
@@ -212,38 +218,60 @@ impl RenderOnce for ToggleButton {
             base = base.opacity(0.5).cursor_not_allowed();
         }
 
-        let action_variant = cx.theme().action_variant(variant);
+        // Resolve custom variant once and reuse for unselected colors.
+        let custom_style: Option<Arc<dyn crate::renderer::VariantStyle>> = match &variant {
+            ButtonVariant::Builtin(_) => None,
+            ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
+        };
+        let variant_builtin = variant
+            .as_builtin()
+            .unwrap_or(ActionVariantKind::Neutral);
+        let action_variant = cx.theme().action_variant(variant_builtin);
         let selected_variant = &cx.theme().action.primary;
+
+        // Helper: pull an Hsla from the custom variant if registered,
+        // otherwise fall back to the given fallback.
+        let custom_bg = |disabled: bool| -> Option<Hsla> {
+            custom_style
+                .as_ref()
+                .map(|s| s.bg(&crate::renderer::variant::VariantState { disabled }))
+        };
+        let custom_fg = |disabled: bool| -> Option<Hsla> {
+            custom_style
+                .as_ref()
+                .map(|s| s.fg(&crate::renderer::variant::VariantState { disabled }))
+        };
 
         let mut resolved_bg = if resolved_selected {
             selected_bg.unwrap_or(selected_variant.bg)
         } else {
-            bg.unwrap_or(action_variant.bg)
+            bg.unwrap_or(custom_bg(false).unwrap_or(action_variant.bg))
         };
 
         let mut resolved_hover_bg = if resolved_selected {
             selected_variant.hover_bg
         } else {
-            hover_bg.unwrap_or(action_variant.hover_bg)
+            hover_bg
+                .unwrap_or(custom_bg(false).unwrap_or(action_variant.hover_bg))
         };
 
         let mut resolved_text_color = if resolved_selected {
             selected_variant.fg
         } else {
-            action_variant.fg
+            custom_fg(false).unwrap_or(action_variant.fg)
         };
 
         if disabled {
             resolved_bg = if resolved_selected {
                 selected_variant.disabled_bg
             } else {
-                action_variant.disabled_bg
+                custom_bg(true).unwrap_or(action_variant.disabled_bg)
             };
             resolved_hover_bg = resolved_bg;
             resolved_text_color = if resolved_selected {
                 selected_variant.disabled_fg
             } else {
-                action_variant.disabled_fg
+                custom_fg(true).unwrap_or(action_variant.disabled_fg)
             };
         }
 

@@ -3,9 +3,12 @@
 //! This module provides common utility functions used across multiple components
 //! to reduce code duplication.
 
+use std::sync::Arc;
+
 use gpui::{App, Bounds, ElementId, Entity, Pixels, Window, px};
 
 use crate::i18n::TextDirection;
+use crate::renderer::{VariantState, VariantStyle};
 use crate::theme::{ActionVariantKind, Theme};
 
 /// Computes the desired left position for a dropdown/popover menu relative to its trigger,
@@ -314,24 +317,61 @@ pub fn compute_action_style(
     custom_bg: Option<gpui::Hsla>,
     custom_hover_bg: Option<gpui::Hsla>,
 ) -> ActionStyle {
-    let action_variant = theme.action_variant(variant);
+    compute_action_style_with_custom(theme, variant, None, disabled, custom_bg, custom_hover_bg)
+}
+
+/// Like [`compute_action_style`], but accepts an optional pre-resolved
+/// `VariantStyle` from the global `VariantRegistry`. When provided, the
+/// custom style takes precedence over the built-in `variant` for the
+/// bg / fg colors (and for `disabled_opacity` is taken from the
+/// variant). The user's `custom_bg` / `custom_hover_bg` overrides still
+/// win, matching the legacy behavior.
+pub fn compute_action_style_with_custom(
+    theme: &Theme,
+    variant: ActionVariantKind,
+    custom_style: Option<Arc<dyn VariantStyle>>,
+    disabled: bool,
+    custom_bg: Option<gpui::Hsla>,
+    custom_hover_bg: Option<gpui::Hsla>,
+) -> ActionStyle {
+    let state = VariantState { disabled };
+    let (variant_bg, variant_fg, variant_disabled_bg, variant_disabled_fg, variant_disabled_opacity) =
+        match &custom_style {
+            Some(s) => (
+                s.bg(&state),
+                s.fg(&state),
+                s.bg(&VariantState { disabled: true }),
+                s.fg(&VariantState { disabled: true }),
+                s.disabled_opacity(),
+            ),
+            None => {
+                let av = theme.action_variant(variant);
+                (av.bg, av.fg, av.disabled_bg, av.disabled_fg, 1.0f32)
+            }
+        };
+
+    // `custom_bg` / `custom_hover_bg` (from `.bg(...)` / `.hover_bg(...)`
+    // on the builder) still take priority over the variant.
+    let bg = custom_bg.unwrap_or(variant_bg);
+    let hover_bg = custom_hover_bg.unwrap_or(bg);
 
     if disabled {
         return ActionStyle {
-            bg: action_variant.disabled_bg,
-            hover_bg: action_variant.disabled_bg,
-            fg: action_variant.disabled_fg,
-            disabled_bg: action_variant.disabled_bg,
-            disabled_fg: action_variant.disabled_fg,
+            bg: variant_disabled_bg,
+            hover_bg: variant_disabled_bg,
+            fg: variant_disabled_fg,
+            disabled_bg: variant_disabled_bg,
+            disabled_fg: variant_disabled_fg,
         };
     }
 
+    let _ = variant_disabled_opacity; // exposed via state, not via ActionStyle
     ActionStyle {
-        bg: custom_bg.unwrap_or(action_variant.bg),
-        hover_bg: custom_hover_bg.unwrap_or(action_variant.hover_bg),
-        fg: action_variant.fg,
-        disabled_bg: action_variant.disabled_bg,
-        disabled_fg: action_variant.disabled_fg,
+        bg,
+        hover_bg,
+        fg: variant_fg,
+        disabled_bg: variant_disabled_bg,
+        disabled_fg: variant_disabled_fg,
     }
 }
 

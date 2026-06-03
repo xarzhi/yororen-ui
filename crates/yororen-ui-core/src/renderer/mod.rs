@@ -103,5 +103,5 @@ pub use tooltip::{TooltipRenderState, TooltipRenderer, TokenTooltipRenderer};
 pub use tree_item::{TreeItemRenderState, TreeItemRenderer, TokenTreeItemRenderer};
 pub use variant::{
     BuiltinVariantKey, ButtonVariant, GlobalVariantRegistry, TokenVariantStyle, VariantKey,
-    VariantRegistry, VariantState, VariantStyle, variant_compose,
+    VariantRegistry, VariantState, VariantStyle, resolve_custom_variant, variant_compose,
 };

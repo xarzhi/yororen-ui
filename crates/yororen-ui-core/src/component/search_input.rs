@@ -7,7 +7,9 @@ use gpui::{
 
 use crate::{
     component::{IconName, TextInputState, icon, icon_button, text_input},
-    theme::ActiveTheme,
+    renderer::{ButtonVariant, VariantKey, resolve_custom_variant},
+    renderer::variant::VariantState,
+    theme::{ActionVariant, ActionVariantKind, ActiveTheme},
 };
 
 /// Creates a new search input element.
@@ -26,6 +28,7 @@ pub struct SearchInput {
     placeholder: SharedString,
 
     disabled: bool,
+    variant: ButtonVariant,
 
     bg: Option<Hsla>,
     border: Option<Hsla>,
@@ -51,6 +54,7 @@ impl SearchInput {
             placeholder: "".into(),
 
             disabled: false,
+            variant: ButtonVariant::default(),
 
             bg: None,
             border: None,
@@ -81,6 +85,20 @@ impl SearchInput {
     pub fn disabled(mut self, disabled: bool) -> Self {
         self.disabled = disabled;
         self
+    }
+
+    /// Set the visual variant of the trailing clear (`x`) button.
+    /// Built-in [`ActionVariantKind`] values map to the theme palette;
+    /// custom variants registered through
+    /// [`crate::renderer::VariantRegistry`] are resolved at render time.
+    pub fn variant(mut self, variant: impl Into<ButtonVariant>) -> Self {
+        self.variant = variant.into();
+        self
+    }
+
+    /// Convenience: set the variant to a custom registry key.
+    pub fn custom_variant(self, key: impl Into<VariantKey>) -> Self {
+        self.variant(ButtonVariant::Custom(key.into()))
     }
 
     pub fn on_change<F>(mut self, handler: F) -> Self
@@ -166,13 +184,37 @@ impl RenderOnce for SearchInput {
         let text_color = self.text_color;
         let on_change = self.on_change;
         let on_submit = self.on_submit;
+        let variant = self.variant;
 
         let input_id: ElementId = (id.clone(), "ui:search-input:input").into();
         let clear_id: ElementId = (id.clone(), "ui:search-input:clear").into();
 
         let theme = cx.theme().clone();
         let hint = theme.content.tertiary;
-        let action_variant = theme.action.neutral.clone();
+
+        // Resolve the clear button's variant. Built-in values fall
+        // through to the theme; custom variants are looked up in the
+        // global VariantRegistry.
+        let custom_style = match &variant {
+            ButtonVariant::Builtin(_) => None,
+            ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
+        };
+        let variant_builtin = variant
+            .as_builtin()
+            .unwrap_or(ActionVariantKind::Neutral);
+        let theme_action_variant = cx.theme().action_variant(variant_builtin).clone();
+        let action_variant = if let Some(s) = &custom_style {
+            ActionVariant {
+                bg: s.bg(&VariantState { disabled }),
+                hover_bg: s.bg(&VariantState { disabled }),
+                active_bg: s.bg(&VariantState { disabled }),
+                fg: s.fg(&VariantState { disabled }),
+                disabled_bg: s.bg(&VariantState { disabled: true }),
+                disabled_fg: s.fg(&VariantState { disabled: true }),
+            }
+        } else {
+            theme_action_variant
+        };
 
         let input_state =
             window.use_keyed_state(input_id.clone(), cx, |_, cx| TextInputState::new(cx));
@@ -258,6 +300,7 @@ impl RenderOnce for SearchInput {
                     .justify_center()
                     .child(
                         icon_button(clear_id)
+                            .variant(variant.clone())
                             .icon(icon(IconName::Close))
                             .icon_size(cx.theme().tokens.sizes.icon_md)
                             .w(clear_size)

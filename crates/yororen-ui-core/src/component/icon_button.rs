@@ -6,7 +6,8 @@ use gpui::{
 };
 
 use crate::{
-    component::{ClickCallback, HoverCallback, Icon, compute_action_style},
+    component::{ClickCallback, HoverCallback, Icon, compute_action_style_with_custom},
+    renderer::{ButtonVariant, VariantKey, resolve_custom_variant},
     theme::{ActionVariantKind, ActiveTheme},
 };
 
@@ -41,7 +42,7 @@ pub struct IconButton {
     hover_fn: Option<HoverCallback>,
     clickable: bool,
     disabled: bool,
-    variant: ActionVariantKind,
+    variant: ButtonVariant,
 
     bg: Option<Hsla>,
     hover_bg: Option<Hsla>,
@@ -59,7 +60,7 @@ impl IconButton {
             hover_fn: None,
             clickable: true,
             disabled: false,
-            variant: ActionVariantKind::Neutral,
+            variant: ButtonVariant::default(),
 
             bg: None,
             hover_bg: None,
@@ -100,9 +101,14 @@ impl IconButton {
         self
     }
 
-    pub fn variant(mut self, variant: ActionVariantKind) -> Self {
-        self.variant = variant;
+    pub fn variant(mut self, variant: impl Into<ButtonVariant>) -> Self {
+        self.variant = variant.into();
         self
+    }
+
+    /// Convenience: set the variant to a custom registry key.
+    pub fn custom_variant(self, key: impl Into<VariantKey>) -> Self {
+        self.variant(ButtonVariant::Custom(key.into()))
     }
 
     pub fn on_click<F>(mut self, listener: F) -> Self
@@ -168,7 +174,22 @@ impl RenderOnce for IconButton {
         let variant = self.variant;
         let icon_size = self.icon_size;
 
-        let action_style = compute_action_style(cx.theme(), variant, disabled, bg, hover_bg);
+        let custom_style = match &variant {
+            ButtonVariant::Builtin(_) => None,
+            ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
+        };
+        let variant_builtin = variant
+            .as_builtin()
+            .unwrap_or(ActionVariantKind::Neutral);
+
+        let action_style = compute_action_style_with_custom(
+            cx.theme(),
+            variant_builtin,
+            custom_style,
+            disabled,
+            bg,
+            hover_bg,
+        );
 
         self.base
             .id(self.element_id)

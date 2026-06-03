@@ -55,6 +55,7 @@ fn main() {
 // register them under any string key.
 // ---------------------------------------------------------------------------
 
+#[derive(Debug)]
 struct GhostVariant;
 
 impl VariantStyle for GhostVariant {
@@ -85,6 +86,7 @@ impl VariantStyle for GhostVariant {
     }
 }
 
+#[derive(Debug)]
 struct BrandedVariant;
 
 impl VariantStyle for BrandedVariant {

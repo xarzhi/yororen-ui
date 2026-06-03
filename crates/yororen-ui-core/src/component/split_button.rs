@@ -8,7 +8,9 @@ use gpui::{
 
 use crate::animation::constants::duration;
 use crate::component::{ArrowDirection, Icon, IconName, button};
-use crate::theme::ActiveTheme;
+use crate::renderer::{ButtonVariant, VariantKey, resolve_custom_variant};
+use crate::renderer::variant::VariantState;
+use crate::theme::{ActionVariantKind, ActiveTheme};
 
 use crate::animation::ease_out_quint_clamped;
 
@@ -51,6 +53,7 @@ pub struct SplitButton {
     on_action: Option<ActionFn>,
     options: Vec<SplitButtonOption>,
     disabled: bool,
+    variant: ButtonVariant,
     bg: Option<Hsla>,
     hover_bg: Option<Hsla>,
     menu_width: Option<Pixels>,
@@ -72,6 +75,7 @@ impl SplitButton {
             on_action: None,
             options: Vec::new(),
             disabled: false,
+            variant: ButtonVariant::default(),
             bg: None,
             hover_bg: None,
             menu_width: None,
@@ -96,6 +100,21 @@ impl SplitButton {
     pub fn disabled(mut self, disabled: bool) -> Self {
         self.disabled = disabled;
         self
+    }
+
+    /// Set the visual variant of the primary action surface. Built-in
+    /// [`ActionVariantKind`] values drive the outer container's bg /
+    /// hover_bg / fg; custom variants registered through
+    /// [`crate::renderer::VariantRegistry`] are resolved at render time.
+    /// Menu items always use the neutral palette regardless of variant.
+    pub fn variant(mut self, variant: impl Into<ButtonVariant>) -> Self {
+        self.variant = variant.into();
+        self
+    }
+
+    /// Convenience: set the variant to a custom registry key.
+    pub fn custom_variant(self, key: impl Into<VariantKey>) -> Self {
+        self.variant(ButtonVariant::Custom(key.into()))
     }
 
     pub fn on_primary<F>(mut self, handler: F) -> Self
@@ -175,7 +194,33 @@ impl RenderOnce for SplitButton {
         let on_action = self.on_action;
         let options = self.options;
         let label = self.label;
-        let action_variant = cx.theme().action.neutral.clone();
+        let variant = self.variant;
+
+        // Resolve the user's variant: built-in ActionVariantKind reads
+        // straight from the theme; custom variants are looked up in the
+        // global VariantRegistry. The lookup only affects the outer
+        // container's bg / hover_bg / fg (the inner primary button is
+        // forced transparent so the outer shows through).
+        let custom_style: Option<Arc<dyn crate::renderer::VariantStyle>> = match &variant {
+            ButtonVariant::Builtin(_) => None,
+            ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
+        };
+        let variant_builtin = variant
+            .as_builtin()
+            .unwrap_or(ActionVariantKind::Neutral);
+        let theme_action_variant = cx.theme().action_variant(variant_builtin).clone();
+        let action_variant = if let Some(s) = &custom_style {
+            crate::theme::ActionVariant {
+                bg: s.bg(&VariantState { disabled }),
+                hover_bg: s.bg(&VariantState { disabled }),
+                active_bg: s.bg(&VariantState { disabled }),
+                fg: s.fg(&VariantState { disabled }),
+                disabled_bg: s.bg(&VariantState { disabled: true }),
+                disabled_fg: s.fg(&VariantState { disabled: true }),
+            }
+        } else {
+            theme_action_variant
+        };
         let bg = self.bg.unwrap_or(action_variant.bg);
         let hover_bg = self.hover_bg.unwrap_or(action_variant.hover_bg);
         let menu_width = self.menu_width;
@@ -284,6 +329,7 @@ impl RenderOnce for SplitButton {
             })
             .child(
                 button(primary_id)
+                    .variant(variant.clone())
                     .h(cx.theme().tokens.control.button.min_height)
                     .px_4()
                     .py_2()

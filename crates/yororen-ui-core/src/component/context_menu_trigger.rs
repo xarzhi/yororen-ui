@@ -1,8 +1,12 @@
+use std::sync::Arc;
+
 use gpui::{
     Div, ElementId, Hsla, InteractiveElement, IntoElement, MouseButton, MouseDownEvent,
     ParentElement, RenderOnce, Styled, div, prelude::FluentBuilder,
 };
 
+use crate::renderer::{ButtonVariant, VariantKey, resolve_custom_variant};
+use crate::renderer::variant::VariantState;
 use crate::theme::{ActionVariantKind, ActiveTheme};
 
 /// Creates a new context menu trigger element.
@@ -20,7 +24,7 @@ pub struct ContextMenuTrigger {
     on_open: Option<OpenFn>,
     consume: bool,
     enabled: bool,
-    variant: ActionVariantKind,
+    variant: ButtonVariant,
 
     bg: Option<Hsla>,
     hover_bg: Option<Hsla>,
@@ -41,7 +45,7 @@ impl ContextMenuTrigger {
             on_open: None,
             consume: true,
             enabled: true,
-            variant: ActionVariantKind::Neutral,
+            variant: ButtonVariant::default(),
 
             bg: None,
             hover_bg: None,
@@ -68,9 +72,14 @@ impl ContextMenuTrigger {
         self
     }
 
-    pub fn variant(mut self, variant: ActionVariantKind) -> Self {
-        self.variant = variant;
+    pub fn variant(mut self, variant: impl Into<ButtonVariant>) -> Self {
+        self.variant = variant.into();
         self
+    }
+
+    /// Convenience: set the variant to a custom registry key.
+    pub fn custom_variant(self, key: impl Into<VariantKey>) -> Self {
+        self.variant(ButtonVariant::Custom(key.into()))
     }
 
     pub fn on_open<F>(mut self, listener: F) -> Self
@@ -119,12 +128,32 @@ impl RenderOnce for ContextMenuTrigger {
         let hover_bg = self.hover_bg;
         let variant = self.variant;
 
-        let action_variant = _cx.theme().action_variant(variant);
-        let hover_bg = hover_bg.unwrap_or(action_variant.hover_bg);
-        let mut resolved_bg = bg.unwrap_or(action_variant.bg);
+        let custom_style: Option<Arc<dyn crate::renderer::VariantStyle>> = match &variant {
+            ButtonVariant::Builtin(_) => None,
+            ButtonVariant::Custom(key) => resolve_custom_variant(_cx, key),
+        };
+        let variant_builtin = variant
+            .as_builtin()
+            .unwrap_or(ActionVariantKind::Neutral);
+        let action_variant = _cx.theme().action_variant(variant_builtin);
+        let hover_bg = hover_bg.unwrap_or_else(|| {
+            custom_style
+                .as_ref()
+                .map(|s| s.bg(&VariantState { disabled: !enabled }))
+                .unwrap_or(action_variant.hover_bg)
+        });
+        let mut resolved_bg = bg.unwrap_or_else(|| {
+            custom_style
+                .as_ref()
+                .map(|s| s.bg(&VariantState { disabled: !enabled }))
+                .unwrap_or(action_variant.bg)
+        });
 
         if !enabled {
-            resolved_bg = action_variant.disabled_bg;
+            resolved_bg = custom_style
+                .as_ref()
+                .map(|s| s.bg(&VariantState { disabled: true }))
+                .unwrap_or(action_variant.disabled_bg);
         }
 
         // Only handle right-click; allow other mouse interactions (including

@@ -1,8 +1,12 @@
+use std::sync::Arc;
+
 use gpui::{
     ClickEvent, Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, RenderOnce,
     StatefulInteractiveElement, Styled, div, prelude::FluentBuilder,
 };
 
+use crate::renderer::{ButtonVariant, VariantKey, resolve_custom_variant};
+use crate::renderer::variant::VariantState;
 use crate::theme::{ActionVariantKind, ActiveTheme};
 
 /// Creates a new clickable surface element.
@@ -24,7 +28,7 @@ pub struct ClickableSurface {
 
     clickable: bool,
     focusable: bool,
-    variant: ActionVariantKind,
+    variant: ButtonVariant,
 
     bg: Option<Hsla>,
     hover_bg: Option<Hsla>,
@@ -48,7 +52,7 @@ impl ClickableSurface {
 
             clickable: true,
             focusable: false,
-            variant: ActionVariantKind::Neutral,
+            variant: ButtonVariant::default(),
 
             bg: None,
             hover_bg: None,
@@ -76,9 +80,14 @@ impl ClickableSurface {
         self
     }
 
-    pub fn variant(mut self, variant: ActionVariantKind) -> Self {
-        self.variant = variant;
+    pub fn variant(mut self, variant: impl Into<ButtonVariant>) -> Self {
+        self.variant = variant.into();
         self
+    }
+
+    /// Convenience: set the variant to a custom registry key.
+    pub fn custom_variant(self, key: impl Into<VariantKey>) -> Self {
+        self.variant(ButtonVariant::Custom(key.into()))
     }
 
     pub fn on_click<F>(mut self, listener: F) -> Self
@@ -145,8 +154,24 @@ impl RenderOnce for ClickableSurface {
         let variant = self.variant;
         let element_id = self.element_id;
 
-        let action_variant = _cx.theme().action_variant(variant);
-        let hover_bg = hover_bg.unwrap_or(action_variant.hover_bg);
+        let custom_style: Option<Arc<dyn crate::renderer::VariantStyle>> = match &variant {
+            ButtonVariant::Builtin(_) => None,
+            ButtonVariant::Custom(key) => resolve_custom_variant(_cx, key),
+        };
+        let variant_builtin = variant
+            .as_builtin()
+            .unwrap_or(ActionVariantKind::Neutral);
+        let action_variant = _cx.theme().action_variant(variant_builtin);
+        let variant_bg = custom_style
+            .as_ref()
+            .map(|s| s.bg(&VariantState { disabled: false }))
+            .unwrap_or(action_variant.bg);
+        let hover_bg = hover_bg.unwrap_or_else(|| {
+            custom_style
+                .as_ref()
+                .map(|s| s.bg(&VariantState { disabled: false }))
+                .unwrap_or(action_variant.hover_bg)
+        });
         let focus_ring = focus_ring.unwrap_or(_cx.theme().border.focus);
 
         self.base
@@ -166,7 +191,7 @@ impl RenderOnce for ClickableSurface {
                     }
                 })
             })
-            .bg(bg.unwrap_or(action_variant.bg))
+            .bg(bg.unwrap_or(variant_bg))
             .hover(move |this| this.bg(hover_bg))
             .focus_visible(|style| style.border_2().border_color(focus_ring))
     }

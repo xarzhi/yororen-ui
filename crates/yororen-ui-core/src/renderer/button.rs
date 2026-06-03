@@ -11,10 +11,11 @@ use gpui::{Hsla, Pixels};
 use crate::theme::{ActionVariantKind, Theme};
 
 use super::spec::{BorderSpec, Edges, ShadowSpec};
+use super::variant::{VariantState, VariantStyle};
 
 /// State passed to a `ButtonRenderer`. Fields are deliberately minimal —
 /// a renderer can read more from the `Theme` if it needs to.
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct ButtonRenderState {
     pub variant: ActionVariantKind,
     pub disabled: bool,
@@ -23,6 +24,12 @@ pub struct ButtonRenderState {
     pub has_custom_bg: bool,
     /// `true` if the user supplied `.hover_bg(...)` on the builder.
     pub has_custom_hover_bg: bool,
+    /// Pre-resolved custom variant from the global `VariantRegistry`.
+    /// When `Some`, the renderer should delegate color decisions
+    /// (bg/fg/border/disabled_opacity) to the contained `VariantStyle`
+    /// instead of reading `theme.action_variant(variant)`. When `None`,
+    /// the renderer falls back to the built-in token path.
+    pub custom_style: Option<Arc<dyn VariantStyle>>,
 }
 
 /// Renderer for the `Button` component. Implementations decide what the
@@ -43,10 +50,20 @@ pub trait ButtonRenderer: Send + Sync {
 
 /// Default implementation. Reads from `Theme.tokens().control.button.*` and
 /// `Theme.action_variant(variant)`. Equivalent to the v0.3 / v0.4 button.
+///
+/// When `state.custom_style` is `Some`, color-related methods delegate to
+/// the registered `VariantStyle` (passing the current `disabled` flag
+/// through `VariantState`). Non-color properties (padding, radius, height)
+/// continue to come from the theme.
 pub struct TokenButtonRenderer;
 
 impl ButtonRenderer for TokenButtonRenderer {
     fn bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
+        if let Some(s) = &state.custom_style {
+            return s.bg(&VariantState {
+                disabled: state.disabled,
+            });
+        }
         let v = theme.action_variant(state.variant);
         if state.disabled {
             v.disabled_bg
@@ -56,6 +73,11 @@ impl ButtonRenderer for TokenButtonRenderer {
     }
 
     fn fg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
+        if let Some(s) = &state.custom_style {
+            return s.fg(&VariantState {
+                disabled: state.disabled,
+            });
+        }
         let v = theme.action_variant(state.variant);
         if state.disabled {
             v.disabled_fg
@@ -74,6 +96,10 @@ impl ButtonRenderer for TokenButtonRenderer {
     }
 
     fn border(&self, _state: &ButtonRenderState, _theme: &Theme) -> Option<BorderSpec> {
+        // We do not bridge `VariantStyle::border` here on purpose: the
+        // default renderer does not draw a border at all (v0.3 / v0.4
+        // behavior), and a custom renderer that wants to consume a
+        // variant-supplied border can do so itself.
         None
     }
 
@@ -85,7 +111,10 @@ impl ButtonRenderer for TokenButtonRenderer {
         theme.tokens.control.button.min_height
     }
 
-    fn disabled_opacity(&self, _state: &ButtonRenderState, _theme: &Theme) -> f32 {
+    fn disabled_opacity(&self, state: &ButtonRenderState, _theme: &Theme) -> f32 {
+        if let Some(s) = &state.custom_style {
+            return s.disabled_opacity();
+        }
         1.0
     }
 }

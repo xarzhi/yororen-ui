@@ -38,7 +38,9 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 
-use gpui::{Global, Hsla};
+use gpui::{App, Global, Hsla};
+
+use crate::theme::ActionVariantKind;
 
 /// A key identifying a custom variant. Built-in variants are referenced
 /// by their `ActionVariantKind` directly; custom variants use a
@@ -71,7 +73,7 @@ pub struct VariantState {
 /// Implementations are registered as `Arc<dyn VariantStyle>` on the
 /// global `VariantRegistry`. The trait is intentionally small so
 /// adding a new variant is just a few lines of code.
-pub trait VariantStyle: Send + Sync {
+pub trait VariantStyle: Send + Sync + std::fmt::Debug {
     fn bg(&self, state: &VariantState) -> Hsla;
     fn fg(&self, state: &VariantState) -> Hsla;
     fn border(&self, state: &VariantState) -> Option<Hsla>;
@@ -81,6 +83,7 @@ pub trait VariantStyle: Send + Sync {
 /// A built-in `VariantStyle` that reads from the v0.4 token / palette
 /// system. Used for the three pre-defined variants; also serves as a
 /// fallback when a custom key cannot be resolved.
+#[derive(Debug)]
 pub struct TokenVariantStyle {
     pub bg: Hsla,
     pub fg: Hsla,
@@ -230,14 +233,14 @@ impl Global for GlobalVariantRegistry {}
 pub enum ButtonVariant {
     /// Legacy v0.3 / v0.4 builtin. Kept so existing call sites continue
     /// to work without changes.
-    Builtin(crate::theme::ActionVariantKind),
+    Builtin(ActionVariantKind),
     /// Custom variant resolved through the global `VariantRegistry`.
     Custom(VariantKey),
 }
 
 impl Default for ButtonVariant {
     fn default() -> Self {
-        Self::Builtin(crate::theme::ActionVariantKind::default())
+        Self::Builtin(ActionVariantKind::default())
     }
 }
 
@@ -252,6 +255,39 @@ impl ButtonVariant {
             },
         }
     }
+
+    /// Resolve the variant to a built-in `ActionVariantKind`. Returns
+    /// `None` for `Custom` variants; callers that need a concrete color
+    /// should resolve the custom variant from the `VariantRegistry`
+    /// first (see [`resolve_custom_variant`]).
+    pub fn as_builtin(&self) -> Option<ActionVariantKind> {
+        match self {
+            Self::Builtin(k) => Some(*k),
+            Self::Custom(_) => None,
+        }
+    }
+}
+
+impl From<ActionVariantKind> for ButtonVariant {
+    fn from(kind: ActionVariantKind) -> Self {
+        Self::Builtin(kind)
+    }
+}
+
+impl From<VariantKey> for ButtonVariant {
+    fn from(key: VariantKey) -> Self {
+        Self::Custom(key)
+    }
+}
+
+/// Look up a custom variant in the global [`VariantRegistry`] (if one
+/// has been installed on `App`). Returns `None` when no global is set
+/// or when the key has not been registered — callers should fall back
+/// to the built-in variant in that case so a missing registry entry
+/// never breaks the UI.
+pub fn resolve_custom_variant(cx: &App, key: &VariantKey) -> Option<Arc<dyn VariantStyle>> {
+    cx.try_global::<GlobalVariantRegistry>()
+        .and_then(|g| g.0.resolve(key))
 }
 
 /// Compose a base variant with a list of override variants. The
@@ -273,6 +309,14 @@ pub fn variant_compose(
 struct ComposedVariantStyle {
     base: Arc<dyn VariantStyle>,
     overrides: Vec<(VariantKey, Arc<dyn VariantStyle>)>,
+}
+
+impl std::fmt::Debug for ComposedVariantStyle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ComposedVariantStyle")
+            .field("overrides_count", &self.overrides.len())
+            .finish()
+    }
 }
 
 impl VariantStyle for ComposedVariantStyle {
@@ -314,6 +358,7 @@ mod tests {
     #[test]
     fn register_and_resolve_custom() {
         let reg = VariantRegistry::with_defaults();
+        #[derive(Debug)]
         struct Ghost;
         impl VariantStyle for Ghost {
             fn bg(&self, _: &VariantState) -> Hsla {
@@ -339,6 +384,7 @@ mod tests {
     #[test]
     fn unregister_removes_custom() {
         let reg = VariantRegistry::with_defaults();
+        #[derive(Debug)]
         struct V;
         impl VariantStyle for V {
             fn bg(&self, _: &VariantState) -> Hsla {
