@@ -157,6 +157,21 @@ impl GlobalTheme {
     fn theme(cx: &App) -> &Arc<Theme> {
         &cx.global::<Self>().theme
     }
+
+    /// Read-only accessor for the active `Arc<Theme>`. Useful when an
+    /// app needs to clone / mutate the theme (e.g. to flip
+    /// `text_direction` for an RTL locale) without going through
+    /// `cx.global::<GlobalTheme>()`.
+    pub fn current(&self) -> &Arc<Theme> {
+        &self.theme
+    }
+
+    /// Consume the wrapper and return the underlying `Arc<Theme>`.
+    /// Useful when re-wrapping the same theme with different
+    /// `WindowAppearance` selection.
+    pub fn into_arc(self) -> Arc<Theme> {
+        self.theme
+    }
 }
 
 #[derive(Clone, Debug)]
