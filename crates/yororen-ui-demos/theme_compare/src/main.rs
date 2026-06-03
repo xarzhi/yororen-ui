@@ -1,23 +1,30 @@
 //! yororen-ui Theme Compare Demo
 //!
 //! Verifies Phase D end-to-end. Splits the window into a left half
-//! (theme-system light) and a right half (theme-mini indigo/cyan). The
-//! same Button / Card / Modal renderers are used on both sides — only
-//! the `Theme.renderers` registry differs.
+//! (theme-system) and a right half (theme-mini). The same Button /
+//! Card renderers are used on both sides — only the
+//! `Theme.renderers` registry differs.
 //!
-//! The "Apply mini to left" button flips the left half to the mini
-//! theme at runtime, proving that `RendererRegistry` is a per-Theme
-//! swappable handle, not a process-global.
+//! Both halves track the current `WindowAppearance`: the system
+//! half follows the OS light/dark setting, and the mini half
+//! combines the matching light/dark palette with the mini
+//! registry. Switching the OS appearance (or rebuilding the app
+//! after a change) updates both halves.
+//!
+//! The right half is wrapped in `with_theme(right_theme, ...)`
+//! from `yororen_ui::component`, which temporarily installs the
+//! supplied theme as the global theme for the lifetime of the
+//! right-half element. The "Switch right" button toggles which
+//! theme that override uses, proving that `RendererRegistry` is a
+//! per-Theme swappable handle, not a process-global.
 
-use std::sync::Arc;
-
-use gpui::{App, AppContext, Application, WindowBounds, WindowOptions, px, size};
+use gpui::{App, AppContext, Application, WindowAppearance, WindowBounds, WindowOptions, px, size};
 
 use yororen_ui::assets::UiAsset;
-use yororen_ui::theme::{GlobalTheme, Theme, ThemeSet};
 
 use yororen_ui_theme_system as theme_system;
 use yororen_ui_theme_mini as theme_mini;
+use yororen_ui::theme::Theme;
 
 mod compare_app;
 mod state;
@@ -49,32 +56,29 @@ fn main() {
     });
 }
 
-/// Build a `Theme` from `theme-system::light()` but with `renderers`
-/// swapped to the mini registry. Used to populate the right half
-/// of the window with the indigo / cyan skin.
-pub fn mini_theme() -> Theme {
-    let mut t = theme_system::light();
+/// Resolve the system palette for the current OS appearance.
+fn system_palette(appearance: WindowAppearance) -> Theme {
+    match appearance {
+        WindowAppearance::Light | WindowAppearance::VibrantLight => theme_system::light(),
+        WindowAppearance::Dark | WindowAppearance::VibrantDark => theme_system::dark(),
+    }
+}
+
+/// Build a system theme matching the current `WindowAppearance`.
+/// Wraps the matching light/dark palette from `theme-system` with
+/// its default `RendererRegistry`. Used to populate the right
+/// half of the window when its override is "system" — the result
+/// tracks the OS's light/dark setting.
+pub fn system_theme(appearance: WindowAppearance) -> Theme {
+    system_palette(appearance)
+}
+
+/// Build a mini theme matching the current `WindowAppearance`.
+/// Wraps the matching light/dark palette from `theme-system` and
+/// swaps in the mini renderer registry. Used to populate the
+/// right half of the window when its override is "mini".
+pub fn mini_theme(appearance: WindowAppearance) -> Theme {
+    let mut t = system_palette(appearance);
     t.renderers = theme_mini::mini_registry();
     t
-}
-
-pub fn system_light_theme() -> Theme {
-    theme_system::light()
-}
-
-pub fn system_dark_theme() -> Theme {
-    theme_system::dark()
-}
-
-/// Replace the active `GlobalTheme` with a new one wrapping `theme`.
-pub fn set_active_theme(cx: &mut App, theme: Theme) {
-    cx.set_global(GlobalTheme::new_with_themes(
-        gpui::WindowAppearance::Light,
-        ThemeSet::new(theme),
-    ));
-    cx.refresh_windows();
-}
-
-pub fn current_theme(cx: &App) -> Arc<Theme> {
-    cx.global::<GlobalTheme>().current().clone()
 }

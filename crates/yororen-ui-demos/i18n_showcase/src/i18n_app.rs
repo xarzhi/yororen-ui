@@ -84,7 +84,6 @@ impl Render for I18nShowcaseApp {
             .bg(theme.surface.base)
             .flex()
             .flex_col()
-            .when(is_rtl, |this| this.flex_row_reverse())
             .gap(px(20.))
             .p(px(28.))
             .child(label("i18n Showcase").strong(true).text_size(px(24.)))
