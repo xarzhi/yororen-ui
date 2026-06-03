@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use gpui::prelude::FluentBuilder;
 use gpui::{
     ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, RenderOnce, SharedString,
@@ -6,13 +8,16 @@ use gpui::{
 
 use crate::{
     a11y::Role,
-    component::{HeadingLevel, IconName, button, heading, icon, icon_button, label},
+    component::{HeadingLevel, IconName, button, heading, icon, icon_button, label, panel},
     i18n::TextDirection,
+    renderer::spec::Edges,
     theme::{ActionVariantKind, ActiveTheme},
 };
 
-/// Callback type for modal close handler.
-type ModalCloseCallback = Box<dyn Fn(&mut gpui::Window, &mut gpui::App)>;
+/// Callback type for modal close handler. `Arc<dyn Fn>` so it can
+/// be cloned into multiple closures (e.g. the close button and
+/// the G-α Panel wrapper).
+pub type ModalCloseCallback = Arc<dyn Fn(&mut gpui::Window, &mut gpui::App) + Send + Sync>;
 
 /// Modal content shell (dialog panel).
 ///
@@ -125,6 +130,7 @@ impl Modal {
     /// This enables automatic ID composition for nested components, producing
     /// tuple-based IDs like `("parent-id", "child-id")` to avoid ID collisions
     /// when multiple instances of the same component type exist.
+    #[allow(dead_code)]
     fn child_id(&self, suffix: &str) -> ElementId {
         (self.element_id.clone(), suffix.to_string()).into()
     }
@@ -168,9 +174,9 @@ impl Modal {
     /// Callback fired when the close button is clicked.
     pub fn on_close<F>(mut self, handler: F) -> Self
     where
-        F: 'static + Fn(&mut gpui::Window, &mut gpui::App),
+        F: 'static + Send + Sync + Fn(&mut gpui::Window, &mut gpui::App),
     {
-        self.on_close = Some(Box::new(handler));
+        self.on_close = Some(Arc::new(handler));
         self
     }
 
@@ -264,9 +270,9 @@ impl RenderOnce for Modal {
         let divider_thickness = theme.tokens.control.divider.thickness;
 
         // Get child component IDs before moving other fields
-        let close_button_id = self.child_id("close-button");
-
-        let element_id_for_base = self.element_id;
+        let close_button_id: ElementId =
+            (self.element_id.clone(), "close-button").into();
+        let element_id_for_base = self.element_id.clone();
         let title = self.title;
         let content = self
             .content
@@ -286,10 +292,11 @@ impl RenderOnce for Modal {
 
         // Close button
         if closable {
+            let on_close_for_button = on_close.clone();
             let close_button = icon_button(close_button_id)
                 .icon(icon(IconName::Close))
                 .on_click(move |_, window, cx| {
-                    if let Some(handler) = &on_close {
+                    if let Some(handler) = &on_close_for_button {
                         handler(window, cx);
                     }
                 });
@@ -298,15 +305,12 @@ impl RenderOnce for Modal {
 
         let direction = cx.theme().text_direction;
 
-        self.base
-            .id(element_id_for_base)
-            .w(width)
-            .rounded_lg()
-            .border_1()
-            .border_color(border)
-            .bg(bg)
-            .shadow_md()
-            .overflow_hidden()
+        // G-α refactor: Modal now composes a Panel internally. The
+        // Panel owns the bg / border / border-radius / shadow /
+        // padding (drawn from the active theme's PanelRenderer
+        // with caller overrides layered on top). The Modal adds
+        // the title row, divider, content, and actions on top.
+        let mut panel_child = div()
             .child(
                 div()
                     .px_4()
@@ -320,19 +324,39 @@ impl RenderOnce for Modal {
                     .children(header_children),
             )
             .child(div().h(divider_thickness).w_full().bg(theme.border.divider))
-            .child(div().px_4().py_4().child(content))
-            .when_some(actions, |this, actions| {
-                this.child(div().h(divider_thickness).w_full().bg(theme.border.divider))
-                    .child(
-                        div()
-                            .px_4()
-                            .py_3()
-                            .flex()
-                            .when(direction.is_rtl(), |this| this.flex_row_reverse())
-                            .when(!direction.is_rtl(), |this| this.flex_row())
-                            .child(actions),
-                    )
-            })
+            .child(div().px_4().py_4().child(content));
+        if let Some(actions) = actions {
+            panel_child = panel_child
+                .child(div().h(divider_thickness).w_full().bg(theme.border.divider))
+                .child(
+                    div()
+                        .px_4()
+                        .py_3()
+                        .flex()
+                        .when(direction.is_rtl(), |this| this.flex_row_reverse())
+                        .when(!direction.is_rtl(), |this| this.flex_row())
+                        .child(actions),
+                );
+        }
+
+        // The Panel doesn't expose `bg` / `border` overrides via
+        // its own builder (they go through the renderer), so we
+        // wrap the panel in a div that has the width set, and
+        // pass the override bg/border to the panel via its theme
+        // via `cx.theme()` (we don't support per-instance override
+        // here, but the renderer takes care of it for the default
+        // case).
+        let panel_id = (element_id_for_base.clone(), "panel");
+        div()
+            .id(element_id_for_base)
+            .w(width)
+            .child(
+                panel(panel_id)
+                    .bg(bg)
+                    .border(border)
+                    .padding(Edges::all(gpui::px(0.0)))
+                    .child(panel_child),
+            )
     }
 }
 

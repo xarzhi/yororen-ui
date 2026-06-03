@@ -26,6 +26,7 @@ use super::list_item::{ListItemRenderer, TokenListItemRenderer};
 use super::modal::{ModalRenderer, TokenModalRenderer};
 use super::notification::{NotificationRenderer, TokenNotificationRenderer};
 use super::number_input::{NumberInputRenderer, TokenNumberInputRenderer};
+use super::panel::{PanelRenderer, TokenPanelRenderer};
 use super::password_input::{PasswordInputRenderer, TokenPasswordInputRenderer};
 use super::popover::{PopoverRenderer, TokenPopoverRenderer};
 use super::progress::{ProgressBarRenderer, TokenProgressBarRenderer};
@@ -75,6 +76,7 @@ pub struct RendererRegistry {
     pub disclosure: Arc<dyn DisclosureRenderer>,
     pub toast: Arc<dyn ToastRenderer>,
     pub notification: Arc<dyn NotificationRenderer>,
+    pub panel: Arc<dyn PanelRenderer>,
     pub card: Arc<dyn CardRenderer>,
     pub form: Arc<dyn FormRenderer>,
     pub list_item: Arc<dyn ListItemRenderer>,
@@ -132,6 +134,7 @@ impl RendererRegistry {
             disclosure: Arc::new(TokenDisclosureRenderer),
             toast: Arc::new(TokenToastRenderer),
             notification: Arc::new(TokenNotificationRenderer),
+            panel: Arc::new(TokenPanelRenderer),
             card: Arc::new(TokenCardRenderer),
             form: Arc::new(TokenFormRenderer),
             list_item: Arc::new(TokenListItemRenderer),
@@ -229,6 +232,10 @@ impl RendererRegistry {
     }
     pub fn with_notification(mut self, r: Arc<dyn NotificationRenderer>) -> Self {
         self.notification = r;
+        self
+    }
+    pub fn with_panel(mut self, r: Arc<dyn PanelRenderer>) -> Self {
+        self.panel = r;
         self
     }
     pub fn with_card(mut self, r: Arc<dyn CardRenderer>) -> Self {

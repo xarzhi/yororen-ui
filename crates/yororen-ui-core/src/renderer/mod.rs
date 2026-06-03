@@ -23,6 +23,7 @@ pub mod list_item;
 pub mod modal;
 pub mod notification;
 pub mod number_input;
+pub mod panel;
 pub mod password_input;
 pub mod popover;
 pub mod progress;
@@ -69,6 +70,7 @@ pub use list_item::{ListItemRenderState, ListItemRenderer, TokenListItemRenderer
 pub use modal::{ModalRenderState, ModalRenderer, TokenModalRenderer};
 pub use notification::{NotificationRenderState, NotificationRenderer, TokenNotificationRenderer};
 pub use number_input::{NumberInputRenderState, NumberInputRenderer, TokenNumberInputRenderer};
+pub use panel::{PanelRenderState, PanelRenderer, TokenPanelRenderer};
 pub use password_input::{
     PasswordInputRenderState, PasswordInputRenderer, TokenPasswordInputRenderer,
 };

@@ -29,6 +29,7 @@ use yororen_ui_core::renderer::{
     FocusRingRenderState, FocusRingRenderer, FormRenderState, FormRenderer, HeadingRenderState,
     HeadingRenderer, IconButtonRenderState, IconButtonRenderer, IconRenderState, IconRenderer,
     IconSizePreset, KeybindingInputRenderState, KeybindingInputRenderer, LabelRenderState,
+    PanelRenderState, PanelRenderer,
     LabelRenderer, ListItemRenderState, ListItemRenderer, ModalRenderState, ModalRenderer,
     NotificationRenderState, NotificationRenderer, NumberInputRenderState, NumberInputRenderer,
     PasswordInputRenderState, PasswordInputRenderer, PopoverRenderState, PopoverRenderer,
@@ -613,6 +614,42 @@ impl EmptyStateRenderer for CatppuccinEmptyStateRenderer {
     }
     fn gap(&self, _state: &EmptyStateRenderState, theme: &Theme) -> Pixels {
         theme.tokens.spacing.inset_sm
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Panel
+// ---------------------------------------------------------------------------
+
+/// Catppuccin panel: `surface.raised` background, `border.default`
+/// border, `lg` (16-px) radius, soft shadow. Reuses the same color
+/// slots as `Card` since `Panel` is the generic dialog/sheet
+/// primitive that `Modal` composes.
+pub struct CatppuccinPanelRenderer;
+
+impl PanelRenderer for CatppuccinPanelRenderer {
+    fn bg(&self, _state: &PanelRenderState, theme: &Theme) -> Hsla {
+        theme.surface.raised
+    }
+    fn border(&self, _state: &PanelRenderState, theme: &Theme) -> Hsla {
+        theme.border.default
+    }
+    fn padding(
+        &self,
+        _state: &PanelRenderState,
+        _theme: &Theme,
+    ) -> Edges<Pixels> {
+        // Panel is a generic container; the Modal that uses it
+        // overrides padding to 0 because Modal lays out its own
+        // title / content / actions spacing. The default 16-px
+        // padding is for direct Panel usage.
+        Edges::all(px(16.0))
+    }
+    fn border_radius(&self, _state: &PanelRenderState, _theme: &Theme) -> Pixels {
+        px(16.0)
+    }
+    fn shadow_alpha(&self, _state: &PanelRenderState, _theme: &Theme) -> f32 {
+        0.25
     }
 }
 
@@ -1553,6 +1590,7 @@ pub fn catppuccin_registry() -> RendererRegistry {
         // Phase F.4 patch (25 more renderers): closes the gap to a
         // complete skin.
         .with_avatar(Arc::new(CatppuccinAvatarRenderer))
+        .with_panel(Arc::new(CatppuccinPanelRenderer))
         .with_badge(Arc::new(CatppuccinBadgeRenderer))
         .with_divider(Arc::new(CatppuccinDividerRenderer))
         .with_heading(Arc::new(CatppuccinHeadingRenderer))
@@ -1867,5 +1905,33 @@ mod tests {
         let _ = reg.form.gap(&FormRenderState::default(), &theme);
         let _ = reg.tree_item.bg(&TreeItemRenderState::default(), &theme);
         let _ = reg.label.color(&LabelRenderState::default(), &theme);
+    }
+}
+
+
+#[cfg(test)]
+mod panel_tests {
+    use super::*;
+    use yororen_ui_core::renderer::PanelRenderState;
+
+    fn cat_light() -> Theme {
+        crate::factories::light()
+    }
+    fn cat_dark() -> Theme {
+        crate::factories::dark()
+    }
+
+    #[test]
+    fn catppuccin_panel_renderer_uses_theme_surface() {
+        let r = CatppuccinPanelRenderer;
+        let light = cat_light();
+        let dark = cat_dark();
+        let state = PanelRenderState::default();
+        // Sanity: light/dark produce different bg.
+        assert_ne!(r.bg(&state, &light), r.bg(&state, &dark));
+        // The renderer reads theme.surface.raised (the same slot
+        // Modal uses for its bg) so the visual is consistent
+        // between Modal and direct Panel usage.
+        assert_eq!(r.bg(&state, &dark), dark.surface.raised);
     }
 }
