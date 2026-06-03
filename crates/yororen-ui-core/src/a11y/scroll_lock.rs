@@ -136,61 +136,76 @@ pub type ScrollLock = ScrollLockGuard;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::Mutex;
+
+    /// Test-only mutex that serializes the scroll_lock tests so the
+    /// global counter is owned by exactly one test at a time.
+    /// Without this, parallel `cargo test` runs cause flaky failures
+    /// from counter races. The Mutex itself is never poisoned
+    /// because we never panic while holding it (each test's body
+    /// is straightforward `let g = ...; drop(g);`).
+    static SERIAL: Mutex<()> = Mutex::new(());
 
     #[test]
     fn lock_count_starts_at_zero() {
-        // After reset the count is 0; `is_locked` reads false. This
-        // test is only correct in single-threaded execution; in
-        // parallel runs other tests may increment concurrently.
-        // We bracket the assertion with a critical section: assert
-        // the count is *no greater than* the value just before.
-        let before = current_lock_count();
+        let _serial = SERIAL.lock().unwrap_or_else(|p| p.into_inner());
         reset_for_test();
         assert_eq!(current_lock_count(), 0);
         assert!(!is_locked());
-        // Restore so the next test sees the same baseline it had.
-        for _ in 0..before {
-            let _ = ScrollLockGuard::acquire();
-        }
     }
 
     #[test]
     fn single_lock_activates_and_deactivates() {
-        // Use a baseline + 1 model so concurrent tests don't break
-        // us. We assert that acquiring+dropping returns us to the
-        // baseline.
-        let baseline = current_lock_count();
+        let _serial = SERIAL.lock().unwrap_or_else(|p| p.into_inner());
+        // Reset to a known baseline for a deterministic test.
+        reset_for_test();
         let g = ScrollLockGuard::acquire();
-        assert_eq!(current_lock_count(), baseline + 1);
+        assert_eq!(current_lock_count(), 1);
         assert!(is_locked());
         drop(g);
-        assert_eq!(current_lock_count(), baseline);
+        assert_eq!(current_lock_count(), 0);
+        assert!(!is_locked());
     }
 
     #[test]
     fn nested_locks_only_release_at_zero() {
-        let baseline = current_lock_count();
+        let _serial = SERIAL.lock().unwrap_or_else(|p| p.into_inner());
+        reset_for_test();
         let outer = ScrollLockGuard::acquire();
         let inner = ScrollLockGuard::acquire();
-        assert_eq!(current_lock_count(), baseline + 2);
+        assert_eq!(current_lock_count(), 2);
         assert!(is_locked());
         drop(inner);
         // Inner released but outer still holds the lock.
         assert!(is_locked());
-        assert_eq!(current_lock_count(), baseline + 1);
+        assert_eq!(current_lock_count(), 1);
         drop(outer);
-        // Back to baseline. We don't assert `!is_locked()` because
-        // a concurrent test may have acquired in the meantime.
-        assert_eq!(current_lock_count(), baseline);
+        assert!(!is_locked());
+        assert_eq!(current_lock_count(), 0);
     }
 
     #[test]
     fn release_is_idempotent() {
-        let baseline = current_lock_count();
+        let _serial = SERIAL.lock().unwrap_or_else(|p| p.into_inner());
+        reset_for_test();
         let g = ScrollLockGuard::acquire();
-        assert_eq!(current_lock_count(), baseline + 1);
+        assert_eq!(current_lock_count(), 1);
+        // release() consumes self and decrements the counter.
         g.release();
-        // release() consumed self and decremented the counter.
-        assert_eq!(current_lock_count(), baseline);
+        assert_eq!(current_lock_count(), 0);
+    }
+
+    #[test]
+    fn forget_leaves_counter_incremented() {
+        let _serial = SERIAL.lock().unwrap_or_else(|p| p.into_inner());
+        reset_for_test();
+        let g = ScrollLockGuard::acquire();
+        assert_eq!(current_lock_count(), 1);
+        g.forget();
+        // The Drop doesn't fire because forget consumed self with
+        // armed = false; the counter is left incremented.
+        assert_eq!(current_lock_count(), 1);
+        // Clean up so the next test sees a clean baseline.
+        SCROLL_LOCK_COUNT.store(0, std::sync::atomic::Ordering::Release);
     }
 }
