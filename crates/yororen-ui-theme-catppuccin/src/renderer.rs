@@ -138,18 +138,19 @@ impl ButtonRenderer for CatppuccinButtonRenderer {
 // Card
 // ---------------------------------------------------------------------------
 
-/// Catppuccin card: 16-px radius, surface0 background, surface1 border
-/// (subtler than the v0.5 default). Larger padding gives the card
-/// "breathing room".
+/// Catppuccin card: 16-px radius, `surface.raised` background
+/// (Latte: `#E6E9EF`, Mocha: `#181825`), `border.default` border
+/// (Latte: `#BCC0CC`, Mocha: `#45475A`). Larger padding gives the
+/// card "breathing room".
 pub struct CatppuccinCardRenderer;
 
 impl CardRenderer for CatppuccinCardRenderer {
-    fn bg(&self, _state: &CardRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::mantle()
+    fn bg(&self, _state: &CardRenderState, theme: &Theme) -> Hsla {
+        theme.surface.raised
     }
 
-    fn border(&self, _state: &CardRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::surface1()
+    fn border(&self, _state: &CardRenderState, theme: &Theme) -> Hsla {
+        theme.border.default
     }
 
     fn padding(
@@ -174,23 +175,23 @@ impl CardRenderer for CatppuccinCardRenderer {
 // Modal
 // ---------------------------------------------------------------------------
 
-/// Catppuccin modal: surface0 panel (subtler than mantle), 16-px
-/// radius, dark scrim at 0.55 alpha.
+/// Catppuccin modal: `surface.raised` panel (Latte: `#E6E9EF`,
+/// Mocha: `#181825`), 16-px radius, dark scrim at 0.55 alpha.
 pub struct CatppuccinModalRenderer;
 
 impl ModalRenderer for CatppuccinModalRenderer {
-    fn scrim(&self, _state: &ModalRenderState, _theme: &Theme) -> Hsla {
-        let mut c = palette::mocha::crust();
+    fn scrim(&self, _state: &ModalRenderState, theme: &Theme) -> Hsla {
+        let mut c = theme.surface.canvas;
         c.a = 0.55;
         c
     }
 
-    fn panel_bg(&self, _state: &ModalRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::mantle()
+    fn panel_bg(&self, _state: &ModalRenderState, theme: &Theme) -> Hsla {
+        theme.surface.raised
     }
 
-    fn panel_border(&self, _state: &ModalRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::surface1()
+    fn panel_border(&self, _state: &ModalRenderState, theme: &Theme) -> Hsla {
+        theme.border.default
     }
 
     fn panel_padding(
@@ -231,21 +232,22 @@ impl FocusRingRenderer for CatppuccinFocusRingRenderer {
 // TextInput
 // ---------------------------------------------------------------------------
 
-/// Catppuccin text input: 12-px radius, surface0 background, focus
-/// border uses `mauve` (the signature focus color).
+/// Catppuccin text input: 12-px radius, `surface.base` background,
+/// `border.default` border, focus border uses the active theme's
+/// `border.focus` (which is `mauve` for both Latte and Mocha).
 pub struct CatppuccinTextInputRenderer;
 
 impl TextInputRenderer for CatppuccinTextInputRenderer {
-    fn bg(&self, state: &TextInputRenderState, _theme: &Theme) -> Hsla {
+    fn bg(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
-            palette::mocha::surface0()
+            theme.surface.sunken
         } else {
-            palette::mocha::base()
+            theme.surface.base
         }
     }
 
-    fn border(&self, _state: &TextInputRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::surface1()
+    fn border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
+        theme.border.default
     }
 
     fn focus_border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
@@ -292,9 +294,10 @@ impl TextInputRenderer for CatppuccinTextInputRenderer {
 // Switch
 // ---------------------------------------------------------------------------
 
-/// Catppuccin switch: track uses `peach` when on (signature Catppuccin
-/// pastel), surface0 when off. 12-px radius matches the rest of the
-/// Catppuccin style language.
+/// Catppuccin switch: track uses `action.primary.bg` when on
+/// (signature Catppuccin main accent — `mocha::blue` for dark,
+/// `latte::blue` for light), `surface.hover` when off. 12-px
+/// radius matches the rest of the Catppuccin style language.
 pub struct CatppuccinSwitchRenderer;
 
 impl SwitchRenderer for CatppuccinSwitchRenderer {
@@ -311,30 +314,30 @@ impl SwitchRenderer for CatppuccinSwitchRenderer {
         theme.tokens.control.switch.padding
     }
 
-    fn track_bg(&self, state: &SwitchRenderState, _theme: &Theme) -> Hsla {
+    fn track_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
-            palette::mocha::surface0()
+            theme.surface.sunken
         } else if state.checked {
-            palette::mocha::peach()
+            theme.action.primary.bg
         } else {
-            palette::mocha::surface1()
+            theme.surface.hover
         }
     }
 
-    fn track_border(&self, _state: &SwitchRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::surface2()
+    fn track_border(&self, _state: &SwitchRenderState, theme: &Theme) -> Hsla {
+        theme.border.muted
     }
 
-    fn track_hover_bg(&self, state: &SwitchRenderState, _theme: &Theme) -> Hsla {
+    fn track_hover_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
         if state.checked {
-            palette::mocha::maroon()
+            theme.action.primary.hover_bg
         } else {
-            palette::mocha::surface2()
+            theme.surface.hover
         }
     }
 
-    fn knob_bg(&self, _state: &SwitchRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::base()
+    fn knob_bg(&self, _state: &SwitchRenderState, theme: &Theme) -> Hsla {
+        theme.content.on_primary
     }
 
     fn focus_color(&self, _state: &SwitchRenderState, theme: &Theme) -> Hsla {
@@ -350,9 +353,10 @@ impl SwitchRenderer for CatppuccinSwitchRenderer {
 // Checkbox
 // ---------------------------------------------------------------------------
 
-/// Catppuccin checkbox: `mauve` background when checked (the
-/// signature focus accent), `text` fg, 4-px radius (slightly less
-/// round than the rest of the UI to keep the check glyph readable).
+/// Catppuccin checkbox: `border.focus` (`mauve`) background when
+/// checked (the signature Catppuccin focus accent — this is
+/// mapped from `accent.mauve()` in the factory for both Latte and
+/// Mocha), `content.on_primary` fg.
 pub struct CatppuccinCheckboxRenderer;
 
 impl CheckboxRenderer for CatppuccinCheckboxRenderer {
@@ -362,31 +366,31 @@ impl CheckboxRenderer for CatppuccinCheckboxRenderer {
     fn check_size(&self, _state: &CheckboxRenderState, theme: &Theme) -> Pixels {
         theme.tokens.control.checkbox.check_size
     }
-    fn box_bg(&self, state: &CheckboxRenderState, _theme: &Theme) -> Hsla {
+    fn box_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
-            palette::mocha::surface0()
+            theme.surface.sunken
         } else if state.checked {
-            palette::mocha::mauve()
+            theme.border.focus
         } else {
-            palette::mocha::base()
+            theme.surface.base
         }
     }
-    fn box_border(&self, state: &CheckboxRenderState, _theme: &Theme) -> Hsla {
+    fn box_border(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         if state.checked {
-            palette::mocha::mauve()
+            theme.border.focus
         } else {
-            palette::mocha::surface2()
+            theme.border.muted
         }
     }
-    fn box_hover_bg(&self, state: &CheckboxRenderState, _theme: &Theme) -> Hsla {
+    fn box_hover_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         if state.checked {
-            palette::mocha::mauve()
+            theme.border.focus
         } else {
-            palette::mocha::surface1()
+            theme.surface.hover
         }
     }
-    fn check_fg(&self, _state: &CheckboxRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::base()
+    fn check_fg(&self, _state: &CheckboxRenderState, theme: &Theme) -> Hsla {
+        theme.content.on_primary
     }
     fn focus_color(&self, _state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         theme.border.focus
@@ -400,8 +404,8 @@ impl CheckboxRenderer for CatppuccinCheckboxRenderer {
 // Radio
 // ---------------------------------------------------------------------------
 
-/// Catppuccin radio: `mauve` ring + dot when checked, matching the
-/// checkbox for visual consistency.
+/// Catppuccin radio: `border.focus` ring + dot when checked,
+/// matching the checkbox for visual consistency.
 pub struct CatppuccinRadioRenderer;
 
 impl RadioRenderer for CatppuccinRadioRenderer {
@@ -411,25 +415,25 @@ impl RadioRenderer for CatppuccinRadioRenderer {
     fn dot_size(&self, _state: &RadioRenderState, theme: &Theme) -> Pixels {
         theme.tokens.control.radio.dot_size
     }
-    fn ring_bg(&self, state: &RadioRenderState, _theme: &Theme) -> Hsla {
+    fn ring_bg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
-            palette::mocha::surface0()
+            theme.surface.sunken
         } else {
-            palette::mocha::base()
+            theme.surface.base
         }
     }
-    fn ring_border(&self, state: &RadioRenderState, _theme: &Theme) -> Hsla {
+    fn ring_border(&self, state: &RadioRenderState, theme: &Theme) -> Hsla {
         if state.checked {
-            palette::mocha::mauve()
+            theme.border.focus
         } else {
-            palette::mocha::surface2()
+            theme.border.muted
         }
     }
-    fn ring_hover_bg(&self, _state: &RadioRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::surface1()
+    fn ring_hover_bg(&self, _state: &RadioRenderState, theme: &Theme) -> Hsla {
+        theme.surface.hover
     }
-    fn dot_fg(&self, _state: &RadioRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::mauve()
+    fn dot_fg(&self, _state: &RadioRenderState, theme: &Theme) -> Hsla {
+        theme.border.focus
     }
     fn focus_color(&self, _state: &RadioRenderState, theme: &Theme) -> Hsla {
         theme.border.focus
@@ -443,13 +447,13 @@ impl RadioRenderer for CatppuccinRadioRenderer {
 // Toast
 // ---------------------------------------------------------------------------
 
-/// Catppuccin toast: surface0 background, surface1 border, 12-px
-/// radius, soft shadow.
+/// Catppuccin toast: `surface.raised` background, `border.default`
+/// border, 12-px radius, soft shadow.
 pub struct CatppuccinToastRenderer;
 
 impl ToastRenderer for CatppuccinToastRenderer {
-    fn bg(&self, _state: &ToastRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::mantle()
+    fn bg(&self, _state: &ToastRenderState, theme: &Theme) -> Hsla {
+        theme.surface.raised
     }
     fn fg(&self, _state: &ToastRenderState, theme: &Theme) -> Hsla {
         theme.content.primary
@@ -467,8 +471,8 @@ impl ToastRenderer for CatppuccinToastRenderer {
     fn border_radius(&self, _state: &ToastRenderState, _theme: &Theme) -> Pixels {
         px(CATPPUCCIN_RADIUS)
     }
-    fn border(&self, _state: &ToastRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::surface1()
+    fn border(&self, _state: &ToastRenderState, theme: &Theme) -> Hsla {
+        theme.border.default
     }
     fn shadow_alpha(&self, _state: &ToastRenderState, _theme: &Theme) -> f32 {
         0.30
@@ -479,23 +483,24 @@ impl ToastRenderer for CatppuccinToastRenderer {
 // Tag
 // ---------------------------------------------------------------------------
 
-/// Catppuccin tag: pill-shaped (border-radius = full), uses surface1
-/// background by default. Selected tag uses `mauve` accent.
+/// Catppuccin tag: pill-shaped (border-radius = full), uses
+/// `surface.hover` background by default. Selected tag uses
+/// `border.focus` (`mauve`) accent.
 pub struct CatppuccinTagRenderer;
 
 impl TagRenderer for CatppuccinTagRenderer {
-    fn bg(&self, state: &TagRenderState, _theme: &Theme) -> Hsla {
+    fn bg(&self, state: &TagRenderState, theme: &Theme) -> Hsla {
         if state.selected {
-            palette::mocha::mauve()
+            theme.border.focus
         } else {
-            palette::mocha::surface1()
+            theme.surface.hover
         }
     }
-    fn fg(&self, state: &TagRenderState, _theme: &Theme) -> Hsla {
+    fn fg(&self, state: &TagRenderState, theme: &Theme) -> Hsla {
         if state.selected {
-            palette::mocha::base()
+            theme.content.on_primary
         } else {
-            palette::mocha::text()
+            theme.content.primary
         }
     }
     fn min_height(&self, _state: &TagRenderState, theme: &Theme) -> Pixels {
@@ -516,8 +521,8 @@ impl TagRenderer for CatppuccinTagRenderer {
     fn close_size(&self, _state: &TagRenderState, _theme: &Theme) -> Pixels {
         px(16.0)
     }
-    fn close_hover_bg(&self, _state: &TagRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::surface2()
+    fn close_hover_bg(&self, _state: &TagRenderState, theme: &Theme) -> Hsla {
+        theme.border.muted
     }
 }
 
@@ -525,25 +530,25 @@ impl TagRenderer for CatppuccinTagRenderer {
 // ListItem
 // ---------------------------------------------------------------------------
 
-/// Catppuccin list item: surface0 background, surface1 hover, `mauve`
-/// selected background.
+/// Catppuccin list item: `surface.base` background, `surface.hover`
+/// hover, `border.focus` (`mauve`) selected background.
 pub struct CatppuccinListItemRenderer;
 
 impl ListItemRenderer for CatppuccinListItemRenderer {
-    fn bg(&self, _state: &ListItemRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::base()
+    fn bg(&self, _state: &ListItemRenderState, theme: &Theme) -> Hsla {
+        theme.surface.base
     }
-    fn hover_bg(&self, _state: &ListItemRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::surface1()
+    fn hover_bg(&self, _state: &ListItemRenderState, theme: &Theme) -> Hsla {
+        theme.surface.hover
     }
-    fn selected_bg(&self, _state: &ListItemRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::mauve()
+    fn selected_bg(&self, _state: &ListItemRenderState, theme: &Theme) -> Hsla {
+        theme.border.focus
     }
     fn fg(&self, state: &ListItemRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.content.disabled
         } else if state.selected {
-            palette::mocha::base()
+            theme.content.on_primary
         } else {
             theme.content.primary
         }
@@ -570,19 +575,20 @@ impl ListItemRenderer for CatppuccinListItemRenderer {
 // EmptyState
 // ---------------------------------------------------------------------------
 
-/// Catppuccin empty state: `overlay0` icon, `subtext1` title, `subtext0`
-/// body. Generous padding and a 64-px icon.
+/// Catppuccin empty state: `content.tertiary` icon,
+/// `content.secondary` title, `content.tertiary` body. Generous
+/// padding and a 64-px icon.
 pub struct CatppuccinEmptyStateRenderer;
 
 impl EmptyStateRenderer for CatppuccinEmptyStateRenderer {
-    fn icon_color(&self, _state: &EmptyStateRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::overlay0()
+    fn icon_color(&self, _state: &EmptyStateRenderState, theme: &Theme) -> Hsla {
+        theme.content.tertiary
     }
-    fn title_color(&self, _state: &EmptyStateRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::subtext1()
+    fn title_color(&self, _state: &EmptyStateRenderState, theme: &Theme) -> Hsla {
+        theme.content.secondary
     }
-    fn body_color(&self, _state: &EmptyStateRenderState, _theme: &Theme) -> Hsla {
-        palette::mocha::subtext0()
+    fn body_color(&self, _state: &EmptyStateRenderState, theme: &Theme) -> Hsla {
+        theme.content.tertiary
     }
     fn padding(
         &self,
@@ -681,6 +687,98 @@ mod tests {
         let state = CardRenderState::default();
         let bg = r.bg(&state, &theme);
         assert_eq!(bg, palette::mocha::mantle());
+    }
+
+    /// Regression test for the v0.5 review's finding: 9 renderers
+    /// hardcoded `palette::mocha::*` and so looked the same in
+    /// light vs dark mode. After the fix, every renderer should
+    /// produce a DIFFERENT bg for a Latte-flavoured Theme vs a
+    /// Mocha-flavoured Theme.
+    #[test]
+    fn card_renderer_light_dark_differ() {
+        use yororen_ui_core::renderer::CardRenderer as _;
+        let r = CatppuccinCardRenderer;
+        let light = cat_light();
+        let dark = cat_dark();
+        let state = CardRenderState::default();
+        let light_bg = r.bg(&state, &light);
+        let dark_bg = r.bg(&state, &dark);
+        assert_ne!(light_bg, dark_bg, "light and dark should produce different card bg");
+        // Sanity: light bg should be on the "light" side (Latte's
+        // surface.raised is #E6E9EF, a near-white tone), dark bg
+        // should be on the "dark" side (Mocha's surface.raised is
+        // #181825, a near-black tone).
+        assert!(light_bg.l > dark_bg.l);
+    }
+
+    #[test]
+    fn modal_renderer_light_dark_differ() {
+        use yororen_ui_core::renderer::ModalRenderer as _;
+        let r = CatppuccinModalRenderer;
+        let light = cat_light();
+        let dark = cat_dark();
+        let state = ModalRenderState::default();
+        let light_panel = r.panel_bg(&state, &light);
+        let dark_panel = r.panel_bg(&state, &dark);
+        assert_ne!(light_panel, dark_panel);
+        assert!(light_panel.l > dark_panel.l);
+    }
+
+    #[test]
+    fn text_input_renderer_light_dark_differ() {
+        use yororen_ui_core::renderer::TextInputRenderer as _;
+        let r = CatppuccinTextInputRenderer;
+        let light = cat_light();
+        let dark = cat_dark();
+        let state = TextInputRenderState::default();
+        let light_bg = r.bg(&state, &light);
+        let dark_bg = r.bg(&state, &dark);
+        assert_ne!(light_bg, dark_bg);
+        assert!(light_bg.l > dark_bg.l);
+    }
+
+    #[test]
+    fn switch_renderer_checked_color_differs_by_flavor() {
+        use yororen_ui_core::renderer::SwitchRenderer as _;
+        let r = CatppuccinSwitchRenderer;
+        let light = cat_light();
+        let dark = cat_dark();
+        // When checked, the track uses theme.action.primary.bg. In
+        // a Catppuccin light theme this is latte::blue; in dark
+        // theme this is mocha::blue. Both are blue, but the
+        // lightness differs.
+        let state = SwitchRenderState { checked: true, ..Default::default() };
+        let light_on = r.track_bg(&state, &light);
+        let dark_on = r.track_bg(&state, &dark);
+        // The exact lightness ordering depends on the Latte vs Mocha
+        // blue; what we can assert is that the two are different
+        // objects (not the same hardcoded color).
+        assert_ne!(light_on, dark_on);
+    }
+
+    #[test]
+    fn checkbox_renderer_uses_focus_color_when_checked() {
+        use yororen_ui_core::renderer::CheckboxRenderer as _;
+        let r = CatppuccinCheckboxRenderer;
+        let light = cat_light();
+        let dark = cat_dark();
+        let state = CheckboxRenderState { checked: true, ..Default::default() };
+        // The Catppuccin checkbox uses the focus color (mauve) for
+        // the checked bg, which is theme.border.focus.
+        assert_eq!(r.box_bg(&state, &light), light.border.focus);
+        assert_eq!(r.box_bg(&state, &dark), dark.border.focus);
+    }
+
+    #[test]
+    fn empty_state_uses_content_tertiary() {
+        use yororen_ui_core::renderer::EmptyStateRenderer as _;
+        let r = CatppuccinEmptyStateRenderer;
+        let light = cat_light();
+        let dark = cat_dark();
+        let state = EmptyStateRenderState::default();
+        // icon_color is content.tertiary per the new impl.
+        assert_eq!(r.icon_color(&state, &light), light.content.tertiary);
+        assert_eq!(r.icon_color(&state, &dark), dark.content.tertiary);
     }
 
     #[test]
