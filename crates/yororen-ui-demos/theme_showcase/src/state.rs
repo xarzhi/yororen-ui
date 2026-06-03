@@ -4,22 +4,17 @@ use gpui::{App, AppContext, Entity, Global};
 
 /// Which theme the right half of the window uses. The left half
 /// always shows the system palette.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum RightThemeKind {
     /// Same as left half: v0.5 system + token renderers.
     System,
     /// Catppuccin Mocha palette + Catppuccin renderers.
+    #[default]
     Catppuccin,
     /// v0.5 system palette but with the Catppuccin renderers
     /// layered on top. Demonstrates that renderer swap and palette
     /// swap are independent.
     CatppuccinRenderersOnSystemPalette,
-}
-
-impl Default for RightThemeKind {
-    fn default() -> Self {
-        Self::Catppuccin
-    }
 }
 
 pub struct ThemeShowcaseState {

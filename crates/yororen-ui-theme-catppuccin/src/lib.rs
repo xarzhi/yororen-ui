@@ -152,7 +152,6 @@ mod tests {
 
     #[test]
     fn catppuccin_button_differs_from_system() {
-        use yororen_ui_core::renderer::ButtonRenderer;
         // The point of the registry swap: the same call against a
         // Catppuccin-flavoured Theme and a system Theme returns
         // different values.

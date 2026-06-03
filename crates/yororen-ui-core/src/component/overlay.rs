@@ -47,17 +47,22 @@
 use std::sync::Arc;
 
 use gpui::{
-    AnyElement, ElementId, InteractiveElement, IntoElement, KeyDownEvent, MouseDownEvent,
+    AnyElement, App, ElementId, InteractiveElement, IntoElement, KeyDownEvent, MouseDownEvent,
     ParentElement, RenderOnce, StyleRefinement, Styled, Window, div,
 };
 
 use crate::a11y::ScrollLockGuard;
 use crate::theme::ActiveTheme;
 
+/// Scrim-click callback. Factored out so clippy doesn't complain
+/// about the `Arc<dyn Fn(...)>` type being too complex.
+type ScrimCallback = Arc<dyn Fn(&MouseDownEvent, &mut Window, &mut App) + Send + Sync>;
+
 /// Callback type for `Overlay::on_close`. Mirrors the rest of the
 /// a11y helpers: takes the close reason, a mutable window, and a
 /// mutable app.
-pub type OverlayCloseCallback = Arc<dyn Fn(&OverlayCloseReason, &mut Window, &mut gpui::App)>;
+pub type OverlayCloseCallback =
+    Arc<dyn Fn(&OverlayCloseReason, &mut Window, &mut gpui::App) + Send + Sync>;
 
 /// Reason the overlay was closed. Useful for analytics / conditional
 /// logic in the `on_close` handler.
@@ -140,7 +145,7 @@ impl Overlay {
     /// `OverlayCloseReason::Programmatic`.
     pub fn on_close<F>(mut self, handler: F) -> Self
     where
-        F: 'static + Fn(&OverlayCloseReason, &mut Window, &mut gpui::App),
+        F: 'static + Send + Sync + Fn(&OverlayCloseReason, &mut Window, &mut gpui::App),
     {
         self.on_close = Some(Arc::new(handler));
         self
@@ -151,7 +156,7 @@ impl Overlay {
     /// why the overlay closed.
     pub fn on_close_any<F>(mut self, handler: F) -> Self
     where
-        F: 'static + Fn(&mut Window, &mut gpui::App),
+        F: 'static + Send + Sync + Fn(&mut Window, &mut gpui::App),
     {
         self.on_close = Some(Arc::new(move |_reason, window, cx| {
             handler(window, cx);
@@ -255,14 +260,13 @@ impl RenderOnce for Overlay {
             .justify_center();
 
         if dismiss_scrim {
-            let cb: Arc<dyn Fn(&MouseDownEvent, &mut Window, &mut gpui::App)> =
-                if let Some(handler) = on_close_scrim {
-                    Arc::new(move |_ev, w, cx| {
-                        handler(&OverlayCloseReason::ScrimClick, w, cx);
-                    })
-                } else {
-                    Arc::new(|_, _, _| {})
-                };
+            let cb: ScrimCallback = if let Some(handler) = on_close_scrim {
+                Arc::new(move |_ev, w, cx| {
+                    handler(&OverlayCloseReason::ScrimClick, w, cx);
+                })
+            } else {
+                Arc::new(|_, _, _| {})
+            };
             scrim = scrim.on_mouse_down_out(move |ev, w, cx| {
                 cb(ev, w, cx);
             });
@@ -272,11 +276,11 @@ impl RenderOnce for Overlay {
             let handler = on_close_escape;
             scrim = scrim.capture_key_down(move |event: &KeyDownEvent, _w, cx| {
                 let ks = &event.keystroke;
-                if ks.key.eq_ignore_ascii_case("escape") {
-                    if let Some(handler) = &handler {
-                        cx.stop_propagation();
-                        handler(&OverlayCloseReason::Escape, _w, cx);
-                    }
+                if ks.key.eq_ignore_ascii_case("escape")
+                    && let Some(handler) = &handler
+                {
+                    cx.stop_propagation();
+                    handler(&OverlayCloseReason::Escape, _w, cx);
                 }
             });
         }
