@@ -19,6 +19,7 @@ members = [
     "crates/yororen-ui-demos/theme_compare",
     "crates/yororen-ui-demos/variant_showcase",
     "crates/yororen-ui-demos/theme_showcase",
+    "crates/yororen-ui-demos/modal_a11y",
 ]
 exclude = [
     "crates/yororen-ui-demos/*/target",
