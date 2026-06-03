@@ -1,12 +1,36 @@
 //! Focus Trap component for accessibility.
 //!
-//! This module provides a FocusTrap component that traps focus within
-//! a container element, ensuring keyboard users cannot tab outside
-//! of a modal or other focused interaction area.
+//! This module provides a `FocusTrap` component that traps focus
+//! within a container element, ensuring keyboard users cannot tab
+//! outside of a modal or other focused interaction area.
+//!
+//! # v0.5 behavior
+//!
+//! The `RenderOnce` impl wires three keyboard handlers:
+//!
+//! - **Escape** (`capture_key_down` with `keystroke.key == "escape"`)
+//!   fires `on_escape` and calls `cx.stop_propagation()` so parent
+//!   overlays don't double-fire.
+//! - **Tab** (key == "tab" with no shift modifier) fires
+//!   `on_focus_next`. The actual focus movement is left to the
+//!   caller — FocusTrap doesn't know which child elements are
+//!   focusable. Most apps will want to wrap FocusTrap around a
+//!   container that has explicit focusable children, and the
+//!   caller can use `keyboard_nav::find_next` (Phase G.2 helper)
+//!   to determine the next element. If the caller doesn't
+//!   implement this, focus will simply move out of the trap
+//!   (gpui's default Tab behavior).
+//! - **Shift+Tab** (key == "tab" with shift modifier) fires
+//!   `on_focus_prev` symmetrically.
+//!
+//! The `FocusTrapState` helper struct provides
+//! `activate` / `deactivate` methods that capture and restore the
+//! focused element, so a modal can return focus to its trigger
+//! when closed.
 
 use gpui::{
-    App, ElementId, FocusHandle, InteractiveElement, IntoElement, ParentElement, RenderOnce,
-    StatefulInteractiveElement, Styled, Window, actions, div,
+    App, ElementId, FocusHandle, InteractiveElement, IntoElement, KeyDownEvent, ParentElement,
+    RenderOnce, StatefulInteractiveElement, Styled, Window, actions, div,
 };
 use std::sync::Arc;
 
@@ -23,7 +47,7 @@ actions!(
 );
 
 /// Callback type for window and app event handlers.
-type WindowAppCallback = Arc<dyn Fn(&mut Window, &mut App)>;
+pub type WindowAppCallback = Arc<dyn Fn(&mut Window, &mut App) + Send + Sync>;
 
 /// A component that traps focus within a container element.
 ///
@@ -39,6 +63,14 @@ type WindowAppCallback = Arc<dyn Fn(&mut Window, &mut App)>;
 ///     })
 ///     .child(modal_content)
 /// ```
+///
+/// # Behavior
+///
+/// - **Escape**: fires `on_escape` and stops propagation.
+/// - **Tab**: fires `on_focus_next` (the actual focus move is up
+///   to the caller; if no handler is set, gpui's default Tab
+///   behavior takes over).
+/// - **Shift+Tab**: fires `on_focus_prev` symmetrically.
 pub fn focus_trap() -> FocusTrap {
     FocusTrap::new()
 }
@@ -93,7 +125,7 @@ impl FocusTrap {
     /// Sets the callback for Escape key.
     pub fn on_escape<F>(mut self, handler: F) -> Self
     where
-        F: 'static + Fn(&mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&mut Window, &mut App),
     {
         self.on_escape = Some(Arc::new(handler));
         self
@@ -102,7 +134,7 @@ impl FocusTrap {
     /// Sets the callback for Tab key (move to next focusable).
     pub fn on_focus_next<F>(mut self, handler: F) -> Self
     where
-        F: 'static + Fn(&mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&mut Window, &mut App),
     {
         self.on_focus_next = Some(Arc::new(handler));
         self
@@ -111,7 +143,7 @@ impl FocusTrap {
     /// Sets the callback for Shift+Tab key (move to previous focusable).
     pub fn on_focus_prev<F>(mut self, handler: F) -> Self
     where
-        F: 'static + Fn(&mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&mut Window, &mut App),
     {
         self.on_focus_prev = Some(Arc::new(handler));
         self
@@ -153,11 +185,41 @@ impl StatefulInteractiveElement for FocusTrap {}
 impl RenderOnce for FocusTrap {
     fn render(self, _window: &mut Window, _cx: &mut App) -> impl IntoElement {
         let element_id = self.element_id;
+        let on_escape = self.on_escape;
+        let on_focus_next = self.on_focus_next;
+        let on_focus_prev = self.on_focus_prev;
+        let _ = self.trap_focus; // reserved for future use
+        let _ = self.initial_focus; // reserved for future use
 
-        // Return the base element with optional ID
-        // Note: Full keyboard trap functionality requires integration at the app/overlay level
-        self.base
-            .id(element_id.unwrap_or_else(|| "focus-trap".into()))
+        // Wire keyboard handlers onto the base div. The handlers
+        // are installed via `capture_key_down` so they fire even
+        // when a child element has focus (which is the common
+        // case for a modal).
+        let mut base = self.base;
+        if let Some(handler) = on_escape {
+            base = base.capture_key_down(move |event: &KeyDownEvent, window, cx| {
+                if event.keystroke.key.eq_ignore_ascii_case("escape") {
+                    cx.stop_propagation();
+                    handler(window, cx);
+                }
+            });
+        }
+        if on_focus_next.is_some() || on_focus_prev.is_some() {
+            base = base.capture_key_down(move |event: &KeyDownEvent, window, cx| {
+                if !event.keystroke.key.eq_ignore_ascii_case("tab") {
+                    return;
+                }
+                let shift = event.keystroke.modifiers.shift;
+                if !shift && let Some(handler) = &on_focus_next {
+                    cx.stop_propagation();
+                    handler(window, cx);
+                } else if shift && let Some(handler) = &on_focus_prev {
+                    cx.stop_propagation();
+                    handler(window, cx);
+                }
+            });
+        }
+        base.id(element_id.unwrap_or_else(|| "focus-trap".into()))
     }
 }
 
@@ -212,33 +274,46 @@ pub enum FocusDirection {
     Last,
 }
 
-/// Focus navigation utilities.
-pub mod focus_nav {
+#[cfg(test)]
+mod tests {
     use super::*;
 
-    /// Finds the next focusable element within a container.
-    ///
-    /// Returns the ElementId of the next focusable element, or None if at the end.
-    pub fn find_next(_container_id: &ElementId, _current_id: &ElementId) -> Option<ElementId> {
-        // This is a simplified implementation.
-        // In a full implementation, you would traverse the DOM/container
-        // to find all focusable elements and return the next one.
-        //
-        // The actual implementation would depend on how the UI framework
-        // exposes the element tree.
-        None
+    #[test]
+    fn default_focus_trap_is_unarmed() {
+        let ft = FocusTrap::new();
+        assert!(ft.on_escape.is_none());
+        assert!(ft.on_focus_next.is_none());
+        assert!(ft.on_focus_prev.is_none());
+        assert!(ft.trap_focus);
+        assert!(ft.initial_focus.is_none());
     }
 
-    /// Finds the previous focusable element within a container.
-    pub fn find_previous(_container_id: &ElementId, _current_id: &ElementId) -> Option<ElementId> {
-        // Simplified implementation - see find_next
-        None
+    #[test]
+    fn setters_update_callbacks() {
+        let ft = FocusTrap::new()
+            .on_escape(|_w, _c| {})
+            .on_focus_next(|_w, _c| {})
+            .on_focus_prev(|_w, _c| {})
+            .trap_focus(false);
+        assert!(ft.on_escape.is_some());
+        assert!(ft.on_focus_next.is_some());
+        assert!(ft.on_focus_prev.is_some());
+        assert!(!ft.trap_focus);
     }
 
-    /// Moves focus to the specified element.
-    pub fn move_focus_to(_element_id: &ElementId, _window: &mut Window) -> bool {
-        // In gpui, you would use the element's focus handle
-        // This is a placeholder for the actual implementation
-        false
+    #[test]
+    fn focus_trap_state_round_trip() {
+        let mut s = FocusTrapState::new();
+        assert!(!s.is_active);
+        s.is_active = true;
+        assert!(s.is_active);
+        s.is_active = false;
+        assert!(!s.is_active);
+    }
+
+    #[test]
+    fn focus_direction_variants_distinct() {
+        assert_ne!(FocusDirection::Next, FocusDirection::Previous);
+        assert_ne!(FocusDirection::First, FocusDirection::Last);
     }
 }
