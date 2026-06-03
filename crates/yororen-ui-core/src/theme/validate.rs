@@ -196,11 +196,11 @@ fn contrast_ratio(a: Hsla, b: Hsla) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::i18n::TextDirection;
     use crate::theme::{
         ActionTheme, ActionVariant, BorderTheme, ContentTheme, DesignTokens, RendererRegistry,
         ShadowTheme, StatusTheme, StatusVariant, SurfaceTheme, Theme,
     };
-    use crate::i18n::TextDirection;
     use gpui::{hsla, rgb};
 
     /// Internal test fixtures. `core` is headless: the production default
@@ -208,10 +208,7 @@ mod tests {
     /// equivalent palettes here so contrast / token-range assertions still
     /// have something to chew on.
     fn fixture_themes() -> [(&'static str, Theme); 2] {
-        [
-            ("dark", fixture_dark()),
-            ("light", fixture_light()),
-        ]
+        [("dark", fixture_dark()), ("light", fixture_light())]
     }
 
     fn fixture_dark() -> Theme {

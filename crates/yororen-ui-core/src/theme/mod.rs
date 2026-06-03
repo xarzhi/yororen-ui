@@ -248,10 +248,7 @@ mod tests {
     /// to exercise the contrast helper. The real, exposed default themes
     /// live in `yororen_ui_theme_system`.
     fn fixture_themes() -> [(&'static str, Theme); 2] {
-        [
-            ("dark", fixture_dark()),
-            ("light", fixture_light()),
-        ]
+        [("dark", fixture_dark()), ("light", fixture_light())]
     }
 
     fn fixture_dark() -> Theme {

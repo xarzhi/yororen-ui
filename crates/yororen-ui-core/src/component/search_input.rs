@@ -7,8 +7,8 @@ use gpui::{
 
 use crate::{
     component::{IconName, TextInputState, icon, icon_button, text_input},
-    renderer::{ButtonVariant, VariantKey, resolve_custom_variant},
     renderer::variant::VariantState,
+    renderer::{ButtonVariant, VariantKey, resolve_custom_variant},
     theme::{ActionVariant, ActionVariantKind, ActiveTheme},
 };
 
@@ -199,9 +199,7 @@ impl RenderOnce for SearchInput {
             ButtonVariant::Builtin(_) => None,
             ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
         };
-        let variant_builtin = variant
-            .as_builtin()
-            .unwrap_or(ActionVariantKind::Neutral);
+        let variant_builtin = variant.as_builtin().unwrap_or(ActionVariantKind::Neutral);
         let theme_action_variant = cx.theme().action_variant(variant_builtin).clone();
         let action_variant = if let Some(s) = &custom_style {
             ActionVariant {

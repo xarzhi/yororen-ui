@@ -8,8 +8,8 @@ use gpui::{
 
 use crate::animation::constants::duration;
 use crate::component::{ArrowDirection, Icon, IconName, button};
-use crate::renderer::{ButtonVariant, VariantKey, resolve_custom_variant};
 use crate::renderer::variant::VariantState;
+use crate::renderer::{ButtonVariant, VariantKey, resolve_custom_variant};
 use crate::theme::{ActionVariantKind, ActiveTheme};
 
 use crate::animation::ease_out_quint_clamped;
@@ -205,9 +205,7 @@ impl RenderOnce for SplitButton {
             ButtonVariant::Builtin(_) => None,
             ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
         };
-        let variant_builtin = variant
-            .as_builtin()
-            .unwrap_or(ActionVariantKind::Neutral);
+        let variant_builtin = variant.as_builtin().unwrap_or(ActionVariantKind::Neutral);
         let theme_action_variant = cx.theme().action_variant(variant_builtin).clone();
         let action_variant = if let Some(s) = &custom_style {
             crate::theme::ActionVariant {

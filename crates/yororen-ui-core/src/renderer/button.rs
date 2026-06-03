@@ -65,11 +65,7 @@ impl ButtonRenderer for TokenButtonRenderer {
             });
         }
         let v = theme.action_variant(state.variant);
-        if state.disabled {
-            v.disabled_bg
-        } else {
-            v.bg
-        }
+        if state.disabled { v.disabled_bg } else { v.bg }
     }
 
     fn fg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
@@ -79,11 +75,7 @@ impl ButtonRenderer for TokenButtonRenderer {
             });
         }
         let v = theme.action_variant(state.variant);
-        if state.disabled {
-            v.disabled_fg
-        } else {
-            v.fg
-        }
+        if state.disabled { v.disabled_fg } else { v.fg }
     }
 
     fn padding(&self, _state: &ButtonRenderState, theme: &Theme) -> Edges<Pixels> {

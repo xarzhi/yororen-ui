@@ -58,11 +58,7 @@ impl SelectRenderer for TokenSelectRenderer {
         theme.tokens.radii.md
     }
     fn chevron_rotation(&self, state: &SelectRenderState, _theme: &Theme) -> f32 {
-        if state.open {
-            180.0
-        } else {
-            0.0
-        }
+        if state.open { 180.0 } else { 0.0 }
     }
 }
 

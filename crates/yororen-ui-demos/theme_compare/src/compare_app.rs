@@ -1,8 +1,6 @@
 //! Root component for the theme-compare demo.
 
-use gpui::{
-    Context, IntoElement, ParentElement, Render, Styled, Window, div, px,
-};
+use gpui::{Context, IntoElement, ParentElement, Render, Styled, Window, div, px};
 
 use yororen_ui::component::{button, card, label, with_theme};
 use yororen_ui::theme::{ActionVariantKind, ActiveTheme};
@@ -68,9 +66,7 @@ impl Render for ThemeCompareApp {
                     .flex()
                     .flex_col()
                     .gap(px(4.))
-                    .child(
-                        label("Theme Compare").strong(true).text_size(px(24.)),
-                    )
+                    .child(label("Theme Compare").strong(true).text_size(px(24.)))
                     .child(label(
                         "Same UI, different skin. Left = theme-system, right = theme-mini. \
                          Click the button to swap the right half's renderer registry.",
@@ -80,10 +76,7 @@ impl Render for ThemeCompareApp {
                 div()
                     .flex()
                     .gap(px(16.))
-                    .child(half_panel(
-                        "Left (system)",
-                        theme.surface.base,
-                    ))
+                    .child(half_panel("Left (system)", theme.surface.base))
                     .child(with_theme(right_theme, move || {
                         half_panel(right_title, right_bg)
                     })),
@@ -107,10 +100,7 @@ impl Render for ThemeCompareApp {
     }
 }
 
-fn half_panel(
-    title: &str,
-    bg: gpui::Hsla,
-) -> gpui::AnyElement {
+fn half_panel(title: &str, bg: gpui::Hsla) -> gpui::AnyElement {
     // For the demo we render two items per half: a primary button
     // and a card. The visual difference comes from the active
     // theme — the left half uses the global theme (theme-system),
@@ -134,8 +124,16 @@ fn half_panel(
             div()
                 .flex()
                 .gap(px(8.))
-                .child(button("left:primary").variant(ActionVariantKind::Primary).child("Primary"))
-                .child(button("left:danger").variant(ActionVariantKind::Danger).child("Danger"))
+                .child(
+                    button("left:primary")
+                        .variant(ActionVariantKind::Primary)
+                        .child("Primary"),
+                )
+                .child(
+                    button("left:danger")
+                        .variant(ActionVariantKind::Danger)
+                        .child("Danger"),
+                )
                 .child(button("left:neutral").child("Neutral")),
         )
         .child(
@@ -145,7 +143,9 @@ fn half_panel(
                     .flex_col()
                     .gap(px(4.))
                     .child(label("Card title").strong(true))
-                    .child(label("Card body text. Radius / padding / border come from the renderer.")),
+                    .child(label(
+                        "Card body text. Radius / padding / border come from the renderer.",
+                    )),
             ),
         )
         .into_any_element()

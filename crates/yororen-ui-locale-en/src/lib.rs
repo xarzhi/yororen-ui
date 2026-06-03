@@ -45,7 +45,10 @@ mod tests {
     #[test]
     fn parses_bundled_json() {
         let map = translation_map();
-        assert_eq!(map.get("common.save").map(String::from), Some("Save".to_string()));
+        assert_eq!(
+            map.get("common.save").map(String::from),
+            Some("Save".to_string())
+        );
         assert_eq!(
             map.get("select.placeholder").map(String::from),
             Some("Select…".to_string())

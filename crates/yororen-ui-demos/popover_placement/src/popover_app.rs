@@ -52,10 +52,7 @@ impl Render for PopoverPlacementApp {
         let dir_btn = button("toggle-dir")
             .child(format!("Switch to {}", if is_rtl { "LTR" } else { "RTL" }))
             .on_click(move |_ev, _window, cx| {
-                let is_rtl = cx
-                    .i18n()
-                    .text_direction()
-                    .is_rtl();
+                let is_rtl = cx.i18n().text_direction().is_rtl();
                 let mut next = cx.i18n().clone();
                 next.set_locale(if is_rtl {
                     Locale::new("en").unwrap()

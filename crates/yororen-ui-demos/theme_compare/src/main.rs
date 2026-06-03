@@ -22,9 +22,9 @@ use gpui::{App, AppContext, Application, WindowAppearance, WindowBounds, WindowO
 
 use yororen_ui::assets::UiAsset;
 
-use yororen_ui_theme_system as theme_system;
-use yororen_ui_theme_mini as theme_mini;
 use yororen_ui::theme::Theme;
+use yororen_ui_theme_mini as theme_mini;
+use yororen_ui_theme_system as theme_system;
 
 mod compare_app;
 mod state;

@@ -178,9 +178,7 @@ impl RenderOnce for IconButton {
             ButtonVariant::Builtin(_) => None,
             ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
         };
-        let variant_builtin = variant
-            .as_builtin()
-            .unwrap_or(ActionVariantKind::Neutral);
+        let variant_builtin = variant.as_builtin().unwrap_or(ActionVariantKind::Neutral);
 
         let action_style = compute_action_style_with_custom(
             cx.theme(),

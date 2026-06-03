@@ -61,7 +61,6 @@ impl KeybindingInput {
         }
     }
 
-
     pub fn id(mut self, id: impl Into<ElementId>) -> Self {
         self.element_id = id.into();
         self

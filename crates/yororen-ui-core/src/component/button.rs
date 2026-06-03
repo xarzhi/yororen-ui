@@ -6,10 +6,10 @@ use gpui::{
 };
 
 use crate::component::{ClickCallback, HoverCallback};
+use crate::renderer::variant::VariantState;
 use crate::renderer::{
     ButtonRenderState, ButtonVariant, Edges, VariantKey, resolve_custom_variant,
 };
-use crate::renderer::variant::VariantState;
 use crate::theme::{ActionVariantKind, ActiveTheme};
 
 /// Creates a new button element.
@@ -175,9 +175,8 @@ impl RenderOnce for Button {
             ButtonVariant::Builtin(_) => None,
             ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
         };
-        let variant_builtin: ActionVariantKind = variant
-            .as_builtin()
-            .unwrap_or(ActionVariantKind::Neutral);
+        let variant_builtin: ActionVariantKind =
+            variant.as_builtin().unwrap_or(ActionVariantKind::Neutral);
 
         // Phase B spike: button visuals go through ButtonRenderer.
         let theme = cx.theme();

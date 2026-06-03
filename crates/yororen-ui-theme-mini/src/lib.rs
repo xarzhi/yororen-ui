@@ -42,8 +42,8 @@ use std::sync::Arc;
 
 use gpui::{App, Hsla, Pixels, WindowAppearance};
 use yororen_ui_core::renderer::{
-    ButtonRenderState, ButtonRenderer, CardRenderState, CardRenderer, ModalRenderState, ModalRenderer,
-    RendererRegistry,
+    ButtonRenderState, ButtonRenderer, CardRenderState, CardRenderer, ModalRenderState,
+    ModalRenderer, RendererRegistry,
 };
 use yororen_ui_core::theme::{GlobalTheme, Theme, ThemeSet};
 
@@ -129,11 +129,7 @@ impl ButtonRenderer for MiniButtonRenderer {
         yororen_ui_core::renderer::Edges::symmetric(gpui::px(20.), gpui::px(12.))
     }
 
-    fn border_radius(
-        &self,
-        _state: &ButtonRenderState,
-        _theme: &Theme,
-    ) -> Pixels {
+    fn border_radius(&self, _state: &ButtonRenderState, _theme: &Theme) -> Pixels {
         gpui::px(12.)
     }
 
@@ -153,19 +149,11 @@ impl ButtonRenderer for MiniButtonRenderer {
         None
     }
 
-    fn min_height(
-        &self,
-        _state: &ButtonRenderState,
-        theme: &Theme,
-    ) -> Pixels {
+    fn min_height(&self, _state: &ButtonRenderState, theme: &Theme) -> Pixels {
         theme.tokens.control.button.min_height
     }
 
-    fn disabled_opacity(
-        &self,
-        _state: &ButtonRenderState,
-        _theme: &Theme,
-    ) -> f32 {
+    fn disabled_opacity(&self, _state: &ButtonRenderState, _theme: &Theme) -> f32 {
         1.0
     }
 }
@@ -264,9 +252,7 @@ pub fn install(cx: &mut App, appearance: WindowAppearance) {
 // Re-export token fallback renderers so callers that want to extend
 // the mini registry don't have to import the core crate directly.
 #[allow(unused_imports)]
-pub use yororen_ui_core::renderer::{
-    TokenButtonRenderer, TokenCardRenderer, TokenModalRenderer,
-};
+pub use yororen_ui_core::renderer::{TokenButtonRenderer, TokenCardRenderer, TokenModalRenderer};
 
 #[cfg(test)]
 mod tests {
@@ -283,16 +269,12 @@ mod tests {
             ..Default::default()
         };
         let mini_bg = reg.button.bg(&state, &theme);
-        let default_bg = yororen_ui_core::renderer::TokenButtonRenderer.bg(
-            &state,
-            &theme,
-        );
+        let default_bg = yororen_ui_core::renderer::TokenButtonRenderer.bg(&state, &theme);
         assert_ne!(mini_bg, default_bg);
 
         let card_state = CardRenderState::default();
         let mini_card_bg = reg.card.bg(&card_state, &theme);
-        let default_card_bg =
-            yororen_ui_core::renderer::TokenCardRenderer.bg(&card_state, &theme);
+        let default_card_bg = yororen_ui_core::renderer::TokenCardRenderer.bg(&card_state, &theme);
         assert_ne!(mini_card_bg, default_card_bg);
 
         let modal_state = ModalRenderState::default();

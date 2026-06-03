@@ -72,8 +72,8 @@ mod factories;
 
 // Public factory functions.
 pub use factories::{
-    dark, frappe, frappe_theme, latte_theme, light, macchiato, macchiato_theme, mocha, mocha_theme,
-    themeset, themeset_all_four, FrappeTheme, LatteTheme, MacchiatoTheme, MochaTheme,
+    FrappeTheme, LatteTheme, MacchiatoTheme, MochaTheme, dark, frappe, frappe_theme, latte_theme,
+    light, macchiato, macchiato_theme, mocha, mocha_theme, themeset, themeset_all_four,
 };
 
 use std::sync::Arc;
@@ -106,10 +106,7 @@ pub fn light_arc() -> Arc<Theme> {
 /// catppuccin::install(cx, window.appearance());
 /// ```
 pub fn install(cx: &mut App, appearance: WindowAppearance) {
-    cx.set_global(GlobalTheme::new_with_themes(
-        appearance,
-        themeset(),
-    ));
+    cx.set_global(GlobalTheme::new_with_themes(appearance, themeset()));
 }
 
 /// Install the Catppuccin theme with the full 4-flavor `ThemeSet`

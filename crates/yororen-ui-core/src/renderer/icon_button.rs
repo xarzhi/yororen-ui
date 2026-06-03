@@ -37,11 +37,7 @@ impl IconButtonRenderer for TokenIconButtonRenderer {
             });
         }
         let v = theme.action_variant(state.variant);
-        if state.disabled {
-            v.disabled_bg
-        } else {
-            v.bg
-        }
+        if state.disabled { v.disabled_bg } else { v.bg }
     }
     fn hover_bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla {
         if let Some(s) = &state.custom_style {

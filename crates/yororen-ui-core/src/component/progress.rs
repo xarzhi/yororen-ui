@@ -5,11 +5,7 @@ use gpui::{
 
 use gpui::InteractiveElement;
 
-use crate::{
-    animation::constants::duration,
-    renderer::ProgressBarRenderState,
-    theme::ActiveTheme,
-};
+use crate::{animation::constants::duration, renderer::ProgressBarRenderState, theme::ActiveTheme};
 
 use crate::animation::ease_in_out_clamped;
 

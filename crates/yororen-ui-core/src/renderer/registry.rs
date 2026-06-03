@@ -10,8 +10,8 @@ use super::button::{ButtonRenderer, TokenButtonRenderer};
 use super::card::{CardRenderer, TokenCardRenderer};
 use super::checkbox::{CheckboxRenderer, TokenCheckboxRenderer};
 use super::combo_box::{ComboBoxRenderer, TokenComboBoxRenderer};
-use super::divider::{DividerRenderer, TokenDividerRenderer};
 use super::disclosure::{DisclosureRenderer, TokenDisclosureRenderer};
+use super::divider::{DividerRenderer, TokenDividerRenderer};
 use super::dropdown_menu::{DropdownMenuRenderer, TokenDropdownMenuRenderer};
 use super::empty_state::{EmptyStateRenderer, TokenEmptyStateRenderer};
 use super::file_path_input::{FilePathInputRenderer, TokenFilePathInputRenderer};
@@ -40,8 +40,8 @@ use super::text_area::{TextAreaRenderer, TokenTextAreaRenderer};
 use super::text_input::{TextInputRenderer, TokenTextInputRenderer};
 use super::toast::{ToastRenderer, TokenToastRenderer};
 use super::toggle_button::{ToggleButtonRenderer, TokenToggleButtonRenderer};
-use super::tooltip::{TooltipRenderer, TokenTooltipRenderer};
-use super::tree_item::{TreeItemRenderer, TokenTreeItemRenderer};
+use super::tooltip::{TokenTooltipRenderer, TooltipRenderer};
+use super::tree_item::{TokenTreeItemRenderer, TreeItemRenderer};
 
 #[derive(Clone)]
 pub struct RendererRegistry {

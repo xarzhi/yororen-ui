@@ -87,11 +87,7 @@ impl ButtonRenderer for CatppuccinButtonRenderer {
             });
         }
         let v = theme.action_variant(state.variant);
-        if state.disabled {
-            v.disabled_fg
-        } else {
-            v.fg
-        }
+        if state.disabled { v.disabled_fg } else { v.fg }
     }
 
     fn padding(
@@ -100,7 +96,10 @@ impl ButtonRenderer for CatppuccinButtonRenderer {
         theme: &Theme,
     ) -> yororen_ui_core::renderer::Edges<Pixels> {
         let t = &theme.tokens.control.button;
-        yororen_ui_core::renderer::Edges::symmetric(t.horizontal_padding, t.horizontal_padding / 1.5)
+        yororen_ui_core::renderer::Edges::symmetric(
+            t.horizontal_padding,
+            t.horizontal_padding / 1.5,
+        )
     }
 
     fn border_radius(&self, _state: &ButtonRenderState, _theme: &Theme) -> Pixels {
@@ -131,11 +130,7 @@ impl ButtonRenderer for CatppuccinButtonRenderer {
         if let Some(s) = &state.custom_style {
             return s.disabled_opacity();
         }
-        if state.disabled {
-            0.55
-        } else {
-            1.0
-        }
+        if state.disabled { 0.55 } else { 1.0 }
     }
 }
 
@@ -712,53 +707,33 @@ mod tests {
     fn registry_includes_twelve_custom_renderers() {
         let reg = catppuccin_registry();
         // All 12 of our overrides are in place.
-        let _ = reg.button.bg(
-            &ButtonRenderState::default(),
-            &cat_light(),
-        );
-        let _ = reg.card.bg(
-            &CardRenderState::default(),
-            &cat_light(),
-        );
-        let _ = reg.modal.panel_bg(
-            &ModalRenderState::default(),
-            &cat_light(),
-        );
-        let _ = reg.focus_ring.color(
-            &FocusRingRenderState::default(),
-            &cat_light(),
-        );
-        let _ = reg.text_input.bg(
-            &TextInputRenderState::default(),
-            &cat_light(),
-        );
-        let _ = reg.switch.track_bg(
-            &SwitchRenderState::default(),
-            &cat_light(),
-        );
-        let _ = reg.checkbox.box_bg(
-            &CheckboxRenderState::default(),
-            &cat_light(),
-        );
-        let _ = reg.radio.ring_bg(
-            &RadioRenderState::default(),
-            &cat_light(),
-        );
-        let _ = reg.toast.bg(
-            &ToastRenderState::default(),
-            &cat_light(),
-        );
-        let _ = reg.tag.bg(
-            &TagRenderState::default(),
-            &cat_light(),
-        );
-        let _ = reg.list_item.bg(
-            &ListItemRenderState::default(),
-            &cat_light(),
-        );
-        let _ = reg.empty_state.icon_color(
-            &EmptyStateRenderState::default(),
-            &cat_light(),
-        );
+        let _ = reg.button.bg(&ButtonRenderState::default(), &cat_light());
+        let _ = reg.card.bg(&CardRenderState::default(), &cat_light());
+        let _ = reg
+            .modal
+            .panel_bg(&ModalRenderState::default(), &cat_light());
+        let _ = reg
+            .focus_ring
+            .color(&FocusRingRenderState::default(), &cat_light());
+        let _ = reg
+            .text_input
+            .bg(&TextInputRenderState::default(), &cat_light());
+        let _ = reg
+            .switch
+            .track_bg(&SwitchRenderState::default(), &cat_light());
+        let _ = reg
+            .checkbox
+            .box_bg(&CheckboxRenderState::default(), &cat_light());
+        let _ = reg
+            .radio
+            .ring_bg(&RadioRenderState::default(), &cat_light());
+        let _ = reg.toast.bg(&ToastRenderState::default(), &cat_light());
+        let _ = reg.tag.bg(&TagRenderState::default(), &cat_light());
+        let _ = reg
+            .list_item
+            .bg(&ListItemRenderState::default(), &cat_light());
+        let _ = reg
+            .empty_state
+            .icon_color(&EmptyStateRenderState::default(), &cat_light());
     }
 }

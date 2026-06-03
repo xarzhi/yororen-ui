@@ -39,11 +39,7 @@ impl DropdownMenuRenderer for TokenDropdownMenuRenderer {
         theme.tokens.radii.md
     }
     fn chevron_rotation(&self, state: &DropdownMenuRenderState, _theme: &Theme) -> f32 {
-        if state.open {
-            180.0
-        } else {
-            0.0
-        }
+        if state.open { 180.0 } else { 0.0 }
     }
 }
 

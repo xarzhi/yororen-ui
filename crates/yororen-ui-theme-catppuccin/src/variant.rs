@@ -35,13 +35,19 @@ use yororen_ui_core::renderer::{
 use crate::palette;
 
 /// The canonical `VariantKey` for the `mocha` variant.
-pub fn key_mocha() -> VariantKey { VariantKey::borrowed("mocha") }
+pub fn key_mocha() -> VariantKey {
+    VariantKey::borrowed("mocha")
+}
 
 /// The canonical `VariantKey` for the `lavender` variant.
-pub fn key_lavender() -> VariantKey { VariantKey::borrowed("lavender") }
+pub fn key_lavender() -> VariantKey {
+    VariantKey::borrowed("lavender")
+}
 
 /// The canonical `VariantKey` for the `ghost` variant.
-pub fn key_ghost() -> VariantKey { VariantKey::borrowed("ghost") }
+pub fn key_ghost() -> VariantKey {
+    VariantKey::borrowed("ghost")
+}
 
 /// "mocha" variant: Catppuccin Mocha's `blue` accent on the
 /// default surface. The `fg` color is `mocha::base()` so the button
@@ -165,7 +171,9 @@ mod tests {
         let v = GhostVariant;
         let bg = v.bg(&VariantState::default());
         assert_eq!(bg.a, 0.0);
-        let border = v.border(&VariantState::default()).expect("ghost has a border");
+        let border = v
+            .border(&VariantState::default())
+            .expect("ghost has a border");
         // Border should be surface1 with low alpha.
         assert!(border.a < 0.5);
     }

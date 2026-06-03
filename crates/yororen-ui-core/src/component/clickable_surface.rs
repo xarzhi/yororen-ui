@@ -5,8 +5,8 @@ use gpui::{
     StatefulInteractiveElement, Styled, div, prelude::FluentBuilder,
 };
 
-use crate::renderer::{ButtonVariant, VariantKey, resolve_custom_variant};
 use crate::renderer::variant::VariantState;
+use crate::renderer::{ButtonVariant, VariantKey, resolve_custom_variant};
 use crate::theme::{ActionVariantKind, ActiveTheme};
 
 /// Creates a new clickable surface element.
@@ -158,9 +158,7 @@ impl RenderOnce for ClickableSurface {
             ButtonVariant::Builtin(_) => None,
             ButtonVariant::Custom(key) => resolve_custom_variant(_cx, key),
         };
-        let variant_builtin = variant
-            .as_builtin()
-            .unwrap_or(ActionVariantKind::Neutral);
+        let variant_builtin = variant.as_builtin().unwrap_or(ActionVariantKind::Neutral);
         let action_variant = _cx.theme().action_variant(variant_builtin);
         let variant_bg = custom_style
             .as_ref()

@@ -118,7 +118,8 @@ mod tests {
             Some("Choose…".to_string())
         );
         assert_eq!(
-            r.resolve(PlaceholderKey::ComboBoxSearch).map(|s| s.to_string()),
+            r.resolve(PlaceholderKey::ComboBoxSearch)
+                .map(|s| s.to_string()),
             Some("Type…".to_string())
         );
         assert!(r.resolve(PlaceholderKey::FilePath).is_none());

@@ -44,7 +44,9 @@ fn main() {
             ..Default::default()
         };
 
-        let _ = cx.open_window(options, |_, cx| cx.new(variant_app::VariantShowcaseApp::new));
+        let _ = cx.open_window(options, |_, cx| {
+            cx.new(variant_app::VariantShowcaseApp::new)
+        });
     });
 }
 

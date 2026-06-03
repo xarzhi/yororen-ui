@@ -72,10 +72,22 @@ fn build_theme(base: BasePalette, accent: AccentPalette, is_dark: bool) -> Theme
         },
         action,
         status: StatusTheme {
-            success: StatusVariant { bg: accent.green, fg: content.on_status },
-            warning: StatusVariant { bg: accent.yellow, fg: content.on_status },
-            error: StatusVariant { bg: accent.red, fg: content.on_status },
-            info: StatusVariant { bg: accent.sapphire, fg: content.on_status },
+            success: StatusVariant {
+                bg: accent.green,
+                fg: content.on_status,
+            },
+            warning: StatusVariant {
+                bg: accent.yellow,
+                fg: content.on_status,
+            },
+            error: StatusVariant {
+                bg: accent.red,
+                fg: content.on_status,
+            },
+            info: StatusVariant {
+                bg: accent.sapphire,
+                fg: content.on_status,
+            },
         },
         shadow: ShadowTheme {
             elevation_1: hsla(0.0, 0.0, 0.0, if is_dark { 0.35 } else { 0.10 }),
@@ -292,16 +304,24 @@ pub type MacchiatoTheme = Theme;
 pub type MochaTheme = Theme;
 
 /// Build a Latte-flavoured `Theme` (light).
-pub fn latte_theme() -> Theme { light() }
+pub fn latte_theme() -> Theme {
+    light()
+}
 
 /// Build a Frappé-flavoured `Theme`.
-pub fn frappe_theme() -> Theme { frappe() }
+pub fn frappe_theme() -> Theme {
+    frappe()
+}
 
 /// Build a Macchiato-flavoured `Theme`.
-pub fn macchiato_theme() -> Theme { macchiato() }
+pub fn macchiato_theme() -> Theme {
+    macchiato()
+}
 
 /// Build a Mocha-flavoured `Theme` (dark).
-pub fn mocha_theme() -> Theme { mocha() }
+pub fn mocha_theme() -> Theme {
+    mocha()
+}
 
 // Silence dead_code: the per-flavor typed alias (`LatteTheme` etc.)
 // are public re-exports.

@@ -335,20 +335,25 @@ pub fn compute_action_style_with_custom(
     custom_hover_bg: Option<gpui::Hsla>,
 ) -> ActionStyle {
     let state = VariantState { disabled };
-    let (variant_bg, variant_fg, variant_disabled_bg, variant_disabled_fg, variant_disabled_opacity) =
-        match &custom_style {
-            Some(s) => (
-                s.bg(&state),
-                s.fg(&state),
-                s.bg(&VariantState { disabled: true }),
-                s.fg(&VariantState { disabled: true }),
-                s.disabled_opacity(),
-            ),
-            None => {
-                let av = theme.action_variant(variant);
-                (av.bg, av.fg, av.disabled_bg, av.disabled_fg, 1.0f32)
-            }
-        };
+    let (
+        variant_bg,
+        variant_fg,
+        variant_disabled_bg,
+        variant_disabled_fg,
+        variant_disabled_opacity,
+    ) = match &custom_style {
+        Some(s) => (
+            s.bg(&state),
+            s.fg(&state),
+            s.bg(&VariantState { disabled: true }),
+            s.fg(&VariantState { disabled: true }),
+            s.disabled_opacity(),
+        ),
+        None => {
+            let av = theme.action_variant(variant);
+            (av.bg, av.fg, av.disabled_bg, av.disabled_fg, 1.0f32)
+        }
+    };
 
     // `custom_bg` / `custom_hover_bg` (from `.bg(...)` / `.hover_bg(...)`
     // on the builder) still take priority over the variant.

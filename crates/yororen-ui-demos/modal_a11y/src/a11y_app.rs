@@ -1,12 +1,8 @@
 //! Root component for the modal a11y demo.
 
-use gpui::{
-    Context, IntoElement, ParentElement, Render, SharedString, Styled, Window, div, px,
-};
+use gpui::{Context, IntoElement, ParentElement, Render, SharedString, Styled, Window, div, px};
 
-use yororen_ui::component::{
-    OverlayCloseReason, button, label, modal, modal_actions_row, overlay,
-};
+use yororen_ui::component::{OverlayCloseReason, button, label, modal, modal_actions_row, overlay};
 use yororen_ui::theme::{ActionVariantKind, ActiveTheme};
 
 use crate::state::ModalA11yState;
@@ -58,9 +54,7 @@ impl Render for ModalA11yApp {
                     .flex()
                     .flex_col()
                     .gap(px(4.))
-                    .child(
-                        label("Modal a11y Showcase").strong(true).text_size(px(24.)),
-                    )
+                    .child(label("Modal a11y Showcase").strong(true).text_size(px(24.)))
                     .child(label(
                         "Three modal kinds. Standard closes on Esc / scrim / button. Required \
                          (non-dismissable) only closes on a button. No-scroll-lock variant is \
@@ -122,7 +116,10 @@ impl Render for ModalA11yApp {
                         visibility.update(cx, |v, _| v.standard = false);
                         cx.refresh_windows();
                     })
-                    .child(build_standard_modal("Standard modal", "Click outside or press Esc to close. Cancel / OK also work.")),
+                    .child(build_standard_modal(
+                        "Standard modal",
+                        "Click outside or press Esc to close. Cancel / OK also work.",
+                    )),
             );
         }
 

@@ -223,9 +223,7 @@ impl RenderOnce for ToggleButton {
             ButtonVariant::Builtin(_) => None,
             ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
         };
-        let variant_builtin = variant
-            .as_builtin()
-            .unwrap_or(ActionVariantKind::Neutral);
+        let variant_builtin = variant.as_builtin().unwrap_or(ActionVariantKind::Neutral);
         let action_variant = cx.theme().action_variant(variant_builtin);
         let selected_variant = &cx.theme().action.primary;
 
@@ -251,8 +249,7 @@ impl RenderOnce for ToggleButton {
         let mut resolved_hover_bg = if resolved_selected {
             selected_variant.hover_bg
         } else {
-            hover_bg
-                .unwrap_or(custom_bg(false).unwrap_or(action_variant.hover_bg))
+            hover_bg.unwrap_or(custom_bg(false).unwrap_or(action_variant.hover_bg))
         };
 
         let mut resolved_text_color = if resolved_selected {

@@ -43,11 +43,31 @@ impl Render for VariantShowcaseApp {
                  VariantRegistry::register() and resolved through the new \
                  ButtonVariant::Custom path.",
             ))
-            .child(variant_row("Neutral (builtin)", ButtonKind::BuiltinNeutral, &save_label))
-            .child(variant_row("Primary (builtin)", ButtonKind::BuiltinPrimary, &save_label))
-            .child(variant_row("Danger (builtin)", ButtonKind::BuiltinDanger, &cancel_label))
-            .child(variant_row("Ghost (custom)", ButtonKind::CustomGhost, &save_label))
-            .child(variant_row("Branded (custom)", ButtonKind::CustomBranded, &save_label))
+            .child(variant_row(
+                "Neutral (builtin)",
+                ButtonKind::BuiltinNeutral,
+                &save_label,
+            ))
+            .child(variant_row(
+                "Primary (builtin)",
+                ButtonKind::BuiltinPrimary,
+                &save_label,
+            ))
+            .child(variant_row(
+                "Danger (builtin)",
+                ButtonKind::BuiltinDanger,
+                &cancel_label,
+            ))
+            .child(variant_row(
+                "Ghost (custom)",
+                ButtonKind::CustomGhost,
+                &save_label,
+            ))
+            .child(variant_row(
+                "Branded (custom)",
+                ButtonKind::CustomBranded,
+                &save_label,
+            ))
     }
 }
 
@@ -71,12 +91,18 @@ fn variant_row(title: &str, kind: ButtonKind, label_text: &str) -> impl IntoElem
 
 fn build_button(kind: ButtonKind, label_text: &str) -> gpui::AnyElement {
     match kind {
-        ButtonKind::BuiltinNeutral => button("variant:builtin:neutral").child(label_text.to_string()),
+        ButtonKind::BuiltinNeutral => {
+            button("variant:builtin:neutral").child(label_text.to_string())
+        }
         ButtonKind::BuiltinPrimary => button("variant:builtin:primary")
-            .variant(ButtonVariant::Builtin(yororen_ui::theme::ActionVariantKind::Primary))
+            .variant(ButtonVariant::Builtin(
+                yororen_ui::theme::ActionVariantKind::Primary,
+            ))
             .child(label_text.to_string()),
         ButtonKind::BuiltinDanger => button("variant:builtin:danger")
-            .variant(ButtonVariant::Builtin(yororen_ui::theme::ActionVariantKind::Danger))
+            .variant(ButtonVariant::Builtin(
+                yororen_ui::theme::ActionVariantKind::Danger,
+            ))
             .child(label_text.to_string()),
         ButtonKind::CustomGhost => button("variant:custom:ghost")
             .variant(ButtonVariant::Custom(VariantKey::borrowed("ghost")))

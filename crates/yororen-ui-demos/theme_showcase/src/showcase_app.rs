@@ -4,9 +4,7 @@
 //! renderers on system palette). A switcher button cycles through
 //! the three.
 
-use gpui::{
-    Context, IntoElement, ParentElement, Render, Styled, Window, div, px,
-};
+use gpui::{Context, IntoElement, ParentElement, Render, Styled, Window, div, px};
 
 use yororen_ui::component::{button, card, label, with_theme};
 use yororen_ui::renderer::{ButtonVariant, VariantKey};
@@ -131,8 +129,16 @@ fn half_panel(title: &str, bg: gpui::Hsla) -> gpui::AnyElement {
             div()
                 .flex()
                 .gap(px(8.))
-                .child(button("primary").variant(ActionVariantKind::Primary).child("Primary"))
-                .child(button("danger").variant(ActionVariantKind::Danger).child("Danger"))
+                .child(
+                    button("primary")
+                        .variant(ActionVariantKind::Primary)
+                        .child("Primary"),
+                )
+                .child(
+                    button("danger")
+                        .variant(ActionVariantKind::Danger)
+                        .child("Danger"),
+                )
                 .child(button("neutral").child("Neutral")),
         )
         // Row 2: 3 Catppuccin custom variants.
@@ -207,14 +213,8 @@ mod tests {
         };
         let cat_theme = catppuccin_theme(gpui::WindowAppearance::Dark);
         let sys_theme = system_theme(gpui::WindowAppearance::Dark);
-        let cat_bg = cat_theme
-            .renderers
-            .button
-            .bg(&state, &cat_theme);
-        let sys_bg = cat_theme
-            .renderers
-            .button
-            .bg(&state, &sys_theme);
+        let cat_bg = cat_theme.renderers.button.bg(&state, &cat_theme);
+        let sys_bg = cat_theme.renderers.button.bg(&state, &sys_theme);
         // Both renderers are CatppuccinButtonRenderer, so the
         // difference comes from the palette. They should differ.
         assert_ne!(cat_bg, sys_bg);

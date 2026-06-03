@@ -21,10 +21,10 @@ use yororen_ui::i18n::{
 };
 use yororen_ui::theme::{GlobalTheme, ThemeSet};
 
-use yororen_ui_theme_system as theme_system;
+use yororen_ui_locale_ar as locale_ar;
 use yororen_ui_locale_en as locale_en;
 use yororen_ui_locale_zh_cn as locale_zh_cn;
-use yororen_ui_locale_ar as locale_ar;
+use yororen_ui_theme_system as theme_system;
 
 mod i18n_app;
 mod state;

@@ -21,14 +21,10 @@
 
 use std::sync::Arc;
 
-use gpui::{
-    App, AppContext, Application, WindowAppearance, WindowBounds, WindowOptions, px, size,
-};
+use gpui::{App, AppContext, Application, WindowAppearance, WindowBounds, WindowOptions, px, size};
 
 use yororen_ui::assets::UiAsset;
-use yororen_ui::renderer::{
-    GlobalVariantRegistry, RendererRegistry, VariantRegistry,
-};
+use yororen_ui::renderer::{GlobalVariantRegistry, RendererRegistry, VariantRegistry};
 
 use yororen_ui_locale_en as locale_en;
 use yororen_ui_theme_catppuccin as catppuccin;

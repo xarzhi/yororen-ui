@@ -189,14 +189,20 @@ impl VariantRegistry {
 
     /// Register (or replace) a custom variant.
     pub fn register(&self, key: VariantKey, style: Arc<dyn VariantStyle>) {
-        let mut w = self.customs.write().expect("variant registry lock poisoned");
+        let mut w = self
+            .customs
+            .write()
+            .expect("variant registry lock poisoned");
         w.insert(key, style);
     }
 
     /// Remove a previously-registered custom variant. Returns the
     /// removed style if it existed.
     pub fn unregister(&self, key: &VariantKey) -> Option<Arc<dyn VariantStyle>> {
-        let mut w = self.customs.write().expect("variant registry lock poisoned");
+        let mut w = self
+            .customs
+            .write()
+            .expect("variant registry lock poisoned");
         w.remove(key)
     }
 
@@ -215,7 +221,10 @@ impl VariantRegistry {
 
     /// Number of custom variants currently registered.
     pub fn custom_count(&self) -> usize {
-        self.customs.read().expect("variant registry lock poisoned").len()
+        self.customs
+            .read()
+            .expect("variant registry lock poisoned")
+            .len()
     }
 }
 
@@ -419,14 +428,9 @@ mod tests {
             disabled_opacity: 0.5,
         });
         let composed = variant_compose(base.clone(), &[]);
-        assert_eq!(
-            composed.bg(&VariantState::default()),
-            rgb(0xAAAAAA).into()
-        );
-        let composed_with_one_override = variant_compose(
-            base.clone(),
-            &[(VariantKey::borrowed("x"), base.clone())],
-        );
+        assert_eq!(composed.bg(&VariantState::default()), rgb(0xAAAAAA).into());
+        let composed_with_one_override =
+            variant_compose(base.clone(), &[(VariantKey::borrowed("x"), base.clone())]);
         assert_eq!(
             composed_with_one_override.bg(&VariantState { disabled: true }),
             rgb(0xCCCCCC).into()

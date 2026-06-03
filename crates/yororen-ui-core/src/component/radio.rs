@@ -181,11 +181,7 @@ impl RenderOnce for Radio {
         }
 
         // Add animated inner dot for checked state
-        let inner_dot = div()
-            .w(dot_size)
-            .h(dot_size)
-            .rounded_full()
-            .bg(dot_fg);
+        let inner_dot = div().w(dot_size).h(dot_size).rounded_full().bg(dot_fg);
 
         let animated_dot = inner_dot.with_animation(
             format!("ui:radio:dot:{}", checked),

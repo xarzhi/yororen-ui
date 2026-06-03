@@ -65,7 +65,9 @@ impl RenderOnce for Divider {
         let element_id = self.element_id;
         let theme = cx.theme();
         let r = &theme.renderers.divider;
-        let state = DividerRenderState { vertical: self.vertical };
+        let state = DividerRenderState {
+            vertical: self.vertical,
+        };
         let color = r.color(&state, theme);
         let thickness = r.thickness(&state, theme);
 

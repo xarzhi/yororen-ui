@@ -238,10 +238,10 @@ impl RenderOnce for Overlay {
         };
 
         let theme = cx.theme();
-        let scrim_color = theme.renderers.modal.scrim(
-            &Default::default(),
-            theme.as_ref(),
-        );
+        let scrim_color = theme
+            .renderers
+            .modal
+            .scrim(&Default::default(), theme.as_ref());
 
         let dismiss_scrim = self.dismiss_on_scrim;
         let dismiss_esc = self.dismiss_on_escape;

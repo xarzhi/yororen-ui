@@ -40,11 +40,7 @@ impl DisclosureRenderer for TokenDisclosureRenderer {
         theme.tokens.radii.md
     }
     fn chevron_rotation(&self, state: &DisclosureRenderState, _theme: &Theme) -> f32 {
-        if state.open {
-            90.0
-        } else {
-            0.0
-        }
+        if state.open { 90.0 } else { 0.0 }
     }
     fn body_padding(&self, _state: &DisclosureRenderState, theme: &Theme) -> Pixels {
         theme.tokens.spacing.inset_md

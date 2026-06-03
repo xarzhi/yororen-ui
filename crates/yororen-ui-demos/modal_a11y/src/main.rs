@@ -15,9 +15,7 @@
 //!   for non-modal overlays where the user should still be able to
 //!   scroll the page underneath.
 
-use gpui::{
-    App, AppContext, Application, WindowBounds, WindowOptions, px, size,
-};
+use gpui::{App, AppContext, Application, WindowBounds, WindowOptions, px, size};
 
 use yororen_ui::assets::UiAsset;
 
