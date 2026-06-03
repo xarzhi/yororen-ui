@@ -47,8 +47,8 @@
 use std::sync::Arc;
 
 use gpui::{
-    AnyElement, App, ElementId, InteractiveElement, IntoElement, KeyDownEvent, MouseDownEvent,
-    ParentElement, RenderOnce, StyleRefinement, Styled, Window, div,
+    AnyElement, App, ElementId, InteractiveElement, IntoElement, KeyDownEvent, MouseButton,
+    MouseDownEvent, ParentElement, RenderOnce, StyleRefinement, Styled, Window, div,
 };
 
 use crate::a11y::ScrollLockGuard;
@@ -218,7 +218,7 @@ impl InteractiveElement for Overlay {
 }
 
 impl RenderOnce for Overlay {
-    fn render(self, _window: &mut Window, cx: &mut gpui::App) -> impl IntoElement {
+    fn render(self, window: &mut Window, cx: &mut gpui::App) -> impl IntoElement {
         if !self.open {
             return div().into_any_element();
         }
@@ -248,6 +248,32 @@ impl RenderOnce for Overlay {
         let on_close_scrim = self.on_close.clone();
         let on_close_escape = self.on_close;
 
+        // Track the previous open state so we can detect the
+        // open transition and focus the scrim exactly once. The
+        // scrim needs to be the focused element (or an ancestor
+        // of it) for `capture_key_down` to receive Esc — the
+        // keyboard dispatch path is rooted at the focused node.
+        let prev_open_state = window.use_keyed_state(
+            (element_id.clone(), "ui:overlay:prev-open"),
+            cx,
+            |_, _| false,
+        );
+        let was_open = *prev_open_state.read(cx);
+        prev_open_state.update(cx, |v, _cx| *v = self.open);
+
+        // Per-overlay focus handle. The scrim becomes focusable
+        // and tracks this handle so it can sit in the dispatch
+        // path. We focus it on the open transition.
+        let scrim_focus = window.use_keyed_state(
+            (element_id.clone(), "ui:overlay:scrim-focus"),
+            cx,
+            |_, cx| cx.focus_handle(),
+        );
+        let scrim_focus_handle = scrim_focus.read(cx);
+        if self.open && !was_open {
+            scrim_focus_handle.focus(window);
+        }
+
         let mut scrim = self
             .base
             .id(element_id)
@@ -257,9 +283,19 @@ impl RenderOnce for Overlay {
             .bg(scrim_color)
             .flex()
             .items_center()
-            .justify_center();
+            .justify_center()
+            .tab_index(0)
+            .track_focus(scrim_focus_handle);
 
         if dismiss_scrim {
+            // `on_mouse_down_out` is wrong here: the scrim's
+            // hitbox IS the whole window, so any click on the
+            // scrim area outside the inner child is still
+            // *inside* the scrim's hitbox — the `_out` variant
+            // would never fire. The child absorbs its own
+            // mouse_down, so plain `on_mouse_down` only fires
+            // for clicks directly on the scrim (i.e. outside
+            // the child), which is exactly what we want.
             let cb: ScrimCallback = if let Some(handler) = on_close_scrim {
                 Arc::new(move |_ev, w, cx| {
                     handler(&OverlayCloseReason::ScrimClick, w, cx);
@@ -267,7 +303,7 @@ impl RenderOnce for Overlay {
             } else {
                 Arc::new(|_, _, _| {})
             };
-            scrim = scrim.on_mouse_down_out(move |ev, w, cx| {
+            scrim = scrim.on_mouse_down(MouseButton::Left, move |ev, w, cx| {
                 cb(ev, w, cx);
             });
         }

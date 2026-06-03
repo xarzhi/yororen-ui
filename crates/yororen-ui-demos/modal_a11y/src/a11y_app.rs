@@ -1,8 +1,12 @@
 //! Root component for the modal a11y demo.
 
+use std::sync::Arc;
+
 use gpui::{Context, IntoElement, ParentElement, Render, SharedString, Styled, Window, div, px};
 
-use yororen_ui::component::{OverlayCloseReason, button, label, modal, modal_actions_row, overlay};
+use yororen_ui::component::{
+    OverlayCloseCallback, OverlayCloseReason, button, label, modal, modal_actions_row, overlay,
+};
 use yororen_ui::theme::{ActionVariantKind, ActiveTheme};
 
 use crate::state::ModalA11yState;
@@ -108,17 +112,24 @@ impl Render for ModalA11yApp {
         if visibility.standard {
             let visibility = state.visibility.clone();
             let log = state.close_log.clone();
+            // Single close callback shared by the overlay
+            // (scrim click / Esc) and the modal's Cancel/OK
+            // buttons. Buttons invoke it with
+            // `OverlayCloseReason::Programmatic`.
+            let on_close: OverlayCloseCallback = Arc::new(move |reason, _w, cx| {
+                log.update(cx, |log, _| log.push(*reason));
+                visibility.update(cx, |v, _| v.standard = false);
+                cx.refresh_windows();
+            });
+            let on_close_for_overlay = on_close.clone();
             root = root.child(
                 overlay("a11y:overlay:standard")
                     .open(true)
-                    .on_close(move |reason, _w, cx| {
-                        log.update(cx, |log, _| log.push(*reason));
-                        visibility.update(cx, |v, _| v.standard = false);
-                        cx.refresh_windows();
-                    })
+                    .on_close(move |reason, w, cx| on_close_for_overlay(reason, w, cx))
                     .child(build_standard_modal(
                         "Standard modal",
                         "Click outside or press Esc to close. Cancel / OK also work.",
+                        on_close,
                     )),
             );
         }
@@ -127,19 +138,22 @@ impl Render for ModalA11yApp {
         if visibility.required {
             let visibility = state.visibility.clone();
             let log = state.close_log.clone();
+            let on_close: OverlayCloseCallback = Arc::new(move |reason, _w, cx| {
+                log.update(cx, |log, _| log.push(*reason));
+                visibility.update(cx, |v, _| v.required = false);
+                cx.refresh_windows();
+            });
+            let on_close_for_overlay = on_close.clone();
             root = root.child(
                 overlay("a11y:overlay:required")
                     .open(true)
                     .dismiss_on_escape(false)
                     .dismiss_on_scrim(false)
-                    .on_close(move |reason, _w, cx| {
-                        log.update(cx, |log, _| log.push(*reason));
-                        visibility.update(cx, |v, _| v.required = false);
-                        cx.refresh_windows();
-                    })
+                    .on_close(move |reason, w, cx| on_close_for_overlay(reason, w, cx))
                     .child(build_standard_modal(
                         "Required modal",
                         "This modal does not close on Esc or scrim click. Use the buttons below.",
+                        on_close,
                     )),
             );
         }
@@ -148,16 +162,22 @@ impl Render for ModalA11yApp {
         if visibility.no_scroll_lock {
             let visibility = state.visibility.clone();
             let log = state.close_log.clone();
+            let on_close: OverlayCloseCallback = Arc::new(move |reason, _w, cx| {
+                log.update(cx, |log, _| log.push(*reason));
+                visibility.update(cx, |v, _| v.no_scroll_lock = false);
+                cx.refresh_windows();
+            });
+            let on_close_for_overlay = on_close.clone();
             root = root.child(
                 overlay("a11y:overlay:no-scroll")
                     .open(true)
                     .lock_scroll(false)
-                    .on_close(move |reason, _w, cx| {
-                        log.update(cx, |log, _| log.push(*reason));
-                        visibility.update(cx, |v, _| v.no_scroll_lock = false);
-                        cx.refresh_windows();
-                    })
-                    .child(build_standard_modal("No-scroll-lock modal", "Same as standard but does not lock body scroll. The user can still scroll the page behind the modal.")),
+                    .on_close(move |reason, w, cx| on_close_for_overlay(reason, w, cx))
+                    .child(build_standard_modal(
+                        "No-scroll-lock modal",
+                        "Same as standard but does not lock body scroll. The user can still scroll the page behind the modal.",
+                        on_close,
+                    )),
             );
         }
 
@@ -165,12 +185,24 @@ impl Render for ModalA11yApp {
     }
 }
 
-fn build_standard_modal(title: &str, body: &str) -> gpui::AnyElement {
+fn build_standard_modal(
+    title: &str,
+    body: &str,
+    on_close: OverlayCloseCallback,
+) -> gpui::AnyElement {
     let title = title.to_string();
     let body = body.to_string();
     let modal_id = format!("a11y:modal:{}", title);
     let cancel_id = format!("a11y:modal:{}:cancel", title);
     let ok_id = format!("a11y:modal:{}:ok", title);
+    // Each button gets its own clone of the callback so we can
+    // route through the same `on_close` (with
+    // `OverlayCloseReason::Programmatic`) that the overlay uses
+    // for scrim click and Esc. This way the close log records
+    // "button" for button dismisses, and the visibility flag is
+    // cleared through one place.
+    let on_close_cancel = on_close.clone();
+    let on_close_ok = on_close;
     modal()
         .id(modal_id)
         .title(title.clone())
@@ -179,10 +211,18 @@ fn build_standard_modal(title: &str, body: &str) -> gpui::AnyElement {
         .actions(modal_actions_row(
             yororen_ui::i18n::TextDirection::Ltr,
             [
-                button(cancel_id).child("Cancel").into_any_element(),
+                button(cancel_id)
+                    .child("Cancel")
+                    .on_click(move |_ev, w, cx| {
+                        on_close_cancel(&OverlayCloseReason::Programmatic, w, cx);
+                    })
+                    .into_any_element(),
                 button(ok_id)
                     .variant(ActionVariantKind::Primary)
                     .child("OK")
+                    .on_click(move |_ev, w, cx| {
+                        on_close_ok(&OverlayCloseReason::Programmatic, w, cx);
+                    })
                     .into_any_element(),
             ],
         ))
@@ -197,7 +237,9 @@ mod tests {
 
     #[test]
     fn build_standard_modal_returns_any_element() {
-        let _: gpui::AnyElement = build_standard_modal("t", "b");
+        let on_close: OverlayCloseCallback =
+            Arc::new(|_reason, _w, _cx| {});
+        let _: gpui::AnyElement = build_standard_modal("t", "b", on_close);
     }
 
     #[test]
