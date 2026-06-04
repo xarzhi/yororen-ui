@@ -153,10 +153,6 @@ impl Slider {
         self
     }
 
-    pub fn key(self, key: impl Into<ElementId>) -> Self {
-        self.id(key)
-    }
-
     pub fn range(mut self, min: f32, max: f32) -> Self {
         assert!(
             min < max,

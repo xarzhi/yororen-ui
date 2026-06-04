@@ -114,10 +114,6 @@ impl Popover {
         (self.element_id.clone(), suffix.to_string()).into()
     }
 
-    pub fn key(self, key: impl Into<ElementId>) -> Self {
-        self.id(key)
-    }
-
     pub fn open(mut self, open: bool) -> Self {
         self.open = open;
         self

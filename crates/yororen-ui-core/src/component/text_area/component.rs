@@ -58,10 +58,6 @@ impl TextArea {
         self
     }
 
-    pub fn key(self, key: impl Into<ElementId>) -> Self {
-        self.id(key)
-    }
-
     pub fn placeholder(mut self, text: impl Into<SharedString>) -> Self {
         self.placeholder = text.into();
         self

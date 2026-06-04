@@ -78,11 +78,6 @@ impl Toast {
         self
     }
 
-    /// Alias for `id(...)`. Use `key(...)` when you want to emphasize state identity.
-    pub fn key(self, key: impl Into<ElementId>) -> Self {
-        self.id(key)
-    }
-
     /// Set the toast message.
     pub fn message(mut self, message: impl Into<SharedString>) -> Self {
         self.message = Some(message.into());

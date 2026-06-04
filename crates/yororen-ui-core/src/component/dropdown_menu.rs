@@ -119,10 +119,6 @@ impl DropdownMenu {
         (self.element_id.clone(), suffix.to_string()).into()
     }
 
-    pub fn key(self, key: impl Into<ElementId>) -> Self {
-        self.id(key)
-    }
-
     pub fn label(mut self, label: impl Into<SharedString>) -> Self {
         self.label = label.into();
         self

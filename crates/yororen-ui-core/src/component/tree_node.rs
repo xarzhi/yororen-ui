@@ -54,10 +54,6 @@ impl TreeNodeComponent {
         self
     }
 
-    pub fn key(self, key: impl Into<ElementId>) -> Self {
-        self.id(key)
-    }
-
     pub fn node(mut self, node: FlatTreeNode) -> Self {
         self.node = Some(node);
         self

@@ -38,11 +38,6 @@ impl VirtualRow {
         }
     }
 
-    /// Provide a stable per-item key.
-    pub fn key(self, key: impl Into<ElementId>) -> Self {
-        self.id(key)
-    }
-
     /// Set the element id (internal use).
     fn id(mut self, id: impl Into<ElementId>) -> Self {
         self.key = Some(id.into());
@@ -64,7 +59,7 @@ impl VirtualRow {
 
 /// Convenience constructor.
 pub fn virtual_row(key: impl Into<ElementId>) -> VirtualRow {
-    VirtualRow::new().key(key)
+    VirtualRow::new().id(key)
 }
 
 impl ParentElement for VirtualRow {

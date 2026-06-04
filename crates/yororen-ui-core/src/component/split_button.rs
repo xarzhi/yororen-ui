@@ -87,11 +87,6 @@ impl SplitButton {
         self
     }
 
-    /// Alias for `id(...)`. Use `key(...)` when you want to emphasize state identity.
-    pub fn key(self, key: impl Into<ElementId>) -> Self {
-        self.id(key)
-    }
-
     pub fn label(mut self, label: impl Into<String>) -> Self {
         self.label = label.into();
         self

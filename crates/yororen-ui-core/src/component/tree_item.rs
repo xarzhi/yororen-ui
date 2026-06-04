@@ -79,10 +79,6 @@ impl TreeItem {
         self
     }
 
-    pub fn key(self, key: impl Into<ElementId>) -> Self {
-        self.id(key)
-    }
-
     pub fn depth(mut self, depth: usize) -> Self {
         self.depth = depth;
         self

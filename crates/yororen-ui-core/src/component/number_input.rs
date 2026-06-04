@@ -74,11 +74,6 @@ impl NumberInput {
         self
     }
 
-    /// Alias for `id(...)`. Use `key(...)` when you want to emphasize state identity.
-    pub fn key(self, key: impl Into<ElementId>) -> Self {
-        self.id(key)
-    }
-
     pub fn value(mut self, value: f64) -> Self {
         self.value = Some(value);
         self

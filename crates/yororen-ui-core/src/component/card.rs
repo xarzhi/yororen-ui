@@ -48,11 +48,6 @@ impl Card {
         self
     }
 
-    /// Alias for `id(...)`. Use `key(...)` when you want to emphasize state identity.
-    pub fn key(self, key: impl Into<ElementId>) -> Self {
-        self.id(key)
-    }
-
     /// Override the card background fill.
     ///
     /// Prefer passing a color with an alpha (e.g. `theme.surface.raised.alpha(0.7)`) instead of
