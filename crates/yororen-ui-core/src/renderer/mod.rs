@@ -7,6 +7,7 @@ pub mod button;
 pub mod card;
 pub mod checkbox;
 pub mod combo_box;
+pub mod component_renderer;
 pub mod disclosure;
 pub mod divider;
 pub mod dropdown_menu;
@@ -15,7 +16,6 @@ pub mod file_path_input;
 pub mod focus_ring;
 pub mod form;
 pub mod heading;
-pub mod icon;
 pub mod icon_button;
 pub mod keybinding_input;
 pub mod label;
@@ -50,6 +50,7 @@ pub use button::{ButtonRenderState, ButtonRenderer, TokenButtonRenderer};
 pub use card::{CardRenderState, CardRenderer, TokenCardRenderer};
 pub use checkbox::{CheckboxRenderState, CheckboxRenderer, TokenCheckboxRenderer};
 pub use combo_box::{ComboBoxRenderState, ComboBoxRenderer, TokenComboBoxRenderer};
+pub use component_renderer::{ComponentRenderer, RenderState};
 pub use disclosure::{DisclosureRenderState, DisclosureRenderer, TokenDisclosureRenderer};
 pub use divider::{DividerRenderState, DividerRenderer, TokenDividerRenderer};
 pub use dropdown_menu::{DropdownMenuRenderState, DropdownMenuRenderer, TokenDropdownMenuRenderer};
@@ -60,7 +61,6 @@ pub use file_path_input::{
 pub use focus_ring::{FocusRingRenderState, FocusRingRenderer, TokenFocusRingRenderer};
 pub use form::{FormRenderState, FormRenderer, TokenFormRenderer};
 pub use heading::{HeadingRenderState, HeadingRenderer, TokenHeadingRenderer};
-pub use icon::{IconRenderState, IconRenderer, IconSizePreset, TokenIconRenderer};
 pub use icon_button::{IconButtonRenderState, IconButtonRenderer, TokenIconButtonRenderer};
 pub use keybinding_input::{
     KeybindingInputRenderState, KeybindingInputRenderer, TokenKeybindingInputRenderer,

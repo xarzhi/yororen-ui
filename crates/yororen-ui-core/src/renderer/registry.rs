@@ -18,7 +18,6 @@ use super::file_path_input::{FilePathInputRenderer, TokenFilePathInputRenderer};
 use super::focus_ring::{FocusRingRenderer, TokenFocusRingRenderer};
 use super::form::{FormRenderer, TokenFormRenderer};
 use super::heading::{HeadingRenderer, TokenHeadingRenderer};
-use super::icon::{IconRenderer, TokenIconRenderer};
 use super::icon_button::{IconButtonRenderer, TokenIconButtonRenderer};
 use super::keybinding_input::{KeybindingInputRenderer, TokenKeybindingInputRenderer};
 use super::label::{LabelRenderer, TokenLabelRenderer};
@@ -84,7 +83,6 @@ pub struct RendererRegistry {
     pub keybinding_input: Arc<dyn KeybindingInputRenderer>,
     pub split_button: Arc<dyn SplitButtonRenderer>,
     pub empty_state: Arc<dyn EmptyStateRenderer>,
-    pub icon: Arc<dyn IconRenderer>,
 }
 
 impl std::fmt::Debug for RendererRegistry {
@@ -142,7 +140,6 @@ impl RendererRegistry {
             keybinding_input: Arc::new(TokenKeybindingInputRenderer),
             split_button: Arc::new(TokenSplitButtonRenderer),
             empty_state: Arc::new(TokenEmptyStateRenderer),
-            icon: Arc::new(TokenIconRenderer),
         }
     }
 
@@ -250,10 +247,6 @@ impl RendererRegistry {
         self.list_item = r;
         self
     }
-    pub fn with_icon(mut self, r: Arc<dyn IconRenderer>) -> Self {
-        self.icon = r;
-        self
-    }
     pub fn with_text_area(mut self, r: Arc<dyn TextAreaRenderer>) -> Self {
         self.text_area = r;
         self
@@ -301,5 +294,42 @@ impl RendererRegistry {
     pub fn with_empty_state(mut self, r: Arc<dyn EmptyStateRenderer>) -> Self {
         self.empty_state = r;
         self
+    }
+
+    /// Generic component renderer setter (P0-4).
+    ///
+    /// Lets a theme package install a renderer for a render-state
+    /// type without writing a `with_<x>` setter per component. The
+    /// 40+ `with_<x>` setters above remain as thin wrappers for
+    /// backward-compat; new code can use this entry point.
+    ///
+    /// The renderer's render-state type is the key. The registry
+    /// downcasts `Arc<dyn Any>` back to `Arc<dyn ComponentRenderer<S>>`
+    /// when components read it. Note: this is currently a
+    /// documentation hook; the actual HashMap-based storage
+    /// migration is staged for v0.4.1 — see ARCHITECTURE_GUIDE §
+    /// "P0-4".
+    pub fn with_component<S, R>(self, _renderer: Arc<R>) -> Self
+    where
+        S: super::component_renderer::RenderState,
+        R: super::component_renderer::ComponentRenderer<S> + 'static,
+    {
+        // Stage 1: type-system only. Stage 2 (v0.4.1) will swap the
+        // 40+ named `Arc<dyn …>` fields for a `HashMap<TypeId, Arc<dyn
+        // Any>>` and route reads through it.
+        self
+    }
+
+    /// Generic renderer lookup (P0-4 stage 1).
+    ///
+    /// Returns `None` until the storage migration is complete; the
+    /// per-component `Arc<dyn …Renderer>` fields are still the
+    /// source of truth. The method exists so call-sites can adopt
+    /// the new API in advance and migrate to the HashMap-based
+    /// lookup transparently when stage 2 ships.
+    pub fn get_component<S: super::component_renderer::RenderState>(
+        &self,
+    ) -> Option<Arc<dyn super::component_renderer::ComponentRenderer<S>>> {
+        None
     }
 }
