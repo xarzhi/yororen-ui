@@ -11,6 +11,7 @@ use super::actions::*;
 use super::element::PasswordLineElement;
 use super::state::{PasswordInputHandler, PasswordInputState};
 use crate::action_handler;
+use crate::i18n::PlaceholderContext;
 use crate::theme::ActiveTheme;
 
 #[derive(gpui::IntoElement)]
@@ -162,7 +163,9 @@ impl RenderOnce for PasswordInput {
 
         let state = window.use_keyed_state(id.clone(), cx, |_, cx| PasswordInputState::new(cx));
         let focus_handle = state.read(cx).focus_handle.clone();
-        let placeholder = self.placeholder;
+        let placeholder = cx
+            .placeholder(crate::i18n::PlaceholderKey::PasswordInput)
+            .unwrap_or(self.placeholder);
         state.update(cx, |state, _cx| {
             state.placeholder = placeholder;
         });

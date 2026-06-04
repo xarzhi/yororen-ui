@@ -52,6 +52,8 @@ pub enum PlaceholderKey {
     KeybindingWaiting,
     /// The "no file selected" hint shown by `file_path_input::FilePathInput`.
     FilePath,
+    /// The "enter password" hint shown by `password_input::PasswordInput`.
+    PasswordInput,
 }
 
 /// Resolves placeholder text for a given slot.
