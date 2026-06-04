@@ -155,8 +155,8 @@ impl RenderOnce for RadioGroup {
 
         let id = self.element_id;
 
-        let use_internal_state = on_change.is_none() && self.value.is_none();
-        let internal_value = use_internal_state.then(|| {
+        let is_uncontrolled = on_change.is_none() && self.value.is_none();
+        let internal_value = is_uncontrolled.then(|| {
             window.use_keyed_state(id.clone(), cx, |_window, _cx| {
                 self.options
                     .first()
@@ -165,7 +165,7 @@ impl RenderOnce for RadioGroup {
             })
         });
 
-        let selected = if use_internal_state {
+        let selected = if is_uncontrolled {
             internal_value
                 .as_ref()
                 .expect("internal state should exist")

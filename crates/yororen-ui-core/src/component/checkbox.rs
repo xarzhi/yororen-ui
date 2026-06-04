@@ -8,8 +8,8 @@ use gpui::{
 use crate::{
     animation,
     component::{
-        IconName, ToggleCallback, create_internal_state, icon, resolve_state_value_simple,
-        use_internal_state_simple,
+        IconName, ToggleCallback, create_internal_state, icon, is_uncontrolled_simple,
+        resolve_state_value_simple,
     },
     renderer::CheckboxRenderState,
     theme::ActiveTheme,
@@ -123,7 +123,7 @@ impl RenderOnce for Checkbox {
         // Use `.id()` to provide a stable ID, or a unique ID will be generated automatically.
         let id = self.element_id;
 
-        let use_internal = use_internal_state_simple(on_toggle.is_some());
+        let use_internal = is_uncontrolled_simple(on_toggle.is_some());
         let internal_checked = create_internal_state(
             window,
             cx,

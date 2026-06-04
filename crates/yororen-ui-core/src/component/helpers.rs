@@ -150,7 +150,15 @@ pub fn resolve_controlled_state<T: Clone + Default + 'static>(
     default_value
 }
 
-/// Determines whether a component should use internal state management.
+/// Determines whether a component should manage its own internal
+/// state ("uncontrolled" in React parlance).
+///
+/// Despite the previous name (`use_internal_state`), this is a
+/// **pure predicate** — it does not allocate any state, register
+/// any hook, or interact with the gpui context. Components that
+/// get back `true` from this call should then go through
+/// [`create_internal_state`] to actually allocate the keyed state
+/// entity.
 ///
 /// A component is "uncontrolled" (uses internal state) when:
 /// - No external value is provided (`value` is None)
@@ -162,23 +170,38 @@ pub fn resolve_controlled_state<T: Clone + Default + 'static>(
 ///
 /// # Returns
 /// `true` if the component should manage its own internal state.
-pub fn use_internal_state(has_value: bool, has_on_change: bool) -> bool {
+pub fn is_uncontrolled(has_value: bool, has_on_change: bool) -> bool {
     !has_value && !has_on_change
 }
 
-/// Determines whether a component should use internal state based on callback presence.
+/// Deprecated alias for [`is_uncontrolled`]. Kept so the rename
+/// doesn't break external callers during the v0.4 → v0.5 cycle.
+#[deprecated(
+    since = "0.4.1",
+    note = "Renamed to `is_uncontrolled` — the `use_` prefix wrongly suggested a hook"
+)]
+pub fn use_internal_state(has_value: bool, has_on_change: bool) -> bool {
+    is_uncontrolled(has_value, has_on_change)
+}
+
+/// Simplified predicate for components that only need to check
+/// the callback (e.g. checkbox, radio, switch, toggle_button) —
+/// they never expose an external `value` prop.
 ///
-/// This is a simplified version for components that only need to check if a callback
-/// is provided (e.g., checkbox, radio, switch, toggle_button).
-/// A component is "uncontrolled" when no callback is provided.
-///
-/// # Parameters
-/// - `has_on_change` - Whether an on_change callback is provided
-///
-/// # Returns
-/// `true` if the component should manage its own internal state.
-pub fn use_internal_state_simple(has_on_change: bool) -> bool {
+/// Returns `true` when the component is uncontrolled.
+pub fn is_uncontrolled_simple(has_on_change: bool) -> bool {
     !has_on_change
+}
+
+/// Deprecated alias for [`is_uncontrolled_simple`]. Kept so the
+/// rename doesn't break external callers during the v0.4 → v0.5
+/// cycle.
+#[deprecated(
+    since = "0.4.1",
+    note = "Renamed to `is_uncontrolled_simple` — the `use_` prefix wrongly suggested a hook"
+)]
+pub fn use_internal_state_simple(has_on_change: bool) -> bool {
+    is_uncontrolled_simple(has_on_change)
 }
 
 /// Creates a keyed state for internal value management.

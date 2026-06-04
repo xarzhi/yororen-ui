@@ -6,7 +6,7 @@ use gpui::{
 };
 
 use crate::{
-    component::{ToggleCallback, create_internal_state, use_internal_state_simple},
+    component::{ToggleCallback, create_internal_state, is_uncontrolled_simple},
     renderer::{ButtonVariant, VariantKey, resolve_custom_variant},
     theme::{ActionVariantKind, ActiveTheme},
 };
@@ -151,7 +151,7 @@ impl RenderOnce for ToggleButton {
         // Use `.id()` to provide a stable ID, or a unique ID will be generated automatically.
         let id = element_id;
 
-        let use_internal = use_internal_state_simple(on_toggle.is_some());
+        let use_internal = is_uncontrolled_simple(on_toggle.is_some());
         let internal_selected = create_internal_state(
             window,
             cx,

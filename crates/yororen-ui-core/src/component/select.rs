@@ -10,7 +10,7 @@ use crate::{
     animation::constants::duration,
     component::{
         ArrowDirection, BoundsTrackerElement, ChangeCallback, ChangeWithEventCallback, IconName,
-        compute_input_style, create_internal_state, desired_menu_left, icon, use_internal_state,
+        compute_input_style, create_internal_state, desired_menu_left, icon, is_uncontrolled,
     },
     i18n::{I18n, PlaceholderContext, PlaceholderKey, TextDirection},
     theme::ActiveTheme,
@@ -330,7 +330,7 @@ impl RenderOnce for Select {
         let direction = cx.theme().text_direction;
         let has_on_change =
             on_change.is_some() || on_change_simple.is_some() || on_change_with_event.is_some();
-        let use_internal = use_internal_state(self.value.is_some(), has_on_change);
+        let use_internal = is_uncontrolled(self.value.is_some(), has_on_change);
         let default_value = options
             .first()
             .and_then(|opt| opt.value.clone())

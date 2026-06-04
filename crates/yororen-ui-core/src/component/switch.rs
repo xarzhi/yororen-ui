@@ -8,8 +8,7 @@ use gpui::{
 use crate::{
     animation,
     component::{
-        ToggleCallback, create_internal_state, resolve_state_value_simple,
-        use_internal_state_simple,
+        ToggleCallback, create_internal_state, is_uncontrolled_simple, resolve_state_value_simple,
     },
     renderer::SwitchRenderState,
     theme::ActiveTheme,
@@ -123,7 +122,7 @@ impl RenderOnce for Switch {
         // Use `.id()` to provide a stable ID, or a unique ID will be generated automatically.
         let id = self.element_id;
 
-        let use_internal = use_internal_state_simple(on_toggle.is_some());
+        let use_internal = is_uncontrolled_simple(on_toggle.is_some());
         let internal_checked = create_internal_state(
             window,
             cx,
