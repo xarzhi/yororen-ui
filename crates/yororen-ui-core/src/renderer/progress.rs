@@ -1,5 +1,6 @@
 //! `ProgressBarRenderer` — the visual side of `ProgressBar`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -13,7 +14,7 @@ pub struct ProgressBarRenderState {
     pub has_custom_height: bool,
 }
 
-pub trait ProgressBarRenderer: Send + Sync {
+pub trait ProgressBarRenderer: Any + Send + Sync {
     fn track(&self, state: &ProgressBarRenderState, theme: &Theme) -> Hsla;
     fn fill(&self, state: &ProgressBarRenderState, theme: &Theme) -> Hsla;
     fn height(&self, state: &ProgressBarRenderState, theme: &Theme) -> Pixels;

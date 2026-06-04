@@ -1,5 +1,6 @@
 //! `FocusRingRenderer` — the visual side of `FocusRing`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -12,7 +13,7 @@ pub struct FocusRingRenderState {
     pub has_custom_color: bool,
 }
 
-pub trait FocusRingRenderer: Send + Sync {
+pub trait FocusRingRenderer: Any + Send + Sync {
     fn color(&self, state: &FocusRingRenderState, theme: &Theme) -> Hsla;
     fn width(&self, state: &FocusRingRenderState, theme: &Theme) -> Pixels;
 }

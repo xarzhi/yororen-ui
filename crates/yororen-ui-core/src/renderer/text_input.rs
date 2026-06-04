@@ -1,5 +1,6 @@
 //! `TextInputRenderer` — visual side of `TextInput`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -16,7 +17,7 @@ pub struct TextInputRenderState {
     pub has_custom_focus_border: bool,
 }
 
-pub trait TextInputRenderer: Send + Sync {
+pub trait TextInputRenderer: Any + Send + Sync {
     fn bg(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;

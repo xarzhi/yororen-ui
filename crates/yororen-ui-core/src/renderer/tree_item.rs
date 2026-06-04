@@ -1,5 +1,6 @@
 //! `TreeItemRenderer` — visual side of `TreeItem`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -15,7 +16,7 @@ pub struct TreeItemRenderState {
     pub is_leaf: bool,
 }
 
-pub trait TreeItemRenderer: Send + Sync {
+pub trait TreeItemRenderer: Any + Send + Sync {
     fn bg(&self, state: &TreeItemRenderState, theme: &Theme) -> Hsla;
     fn hover_bg(&self, state: &TreeItemRenderState, theme: &Theme) -> Hsla;
     fn selected_bg(&self, state: &TreeItemRenderState, theme: &Theme) -> Hsla;

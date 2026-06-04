@@ -1,5 +1,6 @@
 //! `ModalRenderer` — visual side of `Modal`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -10,7 +11,7 @@ use crate::theme::Theme;
 #[derive(Clone, Copy, Debug, Default)]
 pub struct ModalRenderState {}
 
-pub trait ModalRenderer: Send + Sync {
+pub trait ModalRenderer: Any + Send + Sync {
     fn scrim(&self, state: &ModalRenderState, theme: &Theme) -> Hsla;
     fn panel_bg(&self, state: &ModalRenderState, theme: &Theme) -> Hsla;
     fn panel_border(&self, state: &ModalRenderState, theme: &Theme) -> Hsla;

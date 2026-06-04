@@ -1,5 +1,6 @@
 //! `BadgeRenderer` — the visual side of `Badge`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{FontWeight, Hsla, Pixels};
@@ -12,7 +13,7 @@ pub struct BadgeRenderState {
     pub has_custom_tone: bool,
 }
 
-pub trait BadgeRenderer: Send + Sync {
+pub trait BadgeRenderer: Any + Send + Sync {
     fn bg(&self, state: &BadgeRenderState, theme: &Theme) -> Hsla;
     fn fg(&self, state: &BadgeRenderState, theme: &Theme) -> Hsla;
     fn padding_x(&self, state: &BadgeRenderState, theme: &Theme) -> Pixels;

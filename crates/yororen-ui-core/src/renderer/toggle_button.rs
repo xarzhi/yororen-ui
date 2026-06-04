@@ -1,5 +1,6 @@
 //! `ToggleButtonRenderer` — visual side of `ToggleButton`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -21,7 +22,7 @@ pub struct ToggleButtonRenderState {
     pub custom_style: Option<Arc<dyn VariantStyle>>,
 }
 
-pub trait ToggleButtonRenderer: Send + Sync {
+pub trait ToggleButtonRenderer: Any + Send + Sync {
     fn bg(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Hsla;
     fn fg(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Hsla;
     fn min_height(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Pixels;

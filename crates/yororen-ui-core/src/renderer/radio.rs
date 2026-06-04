@@ -1,5 +1,6 @@
 //! `RadioRenderer` — the visual side of `Radio`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -13,7 +14,7 @@ pub struct RadioRenderState {
     pub has_custom_tone: bool,
 }
 
-pub trait RadioRenderer: Send + Sync {
+pub trait RadioRenderer: Any + Send + Sync {
     fn ring_size(&self, state: &RadioRenderState, theme: &Theme) -> Pixels;
     fn dot_size(&self, state: &RadioRenderState, theme: &Theme) -> Pixels;
     fn ring_bg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;

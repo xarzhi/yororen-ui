@@ -1,5 +1,6 @@
 //! `SelectRenderer` — visual side of `Select`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -14,7 +15,7 @@ pub struct SelectRenderState {
     pub has_value: bool,
 }
 
-pub trait SelectRenderer: Send + Sync {
+pub trait SelectRenderer: Any + Send + Sync {
     fn bg(&self, state: &SelectRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &SelectRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &SelectRenderState, theme: &Theme) -> Hsla;

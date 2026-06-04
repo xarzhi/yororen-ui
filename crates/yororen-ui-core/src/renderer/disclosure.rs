@@ -1,5 +1,6 @@
 //! `DisclosureRenderer` — visual side of `Disclosure`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -11,7 +12,7 @@ pub struct DisclosureRenderState {
     pub open: bool,
 }
 
-pub trait DisclosureRenderer: Send + Sync {
+pub trait DisclosureRenderer: Any + Send + Sync {
     fn trigger_bg(&self, state: &DisclosureRenderState, theme: &Theme) -> Hsla;
     fn trigger_fg(&self, state: &DisclosureRenderState, theme: &Theme) -> Hsla;
     fn trigger_hover_bg(&self, state: &DisclosureRenderState, theme: &Theme) -> Hsla;

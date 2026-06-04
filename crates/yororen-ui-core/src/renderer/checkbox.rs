@@ -1,5 +1,6 @@
 //! `CheckboxRenderer` — the visual side of `Checkbox`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -13,7 +14,7 @@ pub struct CheckboxRenderState {
     pub has_custom_tone: bool,
 }
 
-pub trait CheckboxRenderer: Send + Sync {
+pub trait CheckboxRenderer: Any + Send + Sync {
     fn box_size(&self, state: &CheckboxRenderState, theme: &Theme) -> Pixels;
     fn check_size(&self, state: &CheckboxRenderState, theme: &Theme) -> Pixels;
     fn box_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;

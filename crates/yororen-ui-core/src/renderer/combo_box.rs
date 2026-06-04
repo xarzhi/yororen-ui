@@ -1,5 +1,6 @@
 //! `ComboBoxRenderer` — visual side of `ComboBox`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -14,7 +15,7 @@ pub struct ComboBoxRenderState {
     pub has_value: bool,
 }
 
-pub trait ComboBoxRenderer: Send + Sync {
+pub trait ComboBoxRenderer: Any + Send + Sync {
     fn bg(&self, state: &ComboBoxRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &ComboBoxRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &ComboBoxRenderState, theme: &Theme) -> Hsla;

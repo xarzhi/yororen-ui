@@ -5,7 +5,25 @@
 //! The fields are intentionally minimal: a theme package can always
 //! reach into the underlying `Theme` for richer configuration.
 
+use std::any::Any;
+
 use gpui::{Hsla, Pixels};
+
+/// Marker trait that every component's `XxxRenderState` implements.
+///
+/// Used as the keying type in `RendererRegistry`'s internal `HashMap`:
+/// the registry stores renderers under `TypeId::of::<S>()`, and every
+/// render path that wants its renderer looks it up by `S`.
+///
+/// The blanket impl below makes every `'static + Send + Sync` type a
+/// `RenderState` automatically — so the 38 `XxxRenderState` structs
+/// scattered across `renderer/<component>.rs` don't need a hand-written
+/// `impl RenderState for XxxRenderState {}` each. They are composed of
+/// primitives + `Arc<dyn VariantStyle>` and therefore already satisfy
+/// the bounds.
+pub trait RenderState: Any + 'static + Send + Sync {}
+
+impl<T> RenderState for T where T: Any + 'static + Send + Sync {}
 
 /// Four-sided edges, with each side independent.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]

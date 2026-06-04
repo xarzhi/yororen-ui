@@ -1,5 +1,6 @@
 //! `SearchInputRenderer` — visual side of `SearchInput`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -13,7 +14,7 @@ pub struct SearchInputRenderState {
     pub focused: bool,
 }
 
-pub trait SearchInputRenderer: Send + Sync {
+pub trait SearchInputRenderer: Any + Send + Sync {
     fn bg(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;

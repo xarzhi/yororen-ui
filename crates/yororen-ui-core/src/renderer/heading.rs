@@ -1,5 +1,6 @@
 //! `HeadingRenderer` — the visual side of `Heading`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{FontWeight, Hsla, Pixels};
@@ -12,7 +13,7 @@ pub struct HeadingRenderState {
     pub level: HeadingLevel,
 }
 
-pub trait HeadingRenderer: Send + Sync {
+pub trait HeadingRenderer: Any + Send + Sync {
     fn size(&self, state: &HeadingRenderState, theme: &Theme) -> Pixels;
     fn weight(&self, state: &HeadingRenderState, theme: &Theme) -> FontWeight;
     fn color(&self, state: &HeadingRenderState, theme: &Theme) -> Hsla;

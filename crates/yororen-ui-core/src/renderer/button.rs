@@ -3,6 +3,7 @@
 //! One trait, one component. The other 37 component renderer
 //! traits follow the same shape.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -36,7 +37,7 @@ pub struct ButtonRenderState {
 ///
 /// Default: [`TokenButtonRenderer`]. Theme packages override this through
 /// `Theme.renderers.button` to ship a "skin".
-pub trait ButtonRenderer: Send + Sync {
+pub trait ButtonRenderer: Any + Send + Sync {
     fn bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla;
     fn fg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla;
     fn padding(&self, state: &ButtonRenderState, theme: &Theme) -> Edges<Pixels>;

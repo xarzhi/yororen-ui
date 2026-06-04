@@ -1,5 +1,6 @@
 //! `DividerRenderer` — the visual side of `Divider`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -11,7 +12,7 @@ pub struct DividerRenderState {
     pub vertical: bool,
 }
 
-pub trait DividerRenderer: Send + Sync {
+pub trait DividerRenderer: Any + Send + Sync {
     fn color(&self, state: &DividerRenderState, theme: &Theme) -> Hsla;
     fn thickness(&self, state: &DividerRenderState, theme: &Theme) -> Pixels;
 }

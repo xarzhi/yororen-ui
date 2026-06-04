@@ -1,5 +1,6 @@
 //! `DropdownMenuRenderer` — visual side of `DropdownMenu`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -11,7 +12,7 @@ pub struct DropdownMenuRenderState {
     pub open: bool,
 }
 
-pub trait DropdownMenuRenderer: Send + Sync {
+pub trait DropdownMenuRenderer: Any + Send + Sync {
     fn trigger_bg(&self, state: &DropdownMenuRenderState, theme: &Theme) -> Hsla;
     fn trigger_hover_bg(&self, state: &DropdownMenuRenderState, theme: &Theme) -> Hsla;
     fn trigger_fg(&self, state: &DropdownMenuRenderState, theme: &Theme) -> Hsla;

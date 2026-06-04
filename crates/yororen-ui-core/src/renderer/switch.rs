@@ -1,5 +1,6 @@
 //! `SwitchRenderer` — the visual side of `Switch`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -13,7 +14,7 @@ pub struct SwitchRenderState {
     pub has_custom_tone: bool,
 }
 
-pub trait SwitchRenderer: Send + Sync {
+pub trait SwitchRenderer: Any + Send + Sync {
     fn track_w(&self, state: &SwitchRenderState, theme: &Theme) -> Pixels;
     fn track_h(&self, state: &SwitchRenderState, theme: &Theme) -> Pixels;
     fn knob_size(&self, state: &SwitchRenderState, theme: &Theme) -> Pixels;

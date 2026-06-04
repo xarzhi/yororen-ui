@@ -1,5 +1,6 @@
 //! `FilePathInputRenderer` — visual side of `FilePathInput`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -13,7 +14,7 @@ pub struct FilePathInputRenderState {
     pub focused: bool,
 }
 
-pub trait FilePathInputRenderer: Send + Sync {
+pub trait FilePathInputRenderer: Any + Send + Sync {
     fn bg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;

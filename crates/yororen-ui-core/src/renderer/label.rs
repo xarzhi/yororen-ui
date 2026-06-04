@@ -1,5 +1,6 @@
 //! `LabelRenderer` — the visual side of `Label`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{FontWeight, Hsla, SharedString};
@@ -14,7 +15,7 @@ pub struct LabelRenderState {
     pub inherit_color: bool,
 }
 
-pub trait LabelRenderer: Send + Sync {
+pub trait LabelRenderer: Any + Send + Sync {
     fn color(&self, state: &LabelRenderState, theme: &Theme) -> Hsla;
     fn strong_weight(&self, state: &LabelRenderState, theme: &Theme) -> FontWeight;
     fn family_mono(&self, state: &LabelRenderState, theme: &Theme) -> SharedString;

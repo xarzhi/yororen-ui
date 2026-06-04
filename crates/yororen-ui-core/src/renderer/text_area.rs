@@ -1,5 +1,6 @@
 //! `TextAreaRenderer` — visual side of `TextArea`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -14,7 +15,7 @@ pub struct TextAreaRenderState {
     pub has_custom_bg: bool,
 }
 
-pub trait TextAreaRenderer: Send + Sync {
+pub trait TextAreaRenderer: Any + Send + Sync {
     fn bg(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;

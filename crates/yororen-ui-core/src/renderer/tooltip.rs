@@ -1,5 +1,6 @@
 //! `TooltipRenderer` — the visual side of `Tooltip`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -13,7 +14,7 @@ pub struct TooltipRenderState {
     pub has_custom_fg: bool,
 }
 
-pub trait TooltipRenderer: Send + Sync {
+pub trait TooltipRenderer: Any + Send + Sync {
     fn bg(&self, state: &TooltipRenderState, theme: &Theme) -> Hsla;
     fn fg(&self, state: &TooltipRenderState, theme: &Theme) -> Hsla;
     fn padding(&self, state: &TooltipRenderState, theme: &Theme) -> Edges<Pixels>;

@@ -1,5 +1,6 @@
 //! `IconButtonRenderer` — visual side of `IconButton`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -19,7 +20,7 @@ pub struct IconButtonRenderState {
     pub custom_style: Option<Arc<dyn VariantStyle>>,
 }
 
-pub trait IconButtonRenderer: Send + Sync {
+pub trait IconButtonRenderer: Any + Send + Sync {
     fn bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla;
     fn hover_bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla;
     fn size(&self, state: &IconButtonRenderState, theme: &Theme) -> Pixels;

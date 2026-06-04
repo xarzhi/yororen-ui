@@ -1,5 +1,6 @@
 //! `PopoverRenderer` — visual side of `Popover`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -9,7 +10,7 @@ use crate::theme::Theme;
 #[derive(Clone, Copy, Debug, Default)]
 pub struct PopoverRenderState {}
 
-pub trait PopoverRenderer: Send + Sync {
+pub trait PopoverRenderer: Any + Send + Sync {
     fn bg(&self, state: &PopoverRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &PopoverRenderState, theme: &Theme) -> Hsla;
     fn shadow_alpha(&self, state: &PopoverRenderState, theme: &Theme) -> f32;

@@ -6,6 +6,7 @@
 //! other dialog components compose. It carries a renderer trait
 //! that themes override via the `RendererRegistry`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -26,7 +27,7 @@ pub struct PanelRenderState {
     pub has_custom_padding: bool,
 }
 
-pub trait PanelRenderer: Send + Sync {
+pub trait PanelRenderer: Any + Send + Sync {
     fn bg(&self, state: &PanelRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &PanelRenderState, theme: &Theme) -> Hsla;
     fn padding(&self, state: &PanelRenderState, theme: &Theme) -> Edges<Pixels>;

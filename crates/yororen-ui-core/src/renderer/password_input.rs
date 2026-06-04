@@ -1,5 +1,6 @@
 //! `PasswordInputRenderer` — visual side of `PasswordInput`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -13,7 +14,7 @@ pub struct PasswordInputRenderState {
     pub focused: bool,
 }
 
-pub trait PasswordInputRenderer: Send + Sync {
+pub trait PasswordInputRenderer: Any + Send + Sync {
     fn bg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;

@@ -1,5 +1,6 @@
 //! `CardRenderer` — visual side of `Card`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -12,7 +13,7 @@ pub struct CardRenderState {
     pub has_custom_bg: bool,
 }
 
-pub trait CardRenderer: Send + Sync {
+pub trait CardRenderer: Any + Send + Sync {
     fn bg(&self, state: &CardRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &CardRenderState, theme: &Theme) -> Hsla;
     fn padding(&self, state: &CardRenderState, theme: &Theme) -> Edges<Pixels>;

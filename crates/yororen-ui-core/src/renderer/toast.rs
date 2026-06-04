@@ -1,5 +1,6 @@
 //! `ToastRenderer` — visual side of `Toast`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -13,7 +14,7 @@ pub struct ToastRenderState {
     pub has_custom_color: bool,
 }
 
-pub trait ToastRenderer: Send + Sync {
+pub trait ToastRenderer: Any + Send + Sync {
     fn bg(&self, state: &ToastRenderState, theme: &Theme) -> Hsla;
     fn fg(&self, state: &ToastRenderState, theme: &Theme) -> Hsla;
     fn padding(&self, state: &ToastRenderState, theme: &Theme) -> Edges<Pixels>;

@@ -1,5 +1,6 @@
 //! `NumberInputRenderer` — visual side of `NumberInput`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -13,7 +14,7 @@ pub struct NumberInputRenderState {
     pub focused: bool,
 }
 
-pub trait NumberInputRenderer: Send + Sync {
+pub trait NumberInputRenderer: Any + Send + Sync {
     fn bg(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;

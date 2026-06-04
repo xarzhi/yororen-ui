@@ -1,5 +1,6 @@
 //! `AvatarRenderer` — the visual side of `Avatar`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -13,7 +14,7 @@ pub struct AvatarRenderState {
     pub is_circle: bool,
 }
 
-pub trait AvatarRenderer: Send + Sync {
+pub trait AvatarRenderer: Any + Send + Sync {
     fn default_bg(&self, state: &AvatarRenderState, theme: &Theme) -> Hsla;
     fn border_radius(&self, state: &AvatarRenderState, theme: &Theme) -> Pixels;
     fn status_dot_size(&self, state: &AvatarRenderState, theme: &Theme) -> Pixels;

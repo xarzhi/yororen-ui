@@ -1,5 +1,6 @@
 //! `ListItemRenderer` — visual side of `ListItem`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -14,7 +15,7 @@ pub struct ListItemRenderState {
     pub hovered: bool,
 }
 
-pub trait ListItemRenderer: Send + Sync {
+pub trait ListItemRenderer: Any + Send + Sync {
     fn bg(&self, state: &ListItemRenderState, theme: &Theme) -> Hsla;
     fn hover_bg(&self, state: &ListItemRenderState, theme: &Theme) -> Hsla;
     fn selected_bg(&self, state: &ListItemRenderState, theme: &Theme) -> Hsla;

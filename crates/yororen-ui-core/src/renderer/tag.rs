@@ -1,5 +1,6 @@
 //! `TagRenderer` — the visual side of `Tag`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{FontWeight, Hsla, Pixels};
@@ -13,7 +14,7 @@ pub struct TagRenderState {
     pub closable: bool,
 }
 
-pub trait TagRenderer: Send + Sync {
+pub trait TagRenderer: Any + Send + Sync {
     fn bg(&self, state: &TagRenderState, theme: &Theme) -> Hsla;
     fn fg(&self, state: &TagRenderState, theme: &Theme) -> Hsla;
     fn min_height(&self, state: &TagRenderState, theme: &Theme) -> Pixels;

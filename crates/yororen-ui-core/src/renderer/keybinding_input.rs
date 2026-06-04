@@ -1,5 +1,6 @@
 //! `KeybindingInputRenderer` — visual side of `KeybindingInput`.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -13,7 +14,7 @@ pub struct KeybindingInputRenderState {
     pub disabled: bool,
 }
 
-pub trait KeybindingInputRenderer: Send + Sync {
+pub trait KeybindingInputRenderer: Any + Send + Sync {
     fn bg(&self, state: &KeybindingInputRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &KeybindingInputRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &KeybindingInputRenderState, theme: &Theme) -> Hsla;
