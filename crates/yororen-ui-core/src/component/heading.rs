@@ -1,3 +1,4 @@
+use crate::renderer::HeadingRenderer;
 use gpui::{
     Div, ElementId, InteractiveElement, IntoElement, ParentElement, RenderOnce, SharedString,
     Styled, div, prelude::FluentBuilder,
@@ -63,7 +64,7 @@ impl RenderOnce for Heading {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let direction = cx.theme().text_direction;
         let theme = cx.theme();
-        let r = &theme.renderers.heading;
+        let r: &dyn HeadingRenderer = &**theme.renderers.get_heading().expect("HeadingRenderer registered");
         let state = HeadingRenderState { level: self.level };
         let size = r.size(&state, theme);
         let weight = r.weight(&state, theme);

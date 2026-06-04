@@ -1,3 +1,4 @@
+use crate::renderer::DividerRenderer;
 use gpui::{
     Div, ElementId, InteractiveElement, IntoElement, ParentElement, RenderOnce, Styled, div,
 };
@@ -59,7 +60,7 @@ impl RenderOnce for Divider {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let element_id = self.element_id;
         let theme = cx.theme();
-        let r = &theme.renderers.divider;
+        let r: &dyn DividerRenderer = &**theme.renderers.get_divider().expect("DividerRenderer registered");
         let state = DividerRenderState {
             vertical: self.vertical,
         };

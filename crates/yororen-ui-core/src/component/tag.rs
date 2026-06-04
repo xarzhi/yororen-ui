@@ -1,3 +1,4 @@
+use crate::renderer::TagRenderer;
 use gpui::{
     ClickEvent, Div, Hsla, InteractiveElement, IntoElement, ParentElement, RenderOnce,
     StatefulInteractiveElement, Styled, div, prelude::FluentBuilder,
@@ -79,7 +80,7 @@ impl RenderOnce for Tag {
         let user_tone = self.tone;
 
         let theme = cx.theme();
-        let r = &theme.renderers.tag;
+        let r: &dyn TagRenderer = &**theme.renderers.get_tag().expect("TagRenderer registered");
         let state = TagRenderState {
             selected: self.selected,
             has_custom_tone: user_tone.is_some(),

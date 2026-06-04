@@ -1,3 +1,4 @@
+use crate::renderer::FocusRingRenderer;
 use gpui::{
     AbsoluteLength, Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement,
     RenderOnce, StatefulInteractiveElement, Styled, div, prelude::FluentBuilder,
@@ -77,7 +78,7 @@ impl RenderOnce for FocusRing {
         let id = self.element_id.clone();
 
         let theme = cx.theme();
-        let r = &theme.renderers.focus_ring;
+        let r: &dyn FocusRingRenderer = &**theme.renderers.get_focus_ring().expect("FocusRingRenderer registered");
         let state = FocusRingRenderState {
             has_custom_color: user_color.is_some(),
         };

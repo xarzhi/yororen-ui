@@ -416,9 +416,9 @@ impl Render for HeadlessDemoApp {
                 .on_close(move |w, cx| (close)(w, cx))
         };
 
-        let modal_scrim = theme
-            .renderers
-            .modal
+        let modal_renderer: &dyn yororen_ui::renderer::ModalRenderer =
+            &**theme.renderers.get_modal().expect("ModalRenderer registered");
+        let modal_scrim = modal_renderer
             .scrim(&yororen_ui::renderer::ModalRenderState::default(), theme);
         let close_modal_for_scrim = close_modal.clone();
 

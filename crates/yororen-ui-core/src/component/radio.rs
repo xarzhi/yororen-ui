@@ -1,3 +1,4 @@
+use crate::renderer::RadioRenderer;
 use std::sync::Arc;
 
 use gpui::{
@@ -136,7 +137,7 @@ impl RenderOnce for Radio {
             resolve_state_value_simple(explicit_checked, &internal_checked, cx, use_internal);
 
         let theme = cx.theme();
-        let r = &theme.renderers.radio;
+        let r: &dyn RadioRenderer = &**theme.renderers.get_radio().expect("RadioRenderer registered");
         let state = RadioRenderState {
             checked,
             disabled,

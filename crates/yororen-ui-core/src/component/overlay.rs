@@ -238,10 +238,9 @@ impl RenderOnce for Overlay {
         };
 
         let theme = cx.theme();
-        let scrim_color = theme
-            .renderers
-            .modal
-            .scrim(&Default::default(), theme.as_ref());
+        let r: &dyn crate::renderer::ModalRenderer =
+            &**theme.renderers.get_modal().expect("ModalRenderer registered");
+        let scrim_color = r.scrim(&Default::default(), theme.as_ref());
 
         let dismiss_scrim = self.dismiss_on_scrim;
         let dismiss_esc = self.dismiss_on_escape;

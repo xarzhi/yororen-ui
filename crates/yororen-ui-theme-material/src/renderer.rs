@@ -946,7 +946,10 @@ mod tests {
         let reg = material_registry();
         let theme = yororen_ui_theme_system::light();
         let state = test_state();
-        let r1 = reg.button.border_radius(&state, &theme);
+        let r1 = reg
+            .get_button()
+            .expect("ButtonRenderer registered")
+            .border_radius(&state, &theme);
         let r2 = MaterialButtonRenderer.border_radius(&state, &theme);
         assert_eq!(r1, r2);
     }

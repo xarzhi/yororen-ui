@@ -288,8 +288,14 @@ mod tests {
             variant: yororen_ui_core::theme::ActionVariantKind::Primary,
             ..Default::default()
         };
-        let cat_bg = reg.button.bg(&state, &cat_theme);
-        let sys_bg = reg.button.bg(&state, &sys_theme);
+        let cat_bg = reg
+            .get_button()
+            .expect("ButtonRenderer registered")
+            .bg(&state, &cat_theme);
+        let sys_bg = reg
+            .get_button()
+            .expect("ButtonRenderer registered")
+            .bg(&state, &sys_theme);
         assert_ne!(cat_bg, sys_bg);
     }
 }

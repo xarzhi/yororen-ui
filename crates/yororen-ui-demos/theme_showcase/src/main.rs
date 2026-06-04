@@ -177,7 +177,7 @@ mod tests {
             .renderers
             .label
             .color(&LabelRenderState::default(), &theme);
-        let _ = theme.renderers.heading.size(
+        let _ = theme.renderers.get_heading().expect("HeadingRenderer registered").size(
             &HeadingRenderState {
                 level: unsafe { std::mem::zeroed() },
             },
@@ -195,7 +195,7 @@ mod tests {
             .renderers
             .badge
             .bg(&BadgeRenderState::default(), &theme);
-        let _ = theme.renderers.tag.bg(&TagRenderState::default(), &theme);
+        let _ = theme.renderers.get_tag().expect("TagRenderer registered").bg(&TagRenderState::default(), &theme);
         let _ = theme
             .renderers
             .progress_bar
@@ -280,7 +280,7 @@ mod tests {
             .renderers
             .notification
             .bg(&NotificationRenderState::default(), &theme);
-        let _ = theme.renderers.card.bg(&CardRenderState::default(), &theme);
+        let _ = theme.renderers.get_card().expect("CardRenderer registered").bg(&CardRenderState::default(), &theme);
         let _ = theme
             .renderers
             .form

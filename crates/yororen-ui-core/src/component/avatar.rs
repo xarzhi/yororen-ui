@@ -1,3 +1,4 @@
+use crate::renderer::AvatarRenderer;
 use std::sync::Arc;
 
 use gpui::{
@@ -79,7 +80,7 @@ impl RenderOnce for Avatar {
         let is_circle = matches!(self.shape, AvatarShape::Circle);
 
         let theme = cx.theme();
-        let r = &theme.renderers.avatar;
+        let r: &dyn AvatarRenderer = &**theme.renderers.get_avatar().expect("AvatarRenderer registered");
         let state = AvatarRenderState {
             has_custom_bg: self.bg.is_some(),
             has_status: self.status.is_some(),

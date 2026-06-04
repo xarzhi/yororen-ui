@@ -44,6 +44,7 @@
 //! `Panel` reads from the active theme, then layers any
 //! caller-supplied overrides on top.
 
+use crate::renderer::PanelRenderer;
 use gpui::prelude::FluentBuilder;
 use gpui::{
     AnyElement, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, Pixels,
@@ -180,7 +181,7 @@ impl Styled for Panel {
 impl RenderOnce for Panel {
     fn render(self, _window: &mut Window, cx: &mut gpui::App) -> impl IntoElement {
         let theme = cx.theme();
-        let renderer = &theme.renderers.panel;
+        let renderer: &dyn PanelRenderer = &**theme.renderers.get_panel().expect("PanelRenderer registered");
         let state = PanelRenderState {
             has_custom_bg: self.bg.is_some(),
             has_custom_border: self.border.is_some(),

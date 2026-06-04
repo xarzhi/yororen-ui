@@ -234,7 +234,9 @@ mod tests {
         let l = light();
         // Catppuccin uses 12-px button radius; material uses pill.
         let state = yororen_ui_core::renderer::ButtonRenderState::default();
-        let r = l.renderers.button.border_radius(&state, &l);
+        let renderer: &dyn yororen_ui_core::renderer::ButtonRenderer =
+            &**l.renderers.get_button().expect("ButtonRenderer registered");
+        let r = renderer.border_radius(&state, &l);
         assert!(r.to_f64() > 100.0, "expected pill radius (~999 px), got {}", r.to_f64());
     }
 }

@@ -1,3 +1,4 @@
+use crate::renderer::ButtonRenderer;
 use std::sync::Arc;
 
 use gpui::{
@@ -172,7 +173,7 @@ impl RenderOnce for Button {
 
         // button visuals go through ButtonRenderer.
         let theme = cx.theme();
-        let r = &theme.renderers.button;
+        let r: &dyn ButtonRenderer = &**theme.renderers.get_button().expect("ButtonRenderer registered");
         let state = ButtonRenderState {
             variant: variant_builtin,
             disabled,

@@ -1,3 +1,4 @@
+use crate::renderer::SkeletonRenderer;
 use gpui::{
     Animation, AnimationExt, Div, ElementId, Hsla, IntoElement, ParentElement, Pixels, RenderOnce,
     Styled, div,
@@ -78,7 +79,7 @@ impl RenderOnce for SkeletonLine {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let id = self.element_id.clone();
         let theme = cx.theme();
-        let r = &theme.renderers.skeleton;
+        let r: &dyn SkeletonRenderer = &**theme.renderers.get_skeleton().expect("SkeletonRenderer registered");
         let state = SkeletonRenderState {
             block: false,
             block_sharp: false,
@@ -195,7 +196,7 @@ impl RenderOnce for SkeletonBlock {
     fn render(self, _window: &mut gpui::Window, cx: &mut gpui::App) -> impl IntoElement {
         let id = self.element_id.clone();
         let theme = cx.theme();
-        let r = &theme.renderers.skeleton;
+        let r: &dyn SkeletonRenderer = &**theme.renderers.get_skeleton().expect("SkeletonRenderer registered");
         let state = SkeletonRenderState {
             block: true,
             block_sharp: !self.rounded,
