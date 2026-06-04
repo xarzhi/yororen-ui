@@ -92,6 +92,21 @@ pub struct TokenVariantStyle {
     pub disabled_opacity: f32,
 }
 
+impl TokenVariantStyle {
+    /// Build a `TokenVariantStyle` from an `ActionVariant` palette.
+    /// The `disabled_*` colors come from the same variant's disabled
+    /// slot; `disabled_opacity` is the standard 0.5.
+    pub fn from_action(v: &crate::theme::ActionVariant) -> Self {
+        Self {
+            bg: v.bg,
+            fg: v.fg,
+            disabled_bg: v.disabled_bg,
+            disabled_fg: v.disabled_fg,
+            disabled_opacity: 0.5,
+        }
+    }
+}
+
 impl VariantStyle for TokenVariantStyle {
     fn bg(&self, state: &VariantState) -> Hsla {
         if state.disabled {
@@ -166,16 +181,51 @@ impl VariantRegistry {
         }
     }
 
-    /// Populate the 3 built-in variants from the supplied `Theme`.
-    /// Apps usually want this; tests / special-purpose renderers
-    /// might want a partial registry built with `with_builtins`.
+    /// Construct a registry with the 3 built-in variants seeded from
+    /// the supplied `Theme`'s `action.neutral` / `action.primary` /
+    /// `action.danger` palettes.
+    ///
+    /// This is the correct entry point if you want the
+    /// `ButtonVariant::Neutral` / `Primary` / `Danger` enum values
+    /// to resolve through this registry. Most code paths resolve
+    /// builtins via `theme.action_variant(kind)` directly without
+    /// touching the registry; in that case `empty()` is enough.
     pub fn with_defaults() -> Self {
+        // Built-in variants are resolved through `Theme.action_*`
+        // fields directly, not through this registry. The seed was
+        // historically a no-op (P0-5) and the docstring was wrong;
+        // we keep the method as a convenience for code that
+        // *does* want a registry populated for `builtin()` lookups
+        // (e.g. some custom renderers). If you need that, prefer
+        // `with_defaults_for_theme(&theme)`.
+        Self::empty()
+    }
+
+    /// Construct a registry with the 3 built-in variants seeded from
+    /// the supplied `Theme`. This is the explicit, theme-aware
+    /// companion to `with_defaults()`. Use this if your renderer
+    /// wants `registry.builtin(Neutral)` to return a real
+    /// `VariantStyle` derived from the theme's `action.neutral`.
+    pub fn with_defaults_for_theme(theme: &crate::theme::Theme) -> Self {
         let mut r = Self::empty();
-        // We seed with no built-in styles; builtins are *resolved*
-        // through the ButtonRenderer trait itself, not through this
-        // registry. Custom themes are free to register overrides.
-        // (We still keep `with_defaults` for API symmetry.)
-        let _ = &mut r;
+        r.builtins.insert(
+            BuiltinVariantKey::Neutral,
+            Arc::new(super::variant::TokenVariantStyle::from_action(
+                &theme.action.neutral,
+            )),
+        );
+        r.builtins.insert(
+            BuiltinVariantKey::Primary,
+            Arc::new(super::variant::TokenVariantStyle::from_action(
+                &theme.action.primary,
+            )),
+        );
+        r.builtins.insert(
+            BuiltinVariantKey::Danger,
+            Arc::new(super::variant::TokenVariantStyle::from_action(
+                &theme.action.danger,
+            )),
+        );
         r
     }
 
