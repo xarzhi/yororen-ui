@@ -77,7 +77,11 @@ impl ButtonProps {
 }
 
 /// Hover-state entity shared between `use_button` and the
-/// composer's `on_hover` callback.
+/// Stateful hover tracker used by the headless `use_button` /
+/// `use_icon_button` hooks. The renderer-driven component family
+/// (Button, IconButton, etc.) goes through gpui's native
+/// `.hover(|s| ...)` callback instead, so this state struct only
+/// matters for the headless hooks path.
 #[derive(Clone, Default)]
 pub struct HoverState {
     pub hovered: bool,
