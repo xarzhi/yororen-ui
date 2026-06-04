@@ -6,7 +6,44 @@
 //! See the [Tree component documentation](https://github.com/MeowLynxSea/yororen-ui/wiki/Component-Tree) for usage examples.
 
 use gpui::ElementId;
+use std::borrow::Cow;
 use std::collections::HashMap;
+
+/// Newtype for tree-node identifiers. P1-7 decouples the data
+/// model from `gpui::ElementId` so callers can use any `Hash + Eq`
+/// type for node IDs. The conversion to / from `ElementId` lives in
+/// the tree-rendering code, not in the data model.
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+pub struct TreeNodeId(pub Cow<'static, str>);
+
+impl TreeNodeId {
+    /// Convenience for `TreeNodeId(Cow::Borrowed(s))`.
+    pub fn borrowed(s: &'static str) -> Self {
+        Self(Cow::Borrowed(s))
+    }
+    /// Convenience for `TreeNodeId(Cow::Owned(s.into()))`.
+    pub fn owned(s: impl Into<String>) -> Self {
+        Self(Cow::Owned(s.into()))
+    }
+}
+
+impl From<&'static str> for TreeNodeId {
+    fn from(s: &'static str) -> Self {
+        Self::borrowed(s)
+    }
+}
+
+impl From<String> for TreeNodeId {
+    fn from(s: String) -> Self {
+        Self::owned(s)
+    }
+}
+
+impl From<TreeNodeId> for ElementId {
+    fn from(id: TreeNodeId) -> Self {
+        ElementId::Name(id.0.into_owned().into())
+    }
+}
 
 /// Selection mode for tree nodes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -64,8 +101,11 @@ pub type SimpleTreeNode = TreeNode<ArcTreeNode>;
 
 /// Trait for tree node data that must be implemented by user data.
 pub trait TreeNodeData: 'static + Sized + Clone {
-    /// Returns the text label for this node.
-    fn label(&self) -> &str;
+    /// Returns the text label for this node. P1-7: the return type
+    /// changed from `&str` to `Cow<'_, str>` so a node that
+    /// already owns a `String` (or anything `Into<Cow<str>>`) can
+    /// return it without forcing `ArcTreeNode` to clone.
+    fn label(&self) -> Cow<'_, str>;
     /// Returns optional icon name for this node.
     fn icon(&self) -> Option<super::IconName> {
         None
@@ -105,8 +145,8 @@ impl ArcTreeNode {
 }
 
 impl TreeNodeData for ArcTreeNode {
-    fn label(&self) -> &str {
-        &self.label
+    fn label(&self) -> Cow<'_, str> {
+        Cow::Borrowed(&self.label)
     }
 
     fn icon(&self) -> Option<super::IconName> {
