@@ -333,22 +333,6 @@ impl core::marker::Unpin for yororen_ui_theme_catppuccin::renderer::CatppuccinIc
 impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer
-pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer
-impl yororen_ui_core::renderer::icon::IconRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer::color(&self, &yororen_ui_core::renderer::icon::IconRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer::size(&self, &yororen_ui_core::renderer::icon::IconRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer::size_lg(&self, &yororen_ui_core::renderer::icon::IconRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer::size_md(&self, &yororen_ui_core::renderer::icon::IconRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer::size_sm(&self, &yororen_ui_core::renderer::icon::IconRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer::size_xl(&self, &yororen_ui_core::renderer::icon::IconRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer::size_xs(&self, &yororen_ui_core::renderer::icon::IconRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer
-impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer
-impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer
-impl core::marker::Unpin for yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer
-impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer
-impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer
-impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinIconRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer
 impl yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer
 pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::bg(&self, &yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
@@ -826,7 +810,7 @@ pub fn yororen_ui_theme_catppuccin::flavor_from_appearance(gpui::platform::Windo
 pub fn yororen_ui_theme_catppuccin::frappe() -> yororen_ui_core::theme::Theme
 pub fn yororen_ui_theme_catppuccin::frappe_theme() -> yororen_ui_core::theme::Theme
 pub fn yororen_ui_theme_catppuccin::install(&mut gpui::app::App, gpui::platform::WindowAppearance)
-pub fn yororen_ui_theme_catppuccin::install_flavor(&mut gpui::app::App, yororen_ui_theme_catppuccin::CatppuccinFlavor, gpui::platform::WindowAppearance)
+pub fn yororen_ui_theme_catppuccin::install_flavor(&mut gpui::app::App, yororen_ui_theme_catppuccin::CatppuccinFlavor)
 pub fn yororen_ui_theme_catppuccin::latte_theme() -> yororen_ui_core::theme::Theme
 pub fn yororen_ui_theme_catppuccin::light() -> yororen_ui_core::theme::Theme
 pub fn yororen_ui_theme_catppuccin::light_arc() -> alloc::sync::Arc<yororen_ui_core::theme::Theme>
@@ -834,7 +818,6 @@ pub fn yororen_ui_theme_catppuccin::macchiato() -> yororen_ui_core::theme::Theme
 pub fn yororen_ui_theme_catppuccin::macchiato_theme() -> yororen_ui_core::theme::Theme
 pub fn yororen_ui_theme_catppuccin::mocha() -> yororen_ui_core::theme::Theme
 pub fn yororen_ui_theme_catppuccin::mocha_theme() -> yororen_ui_core::theme::Theme
-pub fn yororen_ui_theme_catppuccin::themeset() -> yororen_ui_core::theme::ThemeSet
 pub type yororen_ui_theme_catppuccin::FrappeTheme = yororen_ui_core::theme::Theme
 pub type yororen_ui_theme_catppuccin::LatteTheme = yororen_ui_core::theme::Theme
 pub type yororen_ui_theme_catppuccin::MacchiatoTheme = yororen_ui_core::theme::Theme

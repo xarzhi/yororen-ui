@@ -4,4 +4,3 @@ pub fn yororen_ui_theme_system::dark_arc() -> alloc::sync::Arc<yororen_ui_core::
 pub fn yororen_ui_theme_system::install(&mut gpui::app::App, gpui::platform::WindowAppearance)
 pub fn yororen_ui_theme_system::light() -> yororen_ui_core::theme::Theme
 pub fn yororen_ui_theme_system::light_arc() -> alloc::sync::Arc<yororen_ui_core::theme::Theme>
-pub fn yororen_ui_theme_system::themeset() -> yororen_ui_core::theme::ThemeSet

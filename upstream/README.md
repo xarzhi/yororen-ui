@@ -48,11 +48,26 @@ for pair in \
     "yororen_ui_theme_material:yororen-ui-theme-material" \
     "yororen_ui:yororen-ui"; do
   crate="${pair%%:*}"
-  crate_dash="${pair##*:}"
-  cargo public-api -p "${crate}" --simplified \
-    > "upstream/${crate_dash}.api.txt"
+  # The filename uses underscores (`yororen_ui_*.api.txt`) to
+  # match the crate's `cargo` name; the crate *directory* uses
+  # dashes (`yororen-ui-*.api.txt`). The script below writes to
+  # the underscored filename, which is the committed convention.
+  case "$crate" in
+    yororen_ui_core)              fn="upstream/yororen_ui_core.api.txt" ;;
+    yororen_ui_theme_system)      fn="upstream/yororen_ui_theme_system.api.txt" ;;
+    yororen_ui_theme_catppuccin)  fn="upstream/yororen_ui_theme_catppuccin.api.txt" ;;
+    yororen_ui_theme_material)    fn="upstream/yororen_ui_theme_material.api.txt" ;;
+    yororen_ui)                   fn="upstream/yororen_ui.api.txt" ;;
+  esac
+  cargo public-api -p "${crate}" --simplified >| "$fn"
 done
 ```
+
+Note: the `>|` redirect (not `>`) is required when `setopt
+NO_CLOBBER` is enabled in your shell — otherwise the
+`public-api` regeneration silently no-ops against the existing
+file and you'll think you've refreshed the baseline when you
+haven't.
 
 ## CI
 

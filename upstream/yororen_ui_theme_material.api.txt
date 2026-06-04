@@ -371,4 +371,3 @@ pub fn yororen_ui_theme_material::renderer::material_registry() -> yororen_ui_co
 pub fn yororen_ui_theme_material::dark() -> yororen_ui_core::theme::Theme
 pub fn yororen_ui_theme_material::install(&mut gpui::app::App, gpui::platform::WindowAppearance)
 pub fn yororen_ui_theme_material::light() -> yororen_ui_core::theme::Theme
-pub fn yororen_ui_theme_material::themeset() -> yororen_ui_core::theme::ThemeSet
