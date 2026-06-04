@@ -69,6 +69,7 @@ impl PlaceholderResolver for I18nPlaceholderResolver {
             PlaceholderKey::KeybindingPressKeys => "Press a key…",
             PlaceholderKey::KeybindingWaiting => "Waiting…",
             PlaceholderKey::FilePath => "Pick a file…",
+            PlaceholderKey::PasswordInput => "Enter password…",
         };
         Some(s.into())
     }
