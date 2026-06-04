@@ -345,12 +345,21 @@ impl RenderOnce for Modal {
         // via `cx.theme()` (we don't support per-instance override
         // here, but the renderer takes care of it for the default
         // case).
+        //
+        // P1-6: the previous `panel.padding(Edges::all(0.0))`
+        // workaround has been removed. The Modal now builds the
+        // header / content / actions rows with explicit `px_4`
+        // / `py_3` and lets the inner divs do the spacing. The
+        // Panel's own padding is set to zero via a new
+        // `inset_only` flag (P1-6) — the renderer returns
+        // `Edges::all(0)` for inset-mode panels, and the Modal
+        // does its own padding on the children.
         let panel_id = (element_id_for_base.clone(), "panel");
         div().id(element_id_for_base).w(width).child(
             panel(panel_id)
                 .bg(bg)
                 .border(border)
-                .padding(Edges::all(gpui::px(0.0)))
+                .inset_only(true)
                 .child(panel_child),
         )
     }

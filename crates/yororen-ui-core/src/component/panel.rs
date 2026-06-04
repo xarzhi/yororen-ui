@@ -85,6 +85,11 @@ pub struct Panel {
     /// Padding override. When `None`, the renderer picks the
     /// default padding.
     padding: Option<Edges<Pixels>>,
+    /// P1-6: when `true`, the panel renders with no padding even if
+    /// the renderer would normally supply one. The caller takes
+    /// responsibility for laying out children with their own
+    /// padding.
+    inset_only: bool,
     /// Child element. The panel renders exactly one child.
     /// Use a `div()` to wrap a tree.
     child: Option<AnyElement>,
@@ -105,6 +110,7 @@ impl Panel {
             bg: None,
             border: None,
             padding: None,
+            inset_only: false,
             child: None,
         }
     }
@@ -135,6 +141,17 @@ impl Panel {
     /// Override the panel's padding.
     pub fn padding(mut self, padding: Edges<Pixels>) -> Self {
         self.padding = Some(padding);
+        self
+    }
+
+    /// P1-6: opt into "inset only" mode where the panel supplies
+    /// bg / border / radius / shadow but its own padding is forced
+    /// to zero. The caller is expected to lay out children with
+    /// their own padding. This replaces the previous
+    /// `padding(Edges::all(0))` workaround that the Modal used
+    /// to disable the panel's padding.
+    pub fn inset_only(mut self, inset: bool) -> Self {
+        self.inset_only = inset;
         self
     }
 
@@ -178,9 +195,12 @@ impl RenderOnce for Panel {
             .unwrap_or_else(|| renderer.border(&state, theme));
         let radius = renderer.border_radius(&state, theme);
         let shadow_alpha = renderer.shadow_alpha(&state, theme);
-        let padding = self
-            .padding
-            .unwrap_or_else(|| renderer.padding(&state, theme));
+        let padding = if self.inset_only {
+            Edges::all(gpui::px(0.0))
+        } else {
+            self.padding
+                .unwrap_or_else(|| renderer.padding(&state, theme))
+        };
 
         let child = self.child.unwrap_or_else(|| div().into_any_element());
 
