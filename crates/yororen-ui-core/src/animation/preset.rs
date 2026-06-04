@@ -1,6 +1,36 @@
 //! Preset animations module.
 //!
-//! Provides pre-built animation effects that can be easily applied to components.
+//! Pre-built animation effects that can be applied to components.
+//!
+//! # Use [`AnimationConfig::from_motion`] for new code
+//!
+//! Component authors should reach for [`crate::animation::AnimationConfig`]
+//! (and its `from_motion` factory) rather than the preset helpers
+//! in this module. The preset functions are kept for backward
+//! compatibility with code that wants an inline duration /
+//! easing pair; the [`crate::theme::tokens::MotionTokens`] fields
+//! are the source of truth and should be preferred.
+//!
+//! # What's here
+//!
+//! - [`AnimationType`] — enum of the supported preset kinds.
+//! - [`PresetAnimation`] trait — the shared contract every preset
+//!   implements.
+//! - Concrete presets: [`FadeIn`], [`FadeOut`], [`ScaleIn`],
+//!   [`ScaleOut`], [`BounceIn`], [`BounceOut`], [`ElasticIn`],
+//!   [`ElasticOut`].
+//! - Direction helpers: [`SlideDirection`] plus
+//!   `fade_slide_in_*` / `fade_slide_out_*`.
+//! - [`preset_duration`] — a small set of named duration
+//!   constants used only inside this module.
+//! - [`pulse`] — a reusable opacity-pulse effect.
+//!
+//! Components that want a single source of truth should read
+//! `cx.theme().tokens.motion.*` and build an
+//! [`AnimationConfig`](crate::animation::AnimationConfig). The
+//! functions in this module stay convenient for prototyping but
+//! do not respect a theme override unless the caller threads the
+//! duration / easing through explicitly.
 
 use std::time::Duration;
 
