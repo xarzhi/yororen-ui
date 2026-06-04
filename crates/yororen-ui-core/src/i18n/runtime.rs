@@ -1,7 +1,7 @@
 //! Internationalization runtime state and management.
 
-use std::collections::HashMap;
-use std::sync::Arc;
+use std::collections::{HashMap, HashSet};
+use std::sync::{Arc, Mutex, OnceLock};
 
 use gpui::{App, Global, SharedString};
 
@@ -209,14 +209,23 @@ pub trait Translate {
 
 impl Translate for App {
     fn t(&self, key: &str) -> SharedString {
-        self.lookup(key).unwrap_or_else(|| key.to_string().into())
+        match self.lookup(key) {
+            Some(s) => s,
+            None => {
+                warn_missing_key(key);
+                key.to_string().into()
+            }
+        }
     }
 
     fn t_with_args(&self, key: &str, args: &[&str]) -> SharedString {
         let i18n = self.i18n();
         let base = match i18n.t(key) {
             Some(s) => s.to_string(),
-            None => key.to_string(),
+            None => {
+                warn_missing_key(key);
+                key.to_string()
+            }
         };
 
         replace_placeholders(&base, args).into()
@@ -224,6 +233,23 @@ impl Translate for App {
 
     fn lookup(&self, key: &str) -> Option<SharedString> {
         self.i18n().t(key).map(|s| s.to_string().into())
+    }
+}
+
+/// Emit a one-shot `eprintln!` warning for a missing translation
+/// key. Subsequent calls for the same key are suppressed so that
+/// production log volume stays bounded.
+fn warn_missing_key(key: &str) {
+    static SEEN: OnceLock<Mutex<HashSet<String>>> = OnceLock::new();
+    let seen = SEEN.get_or_init(|| Mutex::new(HashSet::new()));
+    let inserted = match seen.lock() {
+        Ok(mut guard) => guard.insert(key.to_string()),
+        // If the lock is poisoned, swallow the call rather than
+        // panicking; the original panic is the real bug.
+        Err(_) => false,
+    };
+    if inserted {
+        eprintln!("[yororen-ui-core::i18n] missing translation for key: {key}");
     }
 }
 
