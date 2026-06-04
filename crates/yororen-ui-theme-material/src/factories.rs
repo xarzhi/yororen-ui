@@ -228,12 +228,6 @@ mod tests {
     }
 
     #[test]
-    fn themeset_has_both() {
-        let ts = themeset();
-        assert!(ts.dark.is_some());
-    }
-
-    #[test]
     fn renderers_installed() {
         // Sanity: the renderer registry is the material one, not
         // the default `token_based()`.

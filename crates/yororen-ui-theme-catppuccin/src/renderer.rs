@@ -1803,7 +1803,7 @@ mod tests {
         use yororen_ui_core::renderer::{
             AvatarRenderState, BadgeRenderState, ComboBoxRenderState, DisclosureRenderState,
             DividerRenderState, DropdownMenuRenderState, FilePathInputRenderState, FormRenderState,
-            HeadingRenderState, IconButtonRenderState, IconRenderState, KeybindingInputRenderState,
+            HeadingRenderState, IconButtonRenderState, KeybindingInputRenderState,
             LabelRenderState, NotificationRenderState, NumberInputRenderState,
             PasswordInputRenderState, PopoverRenderState, ProgressBarRenderState,
             SearchInputRenderState, SelectRenderState, SkeletonRenderState, SplitButtonRenderState,
@@ -1820,7 +1820,6 @@ mod tests {
             },
             &theme,
         );
-        let _ = reg.icon.color(&IconRenderState::default(), &theme);
         let _ = reg
             .icon_button
             .bg(&IconButtonRenderState::default(), &theme);

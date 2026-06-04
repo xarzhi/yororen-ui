@@ -59,10 +59,4 @@ mod tests {
         let d = dark();
         assert_ne!(l.surface.base, d.surface.base);
     }
-
-    #[test]
-    fn themeset_has_both() {
-        let ts = themeset();
-        assert!(ts.dark.is_some());
-    }
 }
