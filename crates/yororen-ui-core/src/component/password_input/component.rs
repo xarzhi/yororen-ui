@@ -11,6 +11,7 @@ use super::actions::*;
 use super::element::PasswordLineElement;
 use super::state::{PasswordInputHandler, PasswordInputState};
 use crate::action_handler;
+use crate::component::compute_input_style;
 use crate::i18n::PlaceholderContext;
 use crate::theme::ActiveTheme;
 
@@ -174,23 +175,23 @@ impl RenderOnce for PasswordInput {
 
         let theme = cx.theme();
 
-        let bg = if disabled {
-            theme.surface.sunken
-        } else {
-            self.bg.unwrap_or_else(|| theme.surface.base)
-        };
-
-        let border_color = if disabled {
-            theme.border.muted
-        } else {
-            self.border.unwrap_or_else(|| theme.border.default)
-        };
-        let focus_border_color = self.focus_border.unwrap_or_else(|| theme.border.focus);
-        let text_color = if disabled {
-            theme.content.disabled
-        } else {
-            self.text_color.unwrap_or_else(|| theme.content.primary)
-        };
+        // Route the standard disabled / override / theme fallback
+        // through `compute_input_style` so all input components
+        // share one path. The only deviation here is the
+        // focus_border override, which `compute_input_style`
+        // already handles (it falls back to `theme.border.focus`).
+        let input_style = compute_input_style(
+            theme,
+            disabled,
+            self.bg,
+            self.border,
+            self.focus_border,
+            self.text_color,
+        );
+        let bg = input_style.bg;
+        let border_color = input_style.border;
+        let focus_border_color = input_style.focus_border;
+        let text_color = input_style.text_color;
         let height = self
             .height
             .unwrap_or_else(|| cx.theme().tokens.control.button.min_height.into());
