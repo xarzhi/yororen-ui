@@ -2,8 +2,8 @@
 //!
 //! End-to-end demo of Phase F (Catppuccin theme) and Phase G
 //! (a11y completeness) working together. The window is divided
-//! into 4 columns, one per Catppuccin flavor (Latte / Frappé /
-//! Macchiato / Mocha). Each column has the same set of
+//! into 5 columns, one per flavor (4 Catppuccin flavors +
+//! Material Design 3). Each column has the same set of
 //! components — pickers, toggles, a tooltip, and a "Show modal"
 //! button. Opening the modal in any column demonstrates the
 //! v0.5 a11y stack end-to-end:
@@ -21,11 +21,11 @@
 //!   `focus_trap_demo` crate; this demo uses `modal_dialog`'s
 //!   built-in focus handling).
 //!
-//! The 4 flavors are rendered with the **same** code — only the
+//! The 5 flavors are rendered with the **same** code — only the
 //! active `Theme` differs. This proves that the v0.5 Renderer
-//! trait system + `CatppuccinFlavor` enum together give a
-//! complete Catppuccin skin with no per-component hardcoded
-//! color logic.
+//! trait system + `CatppuccinFlavor` enum + `Material` theme
+//! package together give complete third-party skins with no
+//! per-component hardcoded color logic.
 
 use std::sync::Arc;
 
@@ -35,6 +35,7 @@ use yororen_ui::assets::UiAsset;
 use yororen_ui::theme::Theme;
 use yororen_ui_locale_en as locale_en;
 use yororen_ui_theme_catppuccin as catppuccin;
+use yororen_ui_theme_material as material;
 use yororen_ui_theme_system as theme_system;
 
 mod flavor_gallery_app;
@@ -66,7 +67,7 @@ fn main() {
         let options = WindowOptions {
             window_bounds: Some(WindowBounds::Windowed(gpui::Bounds::centered(
                 None,
-                size(px(1280.0), px(620.0)),
+                size(px(1600.0), px(620.0)),
                 cx,
             ))),
             ..Default::default()
@@ -80,8 +81,10 @@ fn main() {
 
 /// Resolve the active Theme for a given flavor and OS appearance.
 ///
-/// Latte / Frappé / Macchiato / Mocha are explicit flavors; "System"
-/// uses the system palette (with the active OS appearance).
+/// Latte / Frappé / Macchiato / Mocha are explicit Catppuccin
+/// flavors; Material is the second official theme (Phase H.1);
+/// "System" uses the system palette (with the active OS
+/// appearance).
 pub fn theme_for(kind: FlavorKind, appearance: gpui::WindowAppearance) -> Theme {
     match kind {
         FlavorKind::System => match appearance {
@@ -94,6 +97,12 @@ pub fn theme_for(kind: FlavorKind, appearance: gpui::WindowAppearance) -> Theme 
         FlavorKind::Frappe => catppuccin::frappe(),
         FlavorKind::Macchiato => catppuccin::macchiato(),
         FlavorKind::Mocha => catppuccin::mocha(),
+        FlavorKind::Material => match appearance {
+            gpui::WindowAppearance::Light | gpui::WindowAppearance::VibrantLight => {
+                material::light()
+            }
+            _ => material::dark(),
+        },
     }
 }
 
@@ -110,29 +119,33 @@ fn _kind_passthrough(k: FlavorKind) -> FlavorKind {
 mod tests {
     use super::*;
 
-    /// The 4 Catppuccin flavors plus System must produce
+    /// The 4 Catppuccin flavors + Material + System must produce
     /// distinct theme surface.bg values. This is the v0.5
-    /// regression test for the F-α no-hardcode rule.
+    /// regression test for the F-α no-hardcode rule, extended
+    /// in Phase H.1 to cover the new Material theme.
     #[test]
-    fn all_five_flavors_produce_distinct_themes() {
+    fn all_six_flavors_produce_distinct_themes() {
         let appearance = gpui::WindowAppearance::Dark;
         let system = theme_for(FlavorKind::System, appearance);
         let latte = theme_for(FlavorKind::Latte, appearance);
         let frappe = theme_for(FlavorKind::Frappe, appearance);
         let macchiato = theme_for(FlavorKind::Macchiato, appearance);
         let mocha = theme_for(FlavorKind::Mocha, appearance);
+        let material = theme_for(FlavorKind::Material, appearance);
         // Pairwise distinct.
         assert_ne!(system.surface.base, latte.surface.base);
         assert_ne!(latte.surface.base, frappe.surface.base);
         assert_ne!(frappe.surface.base, macchiato.surface.base);
         assert_ne!(macchiato.surface.base, mocha.surface.base);
+        assert_ne!(mocha.surface.base, material.surface.base);
         // System is the system theme; Latte is the Catppuccin light.
         assert_ne!(system.surface.base, mocha.surface.base);
     }
 
     /// The same Theme can be plugged into a `with_theme` block
     /// and the descendants see the per-flavor palette.
-    /// This is a sanity check for the F-γ wiring.
+    /// This is a sanity check for the F-γ wiring, extended
+    /// for the new Material variant.
     #[test]
     fn flavor_kind_as_str_matches_demonstration() {
         assert_eq!(FlavorKind::System.as_str(), "System");
@@ -140,6 +153,27 @@ mod tests {
         assert_eq!(FlavorKind::Frappe.as_str(), "Frappé");
         assert_eq!(FlavorKind::Macchiato.as_str(), "Macchiato");
         assert_eq!(FlavorKind::Mocha.as_str(), "Mocha");
+        assert_eq!(FlavorKind::Material.as_str(), "Material 3");
+    }
+
+    /// Material's primary background is its primary accent (M3
+    /// "filled button" look). We verify the renderer yields
+    /// something distinct from the system theme.
+    #[test]
+    fn material_button_bg_differs_from_system() {
+        use yororen_ui::renderer::ButtonRenderState;
+        let appearance = gpui::WindowAppearance::Dark;
+        let mat = theme_for(FlavorKind::Material, appearance);
+        let sys = theme_for(FlavorKind::System, appearance);
+        let state = ButtonRenderState {
+            variant: yororen_ui::theme::ActionVariantKind::Primary,
+            ..Default::default()
+        };
+        let mat_bg = mat.renderers.button.bg(&state, &mat);
+        let sys_bg = sys.renderers.button.bg(&state, &sys);
+        // M3 uses primary accent; system uses dark action.bg.
+        // They should differ.
+        assert_ne!(mat_bg, sys_bg);
     }
 
     /// `theme_for` returns the same Theme across calls (the
