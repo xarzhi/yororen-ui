@@ -178,10 +178,17 @@ pub struct TreeNodeBuilder<T: TreeNodeData = ArcTreeNode> {
 }
 
 impl<T: TreeNodeData> TreeNodeBuilder<T> {
-    pub fn new(id: impl Into<ElementId>, data: T) -> Self {
+    /// Construct a new builder. `id` accepts anything convertible
+    /// to [`TreeNodeId`] — including `&'static str` and `String`
+    /// via the blanket conversions defined above. Using the
+    /// newtype at the API boundary lets callers distinguish a
+    /// tree-node id from an arbitrary `ElementId` from elsewhere
+    /// in the codebase (tabs, list items, etc.), and prevents
+    /// accidental cross-use.
+    pub fn new(id: impl Into<TreeNodeId>, data: T) -> Self {
         Self {
             node: TreeNode {
-                id: id.into(),
+                id: id.into().into(),
                 data,
                 children: Vec::new(),
                 expanded: false,
@@ -429,4 +436,29 @@ fn flatten_tree_recursive<T: TreeNodeData>(
     }
 
     index
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn tree_node_builder_accepts_static_str() {
+        let node = TreeNodeBuilder::new("root", ArcTreeNode::new("Root")).build();
+        assert_eq!(node.id, ElementId::from("root"));
+    }
+
+    #[test]
+    fn tree_node_builder_accepts_owned_string() {
+        let id = String::from("dynamic-1");
+        let node = TreeNodeBuilder::new(id.clone(), ArcTreeNode::new("Dynamic")).build();
+        assert_eq!(node.id, ElementId::from(id));
+    }
+
+    #[test]
+    fn tree_node_builder_accepts_typed_tree_node_id() {
+        let id = TreeNodeId::owned("typed-id");
+        let node = TreeNodeBuilder::new(id, ArcTreeNode::new("Typed")).build();
+        assert_eq!(node.id, ElementId::from("typed-id"));
+    }
 }
