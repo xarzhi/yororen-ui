@@ -117,11 +117,6 @@ impl FocusTrap {
         self
     }
 
-    /// Alias for `id(...)`. Use `key(...)` when you want to emphasize state identity.
-    pub fn key(self, key: impl Into<ElementId>) -> Self {
-        self.id(key)
-    }
-
     /// Sets the callback for Escape key.
     pub fn on_escape<F>(mut self, handler: F) -> Self
     where
