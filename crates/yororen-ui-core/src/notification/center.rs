@@ -1,16 +1,54 @@
 use std::{
     collections::{HashMap, HashSet, VecDeque},
-    sync::{Arc, Mutex},
-    time::Duration,
+    sync::{
+        Arc, Mutex,
+        atomic::{AtomicU64, Ordering},
+    },
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
-use chrono::{DateTime, Utc};
 use gpui::{AnyWindowHandle, AppContext, ClickEvent, Global, SharedString, Window};
 use serde::{Deserialize, Serialize};
 use serde_json::Value as JsonValue;
-use uuid::Uuid;
 
 use crate::component::ToastKind;
+
+/// Opaque, monotonically-increasing identifier for a notification.
+///
+/// Replaces the previous `uuid::Uuid`-based id. A process-local
+/// `AtomicU64` counter is sufficient because notifications never
+/// leave the process boundary, and the host only needs a stable id
+/// to wire `on_click` / `on_dismiss` callbacks through
+/// `HashMap<NotificationId, _>` and to disambiguate stacked toasts
+/// in the gpui element tree.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Ord, PartialOrd, Serialize, Deserialize)]
+pub struct NotificationId(u64);
+
+impl NotificationId {
+    /// Allocate a fresh id. The first id returned in a process is
+    /// `NotificationId(1)`; subsequent ids strictly increase.
+    pub fn allocate() -> Self {
+        static NEXT: AtomicU64 = AtomicU64::new(1);
+        Self(NEXT.fetch_add(1, Ordering::Relaxed))
+    }
+
+    /// Raw `u64` value, useful when building an [`gpui::ElementId`].
+    pub fn raw(self) -> u64 {
+        self.0
+    }
+}
+
+/// Milliseconds since the Unix epoch, captured at the moment a
+/// [`Notification`] is constructed. Replaces the previous
+/// `chrono::DateTime<Utc>` field — UI never formats this timestamp
+/// itself (formatting is the i18n layer's responsibility), so a
+/// simple `u64` is enough and removes the `chrono` dependency.
+fn now_millis() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0)
+}
 
 /// How a notification should be dismissed.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -30,8 +68,10 @@ impl Default for DismissStrategy {
 /// A single notification payload.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Notification {
-    pub id: Uuid,
-    pub created_at: DateTime<Utc>,
+    pub id: NotificationId,
+    /// Milliseconds since the Unix epoch when this notification
+    /// was constructed.
+    pub created_at_ms: u64,
 
     pub title: Option<SharedString>,
     pub message: SharedString,
@@ -56,8 +96,8 @@ pub struct Notification {
 impl Notification {
     pub fn new(message: impl Into<SharedString>) -> Self {
         Self {
-            id: Uuid::new_v4(),
-            created_at: Utc::now(),
+            id: NotificationId::allocate(),
+            created_at_ms: now_millis(),
             title: None,
             message: message.into(),
             kind: ToastKind::Neutral,
@@ -130,11 +170,11 @@ struct State {
     loaded_from_persisted: bool,
 
     // callbacks - not persisted
-    on_click: HashMap<Uuid, ClickCb>,
-    on_dismiss: HashMap<Uuid, DismissCb>,
+    on_click: HashMap<NotificationId, ClickCb>,
+    on_dismiss: HashMap<NotificationId, DismissCb>,
 
     // used to avoid re-scheduling auto-dismiss for the same notification
-    scheduled_auto_dismiss: HashSet<Uuid>,
+    scheduled_auto_dismiss: HashSet<NotificationId>,
 }
 
 impl Global for NotificationCenter {}
@@ -183,7 +223,7 @@ impl NotificationCenter {
         }
     }
 
-    pub fn notify(&self, n: Notification, cx: &mut gpui::App) -> Uuid {
+    pub fn notify(&self, n: Notification, cx: &mut gpui::App) -> NotificationId {
         let id = n.id;
 
         {
@@ -204,7 +244,7 @@ impl NotificationCenter {
         on_click: Option<ClickCb>,
         on_dismiss: Option<DismissCb>,
         cx: &mut gpui::App,
-    ) -> Uuid {
+    ) -> NotificationId {
         let id = self.notify(n, cx);
         let mut state = self.state.lock().unwrap();
         if let Some(cb) = on_click {
@@ -216,7 +256,7 @@ impl NotificationCenter {
         id
     }
 
-    pub fn dismiss(&self, id: Uuid, cx: &mut gpui::App) {
+    pub fn dismiss(&self, id: NotificationId, cx: &mut gpui::App) {
         {
             let mut state = self.state.lock().unwrap();
             state.queue.retain(|n| n.id != id);
@@ -246,7 +286,7 @@ impl NotificationCenter {
         state.queue.iter().cloned().collect()
     }
 
-    pub(crate) fn click(&self, id: Uuid, ev: &ClickEvent, window: &mut Window, cx: &mut gpui::App) {
+    pub(crate) fn click(&self, id: NotificationId, ev: &ClickEvent, window: &mut Window, cx: &mut gpui::App) {
         let (n, cb) = {
             let state = self.state.lock().unwrap();
             let n = state.queue.iter().find(|n| n.id == id).cloned();
@@ -259,7 +299,7 @@ impl NotificationCenter {
         }
     }
 
-    pub(crate) fn dismiss_from_ui(&self, id: Uuid, window: &mut Window, cx: &mut gpui::App) {
+    pub(crate) fn dismiss_from_ui(&self, id: NotificationId, window: &mut Window, cx: &mut gpui::App) {
         let (n, cb) = {
             let state = self.state.lock().unwrap();
             let n = state.queue.iter().find(|n| n.id == id).cloned();
@@ -322,7 +362,7 @@ impl NotificationCenter {
         state.persisted_state = None;
     }
 
-    fn maybe_schedule_auto_dismiss(&self, id: Uuid, cx: &mut gpui::App) {
+    fn maybe_schedule_auto_dismiss(&self, id: NotificationId, cx: &mut gpui::App) {
         let (dismiss, host_window, already_scheduled) = {
             let mut state = self.state.lock().unwrap();
             let Some(n) = state.queue.iter().find(|n| n.id == id) else {

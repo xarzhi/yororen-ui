@@ -158,7 +158,7 @@ impl RenderOnce for NotificationHost {
                 let close_border = Hsla { a: 0.25, ..fg };
 
                 let close = div()
-                    .id(("ui:notification:dismiss", id.as_u128() as u64))
+                    .id(("ui:notification:dismiss", id.raw()))
                     .flex()
                     .items_center()
                     .justify_center()
@@ -210,7 +210,7 @@ impl RenderOnce for NotificationHost {
                     .trailing(close);
 
                 div()
-                    .id(("ui:notification", id.as_u128() as u64))
+                    .id(("ui:notification", id.raw()))
                     .cursor_pointer()
                     .on_click(move |ev: &ClickEvent, window, cx| {
                         center_for_click.click(id, ev, window, cx);
