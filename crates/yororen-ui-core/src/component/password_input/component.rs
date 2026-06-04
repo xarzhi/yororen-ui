@@ -176,10 +176,12 @@ impl RenderOnce for PasswordInput {
         let theme = cx.theme();
 
         // Route the standard disabled / override / theme fallback
-        // through `compute_input_style` so all input components
         // through the configured `PasswordInputRenderer` so all input
         // components share one path. The default `TokenPasswordInputRenderer`
-        // and theme overrides both implement this contract.
+        // and theme overrides both implement this contract. (v0.4
+        // `compute_input_style` helper was removed in v0.4 — see
+        // V5 release notes — but the disabled + custom override
+        // contract is preserved here verbatim.)
         let r: &dyn crate::renderer::PasswordInputRenderer = &**theme
             .renderers
             .get_password_input()

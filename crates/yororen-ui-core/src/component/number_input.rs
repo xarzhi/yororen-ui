@@ -210,10 +210,11 @@ impl RenderOnce for NumberInput {
         let on_change = self.on_change;
         let validate = self.validate;
 
-        // `compute_input_style` is the only consumer of `theme` in
-        // this render path, so we just borrow `cx.theme()` instead
-        // of incurring an `Arc::clone`. All other theme lookups in
-        // this function go through `cx.theme()` directly.
+        // The `NumberInputRenderer` + the local text_color derivation
+        // are the only consumers of `theme` in this render path, so
+        // we just borrow `cx.theme()` instead of incurring an
+        // `Arc::clone`. All other theme lookups in this function
+        // go through `cx.theme()` directly.
         let height = self
             .height
             .unwrap_or_else(|| cx.theme().tokens.control.button.min_height.into());
@@ -236,7 +237,10 @@ impl RenderOnce for NumberInput {
         let input_focus_border = r.focus_border(&rstate, cx.theme());
         // NumberInputRenderer's default trait doesn't expose text_color;
         // compute it from theme + overrides, mirroring the v0.4
-        // `compute_input_style` contract.
+        // pre-renderer `compute_input_style` semantics. (The helper
+        // itself was removed in v0.4 — see V5 release notes — but
+        // the disabled + custom override contract is preserved here
+        // verbatim.)
         let input_text_color: Hsla = if disabled {
             cx.theme().content.disabled
         } else {

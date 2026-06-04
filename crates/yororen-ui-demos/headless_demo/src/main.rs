@@ -268,8 +268,9 @@ impl Render for HeadlessDemoApp {
         // `theme.border.focus`). The hook's `track_focus` only
         // makes the element eligible for focus styling — it does
         // not pick a style for us, so we apply the conditional
-        // border ourselves. `compute_input_style` is the
-        // canonical source for the focus color in the framework.
+        // border ourselves. The `TextInputRenderer::focus_border`
+        // method is the canonical source for the focus color in
+        // the framework.
         let is_text_focused = self.text_focus_handle.is_focused(window);
 
         // Build the styled `use_text_input` element here (after
