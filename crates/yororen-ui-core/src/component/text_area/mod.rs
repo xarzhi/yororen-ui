@@ -20,7 +20,12 @@ pub fn text_area(id: impl Into<ElementId>) -> TextArea {
     TextArea::new().id(id)
 }
 
-pub(crate) fn init(cx: &mut App) {
+pub fn init(cx: &mut App) {
+    use std::sync::OnceLock;
+    static DONE: OnceLock<()> = OnceLock::new();
+    if DONE.set(()).is_err() {
+        return;
+    }
     cx.bind_keys([
         gpui::KeyBinding::new("backspace", Backspace, Some("UITextArea")),
         gpui::KeyBinding::new("delete", Delete, Some("UITextArea")),
