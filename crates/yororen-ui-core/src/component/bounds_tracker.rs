@@ -6,6 +6,14 @@ use gpui::{
 ///
 /// Useful for positioning floating UI (menus/popovers) relative to triggers while keeping them
 /// inside the window.
+///
+/// **Identity contract**: this element intentionally returns
+/// `None` from `Element::id()`. The tracked bounds are the inner
+/// element's bounds, so the element that *uses* this tracker is
+/// responsible for its own element id. In practice, callers wrap
+/// the tracker in a parent `div().id(parent_id)`; the parent id
+/// keys `use_keyed_state` and the tracker's `Entity<Bounds>` is
+/// the side-effect sink.
 pub(crate) struct BoundsTrackerElement {
     pub(crate) bounds_state: gpui::Entity<Bounds<gpui::Pixels>>,
     pub(crate) inner: gpui::AnyElement,
