@@ -475,6 +475,7 @@ pub struct SelectTokens {
     pub horizontal_padding: Pixels, // 12
     pub chevron_size: Pixels,       // 14
     pub menu_min_width: Pixels,     // 120
+    pub menu_width: Pixels,         // 240 (default; user `.menu_width(...)` overrides win)
     pub menu_max_height: Pixels,    // 260
     pub item_padding_y: Pixels,     // 6
     pub item_padding_x: Pixels,     // 12
@@ -487,6 +488,7 @@ impl Default for SelectTokens {
             horizontal_padding: px(12.),
             chevron_size: px(14.),
             menu_min_width: px(120.),
+            menu_width: px(240.),
             menu_max_height: px(260.),
             item_padding_y: px(6.),
             item_padding_x: px(12.),

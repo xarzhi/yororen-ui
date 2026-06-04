@@ -444,7 +444,7 @@ impl RenderOnce for Select {
             )
             .child(
                 icon(IconName::Arrow(ArrowDirection::Down))
-                    .size(cx.theme().tokens.sizes.icon_md)
+                    .size(theme.tokens.sizes.icon_md)
                     .color(hint),
             )
             .when(is_open, move |this| {
@@ -461,7 +461,14 @@ impl RenderOnce for Select {
                     .unwrap_or(TextDirection::Ltr);
 
                 let trigger_bounds = *trigger_bounds_state_for_menu.read(cx);
-                let menu_width_px = menu_width.unwrap_or(trigger_bounds.size.width);
+                // Fallback chain: user override → token (theme) → trigger bounds width.
+                // Aligned with `combo_box.rs` which uses
+                // `theme.tokens.control.combo_box.menu_width` as the
+                // default; `select` now does the same via the new
+                // `SelectTokens::menu_width` entry.
+                let menu_width_px = menu_width
+                    .unwrap_or(theme.tokens.control.select.menu_width)
+                    .max(trigger_bounds.size.width);
                 let menu_left =
                     desired_menu_left(trigger_bounds, menu_width_px, direction, false, window);
                 let relative_left = menu_left - trigger_bounds.left();
@@ -539,7 +546,7 @@ impl RenderOnce for Select {
                             .when(is_selected, |this| {
                                 this.child(
                                     icon(IconName::Check)
-                                        .size(cx.theme().tokens.sizes.icon_sm)
+                                        .size(theme.tokens.sizes.icon_sm)
                                         .color(theme.action.primary.bg),
                                 )
                             })
