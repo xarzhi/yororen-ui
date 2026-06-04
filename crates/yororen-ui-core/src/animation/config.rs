@@ -81,6 +81,22 @@ impl AnimationConfig {
         // for custom easing in the preset module.
         animation
     }
+
+    /// P1-8: build an `AnimationConfig` from a theme's `MotionTokens`.
+    /// This is the unified entry point — duration comes from
+    /// `tokens.motion.duration_normal` and easing from
+    /// `tokens.motion.easing_default`. Components should call this
+    /// instead of independently reading
+    /// `animation::constants::duration::*` and `easing::*`.
+    pub fn from_motion(motion: &crate::theme::tokens::MotionTokens) -> Self {
+        Self {
+            duration: motion.duration_normal,
+            easing: motion.easing_standard,
+            delay: Duration::ZERO,
+            repeat: false,
+            reverse: false,
+        }
+    }
 }
 
 /// State tracking for complex animations.
