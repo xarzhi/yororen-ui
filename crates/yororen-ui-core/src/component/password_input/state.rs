@@ -1,4 +1,13 @@
 //! Password input state module.
+//!
+//! `PasswordInputState` historically duplicated `TextInputState`'s
+//! `content` / `selected_range` / `marked_range` fields. The
+//! `text_input` crate now embeds the shared [`TextEditState`] for
+//! its edit fields; the `password_input` crate intentionally keeps
+//! a separate state struct because it (a) renders masked glyphs
+//! and (b) must avoid leaking the cleartext content through
+//! `EntityInputHandler::text` / `selected_text`. Future work can
+//! compose `TextEditState` once the masking contract is solid.
 
 use std::ops::Range;
 use std::sync::Arc;
