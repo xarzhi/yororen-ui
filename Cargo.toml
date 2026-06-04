@@ -30,6 +30,7 @@ members = [
     "crates/yororen-ui-demos/modal_a11y",
     "crates/yororen-ui-demos/flavor_gallery",
     "crates/yororen-ui-demos/headless_demo",
+    "crates/yororen-ui-demos/meta",
 ]
 exclude = [
     "crates/yororen-ui-demos/*/target",

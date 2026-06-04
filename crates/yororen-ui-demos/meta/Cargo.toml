@@ -1,0 +1,14 @@
+[package]
+name = "yororen-ui-demos"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+description = "Meta-crate index for the 13 demo crates. The demos themselves stay in their own per-crate workspaces so each one can be built with `cargo run -p <name>`."
+repository.workspace = true
+
+[dependencies]
+yororen-ui = { package = "yororen_ui", path = "../../yororen-ui" }
+
+[[bin]]
+name = "yororen-ui-demos"
+path = "src/main.rs"
