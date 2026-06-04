@@ -15,6 +15,7 @@ pub struct ButtonGroup {
     gap: Option<DefiniteLength>,
     radius: Option<AbsoluteLength>,
     connected: bool,
+    vertical: bool,
 }
 
 impl Default for ButtonGroup {
@@ -32,6 +33,7 @@ impl ButtonGroup {
             gap: None,
             radius: None,
             connected: false,
+            vertical: false,
         }
     }
 
@@ -54,6 +56,13 @@ impl ButtonGroup {
         self.connected = connected;
         self
     }
+
+    /// Lay children out vertically instead of the default row.
+    /// Useful for narrow sidebars or stacked action groups.
+    pub fn vertical(mut self, vertical: bool) -> Self {
+        self.vertical = vertical;
+        self
+    }
 }
 
 impl ParentElement for ButtonGroup {
@@ -73,9 +82,13 @@ impl RenderOnce for ButtonGroup {
         let gap = self.gap;
         let radius = self.radius;
         let connected = self.connected;
+        let vertical = self.vertical;
         let element_id = self.element_id;
 
         let mut group = self.base.id(element_id).flex().items_center();
+        if vertical {
+            group = group.flex_col();
+        }
         if let Some(gap) = gap
             && !connected
         {
