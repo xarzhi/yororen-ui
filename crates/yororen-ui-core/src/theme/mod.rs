@@ -122,11 +122,6 @@ impl Theme {
         self.text_direction.is_rtl()
     }
 
-    /// Get the default text direction.
-    pub fn default_text_direction() -> TextDirection {
-        TextDirection::Ltr
-    }
-
     pub fn action_variant(&self, variant: ActionVariantKind) -> &ActionVariant {
         match variant {
             ActionVariantKind::Neutral => &self.action.neutral,
