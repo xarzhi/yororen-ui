@@ -1,4 +1,3 @@
-use std::sync::Arc;
 
 use gpui::{
     ClickEvent, Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, RenderOnce,
@@ -6,8 +5,8 @@ use gpui::{
 };
 
 use crate::renderer::variant::VariantState;
-use crate::renderer::{ButtonVariant, VariantKey, resolve_custom_variant};
-use crate::theme::{ActionVariantKind, ActiveTheme};
+use crate::renderer::{ButtonVariant, VariantKey};
+use crate::theme::ActiveTheme;
 
 /// Creates a new clickable surface element.
 pub fn clickable_surface(id: impl Into<ElementId>) -> ClickableSurface {
@@ -149,11 +148,9 @@ impl RenderOnce for ClickableSurface {
         let variant = self.variant;
         let element_id = self.element_id;
 
-        let custom_style: Option<Arc<dyn crate::renderer::VariantStyle>> = match &variant {
-            ButtonVariant::Builtin(_) => None,
-            ButtonVariant::Custom(key) => resolve_custom_variant(_cx, key),
-        };
-        let variant_builtin = variant.as_builtin().unwrap_or(ActionVariantKind::Neutral);
+        let resolved = crate::component::ResolvedVariant::resolve(&variant, _cx);
+        let custom_style = resolved.custom_style;
+        let variant_builtin = resolved.builtin;
         let action_variant = _cx.theme().action_variant(variant_builtin);
         let variant_bg = custom_style
             .as_ref()

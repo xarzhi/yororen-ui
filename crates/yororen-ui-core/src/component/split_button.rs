@@ -9,8 +9,8 @@ use gpui::{
 use crate::animation::constants::duration;
 use crate::component::{ArrowDirection, Icon, IconName, button};
 use crate::renderer::variant::VariantState;
-use crate::renderer::{ButtonVariant, VariantKey, resolve_custom_variant};
-use crate::theme::{ActionVariantKind, ActiveTheme};
+use crate::renderer::{ButtonVariant, VariantKey};
+use crate::theme::ActiveTheme;
 
 use crate::animation::ease_out_quint_clamped;
 
@@ -196,11 +196,9 @@ impl RenderOnce for SplitButton {
         // global VariantRegistry. The lookup only affects the outer
         // container's bg / hover_bg / fg (the inner primary button is
         // forced transparent so the outer shows through).
-        let custom_style: Option<Arc<dyn crate::renderer::VariantStyle>> = match &variant {
-            ButtonVariant::Builtin(_) => None,
-            ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
-        };
-        let variant_builtin = variant.as_builtin().unwrap_or(ActionVariantKind::Neutral);
+        let resolved = crate::component::ResolvedVariant::resolve(&variant, cx);
+        let custom_style = resolved.custom_style;
+        let variant_builtin = resolved.builtin;
         let theme_action_variant = cx.theme().action_variant(variant_builtin).clone();
         let action_variant = if let Some(s) = &custom_style {
             crate::theme::ActionVariant {

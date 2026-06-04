@@ -10,7 +10,6 @@ use crate::{
     a11y::Role,
     component::{HeadingLevel, IconName, button, heading, icon, icon_button, label, panel},
     i18n::TextDirection,
-    renderer::spec::Edges,
     theme::{ActionVariantKind, ActiveTheme},
 };
 

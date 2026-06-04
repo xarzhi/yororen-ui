@@ -8,7 +8,7 @@ use gpui::{
 use crate::component::{ClickCallback, HoverCallback};
 use crate::renderer::variant::VariantState;
 use crate::renderer::{
-    ButtonRenderState, ButtonVariant, Edges, VariantKey, resolve_custom_variant,
+    ButtonRenderState, ButtonVariant, Edges, VariantKey,
 };
 use crate::theme::{ActionVariantKind, ActiveTheme};
 
@@ -166,12 +166,9 @@ impl RenderOnce for Button {
 
         // Resolve a custom variant up-front so the renderer (and the
         // inline hover fallback below) can both consult it.
-        let custom_style: Option<Arc<dyn crate::renderer::VariantStyle>> = match &variant {
-            ButtonVariant::Builtin(_) => None,
-            ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
-        };
-        let variant_builtin: ActionVariantKind =
-            variant.as_builtin().unwrap_or(ActionVariantKind::Neutral);
+        let resolved = crate::component::ResolvedVariant::resolve(&variant, cx);
+        let custom_style = resolved.custom_style;
+        let variant_builtin: ActionVariantKind = resolved.builtin;
 
         // button visuals go through ButtonRenderer.
         let theme = cx.theme();

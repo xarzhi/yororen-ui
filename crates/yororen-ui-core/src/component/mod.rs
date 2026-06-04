@@ -85,6 +85,7 @@ pub use empty_state::*;
 pub use file_path_input::*;
 pub use focus_ring::*;
 pub use form::*;
+pub use has_variant::*;
 pub use heading::*;
 pub use icon::*;
 pub use icon_button::*;

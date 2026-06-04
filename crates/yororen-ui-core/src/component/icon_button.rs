@@ -7,8 +7,8 @@ use gpui::{
 
 use crate::{
     component::{ClickCallback, HoverCallback, Icon, compute_action_style_with_custom},
-    renderer::{ButtonVariant, VariantKey, resolve_custom_variant},
-    theme::{ActionVariantKind, ActiveTheme},
+    renderer::{ButtonVariant, VariantKey},
+    theme::ActiveTheme,
 };
 
 /// Creates a new icon button element.
@@ -169,11 +169,9 @@ impl RenderOnce for IconButton {
         let variant = self.variant;
         let icon_size = self.icon_size;
 
-        let custom_style = match &variant {
-            ButtonVariant::Builtin(_) => None,
-            ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
-        };
-        let variant_builtin = variant.as_builtin().unwrap_or(ActionVariantKind::Neutral);
+        let resolved = crate::component::ResolvedVariant::resolve(&variant, cx);
+        let custom_style = resolved.custom_style;
+        let variant_builtin = resolved.builtin;
 
         let action_style = compute_action_style_with_custom(
             cx.theme(),

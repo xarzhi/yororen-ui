@@ -8,8 +8,8 @@ use gpui::{
 use crate::{
     component::{IconName, TextInputState, compute_input_style, icon, icon_button, text_input},
     renderer::variant::VariantState,
-    renderer::{ButtonVariant, VariantKey, resolve_custom_variant},
-    theme::{ActionVariant, ActionVariantKind, ActiveTheme},
+    renderer::{ButtonVariant, VariantKey},
+    theme::{ActionVariant, ActiveTheme},
 };
 
 /// Creates a new search input element.
@@ -188,11 +188,9 @@ impl RenderOnce for SearchInput {
         // Resolve the clear button's variant. Built-in values fall
         // through to the theme; custom variants are looked up in the
         // global VariantRegistry.
-        let custom_style = match &variant {
-            ButtonVariant::Builtin(_) => None,
-            ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
-        };
-        let variant_builtin = variant.as_builtin().unwrap_or(ActionVariantKind::Neutral);
+        let resolved = crate::component::ResolvedVariant::resolve(&variant, cx);
+        let custom_style = resolved.custom_style;
+        let variant_builtin = resolved.builtin;
         let theme_action_variant = cx.theme().action_variant(variant_builtin).clone();
         let action_variant = if let Some(s) = &custom_style {
             ActionVariant {

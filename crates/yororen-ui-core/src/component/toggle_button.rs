@@ -7,8 +7,8 @@ use gpui::{
 
 use crate::{
     component::{ToggleCallback, create_internal_state, is_uncontrolled_simple},
-    renderer::{ButtonVariant, VariantKey, resolve_custom_variant},
-    theme::{ActionVariantKind, ActiveTheme},
+    renderer::{ButtonVariant, VariantKey},
+    theme::ActiveTheme,
 };
 
 /// Creates a new toggle button element.
@@ -214,11 +214,9 @@ impl RenderOnce for ToggleButton {
         }
 
         // Resolve custom variant once and reuse for unselected colors.
-        let custom_style: Option<Arc<dyn crate::renderer::VariantStyle>> = match &variant {
-            ButtonVariant::Builtin(_) => None,
-            ButtonVariant::Custom(key) => resolve_custom_variant(cx, key),
-        };
-        let variant_builtin = variant.as_builtin().unwrap_or(ActionVariantKind::Neutral);
+        let resolved = crate::component::ResolvedVariant::resolve(&variant, cx);
+        let custom_style = resolved.custom_style;
+        let variant_builtin = resolved.builtin;
         let action_variant = cx.theme().action_variant(variant_builtin);
         let selected_variant = &cx.theme().action.primary;
 
