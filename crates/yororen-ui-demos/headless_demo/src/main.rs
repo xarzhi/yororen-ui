@@ -19,8 +19,10 @@ use gpui::{
 use yororen_ui::assets::UiAsset;
 use yororen_ui::component::{init as init_component, label as label_comp, panel};
 use yororen_ui::composite::{
-    ComboBoxRoot, DropdownMenuRoot, ModalRoot, PopoverRoot, SelectRoot,
+    ComboBoxRoot, DropdownMenuRoot, ModalRoot, PopoverRoot, SelectRoot, TooltipRoot,
 };
+use yororen_ui::component::tooltip::TooltipPlacement;
+use yororen_ui::component::button as button_comp;
 use yororen_ui::hooks::{
     self, ButtonProps, CheckboxProps, IconButtonProps, LabelProps, RadioProps, SwitchProps,
     TextInputProps, ToggleButtonProps,
@@ -369,6 +371,15 @@ fn render_composite_col(
         .option("sf", "San Francisco")
         .option("tk", "Tokyo");
 
+    // TooltipRoot — a real hover-popup built on top of the
+    // underlying `Tooltip` builder. Hover the button to see the
+    // tooltip. `dismiss_on_escape = true` honours Esc.
+    let tooltip_root = TooltipRoot::new("demo-tooltip")
+        .trigger(button_comp("tip-btn").child("Hover me"))
+        .text("This is a TooltipRoot popup (Phase I.2 P0 real impl)")
+        .placement(TooltipPlacement::Bottom)
+        .dismiss_on_escape(true);
+
     let _ = close_modal;
 
     panel("composite-col")
@@ -390,6 +401,9 @@ fn render_composite_col(
         .child(div().h(px(8.)))
         .child(label_comp("ComboBoxRoot").muted(true))
         .child(combo_root)
+        .child(div().h(px(8.)))
+        .child(label_comp("TooltipRoot (hover the button)").muted(true))
+        .child(tooltip_root)
         .child(div().h(px(8.)))
         .child(label_comp(format!("radio_choice = {radio_choice}")).muted(true))
         .child(div().h(px(8.)))
