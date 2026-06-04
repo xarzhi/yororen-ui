@@ -1,19 +1,22 @@
-//! `ModalShell` — a one-line "show me a modal" wrapper that
-//! composes `Modal` with `Overlay` + body scroll lock, and links
-//! the close-button callback to the overlay's dismiss state.
+//! One-line accessible modal: scrim + focus trap + Esc +
+//! close-button linked, all wired up by a single builder.
 //!
-//! Requirements from the v0.5 review:
+//! `modal_dialog(id)` returns a `ModalShell` that:
 //!
-//! - A single `Modal::new().open(true)` should be enough on its
-//!   own to get a fully a11y modal (focus trap + Esc +
-//!   click-outside + scroll lock). We satisfy this by
-//!   introducing a new `ModalShell` factory that wraps
-//!   everything together.
-//! - The close button on the inner Modal must close
-//!   the outer overlay (the original two callbacks are
-//!   independent). ModalShell solves this by having the Modal's
-//!   on_close callback also flip the shell's `open` state,
-//!   which causes the overlay to close.
+//! - opens / closes with `.open(bool)`;
+//! - dismisses on Esc, scrim click, *and* the inner Modal's
+//!   close button — the three paths route to one `on_close`
+//!   callback;
+//! - locks body scroll while open;
+//! - ships a `Modal::on_close` hook that flips the shell's
+//!   `open` state, so the inner close button and the outer
+//!   overlay stay in sync.
+//!
+//! # When to reach for `modal()` instead
+//!
+//! Use the bare [`modal`](super::modal::modal) factory when you
+//! already have a custom overlay (e.g. an inline form inside a
+//! sidebar) and don't need the scrim.
 
 use std::sync::Arc;
 
