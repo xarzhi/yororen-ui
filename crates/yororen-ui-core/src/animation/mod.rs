@@ -37,7 +37,7 @@ pub use easing::{
 pub use helpers::{
     AnimateExt, SlideDirection as HelpersSlideDirection, animation_id, lerp, lerp_color,
 };
-pub use orchestrator::{AnimationParallel, AnimationSequence, Staggered, parallel, sequence};
+pub use orchestrator::{AnimationParallel, AnimationSequence, OrchestrationBuilder, Staggered, parallel, sequence};
 pub use orchestrator::{Orchestration, TrackId};
 pub use preset::{
     AnimationType, BounceIn, BounceOut, ElasticIn, ElasticOut, FadeIn, FadeOut, PresetAnimation,

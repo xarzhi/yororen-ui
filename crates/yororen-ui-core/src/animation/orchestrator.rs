@@ -308,6 +308,34 @@ impl AnimationParallel {
 
 // Convenience functions
 
+/// Common shape every orchestration builder satisfies. Lets callers
+/// write `B::new().with_all(durs)` regardless of whether the
+/// orchestration is sequential or parallel.
+pub trait OrchestrationBuilder: Default + Sized + Clone {
+    /// Add a single duration.
+    fn with(self, duration: Duration) -> Self;
+    /// Add a batch of durations.
+    fn with_all(self, durations: impl IntoIterator<Item = Duration>) -> Self;
+}
+
+impl OrchestrationBuilder for AnimationSequence {
+    fn with(self, duration: Duration) -> Self {
+        self.then(duration)
+    }
+    fn with_all(self, durations: impl IntoIterator<Item = Duration>) -> Self {
+        self.then_all(durations)
+    }
+}
+
+impl OrchestrationBuilder for AnimationParallel {
+    fn with(self, duration: Duration) -> Self {
+        AnimationParallel::with(self, duration)
+    }
+    fn with_all(self, durations: impl IntoIterator<Item = Duration>) -> Self {
+        AnimationParallel::with_all(self, durations)
+    }
+}
+
 pub fn sequence(durations: &[Duration]) -> AnimationSequence {
     AnimationSequence::new().then_all(durations.iter().copied())
 }
