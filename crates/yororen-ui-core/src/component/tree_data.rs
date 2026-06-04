@@ -5,14 +5,22 @@
 //!
 //! See the [Tree component documentation](https://github.com/MeowLynxSea/yororen-ui/wiki/Component-Tree) for usage examples.
 
-use gpui::ElementId;
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::fmt;
+
+use gpui::ElementId;
 
 /// Newtype for tree-node identifiers. Decouples the data model
 /// from `gpui::ElementId` so callers can use any `Hash + Eq`
 /// type for node IDs. The conversion to / from `ElementId` lives
 /// in the tree-rendering code, not in the data model.
+///
+/// This is the **only** type a `TreeNode` and `FlatTreeNode`'s
+/// `id` field is allowed to hold — `ElementId` cannot be assigned
+/// directly, which prevents accidentally passing a tab id, list
+/// item id, or any other `ElementId` from elsewhere in the
+/// codebase where a tree-node id is expected.
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct TreeNodeId(pub Cow<'static, str>);
 
@@ -24,6 +32,20 @@ impl TreeNodeId {
     /// Convenience for `TreeNodeId(Cow::Owned(s.into()))`.
     pub fn owned(s: impl Into<String>) -> Self {
         Self(Cow::Owned(s.into()))
+    }
+    /// Borrowed conversion to `gpui::ElementId`. Use this at the
+    /// render boundary (e.g. `div().id(node_id.as_element_id())`)
+    /// to avoid the consuming `Into<ElementId>` round-trip and
+    /// keep the original `TreeNodeId` available for HashMap lookups
+    /// without cloning.
+    pub fn as_element_id(&self) -> ElementId {
+        ElementId::Name(self.0.as_ref().to_string().into())
+    }
+}
+
+impl fmt::Display for TreeNodeId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.0)
     }
 }
 
@@ -41,7 +63,7 @@ impl From<String> for TreeNodeId {
 
 impl From<TreeNodeId> for ElementId {
     fn from(id: TreeNodeId) -> Self {
-        ElementId::Name(id.0.into_owned().into())
+        id.as_element_id()
     }
 }
 
@@ -76,8 +98,12 @@ pub enum SelectionMode {
 /// ```
 #[derive(Debug, Clone)]
 pub struct TreeNode<T: TreeNodeData = ArcTreeNode> {
-    /// Unique identifier for this node.
-    pub id: ElementId,
+    /// Unique identifier for this node. **Strongly typed** —
+    /// `TreeNodeId`, not `ElementId`, so a tree node cannot
+    /// accidentally hold an id minted for some other component
+    /// (tabs, list items, etc.). Convert to `ElementId` at the
+    /// render boundary via [`TreeNodeId::as_element_id`].
+    pub id: TreeNodeId,
     /// The data associated with this node.
     pub data: T,
     /// Child nodes of this node.
@@ -188,7 +214,7 @@ impl<T: TreeNodeData> TreeNodeBuilder<T> {
     pub fn new(id: impl Into<TreeNodeId>, data: T) -> Self {
         Self {
             node: TreeNode {
-                id: id.into().into(),
+                id: id.into(),
                 data,
                 children: Vec::new(),
                 expanded: false,
@@ -227,11 +253,14 @@ impl<T: TreeNodeData> TreeNodeBuilder<T> {
 }
 
 /// Tree state that manages the expanded/collapsed state of nodes.
+///
+/// Keys are [`TreeNodeId`] (not `ElementId`) so the lookup type
+/// matches the data model's node id exactly.
 #[derive(Debug, Default, Clone)]
 pub struct TreeState {
-    pub expanded_nodes: HashMap<ElementId, bool>,
-    pub selected_nodes: HashMap<ElementId, bool>,
-    pub checked_nodes: HashMap<ElementId, TreeCheckedState>,
+    pub expanded_nodes: HashMap<TreeNodeId, bool>,
+    pub selected_nodes: HashMap<TreeNodeId, bool>,
+    pub checked_nodes: HashMap<TreeNodeId, TreeCheckedState>,
 }
 
 impl TreeState {
@@ -240,32 +269,32 @@ impl TreeState {
     }
 
     /// Set the expanded state of a node.
-    pub fn set_expanded(&mut self, id: &ElementId, expanded: bool) {
+    pub fn set_expanded(&mut self, id: &TreeNodeId, expanded: bool) {
         self.expanded_nodes.insert(id.clone(), expanded);
     }
 
     /// Check if a node is expanded.
-    pub fn is_expanded(&self, id: &ElementId) -> bool {
+    pub fn is_expanded(&self, id: &TreeNodeId) -> bool {
         self.expanded_nodes.get(id).copied().unwrap_or(false)
     }
 
     /// Set the selected state of a node.
-    pub fn set_selected(&mut self, id: &ElementId, selected: bool) {
+    pub fn set_selected(&mut self, id: &TreeNodeId, selected: bool) {
         self.selected_nodes.insert(id.clone(), selected);
     }
 
     /// Check if a node is selected.
-    pub fn is_selected(&self, id: &ElementId) -> bool {
+    pub fn is_selected(&self, id: &TreeNodeId) -> bool {
         self.selected_nodes.get(id).copied().unwrap_or(false)
     }
 
     /// Set the checked state of a node.
-    pub fn set_checked(&mut self, id: &ElementId, checked: TreeCheckedState) {
+    pub fn set_checked(&mut self, id: &TreeNodeId, checked: TreeCheckedState) {
         self.checked_nodes.insert(id.clone(), checked);
     }
 
     /// Get the checked state of a node.
-    pub fn get_checked(&self, id: &ElementId) -> TreeCheckedState {
+    pub fn get_checked(&self, id: &TreeNodeId) -> TreeCheckedState {
         self.checked_nodes
             .get(id)
             .copied()
@@ -273,7 +302,7 @@ impl TreeState {
     }
 
     /// Toggle the expanded state of a node.
-    pub fn toggle_expanded(&mut self, id: &ElementId) {
+    pub fn toggle_expanded(&mut self, id: &TreeNodeId) {
         let current = self.is_expanded(id);
         self.set_expanded(id, !current);
     }
@@ -284,51 +313,19 @@ impl TreeState {
     }
 
     /// Get all selected node IDs.
-    pub fn selected_ids(&self) -> impl Iterator<Item = &ElementId> {
+    pub fn selected_ids(&self) -> impl Iterator<Item = &TreeNodeId> {
         self.selected_nodes.keys()
     }
 
     /// Get all checked node IDs.
-    pub fn checked_ids(&self) -> impl Iterator<Item = (&ElementId, &TreeCheckedState)> {
+    pub fn checked_ids(&self) -> impl Iterator<Item = (&TreeNodeId, &TreeCheckedState)> {
         self.checked_nodes.iter()
     }
 
     /// Get all expanded node IDs.
-    pub fn expanded_nodes(&self) -> impl Iterator<Item = (&ElementId, &bool)> {
+    pub fn expanded_nodes(&self) -> impl Iterator<Item = (&TreeNodeId, &bool)> {
         self.expanded_nodes.iter()
     }
-}
-
-/// Event emitted by tree interactions.
-#[derive(Debug, Clone)]
-pub enum TreeEvent {
-    /// A node was clicked.
-    Click(ElementId),
-    /// A node was double-clicked.
-    DoubleClick(ElementId),
-    /// A node's expansion state changed.
-    ToggleExpand(ElementId),
-    /// A node's selection changed.
-    Select(ElementId),
-    /// A node's checked state changed (for checkbox mode).
-    Check(ElementId, TreeCheckedState),
-    /// A node was dropped onto another node.
-    Drop {
-        dragged_id: ElementId,
-        target_id: ElementId,
-        position: DropPosition,
-    },
-}
-
-/// Position where a node is dropped relative to the target.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DropPosition {
-    /// Dropped above the target node.
-    Before,
-    /// Dropped below the target node.
-    After,
-    /// Dropped onto the target node (as a child).
-    On,
 }
 
 /// Trait for customizing tree node rendering.
@@ -343,13 +340,38 @@ pub trait TreeNodeRenderer<T: TreeNodeData>: 'static + Sized {
     ) -> gpui::AnyElement;
 }
 
+// --- Tree-specific callback types ----------------------------------------
+//
+// The generic `ElementClickCallback` / `ElementMouseDownCallback` /
+// `ElementCallback` aliases (in `crate::component::callback`) carry an
+// `&ElementId` because the rest of the UI needs an id that can be turned
+// into a `gpui::ElementId` for state-keyed storage. Trees carry
+// `TreeNodeId` instead, so they need their own callback shapes that
+// surface the strongly-typed id to the handler.
+
+/// Click callback for a tree row. Carries the clicked node's
+/// [`TreeNodeId`] (not an `ElementId`).
+pub type TreeItemClickCallback<T = gpui::ClickEvent> =
+    std::sync::Arc<dyn Fn(&TreeNodeId, &T, &mut gpui::Window, &mut gpui::App)>;
+
+/// Right-click / context-menu callback for a tree row.
+pub type TreeItemContextMenuCallback =
+    std::sync::Arc<dyn Fn(&TreeNodeId, &gpui::MouseDownEvent, &mut gpui::Window, &mut gpui::App)>;
+
+/// "Node id only" callback for tree events (toggle_expand, select).
+pub type TreeIdCallback = std::sync::Arc<dyn Fn(&TreeNodeId)>;
+
+/// Checkbox change callback (node id + new checked state).
+pub type TreeCheckCallback =
+    std::sync::Arc<dyn Fn(&TreeNodeId, TreeCheckedState)>;
+
 /// Flattened tree node for virtualized rendering.
 ///
 /// This is used internally by the Tree component to render only visible nodes.
 #[derive(Debug, Clone)]
 pub struct FlatTreeNode<T: TreeNodeData = ArcTreeNode> {
-    /// The original node ID.
-    pub id: ElementId,
+    /// The original node ID. Strongly typed — see [`TreeNode::id`].
+    pub id: TreeNodeId,
     /// The node data.
     pub data: T,
     /// Depth level in the tree.
@@ -372,7 +394,7 @@ pub type SimpleFlatTreeNode = FlatTreeNode<ArcTreeNode>;
 /// Flattens a tree structure into a list for virtualized rendering.
 pub fn flatten_tree<T: TreeNodeData>(
     nodes: &[TreeNode<T>],
-    expanded_ids: &HashMap<ElementId, bool>,
+    expanded_ids: &HashMap<TreeNodeId, bool>,
     include_hidden: bool,
 ) -> Vec<FlatTreeNode<T>> {
     let mut result = Vec::new();
@@ -382,7 +404,7 @@ pub fn flatten_tree<T: TreeNodeData>(
 
 fn flatten_tree_recursive<T: TreeNodeData>(
     nodes: &[TreeNode<T>],
-    expanded_ids: &HashMap<ElementId, bool>,
+    expanded_ids: &HashMap<TreeNodeId, bool>,
     depth: usize,
     result: &mut Vec<FlatTreeNode<T>>,
     include_hidden: bool,
@@ -445,20 +467,58 @@ mod tests {
     #[test]
     fn tree_node_builder_accepts_static_str() {
         let node = TreeNodeBuilder::new("root", ArcTreeNode::new("Root")).build();
-        assert_eq!(node.id, ElementId::from("root"));
+        assert_eq!(node.id, TreeNodeId::borrowed("root"));
     }
 
     #[test]
     fn tree_node_builder_accepts_owned_string() {
         let id = String::from("dynamic-1");
         let node = TreeNodeBuilder::new(id.clone(), ArcTreeNode::new("Dynamic")).build();
-        assert_eq!(node.id, ElementId::from(id));
+        assert_eq!(node.id, TreeNodeId::owned(id));
     }
 
     #[test]
     fn tree_node_builder_accepts_typed_tree_node_id() {
         let id = TreeNodeId::owned("typed-id");
-        let node = TreeNodeBuilder::new(id, ArcTreeNode::new("Typed")).build();
-        assert_eq!(node.id, ElementId::from("typed-id"));
+        let node = TreeNodeBuilder::new(id.clone(), ArcTreeNode::new("Typed")).build();
+        assert_eq!(node.id, id);
+    }
+
+    #[test]
+    fn tree_node_id_field_rejects_element_id_assignment() {
+        // The id is now `TreeNodeId`, not `ElementId` — this is a
+        // **compile-time** guarantee. Verify the field type is
+        // `TreeNodeId` by constructing the struct literally.
+        let node: TreeNode = TreeNode {
+            id: TreeNodeId::borrowed("static-check"),
+            data: ArcTreeNode::new("data"),
+            children: Vec::new(),
+            expanded: false,
+            selected: false,
+            checked: TreeCheckedState::Unchecked,
+            depth: 0,
+            has_children: false,
+        };
+        assert_eq!(node.id.to_string(), "static-check");
+    }
+
+    #[test]
+    fn as_element_id_borrowed_does_not_consume() {
+        let id = TreeNodeId::borrowed("non-consuming");
+        // Call as_element_id twice — the original is still usable.
+        let _ = id.as_element_id();
+        let _ = id.as_element_id();
+        assert_eq!(id.to_string(), "non-consuming");
+    }
+
+    #[test]
+    fn display_via_cow() {
+        // Both borrowed and owned variants implement Display so
+        // tuple-style ElementId construction (`(id, suffix).into()`)
+        // works at the render boundary.
+        let borrowed = TreeNodeId::borrowed("a");
+        let owned = TreeNodeId::owned("b".to_string());
+        assert_eq!(format!("{borrowed}"), "a");
+        assert_eq!(format!("{owned}"), "b");
     }
 }

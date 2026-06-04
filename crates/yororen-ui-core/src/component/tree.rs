@@ -24,13 +24,13 @@ use gpui::{
     ParentElement, Pixels, RenderOnce, StatefulInteractiveElement, Styled, Window, div, list,
 };
 
-use crate::component::ElementMouseDownCallback;
-use crate::component::{ClickCallback, ElementCallback, ElementClickCallback};
+use crate::component::ClickCallback;
 use crate::theme::ActiveTheme;
 
 use super::tree_data::{
-    ArcTreeNode, FlatTreeNode, SelectionMode, TreeCheckedState, TreeNode, TreeNodeData, TreeState,
-    flatten_tree,
+    ArcTreeNode, FlatTreeNode, SelectionMode, TreeCheckCallback, TreeCheckedState,
+    TreeIdCallback, TreeItemClickCallback, TreeItemContextMenuCallback, TreeNode, TreeNodeData,
+    TreeNodeId, TreeState, flatten_tree,
 };
 
 /// Creates a new tree component.
@@ -38,10 +38,18 @@ use super::tree_data::{
 /// # Example
 ///
 /// ```rust,ignore
+/// use yororen_ui::component::{
+///     ArcTreeNode, SelectionMode, TreeNodeBuilder, TreeState, tree,
+/// };
+///
 /// let state = TreeState::new();
 /// let nodes = vec![
-///     TreeNode::new("root")
-///         .children(vec![TreeNode::new("child")])
+///     TreeNodeBuilder::new("root", ArcTreeNode::new("Root"))
+///         .expanded(true)
+///         .child(
+///             TreeNodeBuilder::new("child", ArcTreeNode::new("Child")).build(),
+///         )
+///         .build(),
 /// ];
 ///
 /// tree(state, &nodes)
@@ -52,8 +60,6 @@ pub fn tree(state: TreeState, nodes: &[TreeNode]) -> Tree {
 }
 
 /// Callback type for tree check handler.
-type TreeCheckCallback = Arc<dyn Fn(&ElementId, TreeCheckedState)>;
-
 /// The main tree view component.
 #[derive(IntoElement)]
 pub struct Tree {
@@ -70,10 +76,10 @@ pub struct Tree {
     virtualized: bool,
     list_state: Option<ListState>,
     on_click: Option<ClickCallback>,
-    on_item_click: Option<ElementClickCallback>,
-    on_item_context_menu: Option<ElementMouseDownCallback>,
-    on_toggle_expand: Option<ElementCallback>,
-    on_select: Option<ElementCallback>,
+    on_item_click: Option<TreeItemClickCallback>,
+    on_item_context_menu: Option<TreeItemContextMenuCallback>,
+    on_toggle_expand: Option<TreeIdCallback>,
+    on_select: Option<TreeIdCallback>,
     on_check: Option<TreeCheckCallback>,
 }
 
@@ -125,7 +131,7 @@ impl Tree {
 
         fn collect_expanded(
             nodes: &[TreeNode],
-            expanded: &mut std::collections::HashMap<ElementId, bool>,
+            expanded: &mut std::collections::HashMap<TreeNodeId, bool>,
         ) {
             for node in nodes {
                 // Only seed the initial expanded state from the node if the user
@@ -203,11 +209,11 @@ impl Tree {
         self
     }
 
-    /// Set a click handler that receives the clicked item's element ID.
+    /// Set a click handler that receives the clicked item's tree-node id.
     /// Use this when you need to know which specific item was clicked.
     pub fn on_item_click<F>(mut self, handler: F) -> Self
     where
-        F: 'static + Fn(&ElementId, &ClickEvent, &mut gpui::Window, &mut gpui::App),
+        F: 'static + Fn(&TreeNodeId, &ClickEvent, &mut gpui::Window, &mut gpui::App),
     {
         self.on_item_click = Some(Arc::new(handler));
         self
@@ -218,7 +224,7 @@ impl Tree {
     /// This is triggered when the user right-clicks a row.
     pub fn on_item_context_menu<F>(mut self, handler: F) -> Self
     where
-        F: 'static + Fn(&ElementId, &gpui::MouseDownEvent, &mut gpui::Window, &mut gpui::App),
+        F: 'static + Fn(&TreeNodeId, &gpui::MouseDownEvent, &mut gpui::Window, &mut gpui::App),
     {
         self.on_item_context_menu = Some(Arc::new(handler));
         self
@@ -226,7 +232,7 @@ impl Tree {
 
     pub fn on_toggle_expand<F>(mut self, handler: F) -> Self
     where
-        F: 'static + Fn(&ElementId),
+        F: 'static + Fn(&TreeNodeId),
     {
         self.on_toggle_expand = Some(Arc::new(handler));
         self
@@ -234,7 +240,7 @@ impl Tree {
 
     pub fn on_select<F>(mut self, handler: F) -> Self
     where
-        F: 'static + Fn(&ElementId),
+        F: 'static + Fn(&TreeNodeId),
     {
         self.on_select = Some(Arc::new(handler));
         self
@@ -242,23 +248,23 @@ impl Tree {
 
     pub fn on_check<F>(mut self, handler: F) -> Self
     where
-        F: 'static + Fn(&ElementId, TreeCheckedState),
+        F: 'static + Fn(&TreeNodeId, TreeCheckedState),
     {
         self.on_check = Some(Arc::new(handler));
         self
     }
 
-    pub fn toggle_expand(&mut self, id: &ElementId) {
+    pub fn toggle_expand(&mut self, id: &TreeNodeId) {
         self.state.toggle_expanded(id);
         self.rebuild_flattened();
     }
 
-    pub fn expand(&mut self, id: &ElementId) {
+    pub fn expand(&mut self, id: &TreeNodeId) {
         self.state.set_expanded(id, true);
         self.rebuild_flattened();
     }
 
-    pub fn collapse(&mut self, id: &ElementId) {
+    pub fn collapse(&mut self, id: &TreeNodeId) {
         self.state.set_expanded(id, false);
         self.rebuild_flattened();
     }
@@ -279,7 +285,7 @@ impl Tree {
         self.rebuild_flattened();
     }
 
-    pub fn select(&mut self, id: &ElementId) {
+    pub fn select(&mut self, id: &TreeNodeId) {
         match self.selection_mode {
             SelectionMode::Single => {
                 self.state.clear_selection();
@@ -361,7 +367,7 @@ impl Tree {
         // Also check the nodes' own expanded field, but don't overwrite user state.
         fn collect_expanded<T: super::tree_data::TreeNodeData>(
             nodes: &[super::tree_data::TreeNode<T>],
-            expanded: &mut std::collections::HashMap<ElementId, bool>,
+            expanded: &mut std::collections::HashMap<TreeNodeId, bool>,
         ) {
             for node in nodes {
                 if !expanded.contains_key(&node.id) && node.expanded {
@@ -417,7 +423,11 @@ impl Tree {
 
             let icon_path = node.data.icon.clone().map(super::Icon::new);
 
-            let row_id: ElementId = (node_id.clone(), "ui:tree:row").into();
+            // Compose the row id by combining the (ElementId view of
+            // the) TreeNodeId with a stable suffix. We borrow
+            // `node_id` for the conversion so the original stays
+            // available for HashMap lookups in the closures below.
+            let row_id: ElementId = (node_id.as_element_id(), "ui:tree:row").into();
 
             let mut row = super::tree_item::tree_item(row_id)
                 .depth(node.depth)
@@ -491,7 +501,7 @@ impl Tree {
                 });
             }
 
-            super::virtual_row(node_id.clone())
+            super::virtual_row(node_id.as_element_id())
                 .child(row)
                 .into_any_element()
         })
@@ -544,7 +554,7 @@ impl Tree {
         // Also check the nodes' own expanded field, but don't overwrite user state.
         fn collect_expanded<T: super::tree_data::TreeNodeData>(
             nodes: &[super::tree_data::TreeNode<T>],
-            expanded: &mut std::collections::HashMap<ElementId, bool>,
+            expanded: &mut std::collections::HashMap<TreeNodeId, bool>,
         ) {
             for node in nodes {
                 if !expanded.contains_key(&node.id) && node.expanded {
@@ -596,7 +606,7 @@ impl Tree {
                 // Only support file icon paths for the default ArcTreeNode for now.
                 let icon_path = node.data.icon.clone().map(super::Icon::new);
 
-                let row_id: ElementId = (node_id.clone(), "ui:tree:row").into();
+                let row_id: ElementId = (node_id.as_element_id(), "ui:tree:row").into();
 
                 let mut row = super::tree_item::tree_item(row_id)
                     .depth(node.depth)
@@ -687,7 +697,7 @@ impl Tree {
                 // This field is retained for API stability.
                 let _ = draggable;
 
-                super::virtual_row(node_id.clone()).child(row)
+                super::virtual_row(node_id.as_element_id()).child(row)
             }))
     }
 }

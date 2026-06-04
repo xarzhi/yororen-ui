@@ -5,7 +5,7 @@
 
 use gpui::{App, AppContext, Entity, Global};
 
-use yororen_ui::component::{ArcTreeNode, TreeCheckedState, TreeNode};
+use yororen_ui::component::{ArcTreeNode, TreeCheckedState, TreeNode, TreeNodeId};
 
 /// Global state for the tree demo.
 pub struct TreeDemoState {
@@ -23,7 +23,7 @@ impl TreeDemoState {
 
 impl Global for TreeDemoState {}
 
-fn make_node(id: impl Into<gpui::ElementId>, label: impl Into<String>, expanded: bool) -> TreeNode {
+fn make_node(id: impl Into<TreeNodeId>, label: impl Into<String>, expanded: bool) -> TreeNode {
     TreeNode {
         id: id.into(),
         data: ArcTreeNode::new(label),
