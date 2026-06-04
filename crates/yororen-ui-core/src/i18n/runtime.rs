@@ -260,11 +260,28 @@ fn replace_placeholders(template: &str, args: &[&str]) -> String {
                 out.push('}');
             }
             '{' => {
+                // Expect a matching `}` to close the positional slot.
+                // Anything between the braces is ignored (so legacy
+                // named placeholders like `{name}` are tolerated as
+                // positional substitutions). If `}` is missing, the
+                // literal `{` is preserved so the bug surfaces.
+                let mut matched_close = false;
+                while let Some(&next) = chars.peek() {
+                    chars.next();
+                    if next == '}' {
+                        matched_close = true;
+                        break;
+                    }
+                }
+                if !matched_close {
+                    out.push('{');
+                    continue;
+                }
                 if arg_idx < args.len() {
                     out.push_str(args[arg_idx]);
                     arg_idx += 1;
                 } else {
-                    // Missing arg: leave the `{}` literal so the
+                    // Missing arg: leave the `{` literal so the
                     // bug is visible at runtime.
                     out.push('{');
                 }
@@ -294,12 +311,26 @@ mod tests {
 
     #[test]
     fn test_replace_placeholders() {
-        let template = "Hello {name}, you have {count} items";
-        let mut args = HashMap::new();
-        args.insert("name", "World");
-        args.insert("count", "5");
+        let template = "Hello {}, you have {} items";
+        let args = ["World", "5"];
 
         let result = replace_placeholders(template, &args);
         assert_eq!(result, "Hello World, you have 5 items");
+    }
+
+    #[test]
+    fn test_replace_placeholders_escaped_braces() {
+        let template = "{{literal}} {}";
+        let args = ["value"];
+        assert_eq!(replace_placeholders(template, &args), "{literal} value");
+    }
+
+    #[test]
+    fn test_replace_placeholders_missing_arg_visible() {
+        // Missing args leave `{` so the bug is visible at runtime
+        // instead of silently rendering empty.
+        let template = "{} and {}";
+        let args = ["only-one"];
+        assert_eq!(replace_placeholders(template, &args), "only-one and {");
     }
 }
