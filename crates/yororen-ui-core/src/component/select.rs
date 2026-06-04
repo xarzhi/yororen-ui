@@ -10,7 +10,7 @@ use crate::{
     animation::constants::duration,
     component::{
         ArrowDirection, BoundsTrackerElement, ChangeCallback, ChangeWithEventCallback, IconName,
-        compute_input_style, create_internal_state, desired_menu_left, icon, is_uncontrolled,
+        create_internal_state, desired_menu_left, icon, is_uncontrolled,
     },
     i18n::{I18n, PlaceholderContext, PlaceholderKey, TextDirection},
     theme::ActiveTheme,
@@ -366,14 +366,27 @@ impl RenderOnce for Select {
         let popover_offset: f32 = theme.tokens.control.popover.offset.into();
         let popover_slide: f32 = theme.tokens.motion.slide_distance;
 
-        let input_style = compute_input_style(
-            &theme,
+        let r: &dyn crate::renderer::SelectRenderer = &**theme
+            .renderers
+            .get_select()
+            .expect("SelectRenderer registered");
+        let has_value = internal_value
+            .as_ref()
+            .map(|e| !e.read(cx).is_empty())
+            .unwrap_or(false);
+        let rstate = crate::renderer::SelectRenderState {
+            open: *menu_open.read(cx),
             disabled,
-            self.bg,
-            self.border,
-            self.focus_border,
-            self.text_color,
-        );
+            has_value,
+            custom_bg: self.bg,
+            custom_border: self.border,
+            custom_focus_border: self.focus_border,
+            custom_fg: self.text_color,
+        };
+        let input_bg = r.bg(&rstate, &theme);
+        let input_border = r.border(&rstate, &theme);
+        let input_focus_border = r.focus_border(&rstate, &theme);
+        let input_text_color = r.fg(&rstate, &theme);
 
         let hint = theme.content.tertiary;
 
@@ -401,12 +414,12 @@ impl RenderOnce for Select {
             .h(height)
             .px_3()
             .rounded_md()
-            .bg(input_style.bg)
+            .bg(input_bg)
             .border_1()
-            .border_color(input_style.border)
-            .text_color(input_style.text_color)
+            .border_color(input_border)
+            .text_color(input_text_color)
             .focusable()
-            .focus_visible(|style| style.border_2().border_color(input_style.focus_border))
+            .focus_visible(|style| style.border_2().border_color(input_focus_border))
             .when(disabled, |this| this.opacity(0.6).cursor_not_allowed())
             .when(!disabled, |this| this.cursor_pointer())
             .when(is_open, |this| this.bg(theme.surface.hover))
@@ -424,7 +437,7 @@ impl RenderOnce for Select {
                     .text_color(
                         selected_label
                             .as_ref()
-                            .map(|_| input_style.text_color)
+                            .map(|_| input_text_color)
                             .unwrap_or(hint),
                     )
                     .child(selected_label.unwrap_or(placeholder)),
@@ -441,7 +454,7 @@ impl RenderOnce for Select {
                 let on_change_simple = on_change_simple_for_select.clone();
                 let on_change_with_event = on_change_with_event_for_select.clone();
                 let internal_value = internal_value_for_select.clone();
-                let text_color = input_style.text_color;
+                let text_color = input_text_color;
                 let direction = cx
                     .try_global::<I18n>()
                     .map(|i18n| i18n.text_direction())
