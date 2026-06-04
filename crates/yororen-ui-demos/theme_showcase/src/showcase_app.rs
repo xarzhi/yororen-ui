@@ -11,7 +11,7 @@ use yororen_ui::renderer::{ButtonVariant, VariantKey};
 use yororen_ui::theme::{ActionVariantKind, ActiveTheme};
 
 use crate::state::{RightThemeKind, ThemeShowcaseState};
-use crate::{catppuccin_renderer_only, catppuccin_theme, system_theme};
+use crate::{catppuccin_renderer_only, catppuccin_theme, material_theme, system_theme};
 
 const HALF_HEADER_PX: f32 = 14.0;
 
@@ -33,6 +33,7 @@ impl Render for ThemeShowcaseApp {
         let right_theme = match right_kind {
             RightThemeKind::System => system_theme(appearance),
             RightThemeKind::Catppuccin => catppuccin_theme(appearance),
+            RightThemeKind::Material => material_theme(appearance),
             RightThemeKind::CatppuccinRenderersOnSystemPalette => {
                 catppuccin_renderer_only(appearance)
             }
@@ -41,13 +42,15 @@ impl Render for ThemeShowcaseApp {
         let right_title: &'static str = match right_kind {
             RightThemeKind::System => "Right (system)",
             RightThemeKind::Catppuccin => "Right (catppuccin)",
+            RightThemeKind::Material => "Right (material 3)",
             RightThemeKind::CatppuccinRenderersOnSystemPalette => {
                 "Right (catppuccin renderers, system palette)"
             }
         };
         let switch_label: &'static str = match right_kind {
             RightThemeKind::System => "Switch right: catppuccin",
-            RightThemeKind::Catppuccin => "Switch right: catppuccin renderers on system",
+            RightThemeKind::Catppuccin => "Switch right: material",
+            RightThemeKind::Material => "Switch right: catppuccin renderers on system",
             RightThemeKind::CatppuccinRenderersOnSystemPalette => "Switch right: system",
         };
         let right_bg = theme.surface.canvas;
@@ -93,7 +96,8 @@ impl Render for ThemeShowcaseApp {
                         right_kind_entity.update(cx, |k, _| {
                             *k = match *k {
                                 RightThemeKind::System => RightThemeKind::Catppuccin,
-                                RightThemeKind::Catppuccin => {
+                                RightThemeKind::Catppuccin => RightThemeKind::Material,
+                                RightThemeKind::Material => {
                                     RightThemeKind::CatppuccinRenderersOnSystemPalette
                                 }
                                 RightThemeKind::CatppuccinRenderersOnSystemPalette => {
@@ -183,24 +187,19 @@ mod tests {
     use super::*;
 
     #[test]
-    fn right_kind_cycle_covers_three_states() {
+    fn right_kind_cycle_covers_four_states() {
         let mut k = RightThemeKind::default();
-        k = match k {
-            RightThemeKind::System => RightThemeKind::Catppuccin,
-            RightThemeKind::Catppuccin => RightThemeKind::CatppuccinRenderersOnSystemPalette,
-            RightThemeKind::CatppuccinRenderersOnSystemPalette => RightThemeKind::System,
-        };
-        k = match k {
-            RightThemeKind::System => RightThemeKind::Catppuccin,
-            RightThemeKind::Catppuccin => RightThemeKind::CatppuccinRenderersOnSystemPalette,
-            RightThemeKind::CatppuccinRenderersOnSystemPalette => RightThemeKind::System,
-        };
-        k = match k {
-            RightThemeKind::System => RightThemeKind::Catppuccin,
-            RightThemeKind::Catppuccin => RightThemeKind::CatppuccinRenderersOnSystemPalette,
-            RightThemeKind::CatppuccinRenderersOnSystemPalette => RightThemeKind::System,
-        };
-        // After 3 cycles we land back on the default.
+        // 4 states → 4 cycles to land back on default.
+        for _ in 0..4 {
+            k = match k {
+                RightThemeKind::System => RightThemeKind::Catppuccin,
+                RightThemeKind::Catppuccin => RightThemeKind::Material,
+                RightThemeKind::Material => {
+                    RightThemeKind::CatppuccinRenderersOnSystemPalette
+                }
+                RightThemeKind::CatppuccinRenderersOnSystemPalette => RightThemeKind::System,
+            };
+        }
         assert_eq!(k, RightThemeKind::default());
     }
 
@@ -218,5 +217,23 @@ mod tests {
         // Both renderers are CatppuccinButtonRenderer, so the
         // difference comes from the palette. They should differ.
         assert_ne!(cat_bg, sys_bg);
+    }
+
+    #[test]
+    fn material_button_uses_pill_radius() {
+        use yororen_ui::renderer::ButtonRenderState;
+        let state = ButtonRenderState {
+            variant: ActionVariantKind::Primary,
+            ..Default::default()
+        };
+        let mat_theme = material_theme(gpui::WindowAppearance::Dark);
+        let radius = mat_theme.renderers.button.border_radius(&state, &mat_theme);
+        // Material 3 buttons are pill-shaped (~999 px).
+        let radius_px = radius.to_f64();
+        assert!(
+            radius_px > 100.0,
+            "Material button should be pill-shaped, got {}",
+            radius_px
+        );
     }
 }

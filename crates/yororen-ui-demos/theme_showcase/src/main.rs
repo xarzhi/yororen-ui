@@ -28,6 +28,7 @@ use yororen_ui::renderer::{GlobalVariantRegistry, VariantRegistry};
 
 use yororen_ui_locale_en as locale_en;
 use yororen_ui_theme_catppuccin as catppuccin;
+use yororen_ui_theme_material as material;
 use yororen_ui_theme_system as theme_system;
 
 mod showcase_app;
@@ -90,6 +91,17 @@ pub fn catppuccin_theme(appearance: WindowAppearance) -> yororen_ui::theme::Them
     match appearance {
         WindowAppearance::Light | WindowAppearance::VibrantLight => catppuccin::light(),
         _ => catppuccin::dark(),
+    }
+}
+
+/// Build a Material Design 3 theme matching the current
+/// `WindowAppearance` (Light or Dark scheme) with the full
+/// Material renderer registry. Phase H.1 (the second official
+/// theme) ships this.
+pub fn material_theme(appearance: WindowAppearance) -> yororen_ui::theme::Theme {
+    match appearance {
+        WindowAppearance::Light | WindowAppearance::VibrantLight => material::light(),
+        _ => material::dark(),
     }
 }
 

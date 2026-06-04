@@ -11,6 +11,9 @@ pub enum RightThemeKind {
     /// Catppuccin Mocha palette + Catppuccin renderers.
     #[default]
     Catppuccin,
+    /// Material Design 3 palette + Material renderers (Phase H.1,
+    /// the second official theme).
+    Material,
     /// v0.5 system palette but with the Catppuccin renderers
     /// layered on top. Demonstrates that renderer swap and palette
     /// swap are independent.

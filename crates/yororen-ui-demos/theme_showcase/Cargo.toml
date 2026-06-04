@@ -8,4 +8,5 @@ gpui = { package = "gpui-ce", version = "0.3" }
 yororen-ui = { package = "yororen_ui", path = "../../yororen-ui" }
 yororen-ui-theme-system = { package = "yororen_ui_theme_system", path = "../../yororen-ui-theme-system" }
 yororen-ui-theme-catppuccin = { package = "yororen_ui_theme_catppuccin", path = "../../yororen-ui-theme-catppuccin" }
+yororen-ui-theme-material = { package = "yororen_ui_theme_material", path = "../../yororen-ui-theme-material" }
 yororen-ui-locale-en = { package = "yororen_ui_locale_en", path = "../../yororen-ui-locale-en" }
