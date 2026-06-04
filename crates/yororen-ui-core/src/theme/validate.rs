@@ -136,39 +136,92 @@ pub fn validate(theme: &Theme) -> Vec<Issue> {
         });
     }
 
-    // --- token range ---
-    if !theme.tokens.motion.pulse_min_opacity.is_finite()
-        || theme.tokens.motion.pulse_min_opacity < 0.0
-        || theme.tokens.motion.pulse_min_opacity > 1.0
-    {
-        issues.push(Issue {
-            kind: IssueKind::TokenOutOfRange {
-                token_path: "motion.pulse_min_opacity",
-                value: theme.tokens.motion.pulse_min_opacity,
-            },
-            message: format!(
-                "motion.pulse_min_opacity must be in [0.0, 1.0], got {}",
-                theme.tokens.motion.pulse_min_opacity
-            ),
-        });
-    }
-    if !theme.tokens.motion.pulse_max_opacity.is_finite()
-        || theme.tokens.motion.pulse_max_opacity < 0.0
-        || theme.tokens.motion.pulse_max_opacity > 1.0
-    {
-        issues.push(Issue {
-            kind: IssueKind::TokenOutOfRange {
-                token_path: "motion.pulse_max_opacity",
-                value: theme.tokens.motion.pulse_max_opacity,
-            },
-            message: format!(
-                "motion.pulse_max_opacity must be in [0.0, 1.0], got {}",
-                theme.tokens.motion.pulse_max_opacity
-            ),
-        });
+    // --- token range: motion ---
+    validate_unit_interval(
+        "motion.pulse_min_opacity",
+        theme.tokens.motion.pulse_min_opacity,
+        &mut issues,
+    );
+    validate_unit_interval(
+        "motion.pulse_max_opacity",
+        theme.tokens.motion.pulse_max_opacity,
+        &mut issues,
+    );
+
+    // --- token range: control pixel fields ---
+    //
+    // The list below intentionally covers the most security-sensitive
+    // size tokens (anything that participates in min-height, padding,
+    // ring thickness or focus geometry). A theme that fails any of
+    // these checks would render visibly broken — but bad themes have
+    // shipped in the past with NaN-typed `Pixels` slipping through
+    // ad-hoc f32 arithmetic, so this is the canonical guard.
+    let c = &theme.tokens.control;
+    let pixel_fields: &[(&str, gpui::Pixels)] = &[
+        // Button
+        ("control.button.min_height", c.button.min_height),
+        ("control.button.icon_button_min_size", c.button.icon_button_min_size),
+        ("control.button.horizontal_padding", c.button.horizontal_padding),
+        ("control.button.icon_gap", c.button.icon_gap),
+        // Input
+        ("control.input.min_height", c.input.min_height),
+        ("control.input.horizontal_padding", c.input.horizontal_padding),
+        ("control.input.vertical_padding", c.input.vertical_padding),
+        ("control.input.cursor_thickness", c.input.cursor_thickness),
+        ("control.input.focus_ring_thickness", c.input.focus_ring_thickness),
+        ("control.input.icon_gap", c.input.icon_gap),
+        ("control.input.spinner_size", c.input.spinner_size),
+        ("control.input.text_area_min_h", c.input.text_area_min_h),
+        // Switch
+        ("control.switch.track_w", c.switch.track_w),
+        ("control.switch.track_h", c.switch.track_h),
+        ("control.switch.knob_size", c.switch.knob_size),
+        ("control.switch.padding", c.switch.padding),
+        ("control.switch.border_w", c.switch.border_w),
+        ("control.switch.focus_border_w", c.switch.focus_border_w),
+        // Focus ring (cross-cutting)
+        ("control.focus_ring.thickness", c.focus_ring.thickness),
+        ("control.focus_ring.offset", c.focus_ring.offset),
+    ];
+    for (path, value) in pixel_fields {
+        validate_finite_pixels(path, *value, &mut issues);
     }
 
+    // --- token range: unit-interval opacities outside motion ---
+    validate_unit_interval(
+        "control.switch.disabled_opacity",
+        c.switch.disabled_opacity,
+        &mut issues,
+    );
+
     issues
+}
+
+/// Validate a single `Pixels`-typed token. Flags NaN, infinity,
+/// negative values, or absurdly large values (> 4096 px). The
+/// upper bound is intentionally generous so themes can still
+/// produce large illustrations / hero sections; it only catches
+/// "obvious garbage" such as f32::MAX leaking through arithmetic.
+fn validate_finite_pixels(token_path: &'static str, value: gpui::Pixels, issues: &mut Vec<Issue>) {
+    let v: f32 = value.into();
+    if !v.is_finite() || v < 0.0 || v > 4096.0 {
+        issues.push(Issue {
+            kind: IssueKind::TokenOutOfRange { token_path, value: v },
+            message: format!(
+                "{token_path} must be a finite value in [0.0, 4096.0] px, got {v}"
+            ),
+        });
+    }
+}
+
+/// Validate a single f32 token that must live in `[0.0, 1.0]`.
+fn validate_unit_interval(token_path: &'static str, value: f32, issues: &mut Vec<Issue>) {
+    if !value.is_finite() || !(0.0..=1.0).contains(&value) {
+        issues.push(Issue {
+            kind: IssueKind::TokenOutOfRange { token_path, value },
+            message: format!("{token_path} must be in [0.0, 1.0], got {value}"),
+        });
+    }
 }
 
 fn relative_luminance(color: Hsla) -> f32 {
@@ -377,5 +430,50 @@ mod tests {
                 issues
             );
         }
+    }
+
+    #[test]
+    fn nan_pixels_are_flagged() {
+        let mut theme = fixture_dark();
+        theme.tokens.control.button.min_height = gpui::px(f32::NAN);
+        let issues = validate(&theme);
+        assert!(
+            issues.iter().any(|i| matches!(
+                &i.kind,
+                IssueKind::TokenOutOfRange { token_path, .. }
+                    if *token_path == "control.button.min_height"
+            )),
+            "NaN min_height should be flagged, got: {issues:#?}"
+        );
+    }
+
+    #[test]
+    fn negative_pixels_are_flagged() {
+        let mut theme = fixture_dark();
+        theme.tokens.control.input.cursor_thickness = gpui::px(-1.0);
+        let issues = validate(&theme);
+        assert!(
+            issues.iter().any(|i| matches!(
+                &i.kind,
+                IssueKind::TokenOutOfRange { token_path, .. }
+                    if *token_path == "control.input.cursor_thickness"
+            )),
+            "negative cursor_thickness should be flagged, got: {issues:#?}"
+        );
+    }
+
+    #[test]
+    fn out_of_unit_disabled_opacity_is_flagged() {
+        let mut theme = fixture_dark();
+        theme.tokens.control.switch.disabled_opacity = 1.5;
+        let issues = validate(&theme);
+        assert!(
+            issues.iter().any(|i| matches!(
+                &i.kind,
+                IssueKind::TokenOutOfRange { token_path, .. }
+                    if *token_path == "control.switch.disabled_opacity"
+            )),
+            "disabled_opacity > 1.0 should be flagged, got: {issues:#?}"
+        );
     }
 }
