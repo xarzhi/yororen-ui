@@ -19,6 +19,26 @@ pub fn number_input(id: impl Into<ElementId>) -> NumberInput {
 type ChangeFn = Arc<dyn Fn(f64, &mut gpui::Window, &mut gpui::App)>;
 type ValidateFn = Arc<dyn Fn(&str) -> bool>;
 
+/// Inclusive numeric range. `NumberInput::range(...)` accepts this
+/// so callers can express "the value lives in `[min, max]`" as a
+/// single argument instead of two separate `.min(...).max(...)`
+/// calls, which can drift out of sync.
+#[derive(Debug, Clone, Copy, Default, PartialEq)]
+pub struct NumberRange {
+    pub min: f64,
+    pub max: f64,
+}
+
+impl NumberRange {
+    pub fn new(min: f64, max: f64) -> Self {
+        assert!(
+            min <= max,
+            "NumberRange::new requires min <= max, got {min} > {max}"
+        );
+        Self { min, max }
+    }
+}
+
 #[derive(IntoElement)]
 pub struct NumberInput {
     element_id: ElementId,
@@ -92,6 +112,15 @@ impl NumberInput {
     pub fn step(mut self, step: f64) -> Self {
         assert!(step != 0.0, "NumberInput step cannot be zero");
         self.step = step;
+        self
+    }
+
+    /// Set the inclusive range in a single call. Equivalent to
+    /// setting `min` and `max` together, but impossible to leave
+    /// them out of sync.
+    pub fn range(mut self, range: NumberRange) -> Self {
+        self.min = Some(range.min);
+        self.max = Some(range.max);
         self
     }
 
