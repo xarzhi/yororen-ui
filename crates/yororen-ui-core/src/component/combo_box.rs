@@ -9,7 +9,7 @@ use gpui::{
 use crate::{
     animation::constants::duration,
     component::{
-        ArrowDirection, BoundsTrackerElement, IconName, compute_input_style, desired_menu_left,
+        ArrowDirection, BoundsTrackerElement, IconName, desired_menu_left,
         icon, text_input,
     },
     i18n::{I18n, PlaceholderContext, PlaceholderKey, TextDirection},
@@ -355,14 +355,23 @@ impl RenderOnce for ComboBox {
         let theme = cx.theme().clone();
         let hint = theme.content.tertiary;
 
-        let input_style = compute_input_style(
-            &theme,
+        let r: &dyn crate::renderer::ComboBoxRenderer = &**theme
+            .renderers
+            .get_combo_box()
+            .expect("ComboBoxRenderer registered");
+        let rstate = crate::renderer::ComboBoxRenderState {
+            open: *menu_open.read(cx),
             disabled,
-            self.bg,
-            self.border,
-            self.focus_border,
-            self.text_color,
-        );
+            has_value: !value.is_empty(),
+            custom_bg: self.bg,
+            custom_border: self.border,
+            custom_focus_border: self.focus_border,
+            custom_fg: self.text_color,
+        };
+        let input_bg = r.bg(&rstate, &theme);
+        let input_border = r.border(&rstate, &theme);
+        let input_focus_border = r.focus_border(&rstate, &theme);
+        let input_text_color = r.fg(&rstate, &theme);
 
         let menu_open_for_button = menu_open.clone();
         let menu_open_for_outside = menu_open.clone();
@@ -385,12 +394,12 @@ impl RenderOnce for ComboBox {
             .h(height)
             .px_3()
             .rounded_md()
-            .bg(input_style.bg)
+            .bg(input_bg)
             .border_1()
-            .border_color(input_style.border)
-            .text_color(input_style.text_color)
+            .border_color(input_border)
+            .text_color(input_text_color)
             .focusable()
-            .focus_visible(|style| style.border_2().border_color(input_style.focus_border))
+            .focus_visible(|style| style.border_2().border_color(input_focus_border))
             .when(disabled, |this| this.opacity(0.6).cursor_not_allowed())
             .when(!disabled, |this| this.cursor_pointer())
             .when(is_open, |this| this.bg(theme.surface.hover))
@@ -408,7 +417,7 @@ impl RenderOnce for ComboBox {
                     .text_color(
                         selected_label
                             .as_ref()
-                            .map(|_| input_style.text_color)
+                            .map(|_| input_text_color)
                             .unwrap_or(hint),
                     )
                     .child(selected_label.unwrap_or(placeholder)),
@@ -421,7 +430,7 @@ impl RenderOnce for ComboBox {
 
         let trigger_bounds_state_for_menu = trigger_bounds_state.clone();
         let trigger = trigger.when(is_open, move |this| {
-            let text_color = input_style.text_color;
+            let text_color = input_text_color;
             let value = value.clone();
             let options = options.clone();
             let on_change = on_change_for_select.clone();
