@@ -6,7 +6,7 @@ use gpui::{
 };
 
 use crate::{
-    component::{button, compute_input_style, label, text_input},
+    component::{button, label, text_input},
     i18n::{PlaceholderContext, PlaceholderKey},
     theme::{ActionVariantKind, ActiveTheme},
 };
@@ -201,13 +201,31 @@ impl RenderOnce for FilePathInput {
         let showing_placeholder = value.as_os_str().is_empty();
 
         // Route the standard disabled / override / theme fallback
-        // through `compute_input_style` so all input components
-        // share one path. The status-driven border override is
-        // layered on top *after* this — `compute_input_style` does
-        // not know about file-path validation, and the override
+        // through the configured `FilePathInputRenderer` so all
+        // input components share one path. The status-driven border
+        // override is layered on top *after* this — the renderer
+        // doesn't know about file-path validation, and the override
         // is the only deviation from the standard input style.
-        let input_style =
-            compute_input_style(&theme, disabled, bg, border, focus_border, text_color);
+        let r: &dyn crate::renderer::FilePathInputRenderer = &**theme
+            .renderers
+            .get_file_path_input()
+            .expect("FilePathInputRenderer registered");
+        let rstate = crate::renderer::FilePathInputRenderState {
+            disabled,
+            focused: false,
+            custom_bg: bg,
+            custom_border: border,
+            custom_focus_border: focus_border,
+            custom_fg: text_color,
+        };
+        let input_bg = r.bg(&rstate, &theme);
+        let input_border = r.border(&rstate, &theme);
+        let input_focus_border = r.focus_border(&rstate, &theme);
+        let input_text_color: Hsla = if disabled {
+            theme.content.disabled
+        } else {
+            text_color.unwrap_or(theme.content.primary)
+        };
 
         let derived_status = if status.is_some() {
             status
@@ -226,11 +244,11 @@ impl RenderOnce for FilePathInput {
 
         // Status color wins over the input-style border; otherwise
         // fall back to the standard input border.
-        let border_color = status_color.unwrap_or(input_style.border);
-        let focus_border_color = focus_border.unwrap_or(input_style.focus_border);
+        let border_color = status_color.unwrap_or(input_border);
+        let focus_border_color = focus_border.unwrap_or(input_focus_border);
 
-        let bg_color = input_style.bg;
-        let text_color_value = input_style.text_color;
+        let bg_color = input_bg;
+        let text_color_value = input_text_color;
 
         let on_change = self.on_change;
 

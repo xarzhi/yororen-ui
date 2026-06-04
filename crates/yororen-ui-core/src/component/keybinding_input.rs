@@ -5,7 +5,7 @@ use gpui::{
 };
 
 use crate::{
-    component::{compute_input_style, format_keybinding_ui, shortcut_hint},
+    component::{format_keybinding_ui, shortcut_hint},
     i18n::{PlaceholderContext, PlaceholderKey},
     theme::ActiveTheme,
 };
@@ -163,8 +163,30 @@ impl RenderOnce for KeybindingInput {
         let focus_border = self.focus_border;
         let text_color = self.text_color;
 
-        let input_style =
-            compute_input_style(&theme, disabled, bg, border, focus_border, text_color);
+        let r: &dyn crate::renderer::KeybindingInputRenderer = &**theme
+            .renderers
+            .get_keybinding_input()
+            .expect("KeybindingInputRenderer registered");
+        // `capturing` is filled in later once `capture_active` is
+        // set up; the default `false` here is fine because
+        // `KeybindingInputRenderer::bg/border/focus_border` only
+        // branch on `disabled`, not `capturing`.
+        let rstate = crate::renderer::KeybindingInputRenderState {
+            capturing: false,
+            disabled,
+            custom_bg: bg,
+            custom_border: border,
+            custom_focus_border: focus_border,
+            custom_fg: text_color,
+        };
+        let input_bg = r.bg(&rstate, &theme);
+        let input_border = r.border(&rstate, &theme);
+        let input_focus_border = r.focus_border(&rstate, &theme);
+        let input_text_color: Hsla = if disabled {
+            theme.content.disabled
+        } else {
+            text_color.unwrap_or(theme.content.primary)
+        };
 
         let height = self
             .height
@@ -303,11 +325,11 @@ impl RenderOnce for KeybindingInput {
             .gap_2()
             .px_3()
             .rounded_md()
-            .bg(input_style.bg)
+            .bg(input_bg)
             .border_1()
-            .border_color(input_style.border)
+            .border_color(input_border)
             .focusable()
-            .focus_visible(|style| style.border_2().border_color(input_style.focus_border))
+            .focus_visible(|style| style.border_2().border_color(input_focus_border))
             .track_focus(focus_handle.read(cx))
             .when(disabled, |this| this.opacity(0.6).cursor_not_allowed())
             .when(!disabled, |this| this.cursor_pointer())
@@ -399,7 +421,7 @@ impl RenderOnce for KeybindingInput {
                     } else {
                         div()
                             .font_family("monospace")
-                            .text_color(input_style.text_color)
+                            .text_color(input_text_color)
                             .child(value)
                             .into_any_element()
                     })

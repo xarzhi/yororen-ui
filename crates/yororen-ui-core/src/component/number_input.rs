@@ -6,7 +6,7 @@ use gpui::{
 };
 
 use crate::{
-    component::{button, compute_input_style, text_input},
+    component::{button, text_input},
     theme::{ActionVariantKind, ActiveTheme},
 };
 
@@ -218,14 +218,30 @@ impl RenderOnce for NumberInput {
             .height
             .unwrap_or_else(|| cx.theme().tokens.control.button.min_height.into());
 
-        let input_style = compute_input_style(
-            cx.theme(),
+        let r: &dyn crate::renderer::NumberInputRenderer = &**cx
+            .theme()
+            .renderers
+            .get_number_input()
+            .expect("NumberInputRenderer registered");
+        let rstate = crate::renderer::NumberInputRenderState {
             disabled,
-            self.bg,
-            self.border,
-            self.focus_border,
-            self.text_color,
-        );
+            focused: false,
+            custom_bg: self.bg,
+            custom_border: self.border,
+            custom_focus_border: self.focus_border,
+            custom_fg: self.text_color,
+        };
+        let input_bg = r.bg(&rstate, cx.theme());
+        let input_border = r.border(&rstate, cx.theme());
+        let input_focus_border = r.focus_border(&rstate, cx.theme());
+        // NumberInputRenderer's default trait doesn't expose text_color;
+        // compute it from theme + overrides, mirroring the v0.4
+        // `compute_input_style` contract.
+        let input_text_color: Hsla = if disabled {
+            cx.theme().content.disabled
+        } else {
+            self.text_color.unwrap_or(cx.theme().content.primary)
+        };
 
         let use_internal_value = on_change.is_none();
         let initial_value = self.value.unwrap_or(0.0);
@@ -299,10 +315,10 @@ impl RenderOnce for NumberInput {
                         .placeholder(self.placeholder)
                         .disabled(disabled)
                         .height(height)
-                        .bg(input_style.bg)
-                        .border(input_style.border)
-                        .focus_border(input_style.focus_border)
-                        .text_color(input_style.text_color)
+                        .bg(input_bg)
+                        .border(input_border)
+                        .focus_border(input_focus_border)
+                        .text_color(input_text_color)
                         .content(controlled_text)
                         .on_change({
                             let set_value = set_value.clone();
