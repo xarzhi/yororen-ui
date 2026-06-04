@@ -44,6 +44,20 @@ impl fmt::Display for LocaleParseError {
 
 impl std::error::Error for LocaleParseError {}
 
+/// BCP-47 subset validator helpers. These are intentionally tiny
+/// (no full ABNF) but match the shapes we see in real-world locale
+/// crates — language 2-3 letters, region 2 letters or 3 digits,
+/// variant 5-8 alphanumerics.
+fn is_alpha(s: &str) -> bool {
+    !s.is_empty() && s.chars().all(|c| c.is_ascii_alphabetic())
+}
+fn is_digit(s: &str) -> bool {
+    !s.is_empty() && s.chars().all(|c| c.is_ascii_digit())
+}
+fn is_alnum(s: &str) -> bool {
+    !s.is_empty() && s.chars().all(|c| c.is_ascii_alphanumeric())
+}
+
 /// Simple locale identifier that supports language and region tags.
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub struct Locale {
@@ -57,18 +71,43 @@ pub struct Locale {
 
 impl Locale {
     /// Create a new locale from a language tag string (e.g., "en", "zh-CN", "ar-SA").
+    ///
+    /// P1-3: the tag is now validated against a strict BCP-47 subset.
+    /// The language *primary* subtag is required to be 2-3 ASCII
+    /// letters; the *region* subtag must be either 2 letters or 3
+    /// digits; the *variant* must be 5-8 alphanumerics. Anything
+    /// outside this returns `LocaleParseError`. This prevents the
+    /// old bug where `Locale::new("a-b-c")` would silently succeed
+    /// and never match anything in `match_locale`.
     pub fn new(tag: &str) -> Result<Self, LocaleParseError> {
         let parts: Vec<&str> = tag.split('-').collect();
-
-        let language = parts
-            .first()
-            .map(|s| s.to_string())
-            .ok_or(LocaleParseError)?;
-        let region = parts.get(1).map(|s| s.to_string());
-        let variant = parts.get(2).map(|s| s.to_string());
+        if parts.is_empty() || parts.len() > 3 {
+            return Err(LocaleParseError);
+        }
+        let language = parts[0];
+        if !is_alpha(language) || !(language.len() == 2 || language.len() == 3) {
+            return Err(LocaleParseError);
+        }
+        let region = if let Some(r) = parts.get(1) {
+            if !(r.len() == 2 && is_alpha(r) || r.len() == 3 && is_digit(r)) {
+                return Err(LocaleParseError);
+            }
+            Some(r.to_string())
+        } else {
+            None
+        };
+        let variant = if let Some(v) = parts.get(2) {
+            let alnum = is_alnum(v);
+            if !alnum || !(5..=8).contains(&v.len()) {
+                return Err(LocaleParseError);
+            }
+            Some(v.to_string())
+        } else {
+            None
+        };
 
         Ok(Self {
-            language,
+            language: language.to_string(),
             region,
             variant,
         })
