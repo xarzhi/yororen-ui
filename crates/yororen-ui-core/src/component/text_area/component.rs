@@ -166,20 +166,26 @@ impl RenderOnce for TextArea {
         let theme = cx.theme();
 
         // Route the standard disabled / override / theme fallback
-        // through `compute_input_style` so all input components
-        // share one path.
-        let input_style = compute_input_style(
-            theme,
+        // through the configured `TextAreaRenderer` so all input
+        // components share one path. The default `TokenTextAreaRenderer`
+        // and theme overrides both implement this contract.
+        let r: &dyn crate::renderer::TextAreaRenderer = &**theme
+            .renderers
+            .get_text_area()
+            .expect("TextAreaRenderer registered");
+        let rstate = crate::renderer::TextAreaRenderState {
             disabled,
-            self.bg,
-            self.border,
-            self.focus_border,
-            self.text_color,
-        );
-        let bg = input_style.bg;
-        let border_color = input_style.border;
-        let focus_border_color = input_style.focus_border;
-        let text_color = input_style.text_color;
+            focused: focus_handle.is_focused(window),
+            has_custom_bg: self.bg.is_some(),
+            custom_bg: self.bg,
+            custom_border: self.border,
+            custom_focus_border: self.focus_border,
+            custom_text_color: self.text_color,
+        };
+        let bg = r.bg(&rstate, theme);
+        let border_color = r.border(&rstate, theme);
+        let focus_border_color = r.focus_border(&rstate, theme);
+        let text_color = r.text_color(&rstate, theme);
         let height = self
             .height
             .unwrap_or_else(|| cx.theme().tokens.control.input.text_area_min_h.into());

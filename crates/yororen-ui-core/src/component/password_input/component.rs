@@ -11,7 +11,7 @@ use super::actions::*;
 use super::element::PasswordLineElement;
 use super::state::{PasswordInputHandler, PasswordInputState};
 use crate::action_handler;
-use crate::component::compute_input_style;
+
 use crate::i18n::PlaceholderContext;
 use crate::theme::ActiveTheme;
 
@@ -177,21 +177,25 @@ impl RenderOnce for PasswordInput {
 
         // Route the standard disabled / override / theme fallback
         // through `compute_input_style` so all input components
-        // share one path. The only deviation here is the
-        // focus_border override, which `compute_input_style`
-        // already handles (it falls back to `theme.border.focus`).
-        let input_style = compute_input_style(
-            theme,
+        // through the configured `PasswordInputRenderer` so all input
+        // components share one path. The default `TokenPasswordInputRenderer`
+        // and theme overrides both implement this contract.
+        let r: &dyn crate::renderer::PasswordInputRenderer = &**theme
+            .renderers
+            .get_password_input()
+            .expect("PasswordInputRenderer registered");
+        let rstate = crate::renderer::PasswordInputRenderState {
             disabled,
-            self.bg,
-            self.border,
-            self.focus_border,
-            self.text_color,
-        );
-        let bg = input_style.bg;
-        let border_color = input_style.border;
-        let focus_border_color = input_style.focus_border;
-        let text_color = input_style.text_color;
+            focused: focus_handle.is_focused(window),
+            custom_bg: self.bg,
+            custom_border: self.border,
+            custom_focus_border: self.focus_border,
+            custom_fg: self.text_color,
+        };
+        let bg = r.bg(&rstate, theme);
+        let border_color = r.border(&rstate, theme);
+        let focus_border_color = r.focus_border(&rstate, theme);
+        let text_color = r.fg(&rstate, theme);
         let height = self
             .height
             .unwrap_or_else(|| cx.theme().tokens.control.button.min_height.into());

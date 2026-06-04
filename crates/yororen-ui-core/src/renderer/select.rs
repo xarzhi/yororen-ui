@@ -13,6 +13,10 @@ pub struct SelectRenderState {
     pub open: bool,
     pub disabled: bool,
     pub has_value: bool,
+    pub custom_bg: Option<Hsla>,
+    pub custom_border: Option<Hsla>,
+    pub custom_focus_border: Option<Hsla>,
+    pub custom_fg: Option<Hsla>,
 }
 
 pub trait SelectRenderer: Any + Send + Sync {
@@ -30,17 +34,29 @@ pub trait SelectRenderer: Any + Send + Sync {
 pub struct TokenSelectRenderer;
 
 impl SelectRenderer for TokenSelectRenderer {
-    fn bg(&self, _state: &SelectRenderState, theme: &Theme) -> Hsla {
-        theme.surface.base
+    fn bg(&self, state: &SelectRenderState, theme: &Theme) -> Hsla {
+        if state.disabled {
+            theme.surface.sunken
+        } else {
+            state.custom_bg.unwrap_or(theme.surface.base)
+        }
     }
-    fn border(&self, _state: &SelectRenderState, theme: &Theme) -> Hsla {
-        theme.border.default
+    fn border(&self, state: &SelectRenderState, theme: &Theme) -> Hsla {
+        if state.disabled {
+            theme.border.muted
+        } else {
+            state.custom_border.unwrap_or(theme.border.default)
+        }
     }
-    fn focus_border(&self, _state: &SelectRenderState, theme: &Theme) -> Hsla {
-        theme.border.focus
+    fn focus_border(&self, state: &SelectRenderState, theme: &Theme) -> Hsla {
+        state.custom_focus_border.unwrap_or(theme.border.focus)
     }
     fn fg(&self, state: &SelectRenderState, theme: &Theme) -> Hsla {
-        if state.has_value {
+        if state.disabled {
+            theme.content.disabled
+        } else if state.custom_fg.is_some() {
+            return state.custom_fg.unwrap();
+        } else if state.has_value {
             theme.content.primary
         } else {
             theme.content.tertiary

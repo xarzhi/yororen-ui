@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use super::TextEditState;
 use super::input::action_handler;
-use crate::component::{ChangeCallback, compute_input_style};
+use crate::component::ChangeCallback;
 use crate::theme::ActiveTheme;
 use gpui::{
     AnyElement, App, Bounds, Context, CursorStyle, Div, Element, ElementId, ElementInputHandler,
@@ -963,14 +963,30 @@ impl RenderOnce for TextInput {
 
         let theme = cx.theme();
 
-        let input_style = compute_input_style(
-            theme,
+        // Read input visuals through the configured `TextInputRenderer`.
+        // The `disabled`/`focused` state plus the caller-supplied
+        // overrides flow through the render state; the renderer
+        // (default `TokenTextInputRenderer` or a theme override) is
+        // the single source of truth for `bg`/`border`/etc.
+        let r: &dyn crate::renderer::TextInputRenderer = &**theme
+            .renderers
+            .get_text_input()
+            .expect("TextInputRenderer registered");
+        let rstate = crate::renderer::TextInputRenderState {
             disabled,
-            self.bg,
-            self.border,
-            self.focus_border,
-            self.text_color,
-        );
+            focused: focus_handle.is_focused(window),
+            has_custom_bg: self.bg.is_some(),
+            has_custom_border: self.border.is_some(),
+            has_custom_focus_border: self.focus_border.is_some(),
+            custom_bg: self.bg,
+            custom_border: self.border,
+            custom_focus_border: self.focus_border,
+            custom_text_color: self.text_color,
+        };
+        let bg_color = r.bg(&rstate, theme);
+        let border_color = r.border(&rstate, theme);
+        let focus_border_color = r.focus_border(&rstate, theme);
+        let text_color = r.text_color(&rstate, theme);
 
         let height = self
             .height
@@ -990,11 +1006,11 @@ impl RenderOnce for TextInput {
             .w_full()
             .h(height)
             .rounded_md()
-            .bg(input_style.bg)
+            .bg(bg_color)
             .border_1()
-            .border_color(input_style.border)
+            .border_color(border_color)
             .when(!disabled && focus_handle.is_focused(window), |this| {
-                this.border_2().border_color(input_style.focus_border)
+                this.border_2().border_color(focus_border_color)
             })
             .when(!disabled, |this| this.track_focus(&focus_handle))
             .when(!disabled, |this| this.cursor(CursorStyle::IBeam))
@@ -1073,7 +1089,7 @@ impl RenderOnce for TextInput {
             });
 
         base =
-            base.text_color(input_style.text_color)
+            base.text_color(text_color)
                 .child(
                     div()
                         .w_full()

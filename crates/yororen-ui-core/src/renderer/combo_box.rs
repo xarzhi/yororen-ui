@@ -13,6 +13,10 @@ pub struct ComboBoxRenderState {
     pub open: bool,
     pub disabled: bool,
     pub has_value: bool,
+    pub custom_bg: Option<Hsla>,
+    pub custom_border: Option<Hsla>,
+    pub custom_focus_border: Option<Hsla>,
+    pub custom_fg: Option<Hsla>,
 }
 
 pub trait ComboBoxRenderer: Any + Send + Sync {
@@ -29,17 +33,29 @@ pub trait ComboBoxRenderer: Any + Send + Sync {
 pub struct TokenComboBoxRenderer;
 
 impl ComboBoxRenderer for TokenComboBoxRenderer {
-    fn bg(&self, _state: &ComboBoxRenderState, theme: &Theme) -> Hsla {
-        theme.surface.base
+    fn bg(&self, state: &ComboBoxRenderState, theme: &Theme) -> Hsla {
+        if state.disabled {
+            theme.surface.sunken
+        } else {
+            state.custom_bg.unwrap_or(theme.surface.base)
+        }
     }
-    fn border(&self, _state: &ComboBoxRenderState, theme: &Theme) -> Hsla {
-        theme.border.default
+    fn border(&self, state: &ComboBoxRenderState, theme: &Theme) -> Hsla {
+        if state.disabled {
+            theme.border.muted
+        } else {
+            state.custom_border.unwrap_or(theme.border.default)
+        }
     }
-    fn focus_border(&self, _state: &ComboBoxRenderState, theme: &Theme) -> Hsla {
-        theme.border.focus
+    fn focus_border(&self, state: &ComboBoxRenderState, theme: &Theme) -> Hsla {
+        state.custom_focus_border.unwrap_or(theme.border.focus)
     }
     fn fg(&self, state: &ComboBoxRenderState, theme: &Theme) -> Hsla {
-        if state.has_value {
+        if state.disabled {
+            theme.content.disabled
+        } else if state.custom_fg.is_some() {
+            return state.custom_fg.unwrap();
+        } else if state.has_value {
             theme.content.primary
         } else {
             theme.content.tertiary

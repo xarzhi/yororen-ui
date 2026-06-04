@@ -12,6 +12,10 @@ use crate::theme::Theme;
 pub struct PasswordInputRenderState {
     pub disabled: bool,
     pub focused: bool,
+    pub custom_bg: Option<Hsla>,
+    pub custom_border: Option<Hsla>,
+    pub custom_focus_border: Option<Hsla>,
+    pub custom_fg: Option<Hsla>,
 }
 
 pub trait PasswordInputRenderer: Any + Send + Sync {
@@ -28,17 +32,29 @@ pub trait PasswordInputRenderer: Any + Send + Sync {
 pub struct TokenPasswordInputRenderer;
 
 impl PasswordInputRenderer for TokenPasswordInputRenderer {
-    fn bg(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
-        theme.surface.base
+    fn bg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
+        if state.disabled {
+            theme.surface.sunken
+        } else {
+            state.custom_bg.unwrap_or(theme.surface.base)
+        }
     }
-    fn border(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
-        theme.border.default
+    fn border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
+        if state.disabled {
+            theme.border.muted
+        } else {
+            state.custom_border.unwrap_or(theme.border.default)
+        }
     }
-    fn focus_border(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
-        theme.border.focus
+    fn focus_border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
+        state.custom_focus_border.unwrap_or(theme.border.focus)
     }
-    fn fg(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
-        theme.content.primary
+    fn fg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
+        if state.disabled {
+            theme.content.disabled
+        } else {
+            state.custom_fg.unwrap_or(theme.content.primary)
+        }
     }
     fn min_height(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Pixels {
         theme.tokens.control.input.min_height

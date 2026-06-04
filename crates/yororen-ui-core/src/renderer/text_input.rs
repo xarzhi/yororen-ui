@@ -15,6 +15,13 @@ pub struct TextInputRenderState {
     pub has_custom_bg: bool,
     pub has_custom_border: bool,
     pub has_custom_focus_border: bool,
+    /// Caller-supplied overrides. When the corresponding
+    /// `has_custom_*` is true, the renderer returns this color
+    /// instead of the built-in token path.
+    pub custom_bg: Option<Hsla>,
+    pub custom_border: Option<Hsla>,
+    pub custom_focus_border: Option<Hsla>,
+    pub custom_text_color: Option<Hsla>,
 }
 
 pub trait TextInputRenderer: Any + Send + Sync {
@@ -35,19 +42,33 @@ impl TextInputRenderer for TokenTextInputRenderer {
     fn bg(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.surface.sunken
+        } else if state.has_custom_bg {
+            state.custom_bg.unwrap_or(theme.surface.base)
         } else {
             theme.surface.base
         }
     }
-    fn border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
-        theme.border.default
+    fn border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
+        if state.disabled {
+            theme.border.muted
+        } else if state.has_custom_border {
+            state.custom_border.unwrap_or(theme.border.default)
+        } else {
+            theme.border.default
+        }
     }
-    fn focus_border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
-        theme.border.focus
+    fn focus_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
+        if state.has_custom_focus_border {
+            state.custom_focus_border.unwrap_or(theme.border.focus)
+        } else {
+            theme.border.focus
+        }
     }
     fn text_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.content.disabled
+        } else if state.custom_text_color.is_some() {
+            state.custom_text_color.unwrap()
         } else {
             theme.content.primary
         }
@@ -67,8 +88,8 @@ impl TextInputRenderer for TokenTextInputRenderer {
     fn border_radius(&self, _state: &TextInputRenderState, theme: &Theme) -> Pixels {
         theme.tokens.radii.md
     }
-    fn disabled_opacity(&self, _state: &TextInputRenderState, _theme: &Theme) -> f32 {
-        1.0
+    fn disabled_opacity(&self, state: &TextInputRenderState, _theme: &Theme) -> f32 {
+        if state.disabled { 0.6 } else { 1.0 }
     }
 }
 
