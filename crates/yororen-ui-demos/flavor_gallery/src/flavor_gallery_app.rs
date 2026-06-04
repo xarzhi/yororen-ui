@@ -1,10 +1,11 @@
 //! Root component for the flavor gallery demo.
 //!
-//! Renders 4 columns side-by-side, one per Catppuccin flavor. Each
-//! column is wrapped in `with_theme(theme, ...)` so its descendants
-//! pick up the per-flavor Theme without touching the process
-//! global. Inside each column we render the same set of components
-//! (select, combo_box, "Show modal" button, tooltip) so the visual
+//! Renders 5 columns side-by-side — 4 Catppuccin flavors (Latte,
+//! Frappé, Macchiato, Mocha) plus Material 3. Each column is
+//! wrapped in `with_theme(theme, ...)` so its descendants pick
+//! up the per-flavor `Theme` without touching the process global.
+//! Inside each column we render the same set of components
+//! (select, combo_box, "Show modal" button) so the visual
 //! difference between flavors is unambiguous.
 
 use gpui::prelude::FluentBuilder;
@@ -39,10 +40,10 @@ impl Render for FlavorGalleryApp {
         let theme = cx.theme();
         let appearance = cx.window_appearance();
 
-        // Top bar: 5 buttons (one per FlavorKind) for switching the
-        // demo's active theme. We use the process-global theme for
-        // the top bar; the 4 columns each get their own
-        // with_theme override.
+        // Top bar: 6 buttons (one per FlavorKind, including
+        // System) for switching the demo's active theme. We use
+        // the process-global theme for the top bar; the 5 columns
+        // below each get their own with_theme override.
         let top_bar = div()
             .flex()
             .gap(px(GAP))
@@ -67,7 +68,7 @@ impl Render for FlavorGalleryApp {
                     .on_click(move |_ev, window, cx| {
                         // Switch the process-global theme to the
                         // picked flavor. Note: this is a process-
-                        // global effect; the 4 columns will
+                        // global effect; the 5 columns will
                         // re-render with their per-flavor
                         // with_theme override.
                         let theme = theme_for(*kind, appearance_for_handler);
@@ -78,27 +79,21 @@ impl Render for FlavorGalleryApp {
                     .into_any_element()
             }))
             .child(label(
-                " (top bar uses the active theme; the 4 columns are independent with_theme overrides)",
+                " (top bar uses the active theme; the 5 columns are independent with_theme overrides)",
             ));
 
-        // 4 columns, each wrapped in with_theme so its descendants
-        // pick up the picked flavor. We also wrap the active
-        // modal in the matching column.
+        // 5 columns, each wrapped in with_theme so its descendants
+        // pick up the picked flavor. Columns only describe their
+        // own content; the active modal is rendered separately as
+        // a full-window overlay (see modal_overlay below).
         let flavor_columns = FlavorKind::ALL
             .iter()
             .filter(|k| !matches!(k, FlavorKind::System))
             .map(|kind| {
                 let column_theme = theme_for(*kind, appearance);
-                let column_active = active_modal == ActiveModal::Column(*kind);
                 let state_for_open = state.active_modal.clone();
-                let state_for_close = state.active_modal.clone();
                 with_theme(column_theme, move || {
-                    render_column(
-                        *kind,
-                        column_active,
-                        state_for_open.clone(),
-                        state_for_close.clone(),
-                    )
+                    render_column(*kind, state_for_open.clone())
                 })
             })
             .collect::<Vec<_>>();
@@ -134,23 +129,23 @@ impl Render for FlavorGalleryApp {
     }
 }
 
-/// Render one of the 4 flavor columns.
+/// Render one of the 5 flavor columns. The column owns the
+/// per-flavor content (select / combo_box / "Show modal"
+/// button); the modal itself is rendered separately as a
+/// full-window overlay (see `render_modal`).
 fn render_column(
     kind: FlavorKind,
-    modal_open: bool,
     state_for_open: Entity<ActiveModal>,
-    state_for_close: Entity<ActiveModal>,
 ) -> gpui::AnyElement {
     let column_title: SharedString = format!("{} column", kind).into();
     let variant_kind = ActionVariantKind::Primary;
     let open_handler_state = state_for_open;
-    let close_handler_state = state_for_close;
     let inner_button_id: SharedString = format!("flavor:{}:show-modal", kind.as_str()).into();
     let inner_select_id: SharedString = format!("flavor:{}:select", kind.as_str()).into();
     let inner_combo_id: SharedString = format!("flavor:{}:combo", kind.as_str()).into();
 
     // The same select, combo_box, button components are used
-    // across all 4 columns. The only difference between columns
+    // across all 5 columns. The only difference between columns
     // is the active Theme (set by with_theme in the parent).
     div()
         .w(px(COLUMN_WIDTH))
@@ -163,7 +158,7 @@ fn render_column(
         .child(label(column_title.clone()).strong(true).text_size(px(16.0)))
         .child(
             label(
-                "G-β: select honors Esc via dismiss_on_escape. \
+                "Select honors Esc via dismiss_on_escape. \
                  Open it, then press Esc to close.",
             )
             .muted(true),
@@ -179,7 +174,7 @@ fn render_column(
         )
         .child(
             label(
-                "G-β: combo_box also honors Esc. \
+                "Combo box also honors Esc. \
                  Try typing then pressing Esc.",
             )
             .muted(true),
@@ -193,7 +188,7 @@ fn render_column(
                 ])
                 .placeholder("Pick a pet…"),
         )
-        .child(label("G-γ + G-δ: modal_dialog one-line a11y shell."))
+        .child(label("Modal dialog: full a11y shell (focus trap, Esc, scrim, X)."))
         .child(
             button(inner_button_id.clone())
                 .variant(variant_kind)
@@ -205,65 +200,48 @@ fn render_column(
                     cx.refresh_windows();
                 }),
         )
-        .when(modal_open, |this| {
-            // Render the modal embedded in this column's with_theme
-            // context. The modal_dialog factory auto-composes the
-            // Overlay + ScrollLock.
-            this.child(
-                modal_dialog(format!("flavor:{}:modal", kind.as_str()))
-                    .title(format!("{} modal", kind))
-                    .content(label(format!(
-                        "Modal rendered inside the {} flavor. \
-                             Press Esc / click the scrim / click the X to close. \
-                             All three paths route to a single on_close.",
-                        kind
-                    )))
-                    .actions(modal_actions_row(
-                        yororen_ui::i18n::TextDirection::Ltr,
-                        [
-                            button(format!("flavor:{}:modal:cancel", kind.as_str()))
-                                .child("Cancel")
-                                .into_any_element(),
-                            button(format!("flavor:{}:modal:ok", kind.as_str()))
-                                .variant(ActionVariantKind::Primary)
-                                .child("OK")
-                                .into_any_element(),
-                        ],
-                    ))
-                    .open(true)
-                    .on_close(move |reason: &OverlayCloseReason, _w, cx| {
-                        // G-δ: all close paths (scrim / Esc / X)
-                        // route through this single callback.
-                        eprintln!("[{} modal] closed via {:?}", kind, reason);
-                        close_handler_state.update(cx, |v, _| {
-                            *v = ActiveModal::None;
-                        });
-                        cx.refresh_windows();
-                    })
-                    .into_any_element(),
-            )
-        })
         .into_any_element()
 }
 
-/// Render the active modal in its own with_theme block.
+/// Render the active modal as a full-window overlay so the
+/// scrim covers the columns behind it. The overlay is wrapped
+/// in a `with_theme` block matching the column it was opened
+/// from, so the modal's colors honor that flavor.
 ///
-/// Actually this is unused: we render the modal inline in
-/// `render_column` so the modal sits inside the column's
-/// with_theme context (the column's flavor). Kept here for
-/// future use (e.g. a 'Show all modals at once' mode).
-#[allow(dead_code)]
+/// Only one modal is open at a time (see `ActiveModal`), and
+/// the single `on_close` callback routes Esc / scrim / X /
+/// Cancel / OK all to the same state transition.
 fn render_modal(kind: FlavorKind, state_for_close: Entity<ActiveModal>) -> gpui::AnyElement {
     modal_dialog(format!("flavor:{}:modal", kind.as_str()))
         .title(format!("{} modal", kind))
-        .content(label(format!("Modal for {}", kind)))
-        .on_close(move |_reason, _w, cx| {
+        .content(label(format!(
+            "Modal rendered inside the {} flavor. \
+             Press Esc / click the scrim / click the X to close. \
+             All three paths route to a single on_close.",
+            kind
+        )))
+        .actions(modal_actions_row(
+            yororen_ui::i18n::TextDirection::Ltr,
+            [
+                button(format!("flavor:{}:modal:cancel", kind.as_str()))
+                    .child("Cancel")
+                    .into_any_element(),
+                button(format!("flavor:{}:modal:ok", kind.as_str()))
+                    .variant(ActionVariantKind::Primary)
+                    .child("OK")
+                    .into_any_element(),
+            ],
+        ))
+        .open(true)
+        .on_close(move |reason: &OverlayCloseReason, _w, cx| {
+            // All close paths (scrim / Esc / X / Cancel / OK)
+            // route through this single callback.
+            eprintln!("[{} modal] closed via {:?}", kind, reason);
             state_for_close.update(cx, |v, _| {
                 *v = ActiveModal::None;
             });
             cx.refresh_windows();
         })
-        .open(true)
         .into_any_element()
 }
 

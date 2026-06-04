@@ -4,8 +4,8 @@ use gpui::{App, AppContext, Entity, Global};
 
 /// The 6 flavors the demo can display. "System" uses the system
 /// theme (default light/dark from the OS appearance); the 4 in
-/// the middle are explicit Catppuccin flavors; the last one
-/// (Material) is the second official theme added in Phase H.1.
+/// the middle are the Catppuccin flavors; "Material 3" is the
+/// second official theme package.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum FlavorKind {
     /// Use the system palette. Light/dark follows the OS appearance.
@@ -19,7 +19,7 @@ pub enum FlavorKind {
     Macchiato,
     /// Catppuccin Mocha (darkest, most popular).
     Mocha,
-    /// Material Design 3 (Phase H.1, the second official theme).
+    /// Material Design 3 (the second official theme).
     Material,
 }
 

@@ -1,31 +1,34 @@
 //! yororen-ui Flavor Gallery Demo
 //!
-//! End-to-end demo of Phase F (Catppuccin theme) and Phase G
-//! (a11y completeness) working together. The window is divided
-//! into 5 columns, one per flavor (4 Catppuccin flavors +
-//! Material Design 3). Each column has the same set of
-//! components — pickers, toggles, a tooltip, and a "Show modal"
-//! button. Opening the modal in any column demonstrates the
-//! v0.5 a11y stack end-to-end:
+//! A side-by-side visual comparison of the available theme
+//! "flavors" shipped with yororen-ui: 4 Catppuccin flavors
+//! (Latte, Frappé, Macchiato, Mocha) plus Material Design 3.
+//! The window is divided into 5 columns, one per flavor; each
+//! column renders the same set of components (a select, a
+//! combo box, and a "Show modal" button) so the visual
+//! difference between flavors is unambiguous.
 //!
-//! - The modal is opened via the new `modal_dialog` factory
-//!   (G-γ: one-line API, no need to manually compose Modal +
-//!   Overlay + ScrollLock).
-//! - The modal closes on Esc, scrim click, OR the inner close
-//!   button (G-δ: all three paths route through a single
-//!   `on_close` callback with `OverlayCloseReason`).
-//! - The select / combo_box in each column honours Esc via
-//!   `dismiss_on_escape` (G-β).
-//! - Tab / Shift+Tab inside the modal is the default
-//!   focus-trap behaviour (G-α real impl is used in the
-//!   `focus_trap_demo` crate; this demo uses `modal_dialog`'s
-//!   built-in focus handling).
+//! The top bar also exposes a "System" theme toggle that
+//! switches the **process-global** theme used by the top bar
+//! itself. The 5 columns below are wrapped in `with_theme`
+//! overrides and are independent of that global theme — they
+//! always show their own flavor.
 //!
-//! The 5 flavors are rendered with the **same** code — only the
-//! active `Theme` differs. This proves that the v0.5 Renderer
-//! trait system + `CatppuccinFlavor` enum + `Material` theme
-//! package together give complete third-party skins with no
-//! per-component hardcoded color logic.
+//! The modal exercises the full a11y shell:
+//!
+//! - Opened via the `modal_dialog` factory (one-line API that
+//!   composes Modal + Overlay + ScrollLock + focus trap).
+//! - Closes on Esc, scrim click, the inner X, Cancel, or OK;
+//!   all paths route through a single `on_close` callback
+//!   carrying an `OverlayCloseReason`.
+//! - The select / combo box in each column also honour Esc
+//!   via `dismiss_on_escape`.
+//!
+//! The 5 flavors are rendered with the **same** code — only
+//! the active `Theme` differs. This demonstrates that the
+//! Renderer trait system + `CatppuccinFlavor` enum + `Material`
+//! theme package together give complete third-party skins
+//! with no per-component hardcoded color logic.
 
 use std::sync::Arc;
 
@@ -51,13 +54,13 @@ fn main() {
         yororen_ui::component::init(cx);
 
         // Start with the system theme as the default; the user
-        // picks a flavor via the radio in the top bar.
+        // picks a flavor via the buttons in the top bar.
         theme_system::install(cx, cx.window_appearance());
         locale_en::install(cx);
 
-        // Also register the Catppuccin custom variants so the
-        // "mocha / lavender / ghost" buttons in the gallery can
-        // be rendered with the correct accent.
+        // Register the Catppuccin custom variants so Catppuccin
+        // accents (mocha / lavender / ghost, etc.) resolve to
+        // the right per-flavor palette.
         let variant_reg = Arc::new(catppuccin::variant::catppuccin_registry());
         cx.set_global(yororen_ui::renderer::GlobalVariantRegistry(variant_reg));
 
@@ -81,10 +84,9 @@ fn main() {
 
 /// Resolve the active Theme for a given flavor and OS appearance.
 ///
-/// Latte / Frappé / Macchiato / Mocha are explicit Catppuccin
-/// flavors; Material is the second official theme (Phase H.1);
-/// "System" uses the system palette (with the active OS
-/// appearance).
+/// Latte / Frappé / Macchiato / Mocha are the 4 Catppuccin
+/// flavors; Material 3 is the second official theme; "System"
+/// uses the system palette (with the active OS appearance).
 pub fn theme_for(kind: FlavorKind, appearance: gpui::WindowAppearance) -> Theme {
     match kind {
         FlavorKind::System => match appearance {
@@ -119,10 +121,11 @@ fn _kind_passthrough(k: FlavorKind) -> FlavorKind {
 mod tests {
     use super::*;
 
-    /// The 4 Catppuccin flavors + Material + System must produce
-    /// distinct theme surface.bg values. This is the v0.5
-    /// regression test for the F-α no-hardcode rule, extended
-    /// in Phase H.1 to cover the new Material theme.
+    /// All 6 flavors (System + 4 Catppuccin + Material 3) must
+    /// produce distinct theme surface.base values. This is a
+    /// regression test for the "no hardcoded color" rule — if
+    /// any two flavors collide, a component is almost certainly
+    /// bypassing the renderer and using a baked-in color.
     #[test]
     fn all_six_flavors_produce_distinct_themes() {
         let appearance = gpui::WindowAppearance::Dark;
@@ -142,10 +145,11 @@ mod tests {
         assert_ne!(system.surface.base, mocha.surface.base);
     }
 
-    /// The same Theme can be plugged into a `with_theme` block
-    /// and the descendants see the per-flavor palette.
-    /// This is a sanity check for the F-γ wiring, extended
-    /// for the new Material variant.
+    /// The 5 visible flavor columns can be wrapped in a
+    /// `with_theme` block and their descendants see the
+    /// per-flavor palette regardless of the process-global
+    /// theme in the top bar. Sanity check on the per-element
+    /// theme override.
     #[test]
     fn flavor_kind_as_str_matches_demonstration() {
         assert_eq!(FlavorKind::System.as_str(), "System");
