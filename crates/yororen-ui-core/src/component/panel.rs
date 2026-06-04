@@ -85,7 +85,7 @@ pub struct Panel {
     /// Padding override. When `None`, the renderer picks the
     /// default padding.
     padding: Option<Edges<Pixels>>,
-    /// P1-6: when `true`, the panel renders with no padding even if
+    /// When `true`, the panel renders with no padding even if
     /// the renderer would normally supply one. The caller takes
     /// responsibility for laying out children with their own
     /// padding.
@@ -144,12 +144,10 @@ impl Panel {
         self
     }
 
-    /// P1-6: opt into "inset only" mode where the panel supplies
+    /// Opt into "inset only" mode where the panel supplies
     /// bg / border / radius / shadow but its own padding is forced
     /// to zero. The caller is expected to lay out children with
-    /// their own padding. This replaces the previous
-    /// `padding(Edges::all(0))` workaround that the Modal used
-    /// to disable the panel's padding.
+    /// their own padding.
     pub fn inset_only(mut self, inset: bool) -> Self {
         self.inset_only = inset;
         self

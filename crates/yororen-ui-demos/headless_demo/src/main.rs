@@ -402,14 +402,9 @@ impl Render for HeadlessDemoApp {
 
         let info_col = render_info_col(theme);
 
-        // P2-4: replaced `ModalRoot` with the `modal()` builder
-        // since the composite/ directory was deleted. The builder
-        // doesn't have an `open` setter — open / close is
-        // controlled by the caller mounting the modal only when
-        // needed, e.g. `if self.modal_open { Some(modal_root) }
-        // else { None }` in the final layout. The builder's
-        // `on_close` is 2-arg (no reason), unlike composite's
-        // 3-arg form.
+        // The modal is mounted only when needed; the builder
+        // doesn't have an `open` setter, so the call site gates
+        // it. The builder's `on_close` is 2-arg (no reason).
         let modal_root = {
             let close = close_modal.clone();
             modal()
@@ -545,9 +540,8 @@ fn render_composite_col(
     let close_modal = close_modal.clone();
     let _ = (popover_btn, close_modal); // popover_btn is still passed for symmetry; close_modal is wired in the parent.
 
-    // P2-4: replaced PopoverRoot / DropdownMenuRoot / SelectRoot /
-    // ComboBoxRoot / TooltipRoot with their component:: builder
-    // equivalents after the composite/ directory was deleted.
+    // Popovers, dropdowns, selects, combo boxes, and tooltips all
+    // use the component builders directly.
 
     let popover_root = popover("demo-popover")
         .open(popover_open)

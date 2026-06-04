@@ -1,6 +1,6 @@
 //! Root component for the theme-compare demo.
 //!
-//! `with_theme` was removed in P0-2 because it was panic-unsafe. The
+//! `with_theme` was removed because it was panic-unsafe. The
 //! "theme compare" demo now exercises a single global theme at a
 //! time and lets the user flip between two theme packages to see the
 //! same UI render with two different skins.

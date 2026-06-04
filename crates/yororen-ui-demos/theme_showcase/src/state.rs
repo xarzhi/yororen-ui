@@ -2,9 +2,9 @@
 
 use gpui::{App, AppContext, Entity, Global};
 
-/// Which theme the demo is currently using. `with_theme` was removed
-/// (P0-2) so the demo flips the global theme instead of per-element
-/// overrides.
+/// Which theme the demo is currently using. The per-element
+/// `with_theme` override was removed, so the demo flips the global
+/// theme instead.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum RightThemeKind {
     /// v0.5 system + token renderers.

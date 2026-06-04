@@ -296,7 +296,7 @@ impl RendererRegistry {
         self
     }
 
-    /// Generic component renderer setter (P0-4).
+    /// Generic component renderer setter.
     ///
     /// Lets a theme package install a renderer for a render-state
     /// type without writing a `with_<x>` setter per component. The
@@ -307,8 +307,7 @@ impl RendererRegistry {
     /// downcasts `Arc<dyn Any>` back to `Arc<dyn ComponentRenderer<S>>`
     /// when components read it. Note: this is currently a
     /// documentation hook; the actual HashMap-based storage
-    /// migration is staged for v0.4.1 — see ARCHITECTURE_GUIDE §
-    /// "P0-4".
+    /// migration is staged for v0.4.1.
     pub fn with_component<S, R>(self, _renderer: Arc<R>) -> Self
     where
         S: super::component_renderer::RenderState,
@@ -320,7 +319,7 @@ impl RendererRegistry {
         self
     }
 
-    /// Generic renderer lookup (P0-4 stage 1).
+    /// Generic renderer lookup.
     ///
     /// Returns `None` until the storage migration is complete; the
     /// per-component `Arc<dyn …Renderer>` fields are still the

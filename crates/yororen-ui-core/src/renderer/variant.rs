@@ -192,11 +192,11 @@ impl VariantRegistry {
     /// touching the registry; in that case `empty()` is enough.
     pub fn with_defaults() -> Self {
         // Built-in variants are resolved through `Theme.action_*`
-        // fields directly, not through this registry. The seed was
-        // historically a no-op (P0-5) and the docstring was wrong;
-        // we keep the method as a convenience for code that
-        // *does* want a registry populated for `builtin()` lookups
-        // (e.g. some custom renderers). If you need that, prefer
+        // fields directly, not through this registry. The seed is
+        // intentionally a no-op; we keep the method as a
+        // convenience for code that *does* want a registry
+        // populated for `builtin()` lookups (e.g. some custom
+        // renderers). If you need that, prefer
         // `with_defaults_for_theme(&theme)`.
         Self::empty()
     }

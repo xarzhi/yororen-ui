@@ -199,12 +199,11 @@ pub trait Translate {
 
     /// Look up a translation, returning `None` if the key is missing.
     ///
-    /// This is the P1-2 explicit-fallback API: production code that
-    /// needs to distinguish "no translation" from "translation equals
-    /// the key" should use this and decide whether to log, surface
-    /// a metric, or panic at the call site. The `t(...)` shortcut
-    /// remains for the 99% path where falling back to the key is
-    /// acceptable.
+    /// Production code that needs to distinguish "no translation"
+    /// from "translation equals the key" should use this and decide
+    /// whether to log, surface a metric, or panic at the call
+    /// site. The `t(...)` shortcut remains for the 99% path where
+    /// falling back to the key is acceptable.
     fn lookup(&self, key: &str) -> Option<SharedString>;
 }
 

@@ -171,11 +171,12 @@ impl GlobalTheme {
     /// theme package (e.g. `yororen_ui_theme_system::install`) to
     /// obtain a `Theme` and pass it here.
     ///
-    /// As of P0-3 this is the only identity. The previous `ThemeSet`
-    /// (light/dark factory) and `new_with_themes(appearance, …)` were
-    /// removed because three parallel identity systems caused
-    /// boundary confusion. The new model is: the app picks the right
-    /// `Theme` for the OS appearance, then sets it once.
+    /// As of the headless-core cutover, this is the only identity.
+    /// The previous `ThemeSet` (light/dark factory) and
+    /// `new_with_themes(appearance, …)` were removed because three
+    /// parallel identity systems caused boundary confusion. The
+    /// model now is: the app picks the right `Theme` for the OS
+    /// appearance, then sets it once.
     pub fn new(theme: impl Into<Arc<Theme>>) -> Self {
         Self {
             theme: theme.into(),
@@ -234,7 +235,7 @@ impl ActiveTheme for App {
     }
 }
 
-// Performance note (P1-5):
+// Performance note:
 //
 // `cx.theme()` is hot in every render. It returns `&Arc<Theme>`,
 // not `&Theme`, so:

@@ -31,10 +31,10 @@ mod light;
 /// theme_system::install(cx, window.appearance());
 /// ```
 ///
-/// As of P0-3 this is the only supported identity. The previous
-/// `ThemeSet` (light/dark factory) was removed; the app now picks
-/// the right `Theme` for the OS appearance and stores it in a single
-/// `GlobalTheme` global.
+/// The single supported identity: a `GlobalTheme` global. The
+/// previous `ThemeSet` (light/dark factory) was removed; the app
+/// now picks the right `Theme` for the OS appearance and stores it
+/// in a single `GlobalTheme` global.
 pub fn install(cx: &mut App, appearance: WindowAppearance) {
     let theme = match appearance {
         WindowAppearance::Dark | WindowAppearance::VibrantDark => dark::dark(),

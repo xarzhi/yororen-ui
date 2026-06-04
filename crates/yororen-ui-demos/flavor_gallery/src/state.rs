@@ -57,9 +57,9 @@ impl std::fmt::Display for FlavorKind {
 /// visibility flags for the per-flavor modal that the user opens
 /// via the "Show modal" button.
 pub struct FlavorGalleryState {
-    /// The flavor whose theme is currently active. `with_theme` was
-    /// removed (P0-2) so the demo flips the global theme to this
-    /// flavor on click.
+    /// The flavor whose theme is currently active. The per-element
+    /// `with_theme` override was removed, so the demo flips the
+    /// global theme to this flavor on click.
     pub active_flavor: Entity<FlavorKind>,
     /// The currently open modal (if any). With per-element overrides
     /// gone, only one modal can be visible at a time.

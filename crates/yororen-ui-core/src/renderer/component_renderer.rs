@@ -1,9 +1,8 @@
 //! Unified `ComponentRenderer<S>` trait — the foundation of the v0.4
 //! renderer architecture.
 //!
-//! P0-4 introduces this trait to consolidate the 38 nearly-identical
-//! `XxxRenderer` traits that previously existed as separate files.
-//! The new design is:
+//! The trait consolidates the 38 nearly-identical `XxxRenderer`
+//! traits that previously existed as separate files. The design is:
 //!
 //! 1. Each component still has a strongly-typed marker trait
 //!    (`ButtonRenderer`, `IconButtonRenderer`, …) that is a thin

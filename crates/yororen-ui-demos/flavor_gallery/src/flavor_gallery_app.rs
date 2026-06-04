@@ -1,6 +1,6 @@
 //! Root component for the flavor gallery demo.
 //!
-//! `with_theme` was removed in P0-2 (panic-unsafe). The demo now
+//! `with_theme` was removed (panic-unsafe). The demo now
 //! shows one flavor at a time; a tab strip at the top switches the
 //! global theme. The columns-per-flavor layout was the only consumer
 //! of per-element theme overrides, so it cannot survive without

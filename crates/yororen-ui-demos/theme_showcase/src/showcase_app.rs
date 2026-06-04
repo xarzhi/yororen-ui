@@ -1,6 +1,6 @@
 //! Root component for the theme-showcase demo.
 //!
-//! `with_theme` was removed in P0-2 (panic-unsafe). The demo now
+//! `with_theme` was removed (panic-unsafe). The demo now
 //! cycles a single global theme through 4 configurations
 //! (system / catppuccin / material / catppuccin renderers on system
 //! palette) to show that palette and renderer are independent swap

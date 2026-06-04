@@ -72,13 +72,11 @@ pub struct Locale {
 impl Locale {
     /// Create a new locale from a language tag string (e.g., "en", "zh-CN", "ar-SA").
     ///
-    /// P1-3: the tag is now validated against a strict BCP-47 subset.
-    /// The language *primary* subtag is required to be 2-3 ASCII
-    /// letters; the *region* subtag must be either 2 letters or 3
-    /// digits; the *variant* must be 5-8 alphanumerics. Anything
-    /// outside this returns `LocaleParseError`. This prevents the
-    /// old bug where `Locale::new("a-b-c")` would silently succeed
-    /// and never match anything in `match_locale`.
+    /// The tag is validated against a strict BCP-47 subset. The
+    /// language *primary* subtag must be 2-3 ASCII letters; the
+    /// *region* subtag must be either 2 letters or 3 digits; the
+    /// *variant* must be 5-8 alphanumerics. Anything outside this
+    /// returns `LocaleParseError`.
     pub fn new(tag: &str) -> Result<Self, LocaleParseError> {
         let parts: Vec<&str> = tag.split('-').collect();
         if parts.is_empty() || parts.len() > 3 {

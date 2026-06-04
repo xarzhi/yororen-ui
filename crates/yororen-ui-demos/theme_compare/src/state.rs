@@ -2,9 +2,9 @@
 
 use gpui::{App, AppContext, Entity, Global};
 
-/// Whether the demo is currently showing the mini theme. `with_theme`
-/// was removed (P0-2) so the demo flips the global theme instead of
-/// per-element overrides.
+/// Whether the demo is currently showing the mini theme. The
+/// `with_theme` per-element override was removed, so the demo
+/// flips the global theme instead.
 pub struct ThemeCompareState {
     pub uses_mini: Entity<bool>,
 }

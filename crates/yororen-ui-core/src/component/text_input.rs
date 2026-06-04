@@ -42,14 +42,10 @@ pub fn text_input(id: impl Into<ElementId>) -> TextInput {
 
 /// Bind the text-input keymap to the running `App`.
 ///
-/// P1-4: this used to be unguarded, which meant any host app that
-/// called `init` twice would double-register the keymap (or, on
-/// the other side of the spectrum, would silently swallow
-/// "non-text-input" secondary-v because the binding's context was
-/// global). The current implementation is idempotent: subsequent
-/// calls are no-ops. The binding context is `"UITextInput"`, so
-/// keys fire only when a text input is focused — there is no
-/// "global pollution" of the host app's keymap.
+/// The implementation is idempotent: subsequent calls are
+/// no-ops. The binding context is `"UITextInput"`, so keys fire
+/// only when a text input is focused — there is no global
+/// pollution of the host app's keymap.
 ///
 /// Apps that want the keymap should call this once during
 /// bootstrap. Apps that want their own keymap (e.g. an editor
