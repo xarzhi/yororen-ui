@@ -19,6 +19,7 @@ use std::sync::Arc;
 
 use gpui::{FontWeight, Hsla, Pixels, SharedString, px};
 
+use yororen_ui_core::component::HeadingLevel;
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::renderer::{
     AvatarRenderState, AvatarRenderer, BadgeRenderState, BadgeRenderer, ButtonRenderState,
@@ -745,28 +746,20 @@ pub struct CatppuccinHeadingRenderer;
 impl HeadingRenderer for CatppuccinHeadingRenderer {
     fn size(&self, state: &HeadingRenderState, theme: &Theme) -> Pixels {
         let t = &theme.tokens.typography;
-        // HeadingLevel is in a private module so we can't match
-        // its variants directly. Use std::mem::discriminant
-        // comparison against two of the three known variants
-        // (H1, H2); H3 is the fall-through. `transmute_copy` of
-        // the discriminant is sound because HeadingLevel is
-        // a plain fieldless enum with sequential variants.
-        use std::mem::discriminant;
-        let h1 = discriminant(&state.level);
-        // Build a synthetic H2 discriminant by transmuting a
-        // stack copy of state.level with offset 1. H2 is H1+1.
-        let level: u8 = unsafe { std::mem::transmute_copy(&state.level) };
-        let _ = h1; // silence unused if compiler folds
-        match level {
-            0 => t.font_size_2xl, // H1
-            1 => t.font_size_xl,  // H2
-            _ => t.font_size_lg,  // H3
+        // `HeadingLevel` is a `pub` plain fieldless enum, so we
+        // can match its variants directly. (No need for
+        // `discriminant` or `transmute_copy` of the discriminant —
+        // both of those are unsound-ish and never necessary when
+        // the enum is public.)
+        match state.level {
+            HeadingLevel::H1 => t.font_size_2xl,
+            HeadingLevel::H2 => t.font_size_xl,
+            HeadingLevel::H3 => t.font_size_lg,
         }
     }
     fn weight(&self, state: &HeadingRenderState, theme: &Theme) -> FontWeight {
-        let level: u8 = unsafe { std::mem::transmute_copy(&state.level) };
-        match level {
-            0 => theme.tokens.typography.weight_bold,
+        match state.level {
+            HeadingLevel::H1 => theme.tokens.typography.weight_bold,
             _ => theme.tokens.typography.weight_semibold,
         }
     }
@@ -1816,7 +1809,7 @@ mod tests {
         let _ = reg.get_divider().expect("DividerRenderer registered").color(&DividerRenderState::default(), &theme);
         let _ = reg.get_heading().expect("HeadingRenderer registered").size(
             &HeadingRenderState {
-                level: unsafe { std::mem::zeroed() },
+                level: HeadingLevel::H1,
             },
             &theme,
         );

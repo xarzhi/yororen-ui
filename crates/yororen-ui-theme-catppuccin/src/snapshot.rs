@@ -72,6 +72,7 @@ use yororen_ui_core::renderer::{
     TextInputRenderer, ToastRenderer, ToggleButtonRenderer, TooltipRenderer, TreeItemRenderer,
 };
 
+use yororen_ui_core::component::HeadingLevel;
 use yororen_ui_core::renderer::spec::Edges;
 
 /// Snapshot of one renderer's output for one flavor.
@@ -422,13 +423,10 @@ fn btn(variant: ActionVariantKind) -> ButtonRenderState {
 }
 
 fn heading_state() -> HeadingRenderState {
-    // HeadingLevel lives in a private module; we can't import
-    // the type directly. We rely on the fact that HeadingLevel
-    // is a fieldless sequential enum (`#[repr(u8)]` with H1=0,
-    // H2=1, H3=2). Use a u8 source for the transmute.
-    let level: u8 = 0; // H1
+    // `HeadingLevel` is a `pub` plain fieldless enum; we can
+    // construct it directly without `transmute_copy` shenanigans.
     HeadingRenderState {
-        level: unsafe { std::mem::transmute_copy(&level) },
+        level: HeadingLevel::H1,
     }
 }
 
