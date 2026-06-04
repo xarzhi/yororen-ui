@@ -6,18 +6,31 @@ use super::easing::EasingFn;
 use super::easing::ease_out_quad;
 
 /// Configuration for animations.
+///
+/// # What this carries
+///
+/// - `duration`: how long the animation runs.
+/// - `easing`: the easing curve.
+/// - `repeat`: whether the animation loops.
+///
+/// # What this **does not** carry
+///
+/// `delay` and `reverse` (yoyo) are **not** modeled here. The
+/// underlying `gpui::Animation` does not currently expose them, and
+/// silently dropping them at `to_gpui_animation` would be a footgun.
+///
+/// For delayed / yoyo animations, drive them explicitly with
+/// [`super::orchestrator`]. That module is the public API for
+/// animation choreography that exceeds what `gpui::Animation`
+/// itself supports.
 #[derive(Debug, Clone)]
 pub struct AnimationConfig {
     /// Duration of the animation.
     pub duration: Duration,
     /// Easing function to use.
     pub easing: EasingFn,
-    /// Delay before starting the animation.
-    pub delay: Duration,
     /// Whether the animation should repeat.
     pub repeat: bool,
-    /// Whether the animation should reverse (yoyo effect).
-    pub reverse: bool,
 }
 
 impl Default for AnimationConfig {
@@ -25,9 +38,7 @@ impl Default for AnimationConfig {
         Self {
             duration: Duration::from_millis(200),
             easing: ease_out_quad,
-            delay: Duration::ZERO,
             repeat: false,
-            reverse: false,
         }
     }
 }
@@ -50,30 +61,18 @@ impl AnimationConfig {
         self
     }
 
-    /// Set the delay.
-    pub fn with_delay(mut self, delay: Duration) -> Self {
-        self.delay = delay;
-        self
-    }
-
     /// Enable repeat.
     pub fn with_repeat(mut self) -> Self {
         self.repeat = true;
         self
     }
 
-    /// Enable reverse (yoyo).
-    pub fn with_reverse(mut self) -> Self {
-        self.reverse = true;
-        self
-    }
-
     /// Convert to a `gpui::Animation` honoring the configured
-    /// `duration`, `easing` and `repeat`. `gpui::Animation` does
-    /// not currently model `delay` or `reverse`, so those two
-    /// fields are advisory-only (callers that need them must
-    /// orchestrate manually via `cx.spawn` + timers, see
-    /// `animation::orchestrator`).
+    /// `duration`, `easing` and `repeat`. Note that `delay` and
+    /// `reverse` (yoyo) are intentionally **not** part of this
+    /// config — see the struct-level docs and
+    /// [`super::orchestrator`] for the API surface that does
+    /// support them.
     pub fn to_gpui_animation(self) -> gpui::Animation {
         let mut animation = gpui::Animation::new(self.duration).with_easing(self.easing);
 
@@ -94,9 +93,7 @@ impl AnimationConfig {
         Self {
             duration: motion.duration_normal,
             easing: motion.easing_standard,
-            delay: Duration::ZERO,
             repeat: false,
-            reverse: false,
         }
     }
 }
