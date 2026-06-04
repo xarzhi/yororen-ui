@@ -18,9 +18,9 @@ use gpui::{
 };
 
 use yororen_ui::assets::UiAsset;
-use yororen_ui::component::{init as init_component, label as label_comp, panel};
-use yororen_ui::composite::{
-    ComboBoxRoot, DropdownMenuRoot, ModalRoot, PopoverRoot, SelectRoot, TooltipRoot,
+use yororen_ui::component::{
+    ComboBoxOption, SelectOption, combo_box, init as init_component, label as label_comp, modal,
+    panel, popover, select, tooltip,
 };
 use yororen_ui::component::tooltip::TooltipPlacement;
 use yororen_ui::component::button as button_comp;
@@ -402,20 +402,23 @@ impl Render for HeadlessDemoApp {
 
         let info_col = render_info_col(theme);
 
-        // ModalRoot is rendered at the top level (overlay) so it
-        // doesn't bloat the composite column when closed. It is
-        // only mounted while `modal_open` is true, and is wrapped
-        // in a scrim overlay (the framework's ModalRoot itself
-        // doesn't provide a backdrop — it just renders a styled
-        // panel).
+        // P2-4: replaced `ModalRoot` with the `modal()` builder
+        // since the composite/ directory was deleted. The builder
+        // doesn't have an `open` setter — open / close is
+        // controlled by the caller mounting the modal only when
+        // needed, e.g. `if self.modal_open { Some(modal_root) }
+        // else { None }` in the final layout. The builder's
+        // `on_close` is 2-arg (no reason), unlike composite's
+        // 3-arg form.
         let modal_root = {
-            let close_modal = close_modal.clone();
-            ModalRoot::new("demo-modal")
-                .open(self.modal_open)
+            let close = close_modal.clone();
+            modal()
+                .id("demo-modal")
                 .title("Confirm")
                 .content(div().p(px(8.)).child(label_comp("Modal body.")))
                 .actions(label_comp("actions"))
-                .on_close(move |w, cx| (close_modal)(w, cx))
+                .closable(true)
+                .on_close(move |w, cx| (close)(w, cx))
         };
 
         let modal_scrim = theme
@@ -542,12 +545,12 @@ fn render_composite_col(
     let close_modal = close_modal.clone();
     let _ = (popover_btn, close_modal); // popover_btn is still passed for symmetry; close_modal is wired in the parent.
 
-    let popover_root = PopoverRoot::new("demo-popover")
+    // P2-4: replaced PopoverRoot / DropdownMenuRoot / SelectRoot /
+    // ComboBoxRoot / TooltipRoot with their component:: builder
+    // equivalents after the composite/ directory was deleted.
+
+    let popover_root = popover("demo-popover")
         .open(popover_open)
-        // The trigger must be the `popover_btn` (a real
-        // ButtonProps with on_click that toggles `popover_open`)
-        // — `label_comp("Open popover")` is a plain label with no
-        // click handler and would not open the popover.
         .trigger(
             popover_btn
                 .clone()
@@ -565,30 +568,38 @@ fn render_composite_col(
         )
         .content(div().p(px(12.)).child(label_comp("Popover body")));
 
-    let dropdown_root = DropdownMenuRoot::new("demo-dropdown")
+    let dropdown_root = yororen_ui::component::dropdown_menu("demo-dropdown")
         .label("Choose")
-        .item("a", "Apple")
-        .item("b", "Banana")
-        .item("c", "Cherry");
+        .items([
+            yororen_ui::component::DropdownItem::Item(
+                yororen_ui::component::DropdownMenuItem::new("a", "Apple"),
+            ),
+            yororen_ui::component::DropdownItem::Item(
+                yororen_ui::component::DropdownMenuItem::new("b", "Banana"),
+            ),
+            yororen_ui::component::DropdownItem::Item(
+                yororen_ui::component::DropdownMenuItem::new("c", "Cherry"),
+            ),
+        ]);
 
-    let select_root = SelectRoot::new("demo-select")
-        .option("red", "Red")
-        .option("green", "Green")
-        .option("blue", "Blue");
+    let select_root = select("demo-select")
+        .options([
+            SelectOption::new().value("red").label("Red"),
+            SelectOption::new().value("green").label("Green"),
+            SelectOption::new().value("blue").label("Blue"),
+        ])
+        .placeholder("Pick a color");
 
-    let combo_root = ComboBoxRoot::new("demo-combo")
-        .option("ny", "New York")
-        .option("sf", "San Francisco")
-        .option("tk", "Tokyo");
+    let combo_root = combo_box("demo-combo")
+        .options([
+            ComboBoxOption::new("ny", "New York"),
+            ComboBoxOption::new("sf", "San Francisco"),
+            ComboBoxOption::new("tk", "Tokyo"),
+        ])
+        .placeholder("Pick a city");
 
-    // TooltipRoot — a real hover-popup built on top of the
-    // underlying `Tooltip` builder. Hover the button to see the
-    // tooltip. `dismiss_on_escape = true` honours Esc.
-    let tooltip_root = TooltipRoot::new("demo-tooltip")
-        .trigger(button_comp("tip-btn").child("Hover me"))
-        .text("This is a TooltipRoot popup")
-        .placement(TooltipPlacement::Bottom)
-        .dismiss_on_escape(true);
+    let tooltip_root = tooltip("This is a TooltipRoot popup")
+        .placement(TooltipPlacement::Bottom);
 
     panel("composite-col")
         .p(px(16.))
