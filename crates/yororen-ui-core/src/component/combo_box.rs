@@ -348,6 +348,10 @@ impl RenderOnce for ComboBox {
             .map(|opt| opt.label.clone());
 
         let direction = cx.theme().text_direction;
+        // Owned `Arc<Theme>` clone (one atomic refcount bump): the
+        // nested popover and option-row closures below are `move`
+        // closures, which require an owned capture rather than a
+        // borrow from `cx`.
         let theme = cx.theme().clone();
         let hint = theme.content.tertiary;
 

@@ -210,13 +210,16 @@ impl RenderOnce for NumberInput {
         let on_change = self.on_change;
         let validate = self.validate;
 
-        let theme = cx.theme().clone();
+        // `compute_input_style` is the only consumer of `theme` in
+        // this render path, so we just borrow `cx.theme()` instead
+        // of incurring an `Arc::clone`. All other theme lookups in
+        // this function go through `cx.theme()` directly.
         let height = self
             .height
             .unwrap_or_else(|| cx.theme().tokens.control.button.min_height.into());
 
         let input_style = compute_input_style(
-            &theme,
+            cx.theme(),
             disabled,
             self.bg,
             self.border,

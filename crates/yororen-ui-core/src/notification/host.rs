@@ -93,6 +93,11 @@ impl RenderOnce for NotificationHost {
         sub.detach();
 
         let items = center.items();
+        // Owned `Arc<Theme>` (one atomic refcount bump): the
+        // `.map(move |n| { ... theme ... })` below is a `move`
+        // closure that consumes `theme`, so a borrow from `cx`
+        // wouldn't satisfy `'static`. See `theme::mod` for the
+        // full discussion of why this is cheap.
         let theme = cx.theme().clone();
 
         let direction = cx.theme().text_direction;
