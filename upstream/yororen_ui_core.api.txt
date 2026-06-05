@@ -42,9 +42,6 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::a11y::FocusDir
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::a11y::FocusDirection
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::a11y::FocusDirection
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::a11y::FocusDirection
-impl yororen_ui_core::a11y::Role
-pub struct yororen_ui_core::a11y::AriaAttrs
-impl yororen_ui_core::a11y::AriaAttrs
 pub struct yororen_ui_core::a11y::ClickOutsideCapture
 impl yororen_ui_core::a11y::ClickOutsideCapture
 pub fn yororen_ui_core::a11y::ClickOutsideCapture::new() -> Self
@@ -191,12 +188,10 @@ impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::a11y::FocusRing
 pub struct yororen_ui_core::a11y::FocusTrap
 impl yororen_ui_core::a11y::FocusTrap
 pub fn yororen_ui_core::a11y::FocusTrap::id(self, impl core::convert::Into<gpui::window::ElementId>) -> Self
-pub fn yororen_ui_core::a11y::FocusTrap::initial_focus(self, impl core::convert::Into<gpui::window::ElementId>) -> Self
 pub fn yororen_ui_core::a11y::FocusTrap::new() -> Self
 pub fn yororen_ui_core::a11y::FocusTrap::on_escape<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::a11y::FocusTrap::on_focus_next<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::a11y::FocusTrap::on_focus_prev<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App)
-pub fn yororen_ui_core::a11y::FocusTrap::trap_focus(self, bool) -> Self
 impl core::default::Default for yororen_ui_core::a11y::FocusTrap
 pub fn yororen_ui_core::a11y::FocusTrap::default() -> Self
 impl gpui::element::IntoElement for yororen_ui_core::a11y::FocusTrap
@@ -280,8 +275,6 @@ impl core::marker::Unpin for yororen_ui_core::a11y::ScrollLockGuard
 impl core::marker::UnsafeUnpin for yororen_ui_core::a11y::ScrollLockGuard
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::a11y::ScrollLockGuard
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::a11y::ScrollLockGuard
-impl<E> yororen_ui_core::a11y::RoleExt for E
-pub fn E::role(self, yororen_ui_core::a11y::Role) -> Self where Self: core::marker::Sized
 pub fn yororen_ui_core::a11y::current_lock_count() -> usize
 pub fn yororen_ui_core::a11y::cycle_focus<'a>(&'a yororen_ui_core::a11y::FocusableList, &str, yororen_ui_core::a11y::FocusDirection) -> core::option::Option<&'a str>
 pub fn yororen_ui_core::a11y::focus_trap() -> yororen_ui_core::a11y::FocusTrap
@@ -1008,11 +1001,9 @@ pub fn yororen_ui_core::component::Modal::bg(self, impl core::convert::Into<gpui
 pub fn yororen_ui_core::component::Modal::border(self, impl core::convert::Into<gpui::color::Hsla>) -> Self
 pub fn yororen_ui_core::component::Modal::closable(self, bool) -> Self
 pub fn yororen_ui_core::component::Modal::content(self, impl gpui::element::IntoElement) -> Self
-pub fn yororen_ui_core::component::Modal::get_role(&self) -> yororen_ui_core::a11y::Role
 pub fn yororen_ui_core::component::Modal::id(self, impl core::convert::Into<gpui::window::ElementId>) -> Self
 pub fn yororen_ui_core::component::Modal::new() -> Self
 pub fn yororen_ui_core::component::Modal::on_close<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App)
-pub fn yororen_ui_core::component::Modal::role(self, yororen_ui_core::a11y::Role) -> Self
 pub fn yororen_ui_core::component::Modal::title(self, impl core::convert::Into<gpui::shared_string::SharedString>) -> Self
 pub fn yororen_ui_core::component::Modal::width(self, gpui::geometry::Pixels) -> Self
 impl core::default::Default for yororen_ui_core::component::Modal
@@ -2475,11 +2466,9 @@ pub fn yororen_ui_core::component::Modal::bg(self, impl core::convert::Into<gpui
 pub fn yororen_ui_core::component::Modal::border(self, impl core::convert::Into<gpui::color::Hsla>) -> Self
 pub fn yororen_ui_core::component::Modal::closable(self, bool) -> Self
 pub fn yororen_ui_core::component::Modal::content(self, impl gpui::element::IntoElement) -> Self
-pub fn yororen_ui_core::component::Modal::get_role(&self) -> yororen_ui_core::a11y::Role
 pub fn yororen_ui_core::component::Modal::id(self, impl core::convert::Into<gpui::window::ElementId>) -> Self
 pub fn yororen_ui_core::component::Modal::new() -> Self
 pub fn yororen_ui_core::component::Modal::on_close<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App)
-pub fn yororen_ui_core::component::Modal::role(self, yororen_ui_core::a11y::Role) -> Self
 pub fn yororen_ui_core::component::Modal::title(self, impl core::convert::Into<gpui::shared_string::SharedString>) -> Self
 pub fn yororen_ui_core::component::Modal::width(self, gpui::geometry::Pixels) -> Self
 impl core::default::Default for yororen_ui_core::component::Modal
@@ -10551,6 +10540,7 @@ pub yororen_ui_core::theme::tokens::SelectTokens::item_padding_x: gpui::geometry
 pub yororen_ui_core::theme::tokens::SelectTokens::item_padding_y: gpui::geometry::Pixels
 pub yororen_ui_core::theme::tokens::SelectTokens::menu_max_height: gpui::geometry::Pixels
 pub yororen_ui_core::theme::tokens::SelectTokens::menu_min_width: gpui::geometry::Pixels
+pub yororen_ui_core::theme::tokens::SelectTokens::menu_width: gpui::geometry::Pixels
 pub yororen_ui_core::theme::tokens::SelectTokens::min_height: gpui::geometry::Pixels
 impl core::clone::Clone for yororen_ui_core::theme::tokens::SelectTokens
 pub fn yororen_ui_core::theme::tokens::SelectTokens::clone(&self) -> yororen_ui_core::theme::tokens::SelectTokens
@@ -11408,4 +11398,3 @@ pub fn yororen_ui_core::theme::interactive_colors(&yororen_ui_core::theme::Theme
 pub fn yororen_ui_core::theme::validate(&yororen_ui_core::theme::Theme) -> alloc::vec::Vec<yororen_ui_core::theme::validate::Issue>
 pub type yororen_ui_core::theme::EasingFn = fn(f32) -> f32
 pub macro yororen_ui_core::action_handler!
-pub fn yororen_ui_core::theme::validate(&yororen_ui_core::theme::Theme) -> alloc::vec::Vec<yororen_ui_core::theme::validate::Issue>
