@@ -4617,17 +4617,21 @@ pub mod yororen_ui_core::i18n::runtime
 pub struct yororen_ui_core::i18n::runtime::I18n
 pub yororen_ui_core::i18n::runtime::I18n::available_locales: alloc::vec::Vec<yororen_ui_core::i18n::locale::SupportedLocale>
 pub yororen_ui_core::i18n::runtime::I18n::current_locale: yororen_ui_core::i18n::locale::Locale
+pub yororen_ui_core::i18n::runtime::I18n::fallback_locale: core::option::Option<yororen_ui_core::i18n::locale::Locale>
 impl yororen_ui_core::i18n::runtime::I18n
+pub fn yororen_ui_core::i18n::runtime::I18n::fallback_locale_ref(&self) -> core::option::Option<&yororen_ui_core::i18n::locale::Locale>
 pub fn yororen_ui_core::i18n::runtime::I18n::is_rtl(&self) -> bool
 pub fn yororen_ui_core::i18n::runtime::I18n::load_translations(&mut self, yororen_ui_core::i18n::locale::Locale, yororen_ui_core::i18n::runtime::TranslationMap)
 pub fn yororen_ui_core::i18n::runtime::I18n::locale(&self) -> &yororen_ui_core::i18n::locale::Locale
 pub fn yororen_ui_core::i18n::runtime::I18n::merge_translations(&mut self, yororen_ui_core::i18n::locale::Locale, yororen_ui_core::i18n::runtime::TranslationMap)
 pub fn yororen_ui_core::i18n::runtime::I18n::new() -> Self
+pub fn yororen_ui_core::i18n::runtime::I18n::set_fallback_locale(&mut self, core::option::Option<yororen_ui_core::i18n::locale::Locale>)
 pub fn yororen_ui_core::i18n::runtime::I18n::set_locale(&mut self, yororen_ui_core::i18n::locale::Locale)
 pub fn yororen_ui_core::i18n::runtime::I18n::t(&self, &str) -> core::option::Option<&str>
 pub fn yororen_ui_core::i18n::runtime::I18n::text_direction(&self) -> yororen_ui_core::i18n::locale::TextDirection
 pub fn yororen_ui_core::i18n::runtime::I18n::translations(&self) -> core::option::Option<&alloc::sync::Arc<yororen_ui_core::i18n::runtime::TranslationMap>>
 pub fn yororen_ui_core::i18n::runtime::I18n::with_locale(yororen_ui_core::i18n::locale::Locale) -> Self
+pub fn yororen_ui_core::i18n::runtime::I18n::with_locale_fallback(yororen_ui_core::i18n::locale::Locale, yororen_ui_core::i18n::locale::Locale) -> Self
 impl core::clone::Clone for yororen_ui_core::i18n::runtime::I18n
 pub fn yororen_ui_core::i18n::runtime::I18n::clone(&self) -> yororen_ui_core::i18n::runtime::I18n
 impl core::default::Default for yororen_ui_core::i18n::runtime::I18n
@@ -4981,17 +4985,21 @@ impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::i18n::placeholde
 pub struct yororen_ui_core::i18n::I18n
 pub yororen_ui_core::i18n::I18n::available_locales: alloc::vec::Vec<yororen_ui_core::i18n::locale::SupportedLocale>
 pub yororen_ui_core::i18n::I18n::current_locale: yororen_ui_core::i18n::locale::Locale
+pub yororen_ui_core::i18n::I18n::fallback_locale: core::option::Option<yororen_ui_core::i18n::locale::Locale>
 impl yororen_ui_core::i18n::runtime::I18n
+pub fn yororen_ui_core::i18n::runtime::I18n::fallback_locale_ref(&self) -> core::option::Option<&yororen_ui_core::i18n::locale::Locale>
 pub fn yororen_ui_core::i18n::runtime::I18n::is_rtl(&self) -> bool
 pub fn yororen_ui_core::i18n::runtime::I18n::load_translations(&mut self, yororen_ui_core::i18n::locale::Locale, yororen_ui_core::i18n::runtime::TranslationMap)
 pub fn yororen_ui_core::i18n::runtime::I18n::locale(&self) -> &yororen_ui_core::i18n::locale::Locale
 pub fn yororen_ui_core::i18n::runtime::I18n::merge_translations(&mut self, yororen_ui_core::i18n::locale::Locale, yororen_ui_core::i18n::runtime::TranslationMap)
 pub fn yororen_ui_core::i18n::runtime::I18n::new() -> Self
+pub fn yororen_ui_core::i18n::runtime::I18n::set_fallback_locale(&mut self, core::option::Option<yororen_ui_core::i18n::locale::Locale>)
 pub fn yororen_ui_core::i18n::runtime::I18n::set_locale(&mut self, yororen_ui_core::i18n::locale::Locale)
 pub fn yororen_ui_core::i18n::runtime::I18n::t(&self, &str) -> core::option::Option<&str>
 pub fn yororen_ui_core::i18n::runtime::I18n::text_direction(&self) -> yororen_ui_core::i18n::locale::TextDirection
 pub fn yororen_ui_core::i18n::runtime::I18n::translations(&self) -> core::option::Option<&alloc::sync::Arc<yororen_ui_core::i18n::runtime::TranslationMap>>
 pub fn yororen_ui_core::i18n::runtime::I18n::with_locale(yororen_ui_core::i18n::locale::Locale) -> Self
+pub fn yororen_ui_core::i18n::runtime::I18n::with_locale_fallback(yororen_ui_core::i18n::locale::Locale, yororen_ui_core::i18n::locale::Locale) -> Self
 impl core::clone::Clone for yororen_ui_core::i18n::runtime::I18n
 pub fn yororen_ui_core::i18n::runtime::I18n::clone(&self) -> yororen_ui_core::i18n::runtime::I18n
 impl core::default::Default for yororen_ui_core::i18n::runtime::I18n

@@ -12,6 +12,12 @@ use super::locale::{Locale, SupportedLocale, TextDirection};
 pub struct I18n {
     /// Current active locale.
     pub current_locale: Locale,
+    /// Optional locale to consult when a key is missing from
+    /// `current_locale`. This is the CLDR-style "base locale"
+    /// fallback: apps typically set it to `en` so a partially
+    /// translated `zh-CN` catalog never shows raw dotted key paths
+    /// in the UI.
+    pub fallback_locale: Option<Locale>,
     /// Available locales.
     pub available_locales: Vec<SupportedLocale>,
     /// Translation strings indexed by locale.
@@ -30,6 +36,23 @@ impl I18n {
     pub fn with_locale(locale: Locale) -> Self {
         Self {
             current_locale: locale,
+            fallback_locale: None,
+            available_locales: SupportedLocale::all().to_vec(),
+            translations: HashMap::new(),
+        }
+    }
+
+    /// Create a new i18n instance with a current locale and a fallback
+    /// locale used when a key is missing from the current catalog.
+    ///
+    /// The fallback is consulted only when a key is absent from
+    /// `current_locale`. If the same key is missing in both catalogs
+    /// `t` returns `None` and the `App::t` shortcut surfaces the raw
+    /// key with a one-shot stderr warning.
+    pub fn with_locale_fallback(locale: Locale, fallback: Locale) -> Self {
+        Self {
+            current_locale: locale,
+            fallback_locale: Some(fallback),
             available_locales: SupportedLocale::all().to_vec(),
             translations: HashMap::new(),
         }
@@ -40,9 +63,21 @@ impl I18n {
         self.current_locale = locale;
     }
 
+    /// Set or clear the fallback locale consulted when a key is
+    /// missing from `current_locale`. Pass `None` to disable the
+    /// fallback chain.
+    pub fn set_fallback_locale(&mut self, locale: Option<Locale>) {
+        self.fallback_locale = locale;
+    }
+
     /// Get the current locale.
     pub fn locale(&self) -> &Locale {
         &self.current_locale
+    }
+
+    /// Get the fallback locale if one has been configured.
+    pub fn fallback_locale_ref(&self) -> Option<&Locale> {
+        self.fallback_locale.as_ref()
     }
 
     /// Get the text direction for the current locale.
@@ -81,8 +116,28 @@ impl I18n {
     }
 
     /// Get a translation by key.
+    ///
+    /// Lookup order: `current_locale` → `fallback_locale` (if set) →
+    /// `None`. The fallback is the CLDR "base locale" mechanism: a
+    /// partially translated `zh-CN` catalog should still render the
+    /// English string instead of leaking the raw `common.cancel`
+    /// key path into the UI.
     pub fn t(&self, key: &str) -> Option<&str> {
-        self.translations()?.get(key)
+        if let Some(map) = self.translations.get(&self.current_locale) {
+            if let Some(value) = map.get(key) {
+                return Some(value);
+            }
+        }
+        if let Some(fallback) = &self.fallback_locale {
+            if fallback != &self.current_locale {
+                if let Some(map) = self.translations.get(fallback) {
+                    if let Some(value) = map.get(key) {
+                        return Some(value);
+                    }
+                }
+            }
+        }
+        None
     }
 }
 
@@ -358,5 +413,117 @@ mod tests {
         let template = "{} and {}";
         let args = ["only-one"];
         assert_eq!(replace_placeholders(template, &args), "only-one and {");
+    }
+
+    fn map_with(pairs: &[(&str, &str)]) -> TranslationMap {
+        let mut map = TranslationMap::new();
+        for (k, v) in pairs {
+            map.insert(k, v);
+        }
+        map
+    }
+
+    #[test]
+    fn test_t_returns_current_locale_value() {
+        let en = Locale::new("en").unwrap();
+        let mut i18n = I18n::with_locale(en.clone());
+        i18n.load_translations(en, map_with(&[("common.save", "Save")]));
+
+        assert_eq!(i18n.t("common.save"), Some("Save"));
+    }
+
+    #[test]
+    fn test_t_falls_back_to_fallback_locale() {
+        // zh-CN is current, en is fallback. zh-CN is missing the
+        // `common.cancel` key entirely; the chain should surface the
+        // English string instead of `None`.
+        let zh = Locale::new("zh-CN").unwrap();
+        let en = Locale::new("en").unwrap();
+        let mut i18n = I18n::with_locale_fallback(zh.clone(), en.clone());
+        i18n.load_translations(
+            zh,
+            map_with(&[("common.save", "保存")]),
+        );
+        i18n.load_translations(
+            en,
+            map_with(&[("common.save", "Save"), ("common.cancel", "Cancel")]),
+        );
+
+        assert_eq!(i18n.t("common.save"), Some("保存"));
+        assert_eq!(i18n.t("common.cancel"), Some("Cancel"));
+    }
+
+    #[test]
+    fn test_t_returns_none_when_key_missing_everywhere() {
+        let zh = Locale::new("zh-CN").unwrap();
+        let en = Locale::new("en").unwrap();
+        let mut i18n = I18n::with_locale_fallback(zh.clone(), en.clone());
+        i18n.load_translations(zh, map_with(&[("common.save", "保存")]));
+        i18n.load_translations(en, map_with(&[("common.save", "Save")]));
+
+        assert_eq!(i18n.t("common.cancel"), None);
+    }
+
+    #[test]
+    fn test_t_skips_fallback_when_current_and_fallback_match() {
+        // current == fallback: only one catalog consulted, no risk
+        // of returning a value from the wrong locale.
+        let en = Locale::new("en").unwrap();
+        let mut i18n = I18n::with_locale_fallback(en.clone(), en.clone());
+        i18n.load_translations(en, map_with(&[("common.save", "Save")]));
+
+        assert_eq!(i18n.t("common.save"), Some("Save"));
+        assert_eq!(i18n.t("common.cancel"), None);
+    }
+
+    #[test]
+    fn test_t_skips_fallback_when_fallback_not_loaded() {
+        // Fallback locale is configured but no translations have been
+        // loaded for it. Must not panic and must return None.
+        let zh = Locale::new("zh-CN").unwrap();
+        let en = Locale::new("en").unwrap();
+        let mut i18n = I18n::with_locale_fallback(zh.clone(), en);
+        i18n.load_translations(zh, map_with(&[("common.save", "保存")]));
+
+        assert_eq!(i18n.t("common.save"), Some("保存"));
+        assert_eq!(i18n.t("common.cancel"), None);
+    }
+
+    #[test]
+    fn test_set_fallback_locale_updates_chain() {
+        let zh = Locale::new("zh-CN").unwrap();
+        let en = Locale::new("en").unwrap();
+        let fr = Locale::new("fr").unwrap();
+
+        let mut i18n = I18n::with_locale(zh.clone());
+        assert_eq!(i18n.fallback_locale_ref(), None);
+
+        i18n.set_fallback_locale(Some(en.clone()));
+        assert_eq!(i18n.fallback_locale_ref(), Some(&en));
+
+        i18n.load_translations(zh, map_with(&[("k", "保存")]));
+        i18n.load_translations(en, map_with(&[("k", "Save")]));
+        i18n.load_translations(fr.clone(), map_with(&[("k", "Enregistrer")]));
+        assert_eq!(i18n.t("k"), Some("保存"));
+
+        // Swap fallback: zh-CN is missing nothing, but verifying the
+        // setter is honored by the chain.
+        i18n.load_translations(
+            Locale::new("zh-CN").unwrap(),
+            map_with(&[("k", "保存"), ("only_zh", "仅中文")]),
+        );
+        i18n.set_fallback_locale(Some(fr));
+        assert_eq!(i18n.t("only_zh"), Some("仅中文"));
+        assert_eq!(
+            i18n.fallback_locale_ref().map(Locale::to_tag),
+            Some("fr".to_string())
+        );
+
+        // Clear the chain entirely.
+        i18n.set_fallback_locale(None);
+        assert_eq!(i18n.fallback_locale_ref(), None);
+        // Only `k` and `only_zh` exist in zh-CN; an unknown key now
+        // resolves to None again.
+        assert_eq!(i18n.t("missing_in_zh"), None);
     }
 }
