@@ -18,23 +18,14 @@ members = [
     "crates/yororen-ui-locale-en",
     "crates/yororen-ui-locale-zh-CN",
     "crates/yororen-ui-locale-ar",
-    "crates/yororen-ui-demos/counter",
-    "crates/yororen-ui-demos/todolist",
-    "crates/yororen-ui-demos/file_browser",
-    "crates/yororen-ui-demos/popover_placement",
-    "crates/yororen-ui-demos/toast_notification",
-    "crates/yororen-ui-demos/tree_expanded",
-    "crates/yororen-ui-demos/i18n_showcase",
-    "crates/yororen-ui-demos/theme_compare",
-    "crates/yororen-ui-demos/variant_showcase",
-    "crates/yororen-ui-demos/theme_showcase",
-    "crates/yororen-ui-demos/modal_a11y",
-    "crates/yororen-ui-demos/flavor_gallery",
-    "crates/yororen-ui-demos/headless_demo",
-    "crates/yororen-ui-demos/meta",
 ]
+# Demos are temporarily excluded from the default workspace build
+# while the headless / renderer / theme split is in flux. They are
+# rebuilt on demand (see `crates/yororen-ui-demos/Cargo.toml` for the
+# crate list) and re-added to `members` once each one is rewritten
+# against the new headless API.
 exclude = [
-    "crates/yororen-ui-demos/*/target",
+    "crates/yororen-ui-demos",
 ]
 
 [workspace.package]

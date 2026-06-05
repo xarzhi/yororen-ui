@@ -71,3 +71,48 @@ impl CheckboxRenderer for TokenCheckboxRenderer {
 pub fn arc_checkbox<T: CheckboxRenderer + 'static>(r: T) -> Arc<dyn CheckboxRenderer> {
     Arc::new(r)
 }
+
+// =====================================================================
+// `DefaultCheckbox` — `headless::CheckboxProps` sugar.
+// =====================================================================
+
+use gpui::{prelude::FluentBuilder, div, App, ParentElement, Stateful, Styled, px};
+use yororen_ui_core::headless::checkbox::CheckboxProps;
+
+use crate::theme::ActiveTheme;
+
+pub trait DefaultCheckbox: Sized {
+    fn default_render(self, cx: &App) -> Stateful<gpui::Div>;
+}
+
+impl DefaultCheckbox for CheckboxProps {
+    fn default_render(self, cx: &App) -> Stateful<gpui::Div> {
+        let theme = cx.theme();
+        let r: &dyn CheckboxRenderer = &**theme
+            .renderers
+            .get_checkbox()
+            .expect("CheckboxRenderer registered");
+        let state = CheckboxRenderState {
+            checked: self.checked,
+            disabled: self.disabled,
+            has_custom_tone: false,
+        };
+        let bg = r.box_bg(&state, theme);
+        let border = r.box_border(&state, theme);
+        let size = r.box_size(&state, theme);
+        let check_size = r.check_size(&state, theme);
+        let mut el = div()
+            .bg(bg)
+            .border_1()
+            .border_color(border)
+            .size(size)
+            .rounded(px(4.))
+            .flex()
+            .items_center()
+            .justify_center();
+        if self.checked {
+            el = el.child(div().bg(border).size(check_size).rounded(px(2.)));
+        }
+        self.apply(el)
+    }
+}

@@ -87,3 +87,57 @@ impl SwitchRenderer for TokenSwitchRenderer {
 pub fn arc_switch<T: SwitchRenderer + 'static>(r: T) -> Arc<dyn SwitchRenderer> {
     Arc::new(r)
 }
+
+// =====================================================================
+// `DefaultSwitch` — `headless::SwitchProps` sugar.
+// =====================================================================
+
+use gpui::{prelude::FluentBuilder, div, App, ParentElement, Stateful, Styled, px};
+use yororen_ui_core::headless::switch::SwitchProps;
+
+use crate::theme::ActiveTheme;
+
+pub trait DefaultSwitch: Sized {
+    fn default_render(self, cx: &App) -> Stateful<gpui::Div>;
+}
+
+impl DefaultSwitch for SwitchProps {
+    fn default_render(self, cx: &App) -> Stateful<gpui::Div> {
+        let theme = cx.theme();
+        let r: &dyn SwitchRenderer = &**theme
+            .renderers
+            .get_switch()
+            .expect("SwitchRenderer registered");
+        let state = SwitchRenderState {
+            checked: self.checked,
+            disabled: self.disabled,
+            has_custom_tone: false,
+        };
+        let track = r.track_bg(&state, theme);
+        let knob = r.knob_bg(&state, theme);
+        let w = r.track_w(&state, theme);
+        let h = r.track_h(&state, theme);
+        let knob_size = r.knob_size(&state, theme);
+        let pad = r.padding(&state, theme);
+        let mut el = div()
+            .bg(track)
+            .w(w)
+            .h(h)
+            .rounded(theme.tokens.radii.pill)
+            .p(pad)
+            .flex()
+            .items_center();
+        if self.checked {
+            el = el.justify_end();
+        } else {
+            el = el.justify_start();
+        }
+        el = el.child(
+            div()
+                .bg(knob)
+                .size(knob_size)
+                .rounded(theme.tokens.radii.pill),
+        );
+        self.apply(el)
+    }
+}

@@ -2,6 +2,11 @@
 //!
 //! One trait, one component. The other 37 component renderer
 //! traits follow the same shape.
+//!
+//! `DefaultButton::default_render` is defined at the bottom of this
+//! file — it's the `headless::ButtonProps`-flavoured sugar that
+//! reads this renderer and decorates a `Div` with its bg / fg /
+//! padding / radius / min_height.
 
 use std::any::Any;
 use std::sync::Arc;
@@ -120,6 +125,7 @@ pub fn arc<T: ButtonRenderer + 'static>(r: T) -> Arc<dyn ButtonRenderer> {
 mod tests {
     use super::*;
     use crate::theme::Theme;
+    use yororen_ui_core::i18n::TextDirection;
 
     fn fixture_dark() -> Theme {
         // delegate to the private fixture used by mod.rs
@@ -136,7 +142,7 @@ mod tests {
             action: Default::default(),
             status: Default::default(),
             shadow: Default::default(),
-            text_direction: crate::i18n::TextDirection::Ltr,
+            text_direction: TextDirection::Ltr,
             tokens: Default::default(),
             renderers: super::super::registry::RendererRegistry::token_based(),
         }
@@ -168,5 +174,55 @@ mod tests {
         };
         assert_eq!(r.bg(&state, &theme), theme.action.primary.disabled_bg);
         assert_eq!(r.fg(&state, &theme), theme.action.primary.disabled_fg);
+    }
+}
+
+// =====================================================================
+// `DefaultButton` — render a `headless::ButtonProps` with the
+// registered `ButtonRenderer`. Lives in this same file because it is
+// the `headless`-shaped entry point for *this* renderer.
+// =====================================================================
+
+use gpui::{prelude::FluentBuilder, div, App, Stateful, Styled};
+use yororen_ui_core::headless::button::ButtonProps;
+
+use crate::theme::ActiveTheme;
+
+/// Sugar trait. Add `use yororen_ui_renderer::renderers::button::DefaultButton;`
+/// to a file to unlock `.default_render(cx)` on every `ButtonProps`.
+pub trait DefaultButton: Sized {
+    fn default_render(self, cx: &App) -> Stateful<gpui::Div>;
+}
+
+impl DefaultButton for ButtonProps {
+    fn default_render(self, cx: &App) -> Stateful<gpui::Div> {
+        let theme = cx.theme();
+        let r: &dyn ButtonRenderer = &**theme
+            .renderers
+            .get_button()
+            .expect("ButtonRenderer registered");
+        let state = ButtonRenderState::default();
+        let bg = r.bg(&state, theme);
+        let fg = r.fg(&state, theme);
+        let padding = r.padding(&state, theme);
+        let radius = r.border_radius(&state, theme);
+        let min_h = r.min_height(&state, theme);
+        let opacity = if self.disabled {
+            r.disabled_opacity(&state, theme)
+        } else {
+            1.0
+        };
+        let div = div()
+            .bg(bg)
+            .text_color(fg)
+            .px(padding.left)
+            .py(padding.top)
+            .rounded(radius)
+            .min_h(min_h)
+            .flex()
+            .items_center()
+            .justify_center()
+            .opacity(opacity);
+        self.apply(div)
     }
 }

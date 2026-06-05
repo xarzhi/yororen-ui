@@ -1,30 +1,38 @@
 //! Default renderer for [`yororen_ui_core`] headless primitives.
 //!
-//! This crate holds the *visual* layer of yororen-ui — the `XxxRenderer`
-//! trait fleet, the `DesignTokens` token tree, the `Theme` and
-//! `GlobalTheme` types, and the `XxxPropsExt` extension traits that
-//! render a headless `XxxProps` into a default-styled `Stateful<Div>`
-//! using the currently installed `GlobalTheme`.
+//! This crate holds the *visual* layer of yororen-ui — the 38
+//! `XxxRenderer` traits and their `TokenXxxRenderer` default
+//! implementations, the `DesignTokens` token tree, and the
+//! `Theme` / `GlobalTheme` types.
 //!
-//! It depends on `yororen-ui-core` for the headless `XxxProps` shapes
-//! and on `gpui-ce` for the underlying element/window primitives. It
-//! does **not** know about any concrete palette — that lives in the
-//! `yororen-ui-theme-*` packages, which depend on this crate.
+//! Each `renderers/<name>.rs` file is the home of three things:
+//!
+//! - the `XxxRenderer` trait (the contract a theme implements),
+//! - the `TokenXxxRenderer` struct (the default implementation),
+//! - the `DefaultXxx` extension trait (the `headless::XxxProps` →
+//!   `Stateful<Div>` sugar that reads this renderer).
+//!
+//! Apps depend on this crate when they want a stock look. Apps that
+//! want full visual control depend on `yororen-ui-core` only.
 //!
 //! Three-layer architecture:
 //!
 //! ```text
 //! theme-* ──▶ renderer ──▶ core ──▶ gpui-ce
 //! ```
-//!
-//! Apps that want a stock look depend on `yororen-ui` (which
-//! re-exports `core + renderer + theme-system`) or on the
-//! `renderer` + a `theme-*` crate of their choice. Apps that want
-//! full visual control depend on `yororen-ui-core` only.
 
 #![warn(missing_docs)]
 
 pub mod renderers;
 pub mod theme;
+
+pub use renderers::button::DefaultButton;
+pub use renderers::checkbox::DefaultCheckbox;
+pub use renderers::icon_button::DefaultIconButton;
+pub use renderers::label::DefaultLabel;
+pub use renderers::radio::DefaultRadio;
+pub use renderers::switch::DefaultSwitch;
+pub use renderers::text_input::DefaultTextInput;
+pub use renderers::toggle_button::DefaultToggleButton;
 
 pub use theme::{GlobalTheme, Theme};

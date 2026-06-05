@@ -24,6 +24,7 @@
 
 pub use yororen_ui_core::{a11y, animation, assets, headless, i18n, notification, rtl};
 pub use yororen_ui_renderer as renderer;
+pub use yororen_ui_renderer::theme::{ActiveTheme, GlobalTheme, Theme};
 
 pub use yororen_ui_locale_ar as locale_ar;
 pub use yororen_ui_locale_en as locale_en;

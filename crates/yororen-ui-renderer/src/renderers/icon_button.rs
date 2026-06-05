@@ -69,3 +69,49 @@ impl IconButtonRenderer for TokenIconButtonRenderer {
 pub fn arc_icon_button<T: IconButtonRenderer + 'static>(r: T) -> Arc<dyn IconButtonRenderer> {
     Arc::new(r)
 }
+
+// =====================================================================
+// `DefaultIconButton` — `headless::IconButtonProps` sugar.
+// =====================================================================
+
+use gpui::{prelude::FluentBuilder, div, App, ParentElement, Stateful, Styled};
+use yororen_ui_core::headless::icon_button::IconButtonProps;
+
+use crate::theme::ActiveTheme;
+
+pub trait DefaultIconButton: Sized {
+    fn default_render(self, cx: &App) -> Stateful<gpui::Div>;
+}
+
+impl DefaultIconButton for IconButtonProps {
+    fn default_render(self, cx: &App) -> Stateful<gpui::Div> {
+        let theme = cx.theme();
+        let r: &dyn IconButtonRenderer = &**theme
+            .renderers
+            .get_icon_button()
+            .expect("IconButtonRenderer registered");
+        let state = IconButtonRenderState {
+            variant: Default::default(),
+            disabled: self.disabled,
+            has_custom_bg: false,
+            has_custom_hover_bg: false,
+            custom_style: None,
+        };
+        let bg = r.bg(&state, theme);
+        let radius = r.border_radius(&state, theme);
+        let opacity = if self.disabled {
+            r.disabled_opacity(&state, theme)
+        } else {
+            1.0
+        };
+        let el = div()
+            .bg(bg)
+            .rounded(radius)
+            .size(gpui::px(36.))
+            .opacity(opacity)
+            .flex()
+            .items_center()
+            .justify_center();
+        self.apply(el)
+    }
+}

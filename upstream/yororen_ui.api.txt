@@ -1,4 +1,7 @@
 pub mod yororen_ui
+pub use yororen_ui::ActiveTheme
+pub use yororen_ui::GlobalTheme
+pub use yororen_ui::Theme
 pub use yororen_ui::a11y
 pub use yororen_ui::animation
 pub use yororen_ui::assets

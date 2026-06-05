@@ -86,3 +86,42 @@ impl ToggleButtonRenderer for TokenToggleButtonRenderer {
 pub fn arc_toggle_button<T: ToggleButtonRenderer + 'static>(r: T) -> Arc<dyn ToggleButtonRenderer> {
     Arc::new(r)
 }
+
+// =====================================================================
+// `DefaultToggleButton` — `headless::ToggleButtonProps` sugar.
+// =====================================================================
+
+use gpui::{prelude::FluentBuilder, div, App, Stateful, Styled};
+use yororen_ui_core::headless::toggle_button::ToggleButtonProps;
+
+use crate::theme::ActiveTheme;
+
+pub trait DefaultToggleButton: Sized {
+    fn default_render(self, cx: &App) -> Stateful<gpui::Div>;
+}
+
+impl DefaultToggleButton for ToggleButtonProps {
+    fn default_render(self, cx: &App) -> Stateful<gpui::Div> {
+        let theme = cx.theme();
+        let r: &dyn ToggleButtonRenderer = &**theme
+            .renderers
+            .get_toggle_button()
+            .expect("ToggleButtonRenderer registered");
+        let state = ToggleButtonRenderState::default();
+        let bg = r.bg(&state, theme);
+        let fg = r.fg(&state, theme);
+        let min_h = r.min_height(&state, theme);
+        let radius = r.border_radius(&state, theme);
+        let el = div()
+            .bg(bg)
+            .text_color(fg)
+            .min_h(min_h)
+            .rounded(radius)
+            .px(gpui::px(12.))
+            .py(gpui::px(6.))
+            .flex()
+            .items_center()
+            .justify_center();
+        self.apply(el)
+    }
+}
