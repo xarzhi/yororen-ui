@@ -262,7 +262,7 @@ fn contrast_ratio(a: Hsla, b: Hsla) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::i18n::TextDirection;
+    use yororen_ui_core::i18n::TextDirection;
     use crate::theme::{
         ActionTheme, ActionVariant, BorderTheme, ContentTheme, DesignTokens, RendererRegistry,
         ShadowTheme, StatusTheme, StatusVariant, SurfaceTheme, Theme,

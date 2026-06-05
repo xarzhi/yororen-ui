@@ -24,5 +24,7 @@
 
 #![warn(missing_docs)]
 
-// Phase 0: skeleton. Phase 2 will populate `tokens`, `theme`,
-// `renderers`, and `default` modules.
+pub mod renderers;
+pub mod theme;
+
+pub use theme::{GlobalTheme, Theme};

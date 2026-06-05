@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
-use crate::renderer::spec::Edges;
+use crate::renderers::spec::Edges;
 use crate::theme::Theme;
 
 #[derive(Clone, Copy, Debug, Default)]

@@ -5,8 +5,8 @@ use std::sync::Arc;
 
 use gpui::{FontWeight, Hsla, Pixels};
 
-use crate::component::HeadingLevel;
 use crate::theme::Theme;
+use yororen_ui_core::headless::heading::HeadingLevel;
 
 #[derive(Clone, Copy, Debug)]
 pub struct HeadingRenderState {
@@ -27,6 +27,9 @@ impl HeadingRenderer for TokenHeadingRenderer {
             HeadingLevel::H1 => theme.tokens.typography.font_size_2xl,
             HeadingLevel::H2 => theme.tokens.typography.font_size_xl,
             HeadingLevel::H3 => theme.tokens.typography.font_size_lg,
+            HeadingLevel::H4 => theme.tokens.typography.font_size_md,
+            HeadingLevel::H5 => theme.tokens.typography.font_size_sm,
+            HeadingLevel::H6 => theme.tokens.typography.font_size_xs,
         }
     }
 

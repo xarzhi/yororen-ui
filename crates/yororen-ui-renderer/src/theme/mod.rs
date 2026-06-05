@@ -2,12 +2,12 @@ use std::sync::Arc;
 
 use gpui::{App, Global, Hsla};
 
-use crate::i18n::TextDirection;
+use yororen_ui_core::i18n::TextDirection;
 
 pub mod tokens;
 pub mod validate;
 
-pub use crate::renderer::RendererRegistry;
+pub use crate::renderers::RendererRegistry;
 pub use tokens::{
     DesignTokens, EasingFn, MotionTokens, RadiiTokens, SizeTokens, SpacingTokens, TypographyTokens,
 };
