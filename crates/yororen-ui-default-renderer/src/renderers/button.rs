@@ -317,7 +317,7 @@ mod tests {
 // it is the `headless`-shaped entry point for *this* renderer.
 // =====================================================================
 
-use gpui::{prelude::FluentBuilder, div, App, Stateful, Styled};
+use gpui::{div, App, Stateful, Styled};
 use yororen_ui_core::headless::button::ButtonProps;
 use yororen_ui_core::renderer::RendererContext;
 use yororen_ui_core::theme::ActiveTheme;

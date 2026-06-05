@@ -91,7 +91,7 @@ pub fn arc_switch<T: SwitchRenderer + 'static>(r: T) -> Arc<dyn SwitchRenderer> 
 // `DefaultSwitch` — `headless::SwitchProps` sugar.
 // =====================================================================
 
-use gpui::{prelude::FluentBuilder, div, App, ParentElement, Stateful, Styled};
+use gpui::{div, App, ParentElement, Stateful, Styled};
 use yororen_ui_core::headless::switch::SwitchProps;
 use yororen_ui_core::renderer::{markers, RendererContext};
 use yororen_ui_core::theme::ActiveTheme;

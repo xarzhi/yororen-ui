@@ -85,7 +85,7 @@ pub fn arc_icon_button<T: IconButtonRenderer + 'static>(r: T) -> Arc<dyn IconBut
 // `DefaultIconButton` — `headless::IconButtonProps` sugar.
 // =====================================================================
 
-use gpui::{prelude::FluentBuilder, div, App, ParentElement, Stateful, Styled};
+use gpui::{div, App, Stateful, Styled};
 use yororen_ui_core::headless::icon_button::IconButtonProps;
 use yororen_ui_core::renderer::{markers, RendererContext};
 use yororen_ui_core::theme::ActiveTheme;

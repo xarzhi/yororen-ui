@@ -57,7 +57,7 @@ pub fn arc_label<T: LabelRenderer + 'static>(r: T) -> Arc<dyn LabelRenderer> {
 // `DefaultLabel` — `headless::LabelProps` sugar.
 // =====================================================================
 
-use gpui::{prelude::FluentBuilder, div, App, ParentElement, Stateful, Styled};
+use gpui::{div, App, ParentElement, Stateful, Styled};
 use yororen_ui_core::headless::label::LabelProps;
 use yororen_ui_core::renderer::{markers, RendererContext};
 use yororen_ui_core::theme::ActiveTheme;

@@ -70,7 +70,7 @@ pub fn arc_radio<T: RadioRenderer + 'static>(r: T) -> Arc<dyn RadioRenderer> {
 // `DefaultRadio` — `headless::RadioProps` sugar.
 // =====================================================================
 
-use gpui::{prelude::FluentBuilder, div, App, ParentElement, Stateful, Styled};
+use gpui::{div, App, ParentElement, Stateful, Styled};
 use yororen_ui_core::headless::radio::RadioProps;
 use yororen_ui_core::renderer::{markers, RendererContext};
 use yororen_ui_core::theme::ActiveTheme;

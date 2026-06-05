@@ -76,7 +76,7 @@ pub fn arc_checkbox<T: CheckboxRenderer + 'static>(r: T) -> Arc<dyn CheckboxRend
 // `DefaultCheckbox` — `headless::CheckboxProps` sugar.
 // =====================================================================
 
-use gpui::{prelude::FluentBuilder, div, App, ParentElement, Stateful, Styled, px};
+use gpui::{div, App, ParentElement, Stateful, Styled, px};
 use yororen_ui_core::headless::checkbox::CheckboxProps;
 use yororen_ui_core::renderer::{markers, RendererContext};
 use yororen_ui_core::theme::ActiveTheme;

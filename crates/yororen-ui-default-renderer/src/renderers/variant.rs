@@ -228,7 +228,7 @@ impl VariantRegistry {
     /// `VariantStyle` derived from the theme's `action.neutral`.
     pub fn with_defaults_for_theme(theme: &crate::Theme) -> Self {
         let mut r = Self::empty();
-        let make = |v_kind: ActionVariantKind, key: BuiltinVariantKey| {
+        let make = |v_kind: ActionVariantKind, _key: BuiltinVariantKey| {
             let path_bg = match v_kind {
                 ActionVariantKind::Primary => "action.primary.bg",
                 ActionVariantKind::Danger => "action.danger.bg",

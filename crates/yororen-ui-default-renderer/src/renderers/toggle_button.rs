@@ -92,7 +92,7 @@ pub fn arc_toggle_button<T: ToggleButtonRenderer + 'static>(r: T) -> Arc<dyn Tog
 // `DefaultToggleButton` — `headless::ToggleButtonProps` sugar.
 // =====================================================================
 
-use gpui::{prelude::FluentBuilder, div, App, Stateful, Styled};
+use gpui::{div, App, Stateful, Styled};
 use yororen_ui_core::headless::toggle_button::ToggleButtonProps;
 use yororen_ui_core::renderer::{markers, RendererContext};
 use yororen_ui_core::theme::ActiveTheme;

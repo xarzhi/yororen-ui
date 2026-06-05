@@ -107,7 +107,7 @@ pub fn arc_text_input<T: TextInputRenderer + 'static>(r: T) -> Arc<dyn TextInput
 // `DefaultTextInput` — `headless::TextInputProps` sugar.
 // =====================================================================
 
-use gpui::{prelude::FluentBuilder, div, App, ParentElement, Stateful, Styled};
+use gpui::{div, App, ParentElement, Stateful, Styled};
 use yororen_ui_core::headless::text_input::TextInputProps;
 use yororen_ui_core::renderer::{markers, RendererContext};
 use yororen_ui_core::theme::ActiveTheme;
