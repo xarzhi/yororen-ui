@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# Pre-commit hook: regenerate cargo public-api baselines for any
+# modified crate, and stage the result. Installed by
+# scripts/install-hooks.sh; do not edit .git/hooks/pre-commit
+# directly — your changes will be lost on the next install.
+#
+# Behavior:
+#   - Detects files modified under crates/ (staged + working tree)
+#   - Maps each changed crate dir to its cargo package name
+#   - Calls scripts/regen-public-api.sh for those packages only
+#   - Stages any baseline files that changed
+#
+# This intentionally fails the commit if regen fails, so a stale
+# baseline never slips in. Use `git commit --no-verify` if you need
+# to bypass (e.g. cargo public-api is not installed in CI).
+
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+regen_script="${repo_root}/scripts/regen-public-api.sh"
+
+if [ ! -x "$regen_script" ]; then
+    echo "[pre-commit] ${regen_script} not found or not executable; skipping baseline regen" >&2
+    exit 0
+fi
+
+# Crate dir name -> cargo package name. Mirror the table in
+# scripts/regen-public-api.sh; if you add a published crate there,
+# add it here too.
+declare -A dir_to_pkg=(
+    [yororen-ui-core]=yororen_ui_core
+    [yororen-ui]=yororen_ui
+    [yororen-ui-theme-system]=yororen_ui_theme_system
+    [yororen-ui-theme-catppuccin]=yororen_ui_theme_catppuccin
+    [yororen-ui-theme-material]=yororen_ui_theme_material
+)
+
+# Collect modified files: staged + working tree. Tolerate the
+# unborn-HEAD case (first commit) by swallowing that command's
+# failure.
+modified="$( (git diff --name-only HEAD 2>/dev/null || true); git diff --name-only --cached)"
+
+# Unique crate dirs touched by any modified file.
+changed_dirs="$(printf '%s\n' "$modified" \
+    | grep -E '^crates/[^/]+' \
+    | sed -E 's|^crates/([^/]+)/.*|\1|' \
+    | sort -u || true)"
+
+if [ -z "$changed_dirs" ]; then
+    exit 0
+fi
+
+# Translate dirs to package names.
+packages=()
+for d in $changed_dirs; do
+    if [ -n "${dir_to_pkg[$d]:-}" ]; then
+        packages+=("${dir_to_pkg[$d]}")
+    fi
+done
+
+if [ ${#packages[@]} -eq 0 ]; then
+    exit 0
+fi
+
+echo "[pre-commit] regenerating public-api baselines for: ${packages[*]}"
+"$regen_script" "${packages[@]}"
+
+# Stage any baseline files that actually changed.
+to_add=()
+for pkg in "${packages[@]}"; do
+    case "$pkg" in
+        yororen_ui_core)              f="upstream/yororen_ui_core.api.txt" ;;
+        yororen_ui)                   f="upstream/yororen_ui.api.txt" ;;
+        yororen_ui_theme_system)      f="upstream/yororen_ui_theme_system.api.txt" ;;
+        yororen_ui_theme_catppuccin)  f="upstream/yororen_ui_theme_catppuccin.api.txt" ;;
+        yororen_ui_theme_material)    f="upstream/yororen_ui_theme_material.api.txt" ;;
+        *) continue ;;
+    esac
+    if ! git diff --quiet -- "$f" 2>/dev/null; then
+        to_add+=("$f")
+    fi
+done
+
+if [ ${#to_add[@]} -gt 0 ]; then
+    git add "${to_add[@]}"
+    echo "[pre-commit] staged baseline file(s): ${to_add[*]}"
+fi
