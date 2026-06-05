@@ -50,3 +50,60 @@ impl HeadingRenderer for TokenHeadingRenderer {
 pub fn arc_heading<T: HeadingRenderer + 'static>(r: T) -> Arc<dyn HeadingRenderer> {
     Arc::new(r)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn fixture() -> Theme {
+        let json = include_str!("../../themes/system-light.json");
+        Theme::from_json(json).expect("system-light.json is valid")
+    }
+
+    #[test]
+    fn size_picks_correct_font_size_per_level() {
+        let theme = fixture();
+        let r = TokenHeadingRenderer;
+        let h1 = HeadingRenderState { level: HeadingLevel::H1 };
+        let h6 = HeadingRenderState { level: HeadingLevel::H6 };
+        // H1 should read tokens.typography.font_size_2xl (24).
+        assert_eq!(
+            r.size(&h1, &theme),
+            gpui::px(theme.get_number("tokens.typography.font_size_2xl").unwrap_or(0.0) as f32),
+        );
+        // H6 should read tokens.typography.font_size_xs (11).
+        assert_eq!(
+            r.size(&h6, &theme),
+            gpui::px(theme.get_number("tokens.typography.font_size_xs").unwrap_or(0.0) as f32),
+        );
+    }
+
+    #[test]
+    fn h1_weight_uses_bold_others_use_semibold() {
+        let theme = fixture();
+        let r = TokenHeadingRenderer;
+        let h1 = HeadingRenderState { level: HeadingLevel::H1 };
+        let h2 = HeadingRenderState { level: HeadingLevel::H2 };
+        // H1 reads weight_bold (700).
+        assert_eq!(
+            r.weight(&h1, &theme),
+            FontWeight(theme.get_number("tokens.typography.weight_bold").unwrap_or(700.0) as f32),
+        );
+        // H2 reads weight_semibold (600).
+        assert_eq!(
+            r.weight(&h2, &theme),
+            FontWeight(theme.get_number("tokens.typography.weight_semibold").unwrap_or(600.0) as f32),
+        );
+    }
+
+    #[test]
+    fn color_uses_content_primary() {
+        let theme = fixture();
+        let r = TokenHeadingRenderer;
+        let h1 = HeadingRenderState { level: HeadingLevel::H1 };
+        assert_eq!(
+            r.color(&h1, &theme),
+            theme.get_color("content.primary").unwrap(),
+        );
+    }
+}

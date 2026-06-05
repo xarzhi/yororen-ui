@@ -135,3 +135,65 @@ impl DefaultSwitch for SwitchProps {
         self.apply(el)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn fixture() -> Theme {
+        let json = include_str!("../../themes/system-light.json");
+        Theme::from_json(json).expect("system-light.json is valid")
+    }
+
+    #[test]
+    fn track_w_h_knob_size_padding_read_switch_tokens() {
+        let theme = fixture();
+        let r = TokenSwitchRenderer;
+        let state = SwitchRenderState::default();
+        assert_eq!(
+            r.track_w(&state, &theme),
+            gpui::px(theme.get_number("tokens.control.switch.track_w").unwrap_or(0.0) as f32),
+        );
+        assert_eq!(
+            r.track_h(&state, &theme),
+            gpui::px(theme.get_number("tokens.control.switch.track_h").unwrap_or(0.0) as f32),
+        );
+        assert_eq!(
+            r.knob_size(&state, &theme),
+            gpui::px(theme.get_number("tokens.control.switch.knob_size").unwrap_or(0.0) as f32),
+        );
+    }
+
+    #[test]
+    fn track_bg_uses_action_primary_when_checked() {
+        let theme = fixture();
+        let r = TokenSwitchRenderer;
+        let state = SwitchRenderState { checked: true, ..Default::default() };
+        assert_eq!(
+            r.track_bg(&state, &theme),
+            theme.get_color("action.primary.bg").unwrap(),
+        );
+    }
+
+    #[test]
+    fn track_bg_uses_surface_hover_when_unchecked() {
+        let theme = fixture();
+        let r = TokenSwitchRenderer;
+        let state = SwitchRenderState { checked: false, ..Default::default() };
+        assert_eq!(
+            r.track_bg(&state, &theme),
+            theme.get_color("surface.hover").unwrap(),
+        );
+    }
+
+    #[test]
+    fn disabled_state_doesnt_panic() {
+        let theme = fixture();
+        let r = TokenSwitchRenderer;
+        let state = SwitchRenderState { disabled: true, ..Default::default() };
+        // All methods should not panic on a disabled state.
+        let _ = r.track_bg(&state, &theme);
+        let _ = r.knob_bg(&state, &theme);
+        assert_eq!(r.disabled_opacity(&state, &theme), 0.5);
+    }
+}
