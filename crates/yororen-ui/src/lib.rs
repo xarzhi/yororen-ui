@@ -1,8 +1,12 @@
 //! Meta-crate for yororen-ui.
 //!
-//! Re-exports [`yororen_ui_core`] (headless primitives + i18n mechanism),
-//! [`yororen_ui_theme_system`] (default light/dark theme), and the bundled
-//! locale catalogs (`en`, `zh-CN`, `ar`).
+//! Re-exports the three layers:
+//!
+//! - [`yororen_ui_core`] — headless primitives + i18n + a11y + rtl + animation + assets.
+//! - [`yororen_ui_renderer`] — 38 component renderers + DesignTokens + Theme.
+//! - [`yororen_ui_theme_system`] — first-party neutral default light/dark palette.
+//!
+//! Plus the bundled locale catalogs (`en`, `zh-CN`, `ar`).
 //!
 //! Optional features:
 //!
@@ -15,10 +19,12 @@
 //! themes / locales you need.
 //!
 //! For full control over theming and translation data, depend on
-//! `yororen-ui-core`, `yororen-ui-theme-system`, and the individual
-//! `yororen-ui-locale-*` crates directly.
+//! `yororen-ui-core`, `yororen-ui-renderer`, `yororen-ui-theme-system`,
+//! and the individual `yororen-ui-locale-*` crates directly.
 
-pub use yororen_ui_core::*;
+pub use yororen_ui_core::{a11y, animation, assets, headless, i18n, notification, rtl};
+pub use yororen_ui_renderer as renderer;
+
 pub use yororen_ui_locale_ar as locale_ar;
 pub use yororen_ui_locale_en as locale_en;
 pub use yororen_ui_locale_zh_cn as locale_zh_cn;
