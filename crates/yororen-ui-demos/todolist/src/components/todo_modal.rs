@@ -40,7 +40,7 @@
 
 use gpui::prelude::FluentBuilder;
 use gpui::{InteractiveElement, IntoElement, ParentElement, Styled, div, hsla, px};
-use yororen_ui::headless::{ComboBoxOption, button, combo_box, modal, text_input};
+// TODO: import individually: ComboBoxOption, button, combo_box, modal, text_input
 use yororen_ui::i18n::Translate;
 use yororen_ui::ActionVariantKind;
 

@@ -55,7 +55,7 @@
 
 use gpui::prelude::FluentBuilder;
 use gpui::{AnyElement, IntoElement, ParentElement, Styled, div, px};
-use yororen_ui::headless::{IconName, checkbox, icon_button, label, list_item, tag};
+// TODO: import individually: IconName, checkbox, icon_button, label, list_item, tag
 use yororen_ui::i18n::Translate;
 
 use crate::state::TodoState;

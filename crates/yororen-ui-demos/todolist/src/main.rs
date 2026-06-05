@@ -72,7 +72,6 @@ use gpui::{App, AppContext, Application, WindowOptions, px, size};
 // yororen-ui framework imports
 // These are the foundation of every yororen-ui application
 use yororen_ui::assets::UiAsset;
-use yororen_ui::component;
 use yororen_ui::i18n::Locale;
 use yororen_ui::renderer;
 

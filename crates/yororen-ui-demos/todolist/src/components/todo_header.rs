@@ -33,7 +33,7 @@
 //! - `switch` - Toggle switch for boolean settings (view mode preference)
 
 use gpui::{IntoElement, ParentElement, Styled, div, px};
-use yororen_ui::headless::{heading, label, switch};
+// TODO: import individually: heading, label, switch
 use yororen_ui::i18n::Translate;
 
 use crate::state::TodoState;

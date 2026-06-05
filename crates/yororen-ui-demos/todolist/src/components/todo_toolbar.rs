@@ -36,7 +36,7 @@
 //! - `ComboBoxOption` - Represents individual options in the dropdown, with a code value and display label
 
 use gpui::{IntoElement, ParentElement, Styled, div, px};
-use yororen_ui::headless::{ComboBoxOption, combo_box, search_input};
+// TODO: import individually: ComboBoxOption, combo_box, search_input
 use yororen_ui::i18n::Translate;
 
 use crate::state::TodoState;
