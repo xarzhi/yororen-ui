@@ -17,6 +17,13 @@ pub struct CheckboxProps {
     pub disabled: bool,
     pub focus_handle: FocusHandle,
     pub on_toggle: Option<ToggleCallback>,
+    /// `true` if the caller supplied a custom checked-state color
+    /// (consumed by `CheckboxRenderer.has_custom_tone`).
+    pub has_custom_tone: bool,
+    /// Caller-supplied override for the checked-state fill /
+    /// border color. `None` → renderer falls back to the
+    /// `action.primary` palette.
+    pub custom_tone: Option<gpui::Hsla>,
 }
 
 pub fn checkbox(id: impl Into<ElementId>, cx: &mut App) -> CheckboxProps {
@@ -26,6 +33,8 @@ pub fn checkbox(id: impl Into<ElementId>, cx: &mut App) -> CheckboxProps {
         disabled: false,
         focus_handle: cx.focus_handle(),
         on_toggle: None,
+        has_custom_tone: false,
+        custom_tone: None,
     }
 }
 
@@ -42,6 +51,15 @@ impl CheckboxProps {
     }
     pub fn disabled(mut self, v: bool) -> Self {
         self.disabled = v;
+        self
+    }
+    pub fn has_custom_tone(mut self, v: bool) -> Self {
+        self.has_custom_tone = v;
+        self
+    }
+    pub fn custom_tone(mut self, c: gpui::Hsla) -> Self {
+        self.custom_tone = Some(c);
+        self.has_custom_tone = true;
         self
     }
     pub fn on_toggle<F>(mut self, f: F) -> Self

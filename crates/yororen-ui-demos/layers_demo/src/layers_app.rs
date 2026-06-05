@@ -20,6 +20,7 @@ use yororen_ui::headless::button::button;
 use yororen_ui::headless::label::label;
 use yororen_ui::renderer::DefaultButton;
 use yororen_ui::renderer::DefaultLabel;
+use yororen_ui::ActionVariantKind;
 
 pub struct LayersApp;
 
@@ -38,8 +39,13 @@ impl Render for LayersApp {
             .on_click(|_, _, _| {})
             .apply(div().bg(gpui::hsla(0.0, 0.6, 0.5, 1.0)).p_2().rounded(px(4.)).child("click me"));
 
-        // Column 2: headless + default-renderer sugar.
+        // Column 2: headless + default-renderer sugar. The
+        // default variant is `Neutral` (light gray) which
+        // disappears against a near-white page; we use
+        // `Primary` here so the default-rendered button is
+        // visibly the dark action color from the JSON theme.
         let default_btn = button("default-render", &mut **cx)
+            .variant(ActionVariantKind::Primary)
             .default_render(cx)
             .child("Click me");
 
@@ -47,7 +53,12 @@ impl Render for LayersApp {
         // override. The `default_render` call now resolves
         // to `MiniButtonRenderer` because it was installed
         // last and overwrites the same `markers::Button` key.
+        // Variant is set to `Primary` so the visible surface
+        // matches the `TokenButtonRenderer`'s dark action
+        // color; the mini adds its own padding/radius/height
+        // on top.
         let mini_btn = button("mini-override", &mut **cx)
+            .variant(ActionVariantKind::Primary)
             .default_render(cx)
             .child("Click me");
 

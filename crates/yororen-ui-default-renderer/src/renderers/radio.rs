@@ -11,7 +11,12 @@ use yororen_ui_core::theme::Theme;
 pub struct RadioRenderState {
     pub checked: bool,
     pub disabled: bool,
+    /// `true` if the caller supplied `.custom_tone(...)`.
     pub has_custom_tone: bool,
+    /// Caller-supplied override for the checked-state dot /
+    /// ring color. When `None`, the renderer falls back to
+    /// `action.primary.bg`.
+    pub custom_tone: Option<Hsla>,
 }
 
 pub trait RadioRenderer: Any + Send + Sync {
@@ -43,7 +48,11 @@ impl RadioRenderer for TokenRadioRenderer {
     }
     fn ring_border(&self, state: &RadioRenderState, theme: &Theme) -> Hsla {
         if state.checked {
-            theme.get_color("action.primary.bg").unwrap_or_default()
+            if state.has_custom_tone {
+                state.custom_tone.unwrap_or_default()
+            } else {
+                theme.get_color("action.primary.bg").unwrap_or_default()
+            }
         } else {
             theme.get_color("border.default").unwrap_or_default()
         }
@@ -51,8 +60,12 @@ impl RadioRenderer for TokenRadioRenderer {
     fn ring_hover_bg(&self, _state: &RadioRenderState, theme: &Theme) -> Hsla {
         theme.get_color("surface.hover").unwrap_or_default()
     }
-    fn dot_fg(&self, _state: &RadioRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("action.primary.bg").unwrap_or_default()
+    fn dot_fg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla {
+        if state.has_custom_tone {
+            state.custom_tone.unwrap_or_default()
+        } else {
+            theme.get_color("action.primary.bg").unwrap_or_default()
+        }
     }
     fn focus_color(&self, _state: &RadioRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.focus").unwrap_or_default()
@@ -88,7 +101,8 @@ impl DefaultRadio for RadioProps {
         let state = RadioRenderState {
             checked: self.checked,
             disabled: self.disabled,
-            has_custom_tone: false,
+            has_custom_tone: self.has_custom_tone,
+            custom_tone: self.custom_tone,
         };
         let bg = r.ring_bg(&state, theme);
         let border = r.ring_border(&state, theme);
@@ -109,5 +123,31 @@ impl DefaultRadio for RadioProps {
             el = el.child(div().bg(dot_fg).size(dot_size).rounded(pill_radius));
         }
         self.apply(el)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use gpui::rgb;
+
+    fn fixture() -> Theme {
+        let json = include_str!("../../themes/system-light.json");
+        Theme::from_json(json).expect("system-light.json is valid")
+    }
+
+    #[test]
+    fn custom_tone_overrides_checked_ring_and_dot() {
+        let theme = fixture();
+        let r = TokenRadioRenderer;
+        let custom = rgb(0x123456).into();
+        let state = RadioRenderState {
+            checked: true,
+            disabled: false,
+            has_custom_tone: true,
+            custom_tone: Some(custom),
+        };
+        assert_eq!(r.ring_border(&state, &theme), custom);
+        assert_eq!(r.dot_fg(&state, &theme), custom);
     }
 }

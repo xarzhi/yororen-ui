@@ -35,10 +35,16 @@ pub mod themes;
 
 pub use renderers::button::DefaultButton;
 pub use renderers::checkbox::DefaultCheckbox;
+pub use renderers::file_path_input::DefaultFilePathInput;
 pub use renderers::icon_button::DefaultIconButton;
+pub use renderers::keybinding_input::DefaultKeybindingInput;
 pub use renderers::label::DefaultLabel;
+pub use renderers::number_input::DefaultNumberInput;
+pub use renderers::password_input::DefaultPasswordInput;
 pub use renderers::radio::DefaultRadio;
+pub use renderers::search_input::DefaultSearchInput;
 pub use renderers::switch::DefaultSwitch;
+pub use renderers::text_area::DefaultTextArea;
 pub use renderers::text_input::DefaultTextInput;
 pub use renderers::toggle_button::DefaultToggleButton;
 pub use renderers::{

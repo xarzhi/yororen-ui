@@ -11,7 +11,12 @@ use yororen_ui_core::theme::Theme;
 pub struct CheckboxRenderState {
     pub checked: bool,
     pub disabled: bool,
+    /// `true` if the caller supplied `.custom_tone(...)`.
     pub has_custom_tone: bool,
+    /// Caller-supplied override for the checked-state fill /
+    /// border color. When `None`, the renderer falls back to
+    /// `action.primary.bg`.
+    pub custom_tone: Option<Hsla>,
 }
 
 pub trait CheckboxRenderer: Any + Send + Sync {
@@ -38,14 +43,22 @@ impl CheckboxRenderer for TokenCheckboxRenderer {
         if state.disabled {
             theme.get_color("surface.sunken").unwrap_or_default()
         } else if state.checked {
-            theme.get_color("action.primary.bg").unwrap_or_default()
+            if state.has_custom_tone {
+                state.custom_tone.unwrap_or_default()
+            } else {
+                theme.get_color("action.primary.bg").unwrap_or_default()
+            }
         } else {
             theme.get_color("surface.base").unwrap_or_default()
         }
     }
     fn box_border(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         if state.checked {
-            theme.get_color("action.primary.bg").unwrap_or_default()
+            if state.has_custom_tone {
+                state.custom_tone.unwrap_or_default()
+            } else {
+                theme.get_color("action.primary.bg").unwrap_or_default()
+            }
         } else {
             theme.get_color("border.default").unwrap_or_default()
         }
@@ -94,7 +107,8 @@ impl DefaultCheckbox for CheckboxProps {
         let state = CheckboxRenderState {
             checked: self.checked,
             disabled: self.disabled,
-            has_custom_tone: false,
+            has_custom_tone: self.has_custom_tone,
+            custom_tone: self.custom_tone,
         };
         let bg = r.box_bg(&state, theme);
         let border = r.box_border(&state, theme);
@@ -113,5 +127,40 @@ impl DefaultCheckbox for CheckboxProps {
             el = el.child(div().bg(border).size(check_size).rounded(px(2.)));
         }
         self.apply(el)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use gpui::rgb;
+
+    fn fixture() -> Theme {
+        let json = include_str!("../../themes/system-light.json");
+        Theme::from_json(json).expect("system-light.json is valid")
+    }
+
+    #[test]
+    fn custom_tone_overrides_checked_state_color() {
+        // Regression for the P2 audit finding:
+        // `has_custom_tone` is a *real* field, not a flag the
+        // renderer silently drops.
+        let theme = fixture();
+        let r = TokenCheckboxRenderer;
+        let custom = rgb(0xabcdef).into();
+        let state = CheckboxRenderState {
+            checked: true,
+            disabled: false,
+            has_custom_tone: true,
+            custom_tone: Some(custom),
+        };
+        assert_eq!(r.box_bg(&state, &theme), custom);
+        assert_eq!(r.box_border(&state, &theme), custom);
+        // Unchecked state: tone does not apply.
+        let state_unchecked = CheckboxRenderState {
+            checked: false,
+            ..state
+        };
+        assert_ne!(r.box_bg(&state_unchecked, &theme), custom);
     }
 }

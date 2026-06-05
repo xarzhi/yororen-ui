@@ -12,7 +12,11 @@
 //! for the bundled `system_light`, `system_dark`, etc. loaders.
 
 pub use yororen_ui_core::{a11y, animation, assets, headless, i18n, notification, rtl};
-pub use yororen_ui_core::renderer::{RendererContext, RendererMarker, RendererRegistry, markers};
+pub use yororen_ui_core::renderer::{
+    ButtonVariant, BuiltinVariantKey, GlobalVariantRegistry, RendererContext, RendererMarker,
+    RendererRegistry, TokenVariantStyle, VariantKey, VariantRegistry, VariantState, VariantStyle,
+    markers,
+};
 pub use yororen_ui_core::theme::{ActiveTheme, GlobalTheme, Theme};
 /// Re-export of the core `theme` module so user code can write
 /// `use yororen_ui::theme::ActiveTheme;` (the v0.3 meta exposes
@@ -20,6 +24,9 @@ pub use yororen_ui_core::theme::{ActiveTheme, GlobalTheme, Theme};
 /// `theme::` namespace matches the v0.2 import path).
 pub use yororen_ui_core::theme as theme;
 pub use yororen_ui_default_renderer as renderer;
+/// `ActionVariantKind` is re-exported from the renderer
+/// (the canonical home in v0.3). Also reachable via
+/// `yororen_ui::renderer::ActionVariantKind`.
 pub use yororen_ui_default_renderer::renderers::button::ActionVariantKind;
 pub use yororen_ui_default_renderer::renderers::spec::{BorderSpec, Edges, IconPosition, ShadowSpec};
 

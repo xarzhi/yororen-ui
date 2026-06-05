@@ -11,7 +11,12 @@ use yororen_ui_core::theme::Theme;
 pub struct SwitchRenderState {
     pub checked: bool,
     pub disabled: bool,
+    /// `true` if the caller supplied `.custom_tone(...)`.
     pub has_custom_tone: bool,
+    /// Caller-supplied override for the checked-state track
+    /// color. When `None`, the renderer falls back to
+    /// `action.primary.bg`.
+    pub custom_tone: Option<Hsla>,
 }
 
 pub trait SwitchRenderer: Any + Send + Sync {
@@ -47,7 +52,11 @@ impl SwitchRenderer for TokenSwitchRenderer {
         if state.disabled {
             theme.get_color("surface.sunken").unwrap_or_default()
         } else if state.checked {
-            theme.get_color("action.primary.bg").unwrap_or_default()
+            if state.has_custom_tone {
+                state.custom_tone.unwrap_or_default()
+            } else {
+                theme.get_color("action.primary.bg").unwrap_or_default()
+            }
         } else {
             theme.get_color("surface.hover").unwrap_or_default()
         }
@@ -109,7 +118,8 @@ impl DefaultSwitch for SwitchProps {
         let state = SwitchRenderState {
             checked: self.checked,
             disabled: self.disabled,
-            has_custom_tone: false,
+            has_custom_tone: self.has_custom_tone,
+            custom_tone: self.custom_tone,
         };
         let track = r.track_bg(&state, theme);
         let knob = r.knob_bg(&state, theme);
@@ -195,5 +205,19 @@ mod tests {
         let _ = r.track_bg(&state, &theme);
         let _ = r.knob_bg(&state, &theme);
         assert_eq!(r.disabled_opacity(&state, &theme), 0.5);
+    }
+
+    #[test]
+    fn custom_tone_overrides_checked_track_color() {
+        let theme = fixture();
+        let r = TokenSwitchRenderer;
+        let custom = gpui::rgb(0xdeadbe).into();
+        let state = SwitchRenderState {
+            checked: true,
+            disabled: false,
+            has_custom_tone: true,
+            custom_tone: Some(custom),
+        };
+        assert_eq!(r.track_bg(&state, &theme), custom);
     }
 }

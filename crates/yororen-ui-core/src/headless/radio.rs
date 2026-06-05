@@ -17,6 +17,13 @@ pub struct RadioProps {
     pub disabled: bool,
     pub focus_handle: FocusHandle,
     pub on_toggle: Option<ToggleCallback>,
+    /// `true` if the caller supplied a custom checked-state
+    /// color (consumed by `RadioRenderer.has_custom_tone`).
+    pub has_custom_tone: bool,
+    /// Caller-supplied override for the checked-state dot /
+    /// ring color. `None` → renderer falls back to
+    /// `action.primary.bg`.
+    pub custom_tone: Option<gpui::Hsla>,
 }
 
 pub fn radio(id: impl Into<ElementId>, cx: &mut App) -> RadioProps {
@@ -26,6 +33,8 @@ pub fn radio(id: impl Into<ElementId>, cx: &mut App) -> RadioProps {
         disabled: false,
         focus_handle: cx.focus_handle(),
         on_toggle: None,
+        has_custom_tone: false,
+        custom_tone: None,
     }
 }
 
@@ -42,6 +51,15 @@ impl RadioProps {
     }
     pub fn disabled(mut self, v: bool) -> Self {
         self.disabled = v;
+        self
+    }
+    pub fn has_custom_tone(mut self, v: bool) -> Self {
+        self.has_custom_tone = v;
+        self
+    }
+    pub fn custom_tone(mut self, c: gpui::Hsla) -> Self {
+        self.custom_tone = Some(c);
+        self.has_custom_tone = true;
         self
     }
     pub fn on_toggle<F>(mut self, f: F) -> Self

@@ -220,6 +220,7 @@ pub fn yororen_ui_default_renderer::renderers::card::arc_card<T: yororen_ui_defa
 pub mod yororen_ui_default_renderer::renderers::checkbox
 pub struct yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState
 pub yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState::checked: bool
+pub yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState::custom_tone: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState::disabled: bool
 pub yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState::has_custom_tone: bool
 impl core::clone::Clone for yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState
@@ -554,6 +555,10 @@ impl core::marker::Unpin for yororen_ui_default_renderer::renderers::file_path_i
 impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::file_path_input::TokenFilePathInputRenderer
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::file_path_input::TokenFilePathInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::file_path_input::TokenFilePathInputRenderer
+pub trait yororen_ui_default_renderer::renderers::file_path_input::DefaultFilePathInput: core::marker::Sized
+pub fn yororen_ui_default_renderer::renderers::file_path_input::DefaultFilePathInput::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl yororen_ui_default_renderer::renderers::file_path_input::DefaultFilePathInput for yororen_ui_core::headless::file_path_input::FilePathInputProps
+pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub trait yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderer::action_gap(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
 pub fn yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderer::bg(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
@@ -780,6 +785,10 @@ impl core::marker::Unpin for yororen_ui_default_renderer::renderers::keybinding_
 impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::keybinding_input::TokenKeybindingInputRenderer
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::keybinding_input::TokenKeybindingInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::keybinding_input::TokenKeybindingInputRenderer
+pub trait yororen_ui_default_renderer::renderers::keybinding_input::DefaultKeybindingInput: core::marker::Sized
+pub fn yororen_ui_default_renderer::renderers::keybinding_input::DefaultKeybindingInput::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl yororen_ui_default_renderer::renderers::keybinding_input::DefaultKeybindingInput for yororen_ui_core::headless::keybinding_input::KeybindingInputProps
+pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub trait yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderer::bg(&self, &yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
 pub fn yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderer::border(&self, &yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
@@ -1033,6 +1042,10 @@ impl core::marker::Unpin for yororen_ui_default_renderer::renderers::number_inpu
 impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::number_input::TokenNumberInputRenderer
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::number_input::TokenNumberInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::number_input::TokenNumberInputRenderer
+pub trait yororen_ui_default_renderer::renderers::number_input::DefaultNumberInput: core::marker::Sized
+pub fn yororen_ui_default_renderer::renderers::number_input::DefaultNumberInput::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl yororen_ui_default_renderer::renderers::number_input::DefaultNumberInput for yororen_ui_core::headless::number_input::NumberInputProps
+pub fn yororen_ui_core::headless::number_input::NumberInputProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub trait yororen_ui_default_renderer::renderers::number_input::NumberInputRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_default_renderer::renderers::number_input::NumberInputRenderer::bg(&self, &yororen_ui_default_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
 pub fn yororen_ui_default_renderer::renderers::number_input::NumberInputRenderer::border(&self, &yororen_ui_default_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
@@ -1110,6 +1123,9 @@ pub yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderS
 pub yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState::custom_focus_border: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState::disabled: bool
 pub yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState::focused: bool
+pub yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState::has_custom_bg: bool
+pub yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState::has_custom_border: bool
+pub yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState::has_custom_focus_border: bool
 impl core::clone::Clone for yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState
 pub fn yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState::clone(&self) -> yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState
 impl core::default::Default for yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState
@@ -1141,6 +1157,10 @@ impl core::marker::Unpin for yororen_ui_default_renderer::renderers::password_in
 impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::password_input::TokenPasswordInputRenderer
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::password_input::TokenPasswordInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::password_input::TokenPasswordInputRenderer
+pub trait yororen_ui_default_renderer::renderers::password_input::DefaultPasswordInput: core::marker::Sized
+pub fn yororen_ui_default_renderer::renderers::password_input::DefaultPasswordInput::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl yororen_ui_default_renderer::renderers::password_input::DefaultPasswordInput for yororen_ui_core::headless::password_input::PasswordInputProps
+pub fn yororen_ui_core::headless::password_input::PasswordInputProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub trait yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderer::bg(&self, &yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
 pub fn yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderer::border(&self, &yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
@@ -1251,6 +1271,7 @@ pub fn yororen_ui_default_renderer::renderers::progress::arc_progress_bar<T: yor
 pub mod yororen_ui_default_renderer::renderers::radio
 pub struct yororen_ui_default_renderer::renderers::radio::RadioRenderState
 pub yororen_ui_default_renderer::renderers::radio::RadioRenderState::checked: bool
+pub yororen_ui_default_renderer::renderers::radio::RadioRenderState::custom_tone: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_default_renderer::renderers::radio::RadioRenderState::disabled: bool
 pub yororen_ui_default_renderer::renderers::radio::RadioRenderState::has_custom_tone: bool
 impl core::clone::Clone for yororen_ui_default_renderer::renderers::radio::RadioRenderState
@@ -1442,6 +1463,10 @@ impl core::marker::Unpin for yororen_ui_default_renderer::renderers::search_inpu
 impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::search_input::TokenSearchInputRenderer
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::search_input::TokenSearchInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::search_input::TokenSearchInputRenderer
+pub trait yororen_ui_default_renderer::renderers::search_input::DefaultSearchInput: core::marker::Sized
+pub fn yororen_ui_default_renderer::renderers::search_input::DefaultSearchInput::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl yororen_ui_default_renderer::renderers::search_input::DefaultSearchInput for yororen_ui_core::headless::search_input::SearchInputProps
+pub fn yororen_ui_core::headless::search_input::SearchInputProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub trait yororen_ui_default_renderer::renderers::search_input::SearchInputRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_default_renderer::renderers::search_input::SearchInputRenderer::bg(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
 pub fn yororen_ui_default_renderer::renderers::search_input::SearchInputRenderer::border(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
@@ -1708,6 +1733,7 @@ pub fn yororen_ui_default_renderer::renderers::split_button::arc_split_button<T:
 pub mod yororen_ui_default_renderer::renderers::switch
 pub struct yororen_ui_default_renderer::renderers::switch::SwitchRenderState
 pub yororen_ui_default_renderer::renderers::switch::SwitchRenderState::checked: bool
+pub yororen_ui_default_renderer::renderers::switch::SwitchRenderState::custom_tone: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_default_renderer::renderers::switch::SwitchRenderState::disabled: bool
 pub yororen_ui_default_renderer::renderers::switch::SwitchRenderState::has_custom_tone: bool
 impl core::clone::Clone for yororen_ui_default_renderer::renderers::switch::SwitchRenderState
@@ -1867,6 +1893,10 @@ impl core::marker::Unpin for yororen_ui_default_renderer::renderers::text_area::
 impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::text_area::TokenTextAreaRenderer
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::text_area::TokenTextAreaRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::text_area::TokenTextAreaRenderer
+pub trait yororen_ui_default_renderer::renderers::text_area::DefaultTextArea: core::marker::Sized
+pub fn yororen_ui_default_renderer::renderers::text_area::DefaultTextArea::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl yororen_ui_default_renderer::renderers::text_area::DefaultTextArea for yororen_ui_core::headless::text_area::TextAreaProps
+pub fn yororen_ui_core::headless::text_area::TextAreaProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub trait yororen_ui_default_renderer::renderers::text_area::TextAreaRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_default_renderer::renderers::text_area::TextAreaRenderer::bg(&self, &yororen_ui_default_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
 pub fn yororen_ui_default_renderer::renderers::text_area::TextAreaRenderer::border(&self, &yororen_ui_default_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
@@ -1928,9 +1958,9 @@ impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::text_
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::text_input::TokenTextInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::text_input::TokenTextInputRenderer
 pub trait yororen_ui_default_renderer::renderers::text_input::DefaultTextInput: core::marker::Sized
-pub fn yororen_ui_default_renderer::renderers::text_input::DefaultTextInput::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_default_renderer::renderers::text_input::DefaultTextInput::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl yororen_ui_default_renderer::renderers::text_input::DefaultTextInput for yororen_ui_core::headless::text_input::TextInputProps
-pub fn yororen_ui_core::headless::text_input::TextInputProps::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::text_input::TextInputProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub trait yororen_ui_default_renderer::renderers::text_input::TextInputRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_default_renderer::renderers::text_input::TextInputRenderer::bg(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
 pub fn yororen_ui_default_renderer::renderers::text_input::TextInputRenderer::border(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
@@ -2273,6 +2303,7 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::re
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::card::CardRenderState
 pub struct yororen_ui_default_renderer::renderers::CheckboxRenderState
 pub yororen_ui_default_renderer::renderers::CheckboxRenderState::checked: bool
+pub yororen_ui_default_renderer::renderers::CheckboxRenderState::custom_tone: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_default_renderer::renderers::CheckboxRenderState::disabled: bool
 pub yororen_ui_default_renderer::renderers::CheckboxRenderState::has_custom_tone: bool
 impl core::clone::Clone for yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState
@@ -2621,6 +2652,9 @@ pub yororen_ui_default_renderer::renderers::PasswordInputRenderState::custom_fg:
 pub yororen_ui_default_renderer::renderers::PasswordInputRenderState::custom_focus_border: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_default_renderer::renderers::PasswordInputRenderState::disabled: bool
 pub yororen_ui_default_renderer::renderers::PasswordInputRenderState::focused: bool
+pub yororen_ui_default_renderer::renderers::PasswordInputRenderState::has_custom_bg: bool
+pub yororen_ui_default_renderer::renderers::PasswordInputRenderState::has_custom_border: bool
+pub yororen_ui_default_renderer::renderers::PasswordInputRenderState::has_custom_focus_border: bool
 impl core::clone::Clone for yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState
 pub fn yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState::clone(&self) -> yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState
 impl core::default::Default for yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState
@@ -2669,6 +2703,7 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::re
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::progress::ProgressBarRenderState
 pub struct yororen_ui_default_renderer::renderers::RadioRenderState
 pub yororen_ui_default_renderer::renderers::RadioRenderState::checked: bool
+pub yororen_ui_default_renderer::renderers::RadioRenderState::custom_tone: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_default_renderer::renderers::RadioRenderState::disabled: bool
 pub yororen_ui_default_renderer::renderers::RadioRenderState::has_custom_tone: bool
 impl core::clone::Clone for yororen_ui_default_renderer::renderers::radio::RadioRenderState
@@ -2875,6 +2910,7 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::re
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::split_button::SplitButtonRenderState
 pub struct yororen_ui_default_renderer::renderers::SwitchRenderState
 pub yororen_ui_default_renderer::renderers::SwitchRenderState::checked: bool
+pub yororen_ui_default_renderer::renderers::SwitchRenderState::custom_tone: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_default_renderer::renderers::SwitchRenderState::disabled: bool
 pub yororen_ui_default_renderer::renderers::SwitchRenderState::has_custom_tone: bool
 impl core::clone::Clone for yororen_ui_default_renderer::renderers::switch::SwitchRenderState
@@ -4299,26 +4335,50 @@ pub trait yororen_ui_default_renderer::DefaultCheckbox: core::marker::Sized
 pub fn yororen_ui_default_renderer::DefaultCheckbox::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl yororen_ui_default_renderer::renderers::checkbox::DefaultCheckbox for yororen_ui_core::headless::checkbox::CheckboxProps
 pub fn yororen_ui_core::headless::checkbox::CheckboxProps::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub trait yororen_ui_default_renderer::DefaultFilePathInput: core::marker::Sized
+pub fn yororen_ui_default_renderer::DefaultFilePathInput::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl yororen_ui_default_renderer::renderers::file_path_input::DefaultFilePathInput for yororen_ui_core::headless::file_path_input::FilePathInputProps
+pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub trait yororen_ui_default_renderer::DefaultIconButton: core::marker::Sized
 pub fn yororen_ui_default_renderer::DefaultIconButton::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl yororen_ui_default_renderer::renderers::icon_button::DefaultIconButton for yororen_ui_core::headless::icon_button::IconButtonProps
 pub fn yororen_ui_core::headless::icon_button::IconButtonProps::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub trait yororen_ui_default_renderer::DefaultKeybindingInput: core::marker::Sized
+pub fn yororen_ui_default_renderer::DefaultKeybindingInput::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl yororen_ui_default_renderer::renderers::keybinding_input::DefaultKeybindingInput for yororen_ui_core::headless::keybinding_input::KeybindingInputProps
+pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub trait yororen_ui_default_renderer::DefaultLabel: core::marker::Sized
 pub fn yororen_ui_default_renderer::DefaultLabel::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl yororen_ui_default_renderer::renderers::label::DefaultLabel for yororen_ui_core::headless::label::LabelProps
 pub fn yororen_ui_core::headless::label::LabelProps::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub trait yororen_ui_default_renderer::DefaultNumberInput: core::marker::Sized
+pub fn yororen_ui_default_renderer::DefaultNumberInput::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl yororen_ui_default_renderer::renderers::number_input::DefaultNumberInput for yororen_ui_core::headless::number_input::NumberInputProps
+pub fn yororen_ui_core::headless::number_input::NumberInputProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub trait yororen_ui_default_renderer::DefaultPasswordInput: core::marker::Sized
+pub fn yororen_ui_default_renderer::DefaultPasswordInput::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl yororen_ui_default_renderer::renderers::password_input::DefaultPasswordInput for yororen_ui_core::headless::password_input::PasswordInputProps
+pub fn yororen_ui_core::headless::password_input::PasswordInputProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub trait yororen_ui_default_renderer::DefaultRadio: core::marker::Sized
 pub fn yororen_ui_default_renderer::DefaultRadio::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl yororen_ui_default_renderer::renderers::radio::DefaultRadio for yororen_ui_core::headless::radio::RadioProps
 pub fn yororen_ui_core::headless::radio::RadioProps::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub trait yororen_ui_default_renderer::DefaultSearchInput: core::marker::Sized
+pub fn yororen_ui_default_renderer::DefaultSearchInput::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl yororen_ui_default_renderer::renderers::search_input::DefaultSearchInput for yororen_ui_core::headless::search_input::SearchInputProps
+pub fn yororen_ui_core::headless::search_input::SearchInputProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub trait yororen_ui_default_renderer::DefaultSwitch: core::marker::Sized
 pub fn yororen_ui_default_renderer::DefaultSwitch::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl yororen_ui_default_renderer::renderers::switch::DefaultSwitch for yororen_ui_core::headless::switch::SwitchProps
 pub fn yororen_ui_core::headless::switch::SwitchProps::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub trait yororen_ui_default_renderer::DefaultTextArea: core::marker::Sized
+pub fn yororen_ui_default_renderer::DefaultTextArea::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl yororen_ui_default_renderer::renderers::text_area::DefaultTextArea for yororen_ui_core::headless::text_area::TextAreaProps
+pub fn yororen_ui_core::headless::text_area::TextAreaProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub trait yororen_ui_default_renderer::DefaultTextInput: core::marker::Sized
-pub fn yororen_ui_default_renderer::DefaultTextInput::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_default_renderer::DefaultTextInput::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl yororen_ui_default_renderer::renderers::text_input::DefaultTextInput for yororen_ui_core::headless::text_input::TextInputProps
-pub fn yororen_ui_core::headless::text_input::TextInputProps::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::text_input::TextInputProps::default_render(self, &gpui::app::App, &gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub trait yororen_ui_default_renderer::DefaultToggleButton: core::marker::Sized
 pub fn yororen_ui_default_renderer::DefaultToggleButton::default_render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl yororen_ui_default_renderer::renderers::toggle_button::DefaultToggleButton for yororen_ui_core::headless::toggle_button::ToggleButtonProps
