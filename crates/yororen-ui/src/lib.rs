@@ -14,7 +14,13 @@
 pub use yororen_ui_core::{a11y, animation, assets, headless, i18n, notification, rtl};
 pub use yororen_ui_core::renderer::{RendererContext, RendererMarker, RendererRegistry};
 pub use yororen_ui_core::theme::{ActiveTheme, GlobalTheme, Theme};
+/// Re-export of the core `theme` module so user code can write
+/// `use yororen_ui::theme::ActiveTheme;` (the v0.3 meta exposes
+/// every public item at the crate root too, but the
+/// `theme::` namespace matches the v0.2 import path).
+pub use yororen_ui_core::theme as theme;
 pub use yororen_ui_default_renderer as renderer;
+pub use yororen_ui_default_renderer::renderers::button::ActionVariantKind;
 
 #[cfg(feature = "mini")]
 pub use yororen_ui_mini_renderer as mini_renderer;

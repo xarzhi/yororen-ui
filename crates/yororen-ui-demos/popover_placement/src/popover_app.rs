@@ -11,7 +11,7 @@ use gpui::{
     Context, Entity, FontWeight, IntoElement, ParentElement, Render, Styled, Window, div, px,
 };
 
-use yororen_ui::component::{PopoverPlacement, button, label, popover};
+use yororen_ui::headless::{PopoverPlacement, button, label, popover};
 use yororen_ui::i18n::{I18nContext, Locale};
 use yororen_ui::theme::ActiveTheme;
 

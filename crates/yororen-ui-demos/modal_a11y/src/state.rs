@@ -2,7 +2,7 @@
 
 use gpui::{App, AppContext, Entity, Global};
 
-use yororen_ui::component::OverlayCloseReason;
+use yororen_ui::headless::OverlayCloseReason;
 
 /// Visibility flags for the three modal types the demo exercises.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]

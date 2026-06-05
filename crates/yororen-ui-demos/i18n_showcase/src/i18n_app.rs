@@ -2,7 +2,7 @@
 
 use gpui::{Context, IntoElement, ParentElement, Render, Styled, Window, div, px};
 
-use yororen_ui::component::{SelectOption, button, label, select, text_input};
+use yororen_ui::headless::{SelectOption, button, label, select, text_input};
 use yororen_ui::i18n::{I18nContext, PlaceholderContext, PlaceholderKey, Translate};
 use yororen_ui::theme::{ActionVariantKind, ActiveTheme};
 

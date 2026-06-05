@@ -81,3 +81,39 @@ pub mod tooltip;
 pub mod tree;
 pub mod tree_item;
 pub mod virtual_list;
+
+// Re-export each component's factory function at the top
+// level so callers can write `use yororen_ui::headless::button;`
+// and get the `button(id, cx)` function (not the module).
+pub use avatar::avatar;
+pub use badge::badge;
+pub use button::button;
+pub use checkbox::checkbox;
+pub use combo_box::combo_box;
+pub use divider::divider;
+pub use heading::heading;
+pub use icon::icon;
+pub use icon_button::icon_button;
+pub use label::label;
+pub use list_item::list_item;
+pub use progress::progress;
+pub use radio::radio;
+pub use skeleton::skeleton;
+pub use slider::slider;
+pub use switch::switch;
+pub use tag::tag;
+pub use text::text;
+pub use text_input::text_input;
+pub use toggle_button::toggle_button;
+
+// Marker types (for `cx.renderer_arc::<markers::Button, ...>`).
+// These are the *component* markers, not the `headless::*Props`
+// types — re-exporting them from `headless` keeps the typical
+// `use yororen_ui::headless::*` pattern in app code.
+pub use crate::renderer::markers;
+// `ButtonProps`, `LabelProps`, etc. (the props structs
+// returned by the factory functions) are not re-exported
+// at the top level because callers usually don't need to
+// name the struct — `.apply(div)` consumes the value.
+// Power users can import the struct explicitly via
+// `use yororen_ui::headless::button::ButtonProps;`.

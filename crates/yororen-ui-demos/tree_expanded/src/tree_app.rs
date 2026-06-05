@@ -14,7 +14,7 @@
 
 use gpui::{Context, FontWeight, IntoElement, ParentElement, Render, Styled, Window, div, px};
 
-use yororen_ui::component::{TreeState, button, label, tree};
+use yororen_ui::headless::{TreeState, button, label, tree};
 use yororen_ui::theme::ActiveTheme;
 
 use crate::state::build_nodes;

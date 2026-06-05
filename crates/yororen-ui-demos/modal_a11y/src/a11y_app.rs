@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use gpui::{Context, IntoElement, ParentElement, Render, SharedString, Styled, Window, div, px};
 
-use yororen_ui::component::{
+use yororen_ui::headless::{
     OverlayCloseCallback, OverlayCloseReason, button, label, modal, modal_actions_row, overlay,
 };
 use yororen_ui::theme::{ActionVariantKind, ActiveTheme};
@@ -232,7 +232,7 @@ fn build_standard_modal(
 mod tests {
     use super::*;
     use crate::state::ModalVisibility;
-    use yororen_ui::component::modal_dialog;
+    // TODO: migrate to headless: use yororen_ui::headless::modal_dialog::modal_dialog;
 
     #[test]
     fn build_standard_modal_returns_any_element() {

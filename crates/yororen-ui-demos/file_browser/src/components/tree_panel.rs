@@ -7,7 +7,7 @@ use std::sync::Arc;
 
 use gpui::{AnyElement, IntoElement, ParentElement, Styled, Window, div, px};
 
-use yororen_ui::component::{
+use yororen_ui::headless::{
     SelectionMode, TreeNode, TreeState, button, context_menu_trigger, empty_state, label, tree,
 };
 use yororen_ui::theme::{ActionVariantKind, Theme};

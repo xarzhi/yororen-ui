@@ -5,7 +5,7 @@
 
 use gpui::{App, AppContext, Entity, Global};
 
-use yororen_ui::component::{ArcTreeNode, TreeCheckedState, TreeNode, TreeNodeId};
+use yororen_ui::headless::{ArcTreeNode, TreeCheckedState, TreeNode, TreeNodeId};
 
 /// Global state for the tree demo.
 pub struct TreeDemoState {

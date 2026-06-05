@@ -29,7 +29,7 @@ use gpui::{
     StatefulInteractiveElement, Styled, Window, div, px,
 };
 use serde_json::json;
-use yororen_ui::component::{ToastKind, button, label, toast};
+use yororen_ui::headless::{ToastKind, button, label, toast};
 use yororen_ui::notification::notification_host;
 use yororen_ui::notification::{DismissStrategy, Notification, NotificationCenter};
 use yororen_ui::theme::ActiveTheme;

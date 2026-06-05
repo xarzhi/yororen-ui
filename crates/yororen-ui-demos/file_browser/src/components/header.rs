@@ -6,8 +6,8 @@ use std::path::Path;
 
 use gpui::{IntoElement, ParentElement, Styled, div, px};
 
-use yororen_ui::component::{button, label};
-use yororen_ui::theme::ActionVariantKind;
+use yororen_ui::headless::{button, label};
+use yororen_ui::ActionVariantKind;
 
 use crate::actions;
 

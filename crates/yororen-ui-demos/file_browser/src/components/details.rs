@@ -5,7 +5,7 @@
 use std::path::PathBuf;
 
 use gpui::{IntoElement, ParentElement, Styled, div, px};
-use yororen_ui::component::label;
+// TODO: migrate to headless: use yororen_ui::headless::label::label;
 
 use crate::clipboard::FileClipboard;
 use crate::format;

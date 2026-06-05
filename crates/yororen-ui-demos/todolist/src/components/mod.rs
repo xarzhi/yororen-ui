@@ -50,7 +50,7 @@
 //!
 //! Components are imported from the `yororen_ui::component` module:
 //! ```ignore
-//! use yororen_ui::component::{button, text_input, modal, checkbox, ...};
+//! // TODO: migrate to headless API: button, text_input, modal, checkbox, ...
 //! ```
 
 pub mod todo_form;

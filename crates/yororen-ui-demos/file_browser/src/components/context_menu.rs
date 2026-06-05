@@ -7,7 +7,7 @@ use std::sync::Arc;
 
 use gpui::{AnyElement, InteractiveElement, IntoElement, ParentElement, Pixels, Styled, div, px};
 
-use yororen_ui::component::{
+use yororen_ui::headless::{
     IconName, IconPath, PopoverPlacement, button, divider, icon, label, popover,
 };
 use yororen_ui::theme::{ActionVariantKind, Theme};

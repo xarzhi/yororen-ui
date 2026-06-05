@@ -15,7 +15,7 @@ use std::time::Duration;
 
 use gpui::Window;
 
-use yororen_ui::component::{ArcTreeNode, TreeCheckedState, TreeNode};
+use yororen_ui::headless::{ArcTreeNode, TreeCheckedState, TreeNode};
 
 use crate::state::FileBrowserState;
 

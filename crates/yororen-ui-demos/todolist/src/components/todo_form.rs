@@ -34,9 +34,9 @@
 //! - `button` - Action button with `ActionVariantKind::Primary` variant for the main submit action
 
 use gpui::{IntoElement, ParentElement, Styled, div, px};
-use yororen_ui::component::{ComboBoxOption, button, combo_box, text_input};
+use yororen_ui::headless::{ComboBoxOption, button, combo_box, text_input};
 use yororen_ui::i18n::Translate;
-use yororen_ui::theme::ActionVariantKind;
+use yororen_ui::ActionVariantKind;
 
 use crate::state::TodoState;
 use crate::todo::{Todo, TodoCategory};

@@ -32,7 +32,7 @@
 //! Copy this structure for your yororen-ui app's root component.
 
 use gpui::{AnyElement, Context, IntoElement, ParentElement, Render, Styled, Window, div, px};
-use yororen_ui::component::divider;
+// TODO: migrate to headless: use yororen_ui::headless::divider::divider;
 use yororen_ui::theme::ActiveTheme;
 
 use crate::components;

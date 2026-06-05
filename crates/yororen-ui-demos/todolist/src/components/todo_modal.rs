@@ -40,9 +40,9 @@
 
 use gpui::prelude::FluentBuilder;
 use gpui::{InteractiveElement, IntoElement, ParentElement, Styled, div, hsla, px};
-use yororen_ui::component::{ComboBoxOption, button, combo_box, modal, text_input};
+use yororen_ui::headless::{ComboBoxOption, button, combo_box, modal, text_input};
 use yororen_ui::i18n::Translate;
-use yororen_ui::theme::ActionVariantKind;
+use yororen_ui::ActionVariantKind;
 
 use crate::state::TodoState;
 use crate::todo::TodoCategory;
