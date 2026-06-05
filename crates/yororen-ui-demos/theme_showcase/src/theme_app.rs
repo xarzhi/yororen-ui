@@ -8,9 +8,7 @@
 //! <50 lines per theme, this demo fits in one screen and
 //! makes the "themes are just JSON" point obvious.
 
-use gpui::{
-    Context, IntoElement, ParentElement, Render, Styled, Window, div, px,
-};
+use gpui::{Context, IntoElement, ParentElement, Render, Styled, Window, div, px};
 use yororen_ui::headless::button::button;
 use yororen_ui::headless::label::label;
 use yororen_ui::Theme;
@@ -62,18 +60,16 @@ const MATERIAL: &str = r##"{
 
 impl Render for ThemeApp {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let app: &mut gpui::App =
-            unsafe { &mut *(cx as *mut Context<Self> as *mut gpui::App) };
-
         // Install the current theme (cycle on click for
-        // the demo).
+        // the demo). Install first so the subsequent
+        // `default_render(cx)` calls pick it up.
         theme_mod::install(cx, self.current_theme());
 
         let (name, blurb) = self.themes[self.current];
         let current = self.current;
         let total = self.themes.len();
 
-        let next_btn = button("next-theme", app)
+        let next_btn = button("next-theme", &mut **cx)
             .on_click(move |_, _, cx| {
                 // No-op for the demo — the user clicks the
                 // button but the theme doesn't actually
@@ -93,7 +89,7 @@ impl Render for ThemeApp {
                 label(
                     "title",
                     format!("Theme showcase ({}/{})", current + 1, total),
-                    app,
+                    &mut **cx,
                 )
                 .default_render(cx),
             )
@@ -101,7 +97,7 @@ impl Render for ThemeApp {
                 label(
                     "blurb",
                     format!("Currently: {} — {}", name, blurb),
-                    app,
+                    &mut **cx,
                 )
                 .default_render(cx),
             )

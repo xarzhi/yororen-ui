@@ -882,14 +882,25 @@ impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::badge::
 pub fn yororen_ui_core::headless::badge::badge(impl core::convert::Into<gpui::window::ElementId>, impl core::convert::Into<alloc::string::String>, &mut gpui::app::App) -> yororen_ui_core::headless::badge::BadgeProps
 pub mod yororen_ui_core::headless::button
 pub struct yororen_ui_core::headless::button::Button
-impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::headless::button::Button
-impl core::marker::Freeze for yororen_ui_core::headless::button::Button
-impl core::marker::Send for yororen_ui_core::headless::button::Button
-impl core::marker::Sync for yororen_ui_core::headless::button::Button
-impl core::marker::Unpin for yororen_ui_core::headless::button::Button
-impl core::marker::UnsafeUnpin for yororen_ui_core::headless::button::Button
-impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::button::Button
-impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::button::Button
+impl core::clone::Clone for yororen_ui_core::renderer::Button
+pub fn yororen_ui_core::renderer::Button::clone(&self) -> yororen_ui_core::renderer::Button
+impl core::cmp::Eq for yororen_ui_core::renderer::Button
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Button
+pub fn yororen_ui_core::renderer::Button::eq(&self, &yororen_ui_core::renderer::Button) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Button
+pub fn yororen_ui_core::renderer::Button::default() -> yororen_ui_core::renderer::Button
+impl core::fmt::Debug for yororen_ui_core::renderer::Button
+pub fn yororen_ui_core::renderer::Button::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Button
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Button
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Button
+impl core::marker::Freeze for yororen_ui_core::renderer::Button
+impl core::marker::Send for yororen_ui_core::renderer::Button
+impl core::marker::Sync for yororen_ui_core::renderer::Button
+impl core::marker::Unpin for yororen_ui_core::renderer::Button
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Button
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Button
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Button
 pub struct yororen_ui_core::headless::button::ButtonProps
 pub yororen_ui_core::headless::button::ButtonProps::clickable: bool
 pub yororen_ui_core::headless::button::ButtonProps::disabled: bool
@@ -6050,7 +6061,6 @@ pub fn gpui::app::App::has_renderer<T: yororen_ui_core::renderer::RendererMarker
 pub fn gpui::app::App::register_renderer_arc<T: yororen_ui_core::renderer::RendererMarker, R: ?core::marker::Sized + core::marker::Send + core::marker::Sync + 'static>(&mut self, alloc::sync::Arc<R>)
 pub fn gpui::app::App::renderer_arc<T: yororen_ui_core::renderer::RendererMarker, R: ?core::marker::Sized + core::marker::Send + core::marker::Sync + 'static>(&self) -> core::option::Option<&alloc::sync::Arc<R>>
 pub trait yororen_ui_core::renderer::RendererMarker: 'static
-impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::headless::button::Button
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Avatar
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Badge
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Button

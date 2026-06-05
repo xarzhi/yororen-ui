@@ -1963,54 +1963,6 @@ pub fn yororen_ui_default_renderer::renderers::text_input::TokenTextInputRendere
 pub fn yororen_ui_default_renderer::renderers::text_input::TokenTextInputRenderer::padding(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
 pub fn yororen_ui_default_renderer::renderers::text_input::TokenTextInputRenderer::text_color(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
 pub fn yororen_ui_default_renderer::renderers::text_input::arc_text_input<T: yororen_ui_default_renderer::renderers::text_input::TextInputRenderer + 'static>(T) -> alloc::sync::Arc<dyn yororen_ui_default_renderer::renderers::text_input::TextInputRenderer>
-pub mod yororen_ui_default_renderer::renderers::theme_path
-pub fn yororen_ui_default_renderer::renderers::theme_path::action_color(&yororen_ui_core::theme::Theme, yororen_ui_default_renderer::renderers::button::ActionVariantKind, &str) -> gpui::color::Hsla
-pub fn yororen_ui_default_renderer::renderers::theme_path::border(&yororen_ui_core::theme::Theme, &str) -> gpui::color::Hsla
-pub fn yororen_ui_default_renderer::renderers::theme_path::content(&yororen_ui_core::theme::Theme, &str) -> gpui::color::Hsla
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_avatar(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_badge(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_button(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_card(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_checkbox(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_combo_box(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_disclosure(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_divider(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_dropdown(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_empty_state(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_file_path_input(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_focus_ring(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_form(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_icon_button(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_input(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_keybinding_input(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_list_item(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_modal(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_notification(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_number_input(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_popover(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_progress(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_radio(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_search_input(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_select(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_skeleton(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_slider(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_split_button(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_switch(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_tag(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_toast(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_toggle_button(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_tooltip(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::control_tree_item(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::motion(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::radii(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::radii_md(&yororen_ui_core::theme::Theme) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::shadow(&yororen_ui_core::theme::Theme, &str) -> gpui::color::Hsla
-pub fn yororen_ui_default_renderer::renderers::theme_path::sizes(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::spacing(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::status(&yororen_ui_core::theme::Theme, &str, &str) -> gpui::color::Hsla
-pub fn yororen_ui_default_renderer::renderers::theme_path::surface(&yororen_ui_core::theme::Theme, &str) -> gpui::color::Hsla
-pub fn yororen_ui_default_renderer::renderers::theme_path::typography_num(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<f64>
-pub fn yororen_ui_default_renderer::renderers::theme_path::typography_string(&yororen_ui_core::theme::Theme, &str) -> core::option::Option<alloc::string::String>
 pub mod yororen_ui_default_renderer::renderers::toast
 pub struct yororen_ui_default_renderer::renderers::toast::ToastRenderState
 pub yororen_ui_default_renderer::renderers::toast::ToastRenderState::has_custom_color: bool
@@ -4560,34 +4512,6 @@ pub fn yororen_ui_default_renderer::renderers::variant::TokenVariantStyle::disab
 pub fn yororen_ui_default_renderer::renderers::variant::TokenVariantStyle::fg(&self, &yororen_ui_default_renderer::renderers::variant::VariantState) -> gpui::color::Hsla
 pub fn yororen_ui_default_renderer::renderers::resolve_custom_variant(&gpui::app::App, &yororen_ui_default_renderer::renderers::variant::VariantKey) -> core::option::Option<alloc::sync::Arc<dyn yororen_ui_default_renderer::renderers::variant::VariantStyle>>
 pub fn yororen_ui_default_renderer::renderers::variant_compose(alloc::sync::Arc<dyn yororen_ui_default_renderer::renderers::variant::VariantStyle>, &[(yororen_ui_default_renderer::renderers::variant::VariantKey, alloc::sync::Arc<dyn yororen_ui_default_renderer::renderers::variant::VariantStyle>)]) -> alloc::sync::Arc<dyn yororen_ui_default_renderer::renderers::variant::VariantStyle>
-pub mod yororen_ui_default_renderer::theme
-pub use yororen_ui_default_renderer::theme::<<yororen_ui_core::theme::*>>
-pub enum yororen_ui_default_renderer::theme::ActionVariantKind
-pub yororen_ui_default_renderer::theme::ActionVariantKind::Danger
-pub yororen_ui_default_renderer::theme::ActionVariantKind::Neutral
-pub yororen_ui_default_renderer::theme::ActionVariantKind::Primary
-impl yororen_ui_default_renderer::renderers::button::ActionVariantKind
-pub fn yororen_ui_default_renderer::renderers::button::ActionVariantKind::as_str(self) -> &'static str
-impl core::clone::Clone for yororen_ui_default_renderer::renderers::button::ActionVariantKind
-pub fn yororen_ui_default_renderer::renderers::button::ActionVariantKind::clone(&self) -> yororen_ui_default_renderer::renderers::button::ActionVariantKind
-impl core::cmp::Eq for yororen_ui_default_renderer::renderers::button::ActionVariantKind
-impl core::cmp::PartialEq for yororen_ui_default_renderer::renderers::button::ActionVariantKind
-pub fn yororen_ui_default_renderer::renderers::button::ActionVariantKind::eq(&self, &yororen_ui_default_renderer::renderers::button::ActionVariantKind) -> bool
-impl core::convert::From<yororen_ui_default_renderer::renderers::button::ActionVariantKind> for yororen_ui_default_renderer::renderers::variant::ButtonVariant
-pub fn yororen_ui_default_renderer::renderers::variant::ButtonVariant::from(yororen_ui_default_renderer::renderers::button::ActionVariantKind) -> Self
-impl core::default::Default for yororen_ui_default_renderer::renderers::button::ActionVariantKind
-pub fn yororen_ui_default_renderer::renderers::button::ActionVariantKind::default() -> yororen_ui_default_renderer::renderers::button::ActionVariantKind
-impl core::fmt::Debug for yororen_ui_default_renderer::renderers::button::ActionVariantKind
-pub fn yororen_ui_default_renderer::renderers::button::ActionVariantKind::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::marker::Copy for yororen_ui_default_renderer::renderers::button::ActionVariantKind
-impl core::marker::StructuralPartialEq for yororen_ui_default_renderer::renderers::button::ActionVariantKind
-impl core::marker::Freeze for yororen_ui_default_renderer::renderers::button::ActionVariantKind
-impl core::marker::Send for yororen_ui_default_renderer::renderers::button::ActionVariantKind
-impl core::marker::Sync for yororen_ui_default_renderer::renderers::button::ActionVariantKind
-impl core::marker::Unpin for yororen_ui_default_renderer::renderers::button::ActionVariantKind
-impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::button::ActionVariantKind
-impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::button::ActionVariantKind
-impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::button::ActionVariantKind
 pub mod yororen_ui_default_renderer::themes
 pub fn yororen_ui_default_renderer::themes::install(&mut gpui::app::App, gpui::platform::WindowAppearance)
 pub fn yororen_ui_default_renderer::themes::install_with(&mut gpui::app::App, yororen_ui_core::theme::Theme)
