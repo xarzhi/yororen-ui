@@ -15,15 +15,13 @@ members = [
     "crates/yororen-ui-locale-zh-CN",
     "crates/yororen-ui-locale-ar",
 ]
-# Theme packages are temporarily excluded while the renderer
-# migrates to the JSON-backed Theme. They are reintroduced as
-# JSON files in the renderer crate (see W6).
+# Demos are temporarily excluded from the default workspace build
+# while the headless / renderer / theme split is in flux. They are
+# rebuilt on demand (see `crates/yororen-ui-demos/Cargo.toml` for the
+# crate list) and re-added to `members` once each one is rewritten
+# against the new headless API.
 exclude = [
     "crates/yororen-ui-demos",
-    "crates/yororen-ui-theme-system",
-    "crates/yororen-ui-theme-mini",
-    "crates/yororen-ui-theme-catppuccin",
-    "crates/yororen-ui-theme-material",
 ]
 
 [workspace.package]
