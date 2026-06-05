@@ -16,16 +16,25 @@
 //! - `content.<field>` — text colors.
 //! - `border.<field>` — border colors.
 //! - `status.<kind>.{bg,fg}` — status pill colors.
-//! - `tokens.control.<component>.<field>` — geometry / size
-//!   tokens per control.
+//! - `shadow.<field>` — elevation shadow color.
+//! - `tokens.sizes.<field>` — generic sizes (control heights, icon sizes, avatar sizes).
 //! - `tokens.radii.<key>` — radius scale.
-//! - `tokens.typography.<field>` — font sizes and weights.
+//! - `tokens.spacing.<field>` — gap / inset scale.
+//! - `tokens.typography.<field>` — font sizes, weights, families.
+//! - `tokens.motion.<field>` — animation durations.
+//! - `tokens.control.<component>.<field>` — component-specific
+//!   geometry / size tokens.
 
 use gpui::Hsla;
+use serde_json::Value;
 
 use yororen_ui_core::theme::Theme;
 
 use super::button::ActionVariantKind;
+
+// ---------------------------------------------------------------------------
+// Color helpers
+// ---------------------------------------------------------------------------
 
 /// `action.<variant>.<field>` color. Returns `Hsla::default()` if
 /// the path is missing — renderers that want a different
@@ -59,85 +68,153 @@ pub fn status(theme: &Theme, kind: &str, field: &str) -> Hsla {
     theme.get_color(&key).unwrap_or_default()
 }
 
-/// `tokens.control.button.<field>` number.
+/// `shadow.<field>` color.
+pub fn shadow(theme: &Theme, field: &str) -> Hsla {
+    let key = format!("shadow.{}", field);
+    theme.get_color(&key).unwrap_or_default()
+}
+
+// ---------------------------------------------------------------------------
+// Number helpers (return `Option<f64>`; renderers convert to `Pixels` etc.)
+// ---------------------------------------------------------------------------
+
+fn get_num(theme: &Theme, path: &str) -> Option<f64> {
+    theme.get_number(path)
+}
+
 pub fn control_button(theme: &Theme, field: &str) -> Option<f64> {
-    let key = format!("tokens.control.button.{}", field);
-    theme.get_number(&key)
+    get_num(theme, &format!("tokens.control.button.{}", field))
 }
-
-/// `tokens.control.input.<field>` number.
 pub fn control_input(theme: &Theme, field: &str) -> Option<f64> {
-    let key = format!("tokens.control.input.{}", field);
-    theme.get_number(&key)
+    get_num(theme, &format!("tokens.control.input.{}", field))
 }
-
-/// `tokens.control.switch.<field>` number.
 pub fn control_switch(theme: &Theme, field: &str) -> Option<f64> {
-    let key = format!("tokens.control.switch.{}", field);
-    theme.get_number(&key)
+    get_num(theme, &format!("tokens.control.switch.{}", field))
 }
-
-/// `tokens.control.toggle_button.<field>` number.
-pub fn control_toggle_button(theme: &Theme, field: &str) -> Option<f64> {
-    let key = format!("tokens.control.toggle_button.{}", field);
-    theme.get_number(&key)
-}
-
-/// `tokens.control.checkbox.<field>` number.
 pub fn control_checkbox(theme: &Theme, field: &str) -> Option<f64> {
-    let key = format!("tokens.control.checkbox.{}", field);
-    theme.get_number(&key)
+    get_num(theme, &format!("tokens.control.checkbox.{}", field))
 }
-
-/// `tokens.control.radio.<field>` number.
 pub fn control_radio(theme: &Theme, field: &str) -> Option<f64> {
-    let key = format!("tokens.control.radio.{}", field);
-    theme.get_number(&key)
+    get_num(theme, &format!("tokens.control.radio.{}", field))
 }
-
-/// `tokens.control.select.<field>` number.
 pub fn control_select(theme: &Theme, field: &str) -> Option<f64> {
-    let key = format!("tokens.control.select.{}", field);
-    theme.get_number(&key)
+    get_num(theme, &format!("tokens.control.select.{}", field))
 }
-
-/// `tokens.control.combo_box.<field>` number.
 pub fn control_combo_box(theme: &Theme, field: &str) -> Option<f64> {
-    let key = format!("tokens.control.combo_box.{}", field);
-    theme.get_number(&key)
+    get_num(theme, &format!("tokens.control.combo_box.{}", field))
 }
-
-/// `tokens.control.avatar.<field>` number.
-pub fn control_avatar(theme: &Theme, field: &str) -> Option<f64> {
-    let key = format!("tokens.control.avatar.{}", field);
-    theme.get_number(&key)
+pub fn control_slider(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.slider.{}", field))
 }
-
-/// `tokens.control.tag.<field>` number.
-pub fn control_tag(theme: &Theme, field: &str) -> Option<f64> {
-    let key = format!("tokens.control.tag.{}", field);
-    theme.get_number(&key)
+pub fn control_toast(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.toast.{}", field))
 }
-
-/// `tokens.control.badge.<field>` number.
+pub fn control_modal(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.modal.{}", field))
+}
+pub fn control_popover(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.popover.{}", field))
+}
+pub fn control_dropdown(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.dropdown.{}", field))
+}
 pub fn control_badge(theme: &Theme, field: &str) -> Option<f64> {
-    let key = format!("tokens.control.badge.{}", field);
-    theme.get_number(&key)
+    get_num(theme, &format!("tokens.control.badge.{}", field))
+}
+pub fn control_tag(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.tag.{}", field))
+}
+pub fn control_skeleton(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.skeleton.{}", field))
+}
+pub fn control_progress(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.progress.{}", field))
+}
+pub fn control_avatar(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.avatar.{}", field))
+}
+pub fn control_tooltip(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.tooltip.{}", field))
+}
+pub fn control_disclosure(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.disclosure.{}", field))
+}
+pub fn control_keybinding_input(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.keybinding_input.{}", field))
+}
+pub fn control_split_button(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.split_button.{}", field))
+}
+pub fn control_search_input(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.search_input.{}", field))
+}
+pub fn control_number_input(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.number_input.{}", field))
+}
+pub fn control_file_path_input(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.file_path_input.{}", field))
+}
+pub fn control_icon_button(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.icon_button.{}", field))
+}
+pub fn control_toggle_button(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.toggle_button.{}", field))
+}
+pub fn control_empty_state(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.empty_state.{}", field))
+}
+pub fn control_list_item(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.list_item.{}", field))
+}
+pub fn control_tree_item(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.tree_item.{}", field))
+}
+pub fn control_card(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.card.{}", field))
+}
+pub fn control_divider(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.divider.{}", field))
+}
+pub fn control_form(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.form.{}", field))
+}
+pub fn control_notification(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.notification.{}", field))
+}
+pub fn control_focus_ring(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.control.focus_ring.{}", field))
 }
 
-/// `tokens.radii.<key>` number.
+pub fn sizes(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.sizes.{}", field))
+}
 pub fn radii(theme: &Theme, key: &str) -> Option<f64> {
-    let path = format!("tokens.radii.{}", key);
-    theme.get_number(&path)
+    get_num(theme, &format!("tokens.radii.{}", key))
 }
-
-/// `tokens.radii.md` number.
 pub fn radii_md(theme: &Theme) -> Option<f64> {
     radii(theme, "md")
 }
+pub fn spacing(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.spacing.{}", field))
+}
+pub fn typography_num(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.typography.{}", field))
+}
+pub fn motion(theme: &Theme, field: &str) -> Option<f64> {
+    get_num(theme, &format!("tokens.motion.{}", field))
+}
 
-/// `tokens.typography.<field>` number.
-pub fn typography(theme: &Theme, field: &str) -> Option<f64> {
+// ---------------------------------------------------------------------------
+// String helpers
+// ---------------------------------------------------------------------------
+
+/// `tokens.typography.family_<key>` (e.g. `family_mono`,
+/// `family_default`). Returns `None` for missing paths so the
+/// caller can fall back to a hard-coded string.
+pub fn typography_string(theme: &Theme, field: &str) -> Option<String> {
     let key = format!("tokens.typography.{}", field);
-    theme.get_number(&key)
+    theme.get(&key).and_then(|v| match v {
+        Value::String(s) => Some(s.clone()),
+        _ => None,
+    })
 }
