@@ -11511,6 +11511,4 @@ pub fn yororen_ui_core::theme::interactive_colors(&yororen_ui_core::theme::Theme
 pub fn yororen_ui_core::theme::validate(&yororen_ui_core::theme::Theme) -> alloc::vec::Vec<yororen_ui_core::theme::validate::Issue>
 pub type yororen_ui_core::theme::EasingFn = fn(f32) -> f32
 pub macro yororen_ui_core::action_handler!
-pub macro yororen_ui_core::t!
-pub macro yororen_ui_core::tf!
-pub macro yororen_ui_core::tn!
+pub fn yororen_ui_core::theme::validate(&yororen_ui_core::theme::Theme) -> alloc::vec::Vec<yororen_ui_core::theme::validate::Issue>

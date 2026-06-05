@@ -212,53 +212,6 @@ impl Translator for TranslationMap {
     }
 }
 
-/// Macro for translating strings.
-///
-/// # Example
-/// ```rust,ignore
-/// use yororen_ui::t;
-///
-/// let translated = t!("select.placeholder");
-/// ```
-#[macro_export]
-macro_rules! t {
-    ($key:expr) => {{
-        // This macro is designed to be used within an App context
-        // The actual implementation uses the App::t method
-        $key
-    }};
-}
-
-/// Macro for translating strings with arguments.
-///
-/// # Example
-/// ```rust,ignore
-/// use std::collections::HashMap;
-/// use yororen_ui::{t, tf};
-///
-/// let mut args = HashMap::new();
-/// args.insert("name", "World");
-/// args.insert("count", "5");
-/// let translated = tf!("items.count", &args);
-/// ```
-#[macro_export]
-macro_rules! tf {
-    ($key:expr, $args:expr) => {{ $key }};
-}
-
-/// Macro for plural forms.
-///
-/// # Example
-/// ```rust,ignore
-/// use yororen_ui::tn;
-///
-/// let translated = tn!("items.count", n = 5);
-/// ```
-#[macro_export]
-macro_rules! tn {
-    ($key:expr, n = $n:expr) => {{ $key }};
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
