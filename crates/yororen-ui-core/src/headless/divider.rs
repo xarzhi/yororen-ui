@@ -1,6 +1,6 @@
 //! Headless `divider` — a thin visual line. No state.
 
-use gpui::{Div, ElementId, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct DividerProps {

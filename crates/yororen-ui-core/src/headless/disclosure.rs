@@ -2,7 +2,10 @@
 
 use std::sync::Arc;
 
-use gpui::{App, ClickEvent, Div, ElementId, Stateful, StatefulInteractiveElement, Window};
+use gpui::{
+    App, ClickEvent, Div, ElementId, InteractiveElement, Stateful, StatefulInteractiveElement,
+    Window,
+};
 
 pub type ClickCallback = Arc<dyn Fn(&ClickEvent, &mut Window, &mut App) + Send + Sync>;
 
@@ -15,7 +18,11 @@ pub struct DisclosureProps {
     pub on_toggle: Option<ClickCallback>,
 }
 
-pub fn disclosure(id: impl Into<ElementId>, title: impl Into<String>, _cx: &mut App) -> DisclosureProps {
+pub fn disclosure(
+    id: impl Into<ElementId>,
+    title: impl Into<String>,
+    _cx: &mut App,
+) -> DisclosureProps {
     DisclosureProps {
         id: id.into(),
         title: title.into(),
@@ -36,7 +43,7 @@ impl DisclosureProps {
     }
     pub fn on_toggle<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(&ClickEvent, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&ClickEvent, &mut Window, &mut App),
     {
         self.on_toggle = Some(Arc::new(f));
         self

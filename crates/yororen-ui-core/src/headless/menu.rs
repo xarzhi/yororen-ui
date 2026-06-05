@@ -3,7 +3,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, Entity, SharedString, Stateful};
+use gpui::{App, AppContext, Div, ElementId, Entity, InteractiveElement, SharedString, Stateful};
 
 use super::dropdown_menu::{DropdownItem, DropdownMenuItem, DropdownSelectCallback};
 
@@ -15,8 +15,8 @@ pub struct MenuState {
 }
 
 impl MenuState {
-    pub fn new(cx: &mut App) -> Entity<Self> {
-        cx.new(|_| Self {
+    pub fn new(app: &mut App) -> Entity<Self> {
+        app.new(|_| Self {
             highlighted_index: None,
             items: Vec::new(),
             on_select: None,
@@ -58,7 +58,7 @@ impl MenuState {
     }
     pub fn set_on_select<F>(&mut self, f: F)
     where
-        F: 'static + Fn(SharedString, &mut gpui::Window, &mut App),
+        F: 'static + Send + Sync + Fn(SharedString, &mut gpui::Window, &mut App),
     {
         self.on_select = Some(Arc::new(f));
     }
@@ -81,7 +81,10 @@ pub struct MenuProps {
 }
 
 pub fn menu(id: impl Into<ElementId>, state: Entity<MenuState>) -> MenuProps {
-    MenuProps { id: id.into(), state }
+    MenuProps {
+        id: id.into(),
+        state,
+    }
 }
 
 impl MenuProps {

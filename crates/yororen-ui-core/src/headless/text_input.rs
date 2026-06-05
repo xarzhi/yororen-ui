@@ -7,7 +7,10 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, FocusHandle, Stateful, StatefulInteractiveElement, Window};
+use gpui::{
+    App, Div, ElementId, FocusHandle, InteractiveElement, Stateful, StatefulInteractiveElement,
+    Window,
+};
 
 pub type TextChangeCallback = Arc<dyn Fn(String, &mut Window, &mut App)>;
 
@@ -61,14 +64,14 @@ impl TextInputProps {
     }
     pub fn on_change<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(String, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(String, &mut Window, &mut App),
     {
         self.on_change = Some(Arc::new(f));
         self
     }
     pub fn on_submit<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(String, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(String, &mut Window, &mut App),
     {
         self.on_submit = Some(Arc::new(f));
         self

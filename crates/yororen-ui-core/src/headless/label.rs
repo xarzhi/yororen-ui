@@ -1,6 +1,6 @@
 //! Headless `label` — pure text + flag set, no visual.
 
-use gpui::{App, Div, ElementId, Stateful};
+use gpui::{App, Div, ElementId, InteractiveElement, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct LabelProps {

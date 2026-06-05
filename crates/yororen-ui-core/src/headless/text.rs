@@ -1,6 +1,6 @@
 //! Headless `text` — a typed text span. No state.
 
-use gpui::{Div, ElementId, SharedString, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct TextProps {
@@ -9,7 +9,11 @@ pub struct TextProps {
     pub size: Option<gpui::Pixels>,
 }
 
-pub fn text(id: impl Into<ElementId>, text: impl Into<SharedString>, _cx: &mut gpui::App) -> TextProps {
+pub fn text(
+    id: impl Into<ElementId>,
+    text: impl Into<SharedString>,
+    _cx: &mut gpui::App,
+) -> TextProps {
     TextProps {
         id: id.into(),
         text: text.into(),

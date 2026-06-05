@@ -3,10 +3,12 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, MouseButton, Stateful, StatefulInteractiveElement, Window};
+use gpui::{
+    App, Div, ElementId, InteractiveElement, MouseButton, Stateful, StatefulInteractiveElement,
+    Window,
+};
 
-pub type ContextMenuCallback =
-    Arc<dyn Fn(&gpui::Point<gpui::Pixels>, &mut gpui::Window, &mut App)>;
+pub type ContextMenuCallback = Arc<dyn Fn(&gpui::Point<gpui::Pixels>, &mut gpui::Window, &mut App)>;
 
 #[derive(Clone)]
 pub struct ContextMenuTriggerProps {
@@ -15,10 +17,7 @@ pub struct ContextMenuTriggerProps {
     pub on_show: Option<ContextMenuCallback>,
 }
 
-pub fn context_menu_trigger(
-    id: impl Into<ElementId>,
-    _cx: &mut App,
-) -> ContextMenuTriggerProps {
+pub fn context_menu_trigger(id: impl Into<ElementId>, _cx: &mut App) -> ContextMenuTriggerProps {
     ContextMenuTriggerProps {
         id: id.into(),
         disabled: false,
@@ -33,7 +32,7 @@ impl ContextMenuTriggerProps {
     }
     pub fn on_show<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(&gpui::Point<gpui::Pixels>, &mut gpui::Window, &mut App),
+        F: 'static + Send + Sync + Fn(&gpui::Point<gpui::Pixels>, &mut gpui::Window, &mut App),
     {
         self.on_show = Some(Arc::new(f));
         self

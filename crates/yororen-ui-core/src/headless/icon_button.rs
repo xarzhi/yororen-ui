@@ -4,10 +4,12 @@
 use std::sync::Arc;
 
 use gpui::{
-    App, ClickEvent, Div, ElementId, FocusHandle, Stateful, StatefulInteractiveElement, Window,
+    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
+    StatefulInteractiveElement, Window,
 };
 
-use crate::component::ClickCallback;
+/// Click handler shared by every interactive headless primitive.
+pub type ClickCallback = Arc<dyn Fn(&ClickEvent, &mut Window, &mut App) + Send + Sync>;
 
 #[derive(Clone)]
 pub struct IconButtonProps {
@@ -35,7 +37,7 @@ impl IconButtonProps {
     }
     pub fn on_click<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(&ClickEvent, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&ClickEvent, &mut Window, &mut App),
     {
         self.on_click = Some(Arc::new(f));
         self
@@ -50,9 +52,7 @@ impl IconButtonProps {
         let on_click = self.on_click.clone();
         let disabled = self.disabled;
         let s = el.id(self.id.clone()).track_focus(&focus_handle);
-        if !disabled
-            && let Some(f) = on_click
-        {
+        if !disabled && let Some(f) = on_click {
             s.on_click(move |ev, window, cx| f(ev, window, cx))
         } else {
             s

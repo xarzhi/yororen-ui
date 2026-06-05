@@ -1,6 +1,6 @@
 //! Headless `progress` — a value in [0, max] with optional label.
 
-use gpui::{App, Div, ElementId, Stateful};
+use gpui::{App, Div, ElementId, InteractiveElement, Stateful};
 
 pub type ProgressCallback = std::sync::Arc<dyn Fn(f32, &mut gpui::Window, &mut gpui::App)>;
 

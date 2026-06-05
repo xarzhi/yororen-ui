@@ -1,7 +1,7 @@
 //! Headless `button_group` — horizontal/vertical cluster of
 //! buttons. No state of its own; the caller composes children.
 
-use gpui::{Div, ElementId, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, Stateful};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum ButtonGroupOrientation {

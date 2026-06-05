@@ -2,11 +2,14 @@
 
 use std::sync::Arc;
 
-use gpui::{App, ClickEvent, Div, ElementId, FocusHandle, SharedString, Stateful};
+use gpui::{
+    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, SharedString, Stateful,
+    StatefulInteractiveElement,
+};
 
 pub type ClickCallback = Arc<dyn Fn(&ClickEvent, &mut gpui::Window, &mut App) + Send + Sync>;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct TreeNodeId(pub SharedString);
 
 impl TreeNodeId {
@@ -86,14 +89,14 @@ impl TreeItemProps {
     }
     pub fn on_click<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(&ClickEvent, &mut gpui::Window, &mut App),
+        F: 'static + Send + Sync + Fn(&ClickEvent, &mut gpui::Window, &mut App),
     {
         self.on_click = Some(Arc::new(f));
         self
     }
     pub fn on_toggle<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(&ClickEvent, &mut gpui::Window, &mut App),
+        F: 'static + Send + Sync + Fn(&ClickEvent, &mut gpui::Window, &mut App),
     {
         self.on_toggle = Some(Arc::new(f));
         self

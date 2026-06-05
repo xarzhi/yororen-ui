@@ -1,6 +1,6 @@
 //! Headless `heading` — a typographic level + text. No visual.
 
-use gpui::{Div, ElementId, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, Stateful};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum HeadingLevel {

@@ -3,7 +3,8 @@
 use std::sync::Arc;
 
 use gpui::{
-    App, ClickEvent, Div, ElementId, Stateful, StatefulInteractiveElement, Window,
+    App, ClickEvent, Div, ElementId, InteractiveElement, Stateful, StatefulInteractiveElement,
+    Window,
 };
 
 pub type ClickCallback = Arc<dyn Fn(&ClickEvent, &mut Window, &mut App) + Send + Sync>;
@@ -26,7 +27,7 @@ pub fn clickable_surface(id: impl Into<ElementId>, _cx: &mut App) -> ClickableSu
 impl ClickableSurfaceProps {
     pub fn on_click<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(&ClickEvent, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&ClickEvent, &mut Window, &mut App),
     {
         self.on_click = Some(Arc::new(f));
         self

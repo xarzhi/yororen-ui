@@ -1,7 +1,7 @@
 //! Headless `list_item` — a single row in a list. Pure data
 //! carrier; visual lives in the renderer.
 
-use gpui::{Div, ElementId, SharedString, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct ListItemProps {
@@ -14,7 +14,11 @@ pub struct ListItemProps {
     pub disabled: bool,
 }
 
-pub fn list_item(id: impl Into<ElementId>, title: impl Into<SharedString>, _cx: &mut gpui::App) -> ListItemProps {
+pub fn list_item(
+    id: impl Into<ElementId>,
+    title: impl Into<SharedString>,
+    _cx: &mut gpui::App,
+) -> ListItemProps {
     ListItemProps {
         id: id.into(),
         title: title.into(),

@@ -1,6 +1,6 @@
 //! Headless `spacer` — flexible empty space. No state.
 
-use gpui::{Div, ElementId, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct SpacerProps {

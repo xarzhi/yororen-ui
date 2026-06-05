@@ -1,6 +1,6 @@
 //! Headless `image` — a `gpui::img` with id + alt. No state.
 
-use gpui::{Div, ElementId, SharedString, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct ImageProps {

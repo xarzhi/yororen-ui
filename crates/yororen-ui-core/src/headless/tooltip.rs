@@ -2,7 +2,10 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Bounds, Div, ElementId, Entity, Pixels, Size, Stateful, Window};
+use gpui::{
+    App, AppContext, Bounds, Div, ElementId, Entity, InteractiveElement, Pixels, Size, Stateful,
+    Window,
+};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum TooltipPlacement {
@@ -24,8 +27,8 @@ pub struct TooltipState {
 }
 
 impl TooltipState {
-    pub fn new(cx: &mut App) -> Entity<Self> {
-        cx.new(|_| Self {
+    pub fn new(app: &mut App) -> Entity<Self> {
+        app.new(|_| Self {
             open: false,
             placement: TooltipPlacement::Bottom,
             delay_ms: 400,
@@ -52,7 +55,7 @@ impl TooltipState {
     }
     pub fn set_on_close<F>(&mut self, f: F)
     where
-        F: 'static + Fn(&mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&mut Window, &mut App),
     {
         self.on_close = Some(Arc::new(f));
     }

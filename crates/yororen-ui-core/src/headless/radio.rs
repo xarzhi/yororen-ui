@@ -4,7 +4,8 @@
 use std::sync::Arc;
 
 use gpui::{
-    App, ClickEvent, Div, ElementId, FocusHandle, Stateful, StatefulInteractiveElement, Window,
+    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
+    StatefulInteractiveElement, Window,
 };
 
 use super::switch::ToggleCallback;
@@ -56,7 +57,7 @@ impl RadioProps {
     }
     pub fn on_toggle<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(bool, Option<&ClickEvent>, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(bool, Option<&ClickEvent>, &mut Window, &mut App),
     {
         self.on_toggle = Some(Arc::new(f));
         self

@@ -1,6 +1,9 @@
 //! Headless `tag` — closeable inline label.
 
-use gpui::{App, ClickEvent, Div, ElementId, FocusHandle, Stateful, StatefulInteractiveElement, Window};
+use gpui::{
+    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
+    StatefulInteractiveElement, Window,
+};
 
 use std::sync::Arc;
 
@@ -38,14 +41,14 @@ impl TagProps {
     }
     pub fn on_click<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(&ClickEvent, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&ClickEvent, &mut Window, &mut App),
     {
         self.on_click = Some(Arc::new(f));
         self
     }
     pub fn on_close<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(&ClickEvent, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&ClickEvent, &mut Window, &mut App),
     {
         self.on_close = Some(Arc::new(f));
         self

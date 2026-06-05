@@ -1,7 +1,7 @@
 //! Headless `panel` — generic container with optional title. No
 //! state of its own; the caller composes the content.
 
-use gpui::{Div, ElementId, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct PanelProps {

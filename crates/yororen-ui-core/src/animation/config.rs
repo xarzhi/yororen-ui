@@ -83,16 +83,14 @@ impl AnimationConfig {
         animation
     }
 
-    /// Build an `AnimationConfig` from a theme's `MotionTokens`.
-    /// This is the unified entry point — duration comes from
-    /// `tokens.motion.duration_normal` and easing from
-    /// `tokens.motion.easing_standard`. Components should call this
-    /// instead of independently reading
-    /// `animation::constants::duration::*` and `easing::*`.
-    pub fn from_motion(motion: &crate::theme::tokens::MotionTokens) -> Self {
+    /// Build an `AnimationConfig` from a `Duration` + easing pair.
+    /// Theme-aware callers in `yororen-ui-renderer` read
+    /// `tokens.motion.{duration_normal, easing_standard}` and pass
+    /// them through here.
+    pub fn from_motion(duration: std::time::Duration, easing: EasingFn) -> Self {
         Self {
-            duration: motion.duration_normal,
-            easing: motion.easing_standard,
+            duration,
+            easing,
             repeat: false,
         }
     }

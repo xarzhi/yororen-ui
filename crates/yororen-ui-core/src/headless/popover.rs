@@ -4,7 +4,10 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Bounds, Div, ElementId, Entity, Pixels, Point, Size, Stateful};
+use gpui::{
+    App, AppContext, Bounds, Div, ElementId, Entity, InteractiveElement, Pixels, Point, Size,
+    Stateful,
+};
 
 /// Preferred placement of a popover relative to its trigger.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -43,8 +46,8 @@ pub struct PopoverState {
 pub type CloseFn = Arc<dyn Fn(&mut gpui::Window, &mut App) + Send + Sync>;
 
 impl PopoverState {
-    pub fn new(cx: &mut App) -> Entity<Self> {
-        cx.new(|_| Self {
+    pub fn new(app: &mut App) -> Entity<Self> {
+        app.new(|_| Self {
             open: false,
             placement: PopoverPlacement::default(),
             width: None,
@@ -82,7 +85,7 @@ impl PopoverState {
     }
     pub fn set_on_close<F>(&mut self, f: F)
     where
-        F: 'static + Fn(&mut gpui::Window, &mut App),
+        F: 'static + Send + Sync + Fn(&mut gpui::Window, &mut App),
     {
         self.on_close = Some(Arc::new(f));
     }

@@ -1,6 +1,6 @@
 //! Headless `icon` — a `gpui::svg` with id. No state.
 
-use gpui::{Div, ElementId, SharedString, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct IconProps {

@@ -4,7 +4,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, Entity, FocusHandle, Stateful};
+use gpui::{App, AppContext, Div, ElementId, Entity, FocusHandle, InteractiveElement, Stateful};
 
 /// Reason a modal was closed. Forwarded to the caller's
 /// `on_close` so it can branch.
@@ -32,8 +32,8 @@ pub struct ModalState {
 }
 
 impl ModalState {
-    pub fn new(cx: &mut App) -> Entity<Self> {
-        cx.new(|_| Self {
+    pub fn new(app: &mut App) -> Entity<Self> {
+        app.new(|_| Self {
             open: false,
             dismiss_on_escape: true,
             dismiss_on_scrim: true,
@@ -66,7 +66,7 @@ impl ModalState {
     }
     pub fn set_on_close<F>(&mut self, f: F)
     where
-        F: 'static + Fn(ModalCloseReason, &mut gpui::Window, &mut App),
+        F: 'static + Send + Sync + Fn(ModalCloseReason, &mut gpui::Window, &mut App),
     {
         self.on_close = Some(Arc::new(f));
     }

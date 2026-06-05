@@ -3,7 +3,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, Entity, SharedString, Stateful};
+use gpui::{App, AppContext, Div, ElementId, Entity, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct SelectOption {
@@ -26,8 +26,7 @@ impl SelectOption {
     }
 }
 
-pub type SelectChangeCallback =
-    Arc<dyn Fn(SharedString, &mut gpui::Window, &mut App)>;
+pub type SelectChangeCallback = Arc<dyn Fn(SharedString, &mut gpui::Window, &mut App)>;
 
 #[derive(Clone)]
 pub struct SelectState {
@@ -41,8 +40,8 @@ pub struct SelectState {
 }
 
 impl SelectState {
-    pub fn new(cx: &mut App) -> Entity<Self> {
-        cx.new(|_| Self {
+    pub fn new(app: &mut App) -> Entity<Self> {
+        app.new(|_| Self {
             open: false,
             value: None,
             options: Vec::new(),
@@ -96,7 +95,7 @@ impl SelectState {
     }
     pub fn set_on_change<F>(&mut self, f: F)
     where
-        F: 'static + Fn(SharedString, &mut gpui::Window, &mut App),
+        F: 'static + Send + Sync + Fn(SharedString, &mut gpui::Window, &mut App),
     {
         self.on_change = Some(Arc::new(f));
     }

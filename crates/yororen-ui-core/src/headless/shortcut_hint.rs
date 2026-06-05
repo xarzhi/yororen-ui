@@ -1,6 +1,6 @@
 //! Headless `shortcut_hint` — small inline `Label` + `KeybindingDisplay`.
 
-use gpui::{Div, ElementId, SharedString, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct ShortcutHintProps {

@@ -3,9 +3,10 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, SharedString, Stateful};
+use gpui::{App, Div, ElementId, InteractiveElement, SharedString, Stateful};
 
-pub type FormSubmitCallback = Arc<dyn Fn(HashMap<SharedString, String>, &mut gpui::Window, &mut App)>;
+pub type FormSubmitCallback =
+    Arc<dyn Fn(HashMap<SharedString, String>, &mut gpui::Window, &mut App)>;
 
 #[derive(Clone)]
 pub struct FormProps {
@@ -35,7 +36,7 @@ impl FormProps {
     }
     pub fn on_submit<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(HashMap<SharedString, String>, &mut gpui::Window, &mut App),
+        F: 'static + Send + Sync + Fn(HashMap<SharedString, String>, &mut gpui::Window, &mut App),
     {
         self.on_submit = Some(Arc::new(f));
         self

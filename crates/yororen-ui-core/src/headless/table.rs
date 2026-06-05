@@ -3,7 +3,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, SharedString, Stateful};
+use gpui::{App, Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 pub type TableCellValue = SharedString;
 
@@ -30,8 +30,7 @@ impl TableColumn {
 
 pub type TableRow = Vec<TableCellValue>;
 
-pub type TableSelectCallback =
-    Arc<dyn Fn(usize, &mut gpui::Window, &mut gpui::App)>;
+pub type TableSelectCallback = Arc<dyn Fn(usize, &mut gpui::Window, &mut gpui::App)>;
 
 #[derive(Clone)]
 pub struct TableProps {
@@ -75,7 +74,7 @@ impl TableProps {
     }
     pub fn on_select<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(usize, &mut gpui::Window, &mut gpui::App),
+        F: 'static + Send + Sync + Fn(usize, &mut gpui::Window, &mut gpui::App),
     {
         self.on_select_row = Some(Arc::new(f));
         self

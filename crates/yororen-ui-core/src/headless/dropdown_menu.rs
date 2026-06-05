@@ -3,7 +3,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, Entity, SharedString, Stateful};
+use gpui::{App, AppContext, Div, ElementId, Entity, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub enum DropdownItem {
@@ -51,8 +51,7 @@ pub struct DropdownMenuGroup {
     pub items: Vec<DropdownMenuItem>,
 }
 
-pub type DropdownSelectCallback =
-    Arc<dyn Fn(SharedString, &mut gpui::Window, &mut App)>;
+pub type DropdownSelectCallback = Arc<dyn Fn(SharedString, &mut gpui::Window, &mut App)>;
 
 #[derive(Clone)]
 pub struct DropdownMenuState {
@@ -64,8 +63,8 @@ pub struct DropdownMenuState {
 }
 
 impl DropdownMenuState {
-    pub fn new(cx: &mut App) -> Entity<Self> {
-        cx.new(|_| Self {
+    pub fn new(app: &mut App) -> Entity<Self> {
+        app.new(|_| Self {
             open: false,
             highlighted_index: None,
             dismiss_on_escape: true,
@@ -122,7 +121,7 @@ impl DropdownMenuState {
     }
     pub fn set_on_select<F>(&mut self, f: F)
     where
-        F: 'static + Fn(SharedString, &mut gpui::Window, &mut App),
+        F: 'static + Send + Sync + Fn(SharedString, &mut gpui::Window, &mut App),
     {
         self.on_select = Some(Arc::new(f));
     }
@@ -149,7 +148,10 @@ pub fn dropdown_menu(
     id: impl Into<ElementId>,
     state: Entity<DropdownMenuState>,
 ) -> DropdownMenuProps {
-    DropdownMenuProps { id: id.into(), state }
+    DropdownMenuProps {
+        id: id.into(),
+        state,
+    }
 }
 
 impl DropdownMenuProps {

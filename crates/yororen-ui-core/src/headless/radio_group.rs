@@ -3,7 +3,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, Stateful};
+use gpui::{App, Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 pub type RadioGroupCallback = Arc<dyn Fn(usize, &mut gpui::Window, &mut gpui::App)>;
 
@@ -35,7 +35,7 @@ impl RadioGroupProps {
     }
     pub fn on_change<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(usize, &mut gpui::Window, &mut gpui::App),
+        F: 'static + Send + Sync + Fn(usize, &mut gpui::Window, &mut gpui::App),
     {
         self.on_change = Some(Arc::new(f));
         self

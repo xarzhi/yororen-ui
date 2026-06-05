@@ -5,7 +5,7 @@
 
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
-use gpui::{App, Div, ElementId, SharedString, Stateful};
+use gpui::{App, Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 use super::tree_item::TreeNodeId;
 

@@ -4,7 +4,10 @@
 
 use std::sync::Arc;
 
-use gpui::{App, ClickEvent, Div, ElementId, Stateful, StatefulInteractiveElement, Window};
+use gpui::{
+    App, ClickEvent, Div, ElementId, InteractiveElement, Stateful, StatefulInteractiveElement,
+    Window,
+};
 
 pub type ClickCallback = Arc<dyn Fn(&ClickEvent, &mut Window, &mut App) + Send + Sync>;
 
@@ -18,7 +21,7 @@ pub struct SplitButtonProps {
 
 pub fn split_button(
     id: impl Into<ElementId>,
-    primary: impl 'static + Fn(&ClickEvent, &mut Window, &mut App),
+    primary: impl 'static + Send + Sync + Fn(&ClickEvent, &mut Window, &mut App),
     _cx: &mut App,
 ) -> SplitButtonProps {
     SplitButtonProps {
@@ -32,7 +35,7 @@ pub fn split_button(
 impl SplitButtonProps {
     pub fn on_secondary<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(&ClickEvent, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&ClickEvent, &mut Window, &mut App),
     {
         self.secondary = Some(Arc::new(f));
         self

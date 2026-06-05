@@ -1,6 +1,6 @@
 //! Headless `empty_state` — icon + title + description.
 
-use gpui::{Div, ElementId, SharedString, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct EmptyStateProps {

@@ -15,7 +15,8 @@ use gpui::{
     StatefulInteractiveElement, Window,
 };
 
-use crate::component::ClickCallback;
+/// Click handler shared by every interactive headless primitive.
+pub type ClickCallback = Arc<dyn Fn(&ClickEvent, &mut Window, &mut App) + Send + Sync>;
 
 /// Returns a `ButtonProps` with a fresh `FocusHandle` minted from `cx`.
 ///
@@ -51,7 +52,7 @@ impl ButtonProps {
 
     pub fn on_click<F>(mut self, listener: F) -> Self
     where
-        F: 'static + Fn(&ClickEvent, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&ClickEvent, &mut Window, &mut App),
     {
         self.on_click = Some(Arc::new(listener));
         self
@@ -76,7 +77,8 @@ impl ButtonProps {
         let disabled = self.disabled;
         let clickable = self.clickable;
         let s = el.id(self.id.clone()).track_focus(&focus_handle);
-        if clickable && !disabled
+        if clickable
+            && !disabled
             && let Some(f) = on_click
         {
             s.on_click(move |ev, window, cx| {

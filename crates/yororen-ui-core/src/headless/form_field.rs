@@ -2,7 +2,7 @@
 //! provides the input element as a child; the headless layer only
 //! owns the label and the error string.
 
-use gpui::{Div, ElementId, SharedString, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct FormFieldProps {

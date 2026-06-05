@@ -4,7 +4,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, Entity, SharedString, Stateful};
+use gpui::{App, AppContext, Div, ElementId, Entity, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct ListboxOption {
@@ -27,8 +27,7 @@ impl ListboxOption {
     }
 }
 
-pub type ListboxChangeCallback =
-    Arc<dyn Fn(SharedString, &mut gpui::Window, &mut App)>;
+pub type ListboxChangeCallback = Arc<dyn Fn(SharedString, &mut gpui::Window, &mut App)>;
 
 #[derive(Clone)]
 pub struct ListboxState {
@@ -39,8 +38,8 @@ pub struct ListboxState {
 }
 
 impl ListboxState {
-    pub fn new(cx: &mut App) -> Entity<Self> {
-        cx.new(|_| Self {
+    pub fn new(app: &mut App) -> Entity<Self> {
+        app.new(|_| Self {
             options: Vec::new(),
             highlighted_index: None,
             selected_value: None,
@@ -77,7 +76,7 @@ impl ListboxState {
     }
     pub fn set_on_change<F>(&mut self, f: F)
     where
-        F: 'static + Fn(SharedString, &mut gpui::Window, &mut App),
+        F: 'static + Send + Sync + Fn(SharedString, &mut gpui::Window, &mut App),
     {
         self.on_change = Some(Arc::new(f));
     }
@@ -101,7 +100,10 @@ pub struct ListboxProps {
 }
 
 pub fn listbox(id: impl Into<ElementId>, state: Entity<ListboxState>) -> ListboxProps {
-    ListboxProps { id: id.into(), state }
+    ListboxProps {
+        id: id.into(),
+        state,
+    }
 }
 
 impl ListboxProps {

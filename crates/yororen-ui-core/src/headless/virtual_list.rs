@@ -1,7 +1,7 @@
 //! Headless `virtual_list` — wraps `gpui::list` with id and a
 //! count. The caller passes a render-item closure to the renderer.
 
-use gpui::{Div, ElementId, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct VirtualListProps {
@@ -10,7 +10,11 @@ pub struct VirtualListProps {
     pub overdraw_px: Option<f32>,
 }
 
-pub fn virtual_list(id: impl Into<ElementId>, item_count: usize, _cx: &mut gpui::App) -> VirtualListProps {
+pub fn virtual_list(
+    id: impl Into<ElementId>,
+    item_count: usize,
+    _cx: &mut gpui::App,
+) -> VirtualListProps {
     VirtualListProps {
         id: id.into(),
         item_count,

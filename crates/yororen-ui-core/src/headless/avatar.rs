@@ -1,6 +1,6 @@
 //! Headless `avatar` — image or initials in a circle.
 
-use gpui::{Div, ElementId, SharedString, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct AvatarProps {

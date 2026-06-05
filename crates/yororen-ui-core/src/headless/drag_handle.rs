@@ -2,7 +2,9 @@
 //! headless layer only owns the element id and the value; gpui's
 //! `on_drag` is wired in the renderer.
 
-use gpui::{Any, Div, ElementId, Stateful};
+use std::any::Any;
+
+use gpui::{Div, ElementId, InteractiveElement, Stateful};
 
 pub struct DragHandleProps {
     pub id: ElementId,

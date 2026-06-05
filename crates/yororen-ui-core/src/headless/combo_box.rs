@@ -3,7 +3,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, Entity, SharedString, Stateful};
+use gpui::{App, AppContext, Div, ElementId, Entity, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct ComboBoxOption {
@@ -20,8 +20,7 @@ impl ComboBoxOption {
     }
 }
 
-pub type ComboBoxChangeCallback =
-    Arc<dyn Fn(SharedString, &mut gpui::Window, &mut App)>;
+pub type ComboBoxChangeCallback = Arc<dyn Fn(SharedString, &mut gpui::Window, &mut App)>;
 
 #[derive(Clone)]
 pub struct ComboBoxState {
@@ -36,8 +35,8 @@ pub struct ComboBoxState {
 }
 
 impl ComboBoxState {
-    pub fn new(cx: &mut App) -> Entity<Self> {
-        cx.new(|_| Self {
+    pub fn new(app: &mut App) -> Entity<Self> {
+        app.new(|_| Self {
             open: false,
             text: String::new(),
             value: None,
@@ -105,7 +104,7 @@ impl ComboBoxState {
     }
     pub fn set_on_change<F>(&mut self, f: F)
     where
-        F: 'static + Fn(SharedString, &mut gpui::Window, &mut App),
+        F: 'static + Send + Sync + Fn(SharedString, &mut gpui::Window, &mut App),
     {
         self.on_change = Some(Arc::new(f));
     }

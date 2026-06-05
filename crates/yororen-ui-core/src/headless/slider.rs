@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, Stateful, StatefulInteractiveElement, Window};
+use gpui::{App, Div, ElementId, InteractiveElement, Stateful, StatefulInteractiveElement, Window};
 
 pub type SliderCallback = Arc<dyn Fn(f32, &mut Window, &mut App)>;
 
@@ -49,7 +49,7 @@ impl SliderProps {
     }
     pub fn on_change<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(f32, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(f32, &mut Window, &mut App),
     {
         self.on_change = Some(Arc::new(f));
         self

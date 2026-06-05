@@ -4,7 +4,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, FocusHandle, Stateful};
+use gpui::{App, Div, ElementId, FocusHandle, InteractiveElement, Stateful};
 
 /// Reason an overlay was closed. Forwarded to the caller's
 /// `on_close` callback so the caller can branch on the cause.
@@ -54,7 +54,7 @@ impl OverlayProps {
     }
     pub fn on_close<F>(mut self, f: F) -> Self
     where
-        F: 'static + Fn(OverlayCloseReason, &mut gpui::Window, &mut App),
+        F: 'static + Send + Sync + Fn(OverlayCloseReason, &mut gpui::Window, &mut App),
     {
         self.on_close = Some(Arc::new(f));
         self

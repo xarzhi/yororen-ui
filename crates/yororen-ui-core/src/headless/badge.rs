@@ -1,6 +1,6 @@
 //! Headless `badge` — small inline label with a variant flag set.
 
-use gpui::{Div, ElementId, SharedString, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct BadgeProps {
@@ -20,11 +20,7 @@ pub enum BadgeVariant {
     Info,
 }
 
-pub fn badge(
-    id: impl Into<ElementId>,
-    text: impl Into<String>,
-    _cx: &mut gpui::App,
-) -> BadgeProps {
+pub fn badge(id: impl Into<ElementId>, text: impl Into<String>, _cx: &mut gpui::App) -> BadgeProps {
     BadgeProps {
         id: id.into(),
         text: text.into(),

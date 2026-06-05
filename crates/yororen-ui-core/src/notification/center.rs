@@ -11,7 +11,16 @@ use gpui::{AnyWindowHandle, AppContext, ClickEvent, Global, SharedString, Window
 use serde::{Deserialize, Serialize};
 use serde_json::Value as JsonValue;
 
-use crate::component::ToastKind;
+/// Visual class of a toast / notification. The headless layer only
+/// carries the tag; the renderer maps it to a concrete color.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+pub enum ToastKind {
+    Neutral,
+    Success,
+    Warning,
+    Error,
+    Info,
+}
 
 /// Opaque, monotonically-increasing identifier for a notification.
 ///
