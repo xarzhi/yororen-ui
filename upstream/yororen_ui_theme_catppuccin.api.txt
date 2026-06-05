@@ -112,13 +112,13 @@ pub fn yororen_ui_theme_catppuccin::palette::dark_scrim() -> gpui::color::Hsla
 pub fn yororen_ui_theme_catppuccin::palette::with_alpha(gpui::color::Hsla, f32) -> gpui::color::Hsla
 pub mod yororen_ui_theme_catppuccin::renderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer
-impl yororen_ui_core::renderer::avatar::AvatarRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer::border_radius(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer::default_bg(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer::status_border_color(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer::status_border_w(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer::status_dot_size(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer::status_inset(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::avatar::AvatarRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer::border_radius(&self, &yororen_ui_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer::default_bg(&self, &yororen_ui_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer::status_border_color(&self, &yororen_ui_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer::status_border_w(&self, &yororen_ui_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer::status_dot_size(&self, &yororen_ui_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer::status_inset(&self, &yororen_ui_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer
@@ -127,14 +127,14 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinAvatarRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer
-impl yororen_ui_core::renderer::badge::BadgeRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::bg(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::border_radius(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::fg(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::font_size(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::font_weight(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::height(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::padding_x(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::badge::BadgeRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::bg(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::border_radius(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::fg(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::font_size(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::font_weight(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::text_system::FontWeight
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::height(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer::padding_x(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer
@@ -143,15 +143,15 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinBadgeRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer
-impl yororen_ui_core::renderer::button::ButtonRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::bg(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::border(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> core::option::Option<yororen_ui_core::renderer::spec::BorderSpec>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::border_radius(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::fg(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::min_height(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::padding(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::shadow(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> core::option::Option<yororen_ui_core::renderer::spec::ShadowSpec>
+impl yororen_ui_renderer::renderers::button::ButtonRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::bg(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::border(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> core::option::Option<yororen_ui_renderer::renderers::spec::BorderSpec>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::border_radius(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::disabled_opacity(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::fg(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::min_height(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::padding(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer::shadow(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> core::option::Option<yororen_ui_renderer::renderers::spec::ShadowSpec>
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer
@@ -160,12 +160,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinButtonRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer
-impl yororen_ui_core::renderer::card::CardRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer::bg(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer::border(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer::border_radius(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer::padding(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_renderer::renderers::card::CardRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer::bg(&self, &yororen_ui_renderer::renderers::card::CardRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer::border(&self, &yororen_ui_renderer::renderers::card::CardRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer::border_radius(&self, &yororen_ui_renderer::renderers::card::CardRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer::padding(&self, &yororen_ui_renderer::renderers::card::CardRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer::shadow_alpha(&self, &yororen_ui_renderer::renderers::card::CardRenderState, &yororen_ui_renderer::theme::Theme) -> f32
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer
@@ -174,15 +174,15 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinCardRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer
-impl yororen_ui_core::renderer::checkbox::CheckboxRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::box_bg(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::box_border(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::box_hover_bg(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::box_size(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::check_fg(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::check_size(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::focus_color(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::checkbox::CheckboxRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::box_bg(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::box_border(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::box_hover_bg(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::box_size(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::check_fg(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::check_size(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::disabled_opacity(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer::focus_color(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer
@@ -191,15 +191,15 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinCheckboxRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer
-impl yororen_ui_core::renderer::combo_box::ComboBoxRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::bg(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::border(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::border_radius(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::fg(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::focus_border(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::min_height(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::padding(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::search_bg(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::combo_box::ComboBoxRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::bg(&self, &yororen_ui_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::border(&self, &yororen_ui_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::border_radius(&self, &yororen_ui_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::fg(&self, &yororen_ui_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::focus_border(&self, &yororen_ui_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::min_height(&self, &yororen_ui_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::padding(&self, &yororen_ui_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer::search_bg(&self, &yororen_ui_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer
@@ -208,14 +208,14 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinComboBoxRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer
-impl yororen_ui_core::renderer::disclosure::DisclosureRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::body_padding(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::border_radius(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::chevron_rotation(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::min_height(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::trigger_bg(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::trigger_fg(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::trigger_hover_bg(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::disclosure::DisclosureRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::body_padding(&self, &yororen_ui_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::border_radius(&self, &yororen_ui_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::chevron_rotation(&self, &yororen_ui_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::min_height(&self, &yororen_ui_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::trigger_bg(&self, &yororen_ui_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::trigger_fg(&self, &yororen_ui_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer::trigger_hover_bg(&self, &yororen_ui_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer
@@ -224,9 +224,9 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinDisclosureRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinDividerRenderer
-impl yororen_ui_core::renderer::divider::DividerRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinDividerRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDividerRenderer::color(&self, &yororen_ui_core::renderer::divider::DividerRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDividerRenderer::thickness(&self, &yororen_ui_core::renderer::divider::DividerRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::divider::DividerRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinDividerRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDividerRenderer::color(&self, &yororen_ui_renderer::renderers::divider::DividerRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDividerRenderer::thickness(&self, &yororen_ui_renderer::renderers::divider::DividerRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinDividerRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinDividerRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinDividerRenderer
@@ -235,13 +235,13 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinDividerRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinDividerRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer
-impl yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer::border_radius(&self, &yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer::chevron_rotation(&self, &yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer::min_height(&self, &yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer::trigger_bg(&self, &yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer::trigger_fg(&self, &yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer::trigger_hover_bg(&self, &yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::dropdown_menu::DropdownMenuRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer::border_radius(&self, &yororen_ui_renderer::renderers::dropdown_menu::DropdownMenuRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer::chevron_rotation(&self, &yororen_ui_renderer::renderers::dropdown_menu::DropdownMenuRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer::min_height(&self, &yororen_ui_renderer::renderers::dropdown_menu::DropdownMenuRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer::trigger_bg(&self, &yororen_ui_renderer::renderers::dropdown_menu::DropdownMenuRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer::trigger_fg(&self, &yororen_ui_renderer::renderers::dropdown_menu::DropdownMenuRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer::trigger_hover_bg(&self, &yororen_ui_renderer::renderers::dropdown_menu::DropdownMenuRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer
@@ -250,13 +250,13 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinDropdownMenuRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer
-impl yororen_ui_core::renderer::empty_state::EmptyStateRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer::body_color(&self, &yororen_ui_core::renderer::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer::gap(&self, &yororen_ui_core::renderer::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer::icon_color(&self, &yororen_ui_core::renderer::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer::icon_size(&self, &yororen_ui_core::renderer::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer::padding(&self, &yororen_ui_core::renderer::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer::title_color(&self, &yororen_ui_core::renderer::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::empty_state::EmptyStateRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer::body_color(&self, &yororen_ui_renderer::renderers::empty_state::EmptyStateRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer::gap(&self, &yororen_ui_renderer::renderers::empty_state::EmptyStateRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer::icon_color(&self, &yororen_ui_renderer::renderers::empty_state::EmptyStateRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer::icon_size(&self, &yororen_ui_renderer::renderers::empty_state::EmptyStateRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer::padding(&self, &yororen_ui_renderer::renderers::empty_state::EmptyStateRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer::title_color(&self, &yororen_ui_renderer::renderers::empty_state::EmptyStateRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer
@@ -265,17 +265,17 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinEmptyStateRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer
-impl yororen_ui_core::renderer::file_path_input::FilePathInputRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::action_gap(&self, &yororen_ui_core::renderer::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::bg(&self, &yororen_ui_core::renderer::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::border(&self, &yororen_ui_core::renderer::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::border_radius(&self, &yororen_ui_core::renderer::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::button_bg(&self, &yororen_ui_core::renderer::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::button_fg(&self, &yororen_ui_core::renderer::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::focus_border(&self, &yororen_ui_core::renderer::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::icon_size(&self, &yororen_ui_core::renderer::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::min_height(&self, &yororen_ui_core::renderer::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::padding(&self, &yororen_ui_core::renderer::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+impl yororen_ui_renderer::renderers::file_path_input::FilePathInputRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::action_gap(&self, &yororen_ui_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::bg(&self, &yororen_ui_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::border(&self, &yororen_ui_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::border_radius(&self, &yororen_ui_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::button_bg(&self, &yororen_ui_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::button_fg(&self, &yororen_ui_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::focus_border(&self, &yororen_ui_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::icon_size(&self, &yororen_ui_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::min_height(&self, &yororen_ui_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer::padding(&self, &yororen_ui_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer
@@ -284,9 +284,9 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinFilePathInputRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinFocusRingRenderer
-impl yororen_ui_core::renderer::focus_ring::FocusRingRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinFocusRingRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFocusRingRenderer::color(&self, &yororen_ui_core::renderer::focus_ring::FocusRingRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFocusRingRenderer::width(&self, &yororen_ui_core::renderer::focus_ring::FocusRingRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::focus_ring::FocusRingRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinFocusRingRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFocusRingRenderer::color(&self, &yororen_ui_renderer::renderers::focus_ring::FocusRingRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFocusRingRenderer::width(&self, &yororen_ui_renderer::renderers::focus_ring::FocusRingRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinFocusRingRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinFocusRingRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinFocusRingRenderer
@@ -295,11 +295,11 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinFocusRingRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinFocusRingRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer
-impl yororen_ui_core::renderer::form::FormRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer::error_color(&self, &yororen_ui_core::renderer::form::FormRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer::gap(&self, &yororen_ui_core::renderer::form::FormRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer::helper_color(&self, &yororen_ui_core::renderer::form::FormRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer::label_color(&self, &yororen_ui_core::renderer::form::FormRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::form::FormRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer::error_color(&self, &yororen_ui_renderer::renderers::form::FormRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer::gap(&self, &yororen_ui_renderer::renderers::form::FormRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer::helper_color(&self, &yororen_ui_renderer::renderers::form::FormRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer::label_color(&self, &yororen_ui_renderer::renderers::form::FormRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer
@@ -308,10 +308,10 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinFormRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer
-impl yororen_ui_core::renderer::heading::HeadingRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer::color(&self, &yororen_ui_core::renderer::heading::HeadingRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer::size(&self, &yororen_ui_core::renderer::heading::HeadingRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer::weight(&self, &yororen_ui_core::renderer::heading::HeadingRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
+impl yororen_ui_renderer::renderers::heading::HeadingRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer::color(&self, &yororen_ui_renderer::renderers::heading::HeadingRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer::size(&self, &yororen_ui_renderer::renderers::heading::HeadingRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer::weight(&self, &yororen_ui_renderer::renderers::heading::HeadingRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::text_system::FontWeight
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer
@@ -320,12 +320,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinHeadingRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer
-impl yororen_ui_core::renderer::icon_button::IconButtonRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer::bg(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer::border_radius(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer::hover_bg(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer::size(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::icon_button::IconButtonRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer::bg(&self, &yororen_ui_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer::border_radius(&self, &yororen_ui_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer::disabled_opacity(&self, &yororen_ui_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer::hover_bg(&self, &yororen_ui_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer::size(&self, &yororen_ui_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer
@@ -334,17 +334,17 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinIconButtonRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer
-impl yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::bg(&self, &yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::border(&self, &yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::border_radius(&self, &yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::focus_border(&self, &yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::icon_size(&self, &yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::kbd_bg(&self, &yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::kbd_fg(&self, &yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::kbd_min_width(&self, &yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::kbd_padding(&self, &yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::min_height(&self, &yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::keybinding_input::KeybindingInputRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::bg(&self, &yororen_ui_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::border(&self, &yororen_ui_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::border_radius(&self, &yororen_ui_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::focus_border(&self, &yororen_ui_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::icon_size(&self, &yororen_ui_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::kbd_bg(&self, &yororen_ui_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::kbd_fg(&self, &yororen_ui_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::kbd_min_width(&self, &yororen_ui_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::kbd_padding(&self, &yororen_ui_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer::min_height(&self, &yororen_ui_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer
@@ -353,10 +353,10 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinKeybindingInputRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer
-impl yororen_ui_core::renderer::label::LabelRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer::color(&self, &yororen_ui_core::renderer::label::LabelRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer::family_mono(&self, &yororen_ui_core::renderer::label::LabelRenderState, &yororen_ui_core::theme::Theme) -> gpui::shared_string::SharedString
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer::strong_weight(&self, &yororen_ui_core::renderer::label::LabelRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
+impl yororen_ui_renderer::renderers::label::LabelRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer::color(&self, &yororen_ui_renderer::renderers::label::LabelRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer::family_mono(&self, &yororen_ui_renderer::renderers::label::LabelRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::shared_string::SharedString
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer::strong_weight(&self, &yororen_ui_renderer::renderers::label::LabelRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::text_system::FontWeight
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer
@@ -365,14 +365,14 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinLabelRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer
-impl yororen_ui_core::renderer::list_item::ListItemRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::bg(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::border_radius(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::fg(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::hover_bg(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::min_height(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::padding(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::selected_bg(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::list_item::ListItemRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::bg(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::border_radius(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::fg(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::hover_bg(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::min_height(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::padding(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer::selected_bg(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer
@@ -381,13 +381,13 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinListItemRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer
-impl yororen_ui_core::renderer::modal::ModalRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer::panel_bg(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer::panel_border(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer::panel_border_radius(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer::panel_padding(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer::panel_shadow_alpha(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer::scrim(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::modal::ModalRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer::panel_bg(&self, &yororen_ui_renderer::renderers::modal::ModalRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer::panel_border(&self, &yororen_ui_renderer::renderers::modal::ModalRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer::panel_border_radius(&self, &yororen_ui_renderer::renderers::modal::ModalRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer::panel_padding(&self, &yororen_ui_renderer::renderers::modal::ModalRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer::panel_shadow_alpha(&self, &yororen_ui_renderer::renderers::modal::ModalRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer::scrim(&self, &yororen_ui_renderer::renderers::modal::ModalRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer
@@ -396,12 +396,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinModalRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer
-impl yororen_ui_core::renderer::notification::NotificationRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer::bg(&self, &yororen_ui_core::renderer::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer::border(&self, &yororen_ui_core::renderer::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer::border_radius(&self, &yororen_ui_core::renderer::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer::padding(&self, &yororen_ui_core::renderer::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_renderer::renderers::notification::NotificationRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer::bg(&self, &yororen_ui_renderer::renderers::notification::NotificationRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer::border(&self, &yororen_ui_renderer::renderers::notification::NotificationRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer::border_radius(&self, &yororen_ui_renderer::renderers::notification::NotificationRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer::padding(&self, &yororen_ui_renderer::renderers::notification::NotificationRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer::shadow_alpha(&self, &yororen_ui_renderer::renderers::notification::NotificationRenderState, &yororen_ui_renderer::theme::Theme) -> f32
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer
@@ -410,17 +410,17 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinNotificationRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer
-impl yororen_ui_core::renderer::number_input::NumberInputRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::bg(&self, &yororen_ui_core::renderer::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::border(&self, &yororen_ui_core::renderer::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::border_radius(&self, &yororen_ui_core::renderer::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::focus_border(&self, &yororen_ui_core::renderer::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::min_height(&self, &yororen_ui_core::renderer::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::padding(&self, &yororen_ui_core::renderer::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::stepper_bg(&self, &yororen_ui_core::renderer::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::stepper_button_size(&self, &yororen_ui_core::renderer::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::stepper_fg(&self, &yororen_ui_core::renderer::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::stepper_icon_size(&self, &yororen_ui_core::renderer::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::number_input::NumberInputRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::bg(&self, &yororen_ui_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::border(&self, &yororen_ui_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::border_radius(&self, &yororen_ui_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::focus_border(&self, &yororen_ui_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::min_height(&self, &yororen_ui_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::padding(&self, &yororen_ui_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::stepper_bg(&self, &yororen_ui_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::stepper_button_size(&self, &yororen_ui_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::stepper_fg(&self, &yororen_ui_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer::stepper_icon_size(&self, &yororen_ui_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer
@@ -429,12 +429,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinNumberInputRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer
-impl yororen_ui_core::renderer::panel::PanelRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer::bg(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer::border(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer::border_radius(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer::padding(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_renderer::renderers::panel::PanelRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer::bg(&self, &yororen_ui_renderer::renderers::panel::PanelRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer::border(&self, &yororen_ui_renderer::renderers::panel::PanelRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer::border_radius(&self, &yororen_ui_renderer::renderers::panel::PanelRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer::padding(&self, &yororen_ui_renderer::renderers::panel::PanelRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer::shadow_alpha(&self, &yororen_ui_renderer::renderers::panel::PanelRenderState, &yororen_ui_renderer::theme::Theme) -> f32
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer
@@ -443,15 +443,15 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinPanelRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer
-impl yororen_ui_core::renderer::password_input::PasswordInputRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::bg(&self, &yororen_ui_core::renderer::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::border(&self, &yororen_ui_core::renderer::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::border_radius(&self, &yororen_ui_core::renderer::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::fg(&self, &yororen_ui_core::renderer::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::focus_border(&self, &yororen_ui_core::renderer::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::min_height(&self, &yororen_ui_core::renderer::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::padding(&self, &yororen_ui_core::renderer::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::toggle_icon_size(&self, &yororen_ui_core::renderer::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::password_input::PasswordInputRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::bg(&self, &yororen_ui_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::border(&self, &yororen_ui_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::border_radius(&self, &yororen_ui_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::fg(&self, &yororen_ui_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::focus_border(&self, &yororen_ui_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::min_height(&self, &yororen_ui_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::padding(&self, &yororen_ui_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer::toggle_icon_size(&self, &yororen_ui_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer
@@ -460,12 +460,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinPasswordInputRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer
-impl yororen_ui_core::renderer::popover::PopoverRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer::bg(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer::border(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer::border_radius(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer::offset(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_renderer::renderers::popover::PopoverRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer::bg(&self, &yororen_ui_renderer::renderers::popover::PopoverRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer::border(&self, &yororen_ui_renderer::renderers::popover::PopoverRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer::border_radius(&self, &yororen_ui_renderer::renderers::popover::PopoverRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer::offset(&self, &yororen_ui_renderer::renderers::popover::PopoverRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer::shadow_alpha(&self, &yororen_ui_renderer::renderers::popover::PopoverRenderState, &yororen_ui_renderer::theme::Theme) -> f32
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer
@@ -474,12 +474,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinPopoverRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer
-impl yororen_ui_core::renderer::progress::ProgressBarRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer::border_color(&self, &yororen_ui_core::renderer::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer::border_radius(&self, &yororen_ui_core::renderer::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer::fill(&self, &yororen_ui_core::renderer::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer::height(&self, &yororen_ui_core::renderer::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer::track(&self, &yororen_ui_core::renderer::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::progress::ProgressBarRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer::border_color(&self, &yororen_ui_renderer::renderers::progress::ProgressBarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer::border_radius(&self, &yororen_ui_renderer::renderers::progress::ProgressBarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer::fill(&self, &yororen_ui_renderer::renderers::progress::ProgressBarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer::height(&self, &yororen_ui_renderer::renderers::progress::ProgressBarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer::track(&self, &yororen_ui_renderer::renderers::progress::ProgressBarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer
@@ -488,15 +488,15 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinProgressBarRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer
-impl yororen_ui_core::renderer::radio::RadioRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::dot_fg(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::dot_size(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::focus_color(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::ring_bg(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::ring_border(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::ring_hover_bg(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::ring_size(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::radio::RadioRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::disabled_opacity(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::dot_fg(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::dot_size(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::focus_color(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::ring_bg(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::ring_border(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::ring_hover_bg(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer::ring_size(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer
@@ -505,17 +505,17 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinRadioRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer
-impl yororen_ui_core::renderer::search_input::SearchInputRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::bg(&self, &yororen_ui_core::renderer::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::border(&self, &yororen_ui_core::renderer::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::border_radius(&self, &yororen_ui_core::renderer::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::fg(&self, &yororen_ui_core::renderer::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::focus_border(&self, &yororen_ui_core::renderer::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::icon_color(&self, &yororen_ui_core::renderer::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::icon_size(&self, &yororen_ui_core::renderer::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::input_gap(&self, &yororen_ui_core::renderer::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::min_height(&self, &yororen_ui_core::renderer::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::padding(&self, &yororen_ui_core::renderer::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+impl yororen_ui_renderer::renderers::search_input::SearchInputRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::bg(&self, &yororen_ui_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::border(&self, &yororen_ui_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::border_radius(&self, &yororen_ui_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::fg(&self, &yororen_ui_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::focus_border(&self, &yororen_ui_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::icon_color(&self, &yororen_ui_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::icon_size(&self, &yororen_ui_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::input_gap(&self, &yororen_ui_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::min_height(&self, &yororen_ui_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer::padding(&self, &yororen_ui_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer
@@ -524,16 +524,16 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinSearchInputRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer
-impl yororen_ui_core::renderer::select::SelectRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::bg(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::border(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::border_radius(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::chevron_rotation(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::fg(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::focus_border(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::hint_color(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::min_height(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::padding(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+impl yororen_ui_renderer::renderers::select::SelectRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::bg(&self, &yororen_ui_renderer::renderers::select::SelectRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::border(&self, &yororen_ui_renderer::renderers::select::SelectRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::border_radius(&self, &yororen_ui_renderer::renderers::select::SelectRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::chevron_rotation(&self, &yororen_ui_renderer::renderers::select::SelectRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::fg(&self, &yororen_ui_renderer::renderers::select::SelectRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::focus_border(&self, &yororen_ui_renderer::renderers::select::SelectRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::hint_color(&self, &yororen_ui_renderer::renderers::select::SelectRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::min_height(&self, &yororen_ui_renderer::renderers::select::SelectRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer::padding(&self, &yororen_ui_renderer::renderers::select::SelectRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer
@@ -542,10 +542,10 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinSelectRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer
-impl yororen_ui_core::renderer::skeleton::SkeletonRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer::bg(&self, &yororen_ui_core::renderer::skeleton::SkeletonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer::border_radius(&self, &yororen_ui_core::renderer::skeleton::SkeletonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer::min_height(&self, &yororen_ui_core::renderer::skeleton::SkeletonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::skeleton::SkeletonRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer::bg(&self, &yororen_ui_renderer::renderers::skeleton::SkeletonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer::border_radius(&self, &yororen_ui_renderer::renderers::skeleton::SkeletonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer::min_height(&self, &yororen_ui_renderer::renderers::skeleton::SkeletonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer
@@ -554,15 +554,15 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinSkeletonRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer
-impl yororen_ui_core::renderer::split_button::SplitButtonRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::border_radius(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::chevron_bg(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::chevron_fg(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::chevron_hover_bg(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::gap(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::min_height(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::primary_bg(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::primary_fg(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::split_button::SplitButtonRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::border_radius(&self, &yororen_ui_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::chevron_bg(&self, &yororen_ui_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::chevron_fg(&self, &yororen_ui_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::chevron_hover_bg(&self, &yororen_ui_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::gap(&self, &yororen_ui_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::min_height(&self, &yororen_ui_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::primary_bg(&self, &yororen_ui_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer::primary_fg(&self, &yororen_ui_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer
@@ -571,17 +571,17 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinSplitButtonRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer
-impl yororen_ui_core::renderer::switch::SwitchRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::focus_color(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::knob_bg(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::knob_size(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::padding(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::track_bg(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::track_border(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::track_h(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::track_hover_bg(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::track_w(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::switch::SwitchRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::disabled_opacity(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::focus_color(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::knob_bg(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::knob_size(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::padding(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::track_bg(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::track_border(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::track_h(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::track_hover_bg(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer::track_w(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer
@@ -590,16 +590,16 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinSwitchRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer
-impl yororen_ui_core::renderer::tag::TagRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::bg(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::border_radius(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::close_hover_bg(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::close_size(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::fg(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::font_size(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::font_weight(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::min_height(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::padding_x(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::tag::TagRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::bg(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::border_radius(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::close_hover_bg(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::close_size(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::fg(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::font_size(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::font_weight(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::text_system::FontWeight
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::min_height(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer::padding_x(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer
@@ -608,14 +608,14 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinTagRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer
-impl yororen_ui_core::renderer::text_area::TextAreaRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::bg(&self, &yororen_ui_core::renderer::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::border(&self, &yororen_ui_core::renderer::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::border_radius(&self, &yororen_ui_core::renderer::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::focus_border(&self, &yororen_ui_core::renderer::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::min_height(&self, &yororen_ui_core::renderer::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::padding(&self, &yororen_ui_core::renderer::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::text_color(&self, &yororen_ui_core::renderer::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::text_area::TextAreaRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::bg(&self, &yororen_ui_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::border(&self, &yororen_ui_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::border_radius(&self, &yororen_ui_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::focus_border(&self, &yororen_ui_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::min_height(&self, &yororen_ui_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::padding(&self, &yororen_ui_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer::text_color(&self, &yororen_ui_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer
@@ -624,16 +624,16 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinTextAreaRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer
-impl yororen_ui_core::renderer::text_input::TextInputRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::bg(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::border(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::border_radius(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::focus_border(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::hint_color(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::min_height(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::padding(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::text_color(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::text_input::TextInputRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::bg(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::border(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::border_radius(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::disabled_opacity(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::focus_border(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::hint_color(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::min_height(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::padding(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer::text_color(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer
@@ -642,13 +642,13 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinTextInputRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer
-impl yororen_ui_core::renderer::toast::ToastRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer::bg(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer::border(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer::border_radius(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer::fg(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer::padding(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_renderer::renderers::toast::ToastRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer::bg(&self, &yororen_ui_renderer::renderers::toast::ToastRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer::border(&self, &yororen_ui_renderer::renderers::toast::ToastRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer::border_radius(&self, &yororen_ui_renderer::renderers::toast::ToastRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer::fg(&self, &yororen_ui_renderer::renderers::toast::ToastRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer::padding(&self, &yororen_ui_renderer::renderers::toast::ToastRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer::shadow_alpha(&self, &yororen_ui_renderer::renderers::toast::ToastRenderState, &yororen_ui_renderer::theme::Theme) -> f32
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer
@@ -657,12 +657,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinToastRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer
-impl yororen_ui_core::renderer::toggle_button::ToggleButtonRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer::bg(&self, &yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer::border_radius(&self, &yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer::fg(&self, &yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer::min_height(&self, &yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::toggle_button::ToggleButtonRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer::bg(&self, &yororen_ui_renderer::renderers::toggle_button::ToggleButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer::border_radius(&self, &yororen_ui_renderer::renderers::toggle_button::ToggleButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer::disabled_opacity(&self, &yororen_ui_renderer::renderers::toggle_button::ToggleButtonRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer::fg(&self, &yororen_ui_renderer::renderers::toggle_button::ToggleButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer::min_height(&self, &yororen_ui_renderer::renderers::toggle_button::ToggleButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer
@@ -671,12 +671,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinToggleButtonRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer
-impl yororen_ui_core::renderer::tooltip::TooltipRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer::bg(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer::border_radius(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer::fg(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer::font_size(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer::padding(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+impl yororen_ui_renderer::renderers::tooltip::TooltipRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer::bg(&self, &yororen_ui_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer::border_radius(&self, &yororen_ui_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer::fg(&self, &yororen_ui_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer::font_size(&self, &yororen_ui_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer::padding(&self, &yororen_ui_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer
@@ -685,15 +685,15 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::renderer::Catppu
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::renderer::CatppuccinTooltipRenderer
 pub struct yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer
-impl yororen_ui_core::renderer::tree_item::TreeItemRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::bg(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::chevron_size(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::fg(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::hover_bg(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::indent(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::min_height(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::padding(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::selected_bg(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::tree_item::TreeItemRenderer for yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::bg(&self, &yororen_ui_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::chevron_size(&self, &yororen_ui_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::fg(&self, &yororen_ui_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::hover_bg(&self, &yororen_ui_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::indent(&self, &yororen_ui_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::min_height(&self, &yororen_ui_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::padding(&self, &yororen_ui_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer::selected_bg(&self, &yororen_ui_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer
 impl core::marker::Send for yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer
 impl core::marker::Sync for yororen_ui_theme_catppuccin::renderer::CatppuccinTreeItemRenderer
@@ -704,8 +704,8 @@ impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::rende
 pub const yororen_ui_theme_catppuccin::renderer::CATPPUCCIN_RADIUS: f32
 pub const yororen_ui_theme_catppuccin::renderer::CATPPUCCIN_RADIUS_SM: f32
 pub const yororen_ui_theme_catppuccin::renderer::FOCUS_RING_WIDTH: f32
-pub fn yororen_ui_theme_catppuccin::renderer::catppuccin_registry() -> yororen_ui_core::renderer::registry::RendererRegistry
-pub fn yororen_ui_theme_catppuccin::renderer::focus_ring_color_for(&yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::renderer::catppuccin_registry() -> yororen_ui_renderer::renderers::registry::RendererRegistry
+pub fn yororen_ui_theme_catppuccin::renderer::focus_ring_color_for(&yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 pub mod yororen_ui_theme_catppuccin::snapshot
 pub struct yororen_ui_theme_catppuccin::snapshot::RendererSnapshot
 pub yororen_ui_theme_catppuccin::snapshot::RendererSnapshot::dark: alloc::string::String
@@ -728,11 +728,11 @@ pub mod yororen_ui_theme_catppuccin::variant
 pub struct yororen_ui_theme_catppuccin::variant::GhostVariant
 impl core::fmt::Debug for yororen_ui_theme_catppuccin::variant::GhostVariant
 pub fn yororen_ui_theme_catppuccin::variant::GhostVariant::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl yororen_ui_core::renderer::variant::VariantStyle for yororen_ui_theme_catppuccin::variant::GhostVariant
-pub fn yororen_ui_theme_catppuccin::variant::GhostVariant::bg(&self, &yororen_ui_core::renderer::variant::VariantState) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::variant::GhostVariant::border(&self, &yororen_ui_core::renderer::variant::VariantState) -> core::option::Option<gpui::color::Hsla>
+impl yororen_ui_renderer::renderers::variant::VariantStyle for yororen_ui_theme_catppuccin::variant::GhostVariant
+pub fn yororen_ui_theme_catppuccin::variant::GhostVariant::bg(&self, &yororen_ui_renderer::renderers::variant::VariantState) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::variant::GhostVariant::border(&self, &yororen_ui_renderer::renderers::variant::VariantState) -> core::option::Option<gpui::color::Hsla>
 pub fn yororen_ui_theme_catppuccin::variant::GhostVariant::disabled_opacity(&self) -> f32
-pub fn yororen_ui_theme_catppuccin::variant::GhostVariant::fg(&self, &yororen_ui_core::renderer::variant::VariantState) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::variant::GhostVariant::fg(&self, &yororen_ui_renderer::renderers::variant::VariantState) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::variant::GhostVariant
 impl core::marker::Send for yororen_ui_theme_catppuccin::variant::GhostVariant
 impl core::marker::Sync for yororen_ui_theme_catppuccin::variant::GhostVariant
@@ -743,11 +743,11 @@ impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::varia
 pub struct yororen_ui_theme_catppuccin::variant::LavenderVariant
 impl core::fmt::Debug for yororen_ui_theme_catppuccin::variant::LavenderVariant
 pub fn yororen_ui_theme_catppuccin::variant::LavenderVariant::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl yororen_ui_core::renderer::variant::VariantStyle for yororen_ui_theme_catppuccin::variant::LavenderVariant
-pub fn yororen_ui_theme_catppuccin::variant::LavenderVariant::bg(&self, &yororen_ui_core::renderer::variant::VariantState) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::variant::LavenderVariant::border(&self, &yororen_ui_core::renderer::variant::VariantState) -> core::option::Option<gpui::color::Hsla>
+impl yororen_ui_renderer::renderers::variant::VariantStyle for yororen_ui_theme_catppuccin::variant::LavenderVariant
+pub fn yororen_ui_theme_catppuccin::variant::LavenderVariant::bg(&self, &yororen_ui_renderer::renderers::variant::VariantState) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::variant::LavenderVariant::border(&self, &yororen_ui_renderer::renderers::variant::VariantState) -> core::option::Option<gpui::color::Hsla>
 pub fn yororen_ui_theme_catppuccin::variant::LavenderVariant::disabled_opacity(&self) -> f32
-pub fn yororen_ui_theme_catppuccin::variant::LavenderVariant::fg(&self, &yororen_ui_core::renderer::variant::VariantState) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::variant::LavenderVariant::fg(&self, &yororen_ui_renderer::renderers::variant::VariantState) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::variant::LavenderVariant
 impl core::marker::Send for yororen_ui_theme_catppuccin::variant::LavenderVariant
 impl core::marker::Sync for yororen_ui_theme_catppuccin::variant::LavenderVariant
@@ -758,11 +758,11 @@ impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::varia
 pub struct yororen_ui_theme_catppuccin::variant::MochaVariant
 impl core::fmt::Debug for yororen_ui_theme_catppuccin::variant::MochaVariant
 pub fn yororen_ui_theme_catppuccin::variant::MochaVariant::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl yororen_ui_core::renderer::variant::VariantStyle for yororen_ui_theme_catppuccin::variant::MochaVariant
-pub fn yororen_ui_theme_catppuccin::variant::MochaVariant::bg(&self, &yororen_ui_core::renderer::variant::VariantState) -> gpui::color::Hsla
-pub fn yororen_ui_theme_catppuccin::variant::MochaVariant::border(&self, &yororen_ui_core::renderer::variant::VariantState) -> core::option::Option<gpui::color::Hsla>
+impl yororen_ui_renderer::renderers::variant::VariantStyle for yororen_ui_theme_catppuccin::variant::MochaVariant
+pub fn yororen_ui_theme_catppuccin::variant::MochaVariant::bg(&self, &yororen_ui_renderer::renderers::variant::VariantState) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::variant::MochaVariant::border(&self, &yororen_ui_renderer::renderers::variant::VariantState) -> core::option::Option<gpui::color::Hsla>
 pub fn yororen_ui_theme_catppuccin::variant::MochaVariant::disabled_opacity(&self) -> f32
-pub fn yororen_ui_theme_catppuccin::variant::MochaVariant::fg(&self, &yororen_ui_core::renderer::variant::VariantState) -> gpui::color::Hsla
+pub fn yororen_ui_theme_catppuccin::variant::MochaVariant::fg(&self, &yororen_ui_renderer::renderers::variant::VariantState) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_catppuccin::variant::MochaVariant
 impl core::marker::Send for yororen_ui_theme_catppuccin::variant::MochaVariant
 impl core::marker::Sync for yororen_ui_theme_catppuccin::variant::MochaVariant
@@ -770,10 +770,10 @@ impl core::marker::Unpin for yororen_ui_theme_catppuccin::variant::MochaVariant
 impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::variant::MochaVariant
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::variant::MochaVariant
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::variant::MochaVariant
-pub fn yororen_ui_theme_catppuccin::variant::catppuccin_registry() -> yororen_ui_core::renderer::variant::VariantRegistry
-pub fn yororen_ui_theme_catppuccin::variant::key_ghost() -> yororen_ui_core::renderer::variant::VariantKey
-pub fn yororen_ui_theme_catppuccin::variant::key_lavender() -> yororen_ui_core::renderer::variant::VariantKey
-pub fn yororen_ui_theme_catppuccin::variant::key_mocha() -> yororen_ui_core::renderer::variant::VariantKey
+pub fn yororen_ui_theme_catppuccin::variant::catppuccin_registry() -> yororen_ui_renderer::renderers::variant::VariantRegistry
+pub fn yororen_ui_theme_catppuccin::variant::key_ghost() -> yororen_ui_renderer::renderers::variant::VariantKey
+pub fn yororen_ui_theme_catppuccin::variant::key_lavender() -> yororen_ui_renderer::renderers::variant::VariantKey
+pub fn yororen_ui_theme_catppuccin::variant::key_mocha() -> yororen_ui_renderer::renderers::variant::VariantKey
 pub fn yororen_ui_theme_catppuccin::variant::register_all(&mut gpui::app::App)
 pub enum yororen_ui_theme_catppuccin::CatppuccinFlavor
 pub yororen_ui_theme_catppuccin::CatppuccinFlavor::Frappe
@@ -783,7 +783,7 @@ pub yororen_ui_theme_catppuccin::CatppuccinFlavor::Mocha
 impl yororen_ui_theme_catppuccin::CatppuccinFlavor
 pub const yororen_ui_theme_catppuccin::CatppuccinFlavor::ALL: [yororen_ui_theme_catppuccin::CatppuccinFlavor; 4]
 pub fn yororen_ui_theme_catppuccin::CatppuccinFlavor::as_str(self) -> &'static str
-pub fn yororen_ui_theme_catppuccin::CatppuccinFlavor::theme(self) -> yororen_ui_core::theme::Theme
+pub fn yororen_ui_theme_catppuccin::CatppuccinFlavor::theme(self) -> yororen_ui_renderer::theme::Theme
 impl core::clone::Clone for yororen_ui_theme_catppuccin::CatppuccinFlavor
 pub fn yororen_ui_theme_catppuccin::CatppuccinFlavor::clone(&self) -> yororen_ui_theme_catppuccin::CatppuccinFlavor
 impl core::cmp::Eq for yororen_ui_theme_catppuccin::CatppuccinFlavor
@@ -804,21 +804,21 @@ impl core::marker::Unpin for yororen_ui_theme_catppuccin::CatppuccinFlavor
 impl core::marker::UnsafeUnpin for yororen_ui_theme_catppuccin::CatppuccinFlavor
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_catppuccin::CatppuccinFlavor
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_catppuccin::CatppuccinFlavor
-pub fn yororen_ui_theme_catppuccin::dark() -> yororen_ui_core::theme::Theme
-pub fn yororen_ui_theme_catppuccin::dark_arc() -> alloc::sync::Arc<yororen_ui_core::theme::Theme>
+pub fn yororen_ui_theme_catppuccin::dark() -> yororen_ui_renderer::theme::Theme
+pub fn yororen_ui_theme_catppuccin::dark_arc() -> alloc::sync::Arc<yororen_ui_renderer::theme::Theme>
 pub fn yororen_ui_theme_catppuccin::flavor_from_appearance(gpui::platform::WindowAppearance) -> yororen_ui_theme_catppuccin::CatppuccinFlavor
-pub fn yororen_ui_theme_catppuccin::frappe() -> yororen_ui_core::theme::Theme
-pub fn yororen_ui_theme_catppuccin::frappe_theme() -> yororen_ui_core::theme::Theme
+pub fn yororen_ui_theme_catppuccin::frappe() -> yororen_ui_renderer::theme::Theme
+pub fn yororen_ui_theme_catppuccin::frappe_theme() -> yororen_ui_renderer::theme::Theme
 pub fn yororen_ui_theme_catppuccin::install(&mut gpui::app::App, gpui::platform::WindowAppearance)
 pub fn yororen_ui_theme_catppuccin::install_flavor(&mut gpui::app::App, yororen_ui_theme_catppuccin::CatppuccinFlavor)
-pub fn yororen_ui_theme_catppuccin::latte_theme() -> yororen_ui_core::theme::Theme
-pub fn yororen_ui_theme_catppuccin::light() -> yororen_ui_core::theme::Theme
-pub fn yororen_ui_theme_catppuccin::light_arc() -> alloc::sync::Arc<yororen_ui_core::theme::Theme>
-pub fn yororen_ui_theme_catppuccin::macchiato() -> yororen_ui_core::theme::Theme
-pub fn yororen_ui_theme_catppuccin::macchiato_theme() -> yororen_ui_core::theme::Theme
-pub fn yororen_ui_theme_catppuccin::mocha() -> yororen_ui_core::theme::Theme
-pub fn yororen_ui_theme_catppuccin::mocha_theme() -> yororen_ui_core::theme::Theme
-pub type yororen_ui_theme_catppuccin::FrappeTheme = yororen_ui_core::theme::Theme
-pub type yororen_ui_theme_catppuccin::LatteTheme = yororen_ui_core::theme::Theme
-pub type yororen_ui_theme_catppuccin::MacchiatoTheme = yororen_ui_core::theme::Theme
-pub type yororen_ui_theme_catppuccin::MochaTheme = yororen_ui_core::theme::Theme
+pub fn yororen_ui_theme_catppuccin::latte_theme() -> yororen_ui_renderer::theme::Theme
+pub fn yororen_ui_theme_catppuccin::light() -> yororen_ui_renderer::theme::Theme
+pub fn yororen_ui_theme_catppuccin::light_arc() -> alloc::sync::Arc<yororen_ui_renderer::theme::Theme>
+pub fn yororen_ui_theme_catppuccin::macchiato() -> yororen_ui_renderer::theme::Theme
+pub fn yororen_ui_theme_catppuccin::macchiato_theme() -> yororen_ui_renderer::theme::Theme
+pub fn yororen_ui_theme_catppuccin::mocha() -> yororen_ui_renderer::theme::Theme
+pub fn yororen_ui_theme_catppuccin::mocha_theme() -> yororen_ui_renderer::theme::Theme
+pub type yororen_ui_theme_catppuccin::FrappeTheme = yororen_ui_renderer::theme::Theme
+pub type yororen_ui_theme_catppuccin::LatteTheme = yororen_ui_renderer::theme::Theme
+pub type yororen_ui_theme_catppuccin::MacchiatoTheme = yororen_ui_renderer::theme::Theme
+pub type yororen_ui_theme_catppuccin::MochaTheme = yororen_ui_renderer::theme::Theme

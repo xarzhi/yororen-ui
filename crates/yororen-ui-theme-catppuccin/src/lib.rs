@@ -57,7 +57,7 @@
 //!
 //! ```rust,ignore
 //! use yororen_ui::renderer::ButtonVariant;
-//! use yororen_ui_core::renderer::VariantKey;
+//! use yororen_ui_renderer::renderers::VariantKey;
 //!
 //! button("save")
 //!     .variant(ButtonVariant::Custom(VariantKey::borrowed("lavender")))
@@ -82,7 +82,7 @@ use std::sync::Arc;
 use gpui::App;
 use gpui::WindowAppearance;
 
-use yororen_ui_core::theme::{GlobalTheme, Theme};
+use yororen_ui_renderer::theme::{GlobalTheme, Theme};
 
 /// Catppuccin flavor identifier.
 ///
@@ -284,8 +284,8 @@ mod tests {
         let reg = renderer::catppuccin_registry();
         let cat_theme = light();
         let sys_theme = theme_system::light();
-        let state = yororen_ui_core::renderer::ButtonRenderState {
-            variant: yororen_ui_core::theme::ActionVariantKind::Primary,
+        let state = yororen_ui_renderer::renderers::ButtonRenderState {
+            variant: yororen_ui_renderer::theme::ActionVariantKind::Primary,
             ..Default::default()
         };
         let cat_bg = reg

@@ -1,13 +1,13 @@
 //! Theme factories: `light()` = Latte, `dark()` = Mocha, plus
 //! `frappe()` and `macchiato()` for the medium-dark and dark Catppuccin
-//! flavors. All four return a `yororen_ui_core::theme::Theme` with
+//! flavors. All four return a `yororen_ui_renderer::theme::Theme` with
 //! the Catppuccin `RendererRegistry` already wired in.
 
 use gpui::{hsla, rgb};
 
 use yororen_ui_core::i18n::TextDirection;
-use yororen_ui_core::theme::tokens::DesignTokens;
-use yororen_ui_core::theme::{
+use yororen_ui_renderer::theme::tokens::DesignTokens;
+use yororen_ui_renderer::theme::{
     ActionTheme, ActionVariant, BorderTheme, ContentTheme, ShadowTheme, StatusTheme, StatusVariant,
     SurfaceTheme, Theme,
 };

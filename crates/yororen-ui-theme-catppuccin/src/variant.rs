@@ -17,7 +17,7 @@
 //! ```rust,ignore
 //! use yororen_ui::component::button;
 //! use yororen_ui::renderer::ButtonVariant;
-//! use yororen_ui_core::renderer::VariantKey;
+//! use yororen_ui_renderer::renderers::VariantKey;
 //!
 //! button("save")
 //!     .variant(ButtonVariant::Custom(VariantKey::borrowed("lavender")))
@@ -28,7 +28,7 @@ use std::sync::Arc;
 
 use gpui::{App, Hsla};
 
-use yororen_ui_core::renderer::{
+use yororen_ui_renderer::renderers::{
     GlobalVariantRegistry, VariantKey, VariantRegistry, VariantState, VariantStyle,
 };
 

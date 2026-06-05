@@ -19,9 +19,9 @@ use std::sync::Arc;
 
 use gpui::{FontWeight, Hsla, Pixels, SharedString, px};
 
-use yororen_ui_core::component::HeadingLevel;
-use yororen_ui_core::renderer::spec::Edges;
-use yororen_ui_core::renderer::{
+use yororen_ui_core::headless::heading::HeadingLevel;
+use yororen_ui_renderer::renderers::spec::Edges;
+use yororen_ui_renderer::renderers::{
     AvatarRenderState, AvatarRenderer, BadgeRenderState, BadgeRenderer, ButtonRenderState,
     ButtonRenderer, CardRenderState, CardRenderer, CheckboxRenderState, CheckboxRenderer,
     ComboBoxRenderState, ComboBoxRenderer, DisclosureRenderState, DisclosureRenderer,
@@ -41,7 +41,7 @@ use yororen_ui_core::renderer::{
     ToastRenderState, ToastRenderer, ToggleButtonRenderState, ToggleButtonRenderer,
     TooltipRenderState, TooltipRenderer, TreeItemRenderState, TreeItemRenderer,
 };
-use yororen_ui_core::theme::{ActionVariantKind, Theme};
+use yororen_ui_renderer::theme::{ActionVariantKind, Theme};
 
 /// Catppuccin's signature border radius. Bigger than the v0.5 system
 /// default of 6 px; gives the UI a softer, chunkier feel.
@@ -76,7 +76,7 @@ pub struct CatppuccinButtonRenderer;
 impl ButtonRenderer for CatppuccinButtonRenderer {
     fn bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
         if let Some(s) = &state.custom_style {
-            return s.bg(&yororen_ui_core::renderer::VariantState {
+            return s.bg(&yororen_ui_renderer::renderers::VariantState {
                 disabled: state.disabled,
             });
         }
@@ -94,7 +94,7 @@ impl ButtonRenderer for CatppuccinButtonRenderer {
 
     fn fg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
         if let Some(s) = &state.custom_style {
-            return s.fg(&yororen_ui_core::renderer::VariantState {
+            return s.fg(&yororen_ui_renderer::renderers::VariantState {
                 disabled: state.disabled,
             });
         }
@@ -106,9 +106,9 @@ impl ButtonRenderer for CatppuccinButtonRenderer {
         &self,
         _state: &ButtonRenderState,
         theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
         let t = &theme.tokens.control.button;
-        yororen_ui_core::renderer::Edges::symmetric(
+        yororen_ui_renderer::renderers::Edges::symmetric(
             t.horizontal_padding,
             t.horizontal_padding / 1.5,
         )
@@ -122,7 +122,7 @@ impl ButtonRenderer for CatppuccinButtonRenderer {
         &self,
         _state: &ButtonRenderState,
         _theme: &Theme,
-    ) -> Option<yororen_ui_core::renderer::BorderSpec> {
+    ) -> Option<yororen_ui_renderer::renderers::BorderSpec> {
         None
     }
 
@@ -130,7 +130,7 @@ impl ButtonRenderer for CatppuccinButtonRenderer {
         &self,
         _state: &ButtonRenderState,
         _theme: &Theme,
-    ) -> Option<yororen_ui_core::renderer::ShadowSpec> {
+    ) -> Option<yororen_ui_renderer::renderers::ShadowSpec> {
         None
     }
 
@@ -169,8 +169,8 @@ impl CardRenderer for CatppuccinCardRenderer {
         &self,
         _state: &CardRenderState,
         _theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::all(px(20.0))
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::all(px(20.0))
     }
 
     fn border_radius(&self, _state: &CardRenderState, _theme: &Theme) -> Pixels {
@@ -210,8 +210,8 @@ impl ModalRenderer for CatppuccinModalRenderer {
         &self,
         _state: &ModalRenderState,
         _theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::all(px(24.0))
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::all(px(24.0))
     }
 
     fn panel_border_radius(&self, _state: &ModalRenderState, _theme: &Theme) -> Pixels {
@@ -286,8 +286,8 @@ impl TextInputRenderer for CatppuccinTextInputRenderer {
         &self,
         _state: &TextInputRenderState,
         theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::symmetric(
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::symmetric(
             theme.tokens.control.input.horizontal_padding,
             theme.tokens.control.input.vertical_padding,
         )
@@ -474,8 +474,8 @@ impl ToastRenderer for CatppuccinToastRenderer {
         &self,
         _state: &ToastRenderState,
         theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::symmetric(
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::symmetric(
             theme.tokens.spacing.inset_md,
             theme.tokens.spacing.inset_sm,
         )
@@ -569,8 +569,8 @@ impl ListItemRenderer for CatppuccinListItemRenderer {
         &self,
         _state: &ListItemRenderState,
         theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::symmetric(
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::symmetric(
             theme.tokens.spacing.inset_sm,
             theme.tokens.spacing.inset_xs,
         )
@@ -606,8 +606,8 @@ impl EmptyStateRenderer for CatppuccinEmptyStateRenderer {
         &self,
         _state: &EmptyStateRenderState,
         _theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::all(px(32.0))
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::all(px(32.0))
     }
     fn icon_size(&self, _state: &EmptyStateRenderState, theme: &Theme) -> Pixels {
         theme.tokens.sizes.icon_xl
@@ -755,6 +755,9 @@ impl HeadingRenderer for CatppuccinHeadingRenderer {
             HeadingLevel::H1 => t.font_size_2xl,
             HeadingLevel::H2 => t.font_size_xl,
             HeadingLevel::H3 => t.font_size_lg,
+            HeadingLevel::H4 => t.font_size_md,
+            HeadingLevel::H5 => t.font_size_sm,
+            HeadingLevel::H6 => t.font_size_xs,
         }
     }
     fn weight(&self, state: &HeadingRenderState, theme: &Theme) -> FontWeight {
@@ -1576,7 +1579,7 @@ pub fn catppuccin_registry() -> RendererRegistry {
 mod tests {
     use super::*;
     use crate::palette;
-    use yororen_ui_core::theme::ActionVariantKind;
+    use yororen_ui_renderer::theme::ActionVariantKind;
 
     fn cat_light() -> Theme {
         crate::factories::light()
@@ -1608,7 +1611,7 @@ mod tests {
 
     #[test]
     fn button_renderer_uses_mocha_palette_when_given_mocha_theme() {
-        use yororen_ui_core::renderer::ButtonRenderer;
+        use yororen_ui_renderer::renderers::ButtonRenderer;
         // The Catppuccin renderer reads from the same action palette
         // as the v0.5 default; the visual difference comes from the
         // Theme itself being a Catppuccin palette. Verify the
@@ -1639,7 +1642,7 @@ mod tests {
     /// Mocha-flavoured Theme.
     #[test]
     fn card_renderer_light_dark_differ() {
-        use yororen_ui_core::renderer::CardRenderer as _;
+        use yororen_ui_renderer::renderers::CardRenderer as _;
         let r = CatppuccinCardRenderer;
         let light = cat_light();
         let dark = cat_dark();
@@ -1659,7 +1662,7 @@ mod tests {
 
     #[test]
     fn modal_renderer_light_dark_differ() {
-        use yororen_ui_core::renderer::ModalRenderer as _;
+        use yororen_ui_renderer::renderers::ModalRenderer as _;
         let r = CatppuccinModalRenderer;
         let light = cat_light();
         let dark = cat_dark();
@@ -1672,7 +1675,7 @@ mod tests {
 
     #[test]
     fn text_input_renderer_light_dark_differ() {
-        use yororen_ui_core::renderer::TextInputRenderer as _;
+        use yororen_ui_renderer::renderers::TextInputRenderer as _;
         let r = CatppuccinTextInputRenderer;
         let light = cat_light();
         let dark = cat_dark();
@@ -1685,7 +1688,7 @@ mod tests {
 
     #[test]
     fn switch_renderer_checked_color_differs_by_flavor() {
-        use yororen_ui_core::renderer::SwitchRenderer as _;
+        use yororen_ui_renderer::renderers::SwitchRenderer as _;
         let r = CatppuccinSwitchRenderer;
         let light = cat_light();
         let dark = cat_dark();
@@ -1707,7 +1710,7 @@ mod tests {
 
     #[test]
     fn checkbox_renderer_uses_focus_color_when_checked() {
-        use yororen_ui_core::renderer::CheckboxRenderer as _;
+        use yororen_ui_renderer::renderers::CheckboxRenderer as _;
         let r = CatppuccinCheckboxRenderer;
         let light = cat_light();
         let dark = cat_dark();
@@ -1723,7 +1726,7 @@ mod tests {
 
     #[test]
     fn empty_state_uses_content_tertiary() {
-        use yororen_ui_core::renderer::EmptyStateRenderer as _;
+        use yororen_ui_renderer::renderers::EmptyStateRenderer as _;
         let r = CatppuccinEmptyStateRenderer;
         let light = cat_light();
         let dark = cat_dark();
@@ -1813,7 +1816,7 @@ mod tests {
     /// output, just that the trait methods are callable.
     #[test]
     fn registry_includes_new_renderers() {
-        use yororen_ui_core::renderer::{
+        use yororen_ui_renderer::renderers::{
             AvatarRenderState, BadgeRenderState, ComboBoxRenderState, DisclosureRenderState,
             DividerRenderState, DropdownMenuRenderState, FilePathInputRenderState, FormRenderState,
             HeadingRenderState, IconButtonRenderState, KeybindingInputRenderState,
@@ -1932,7 +1935,7 @@ mod tests {
 #[cfg(test)]
 mod panel_tests {
     use super::*;
-    use yororen_ui_core::renderer::PanelRenderState;
+    use yororen_ui_renderer::renderers::PanelRenderState;
 
     fn cat_light() -> Theme {
         crate::factories::light()

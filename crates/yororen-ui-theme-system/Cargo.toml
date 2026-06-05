@@ -8,5 +8,6 @@ readme = "../../README.md"
 repository.workspace = true
 
 [dependencies]
+yororen-ui-renderer = { package = "yororen_ui_renderer", path = "../yororen-ui-renderer", version = "0.3" }
 yororen-ui-core = { package = "yororen_ui_core", path = "../yororen-ui-core", version = "0.3" }
 gpui = { package = "gpui-ce", version = "0.3" }

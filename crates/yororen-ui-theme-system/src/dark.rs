@@ -2,15 +2,15 @@
 
 use gpui::{hsla, rgb};
 
-use yororen_ui_core::theme::{
+use yororen_ui_renderer::theme::{
     ActionTheme, ActionVariant, BorderTheme, ContentTheme, ShadowTheme, StatusTheme, StatusVariant,
     SurfaceTheme, Theme,
 };
 
 use yororen_ui_core::i18n::TextDirection;
 
-use yororen_ui_core::renderer::RendererRegistry;
-use yororen_ui_core::theme::tokens::DesignTokens;
+use yororen_ui_renderer::renderers::RendererRegistry;
+use yororen_ui_renderer::theme::tokens::DesignTokens;
 
 /// Default dark theme. Neutral palette, no brand colors.
 pub fn dark() -> Theme {

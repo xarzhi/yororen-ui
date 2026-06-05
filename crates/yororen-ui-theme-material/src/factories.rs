@@ -9,8 +9,8 @@
 use gpui::{App, Hsla, WindowAppearance};
 
 use yororen_ui_core::i18n::TextDirection;
-use yororen_ui_core::theme::tokens::DesignTokens;
-use yororen_ui_core::theme::{
+use yororen_ui_renderer::theme::tokens::DesignTokens;
+use yororen_ui_renderer::theme::{
     ActionTheme, ActionVariant, BorderTheme, ContentTheme, GlobalTheme, ShadowTheme, StatusTheme,
     StatusVariant, SurfaceTheme, Theme,
 };
@@ -306,8 +306,8 @@ mod tests {
         // the default `token_based()`.
         let l = light();
         // Catppuccin uses 12-px button radius; material uses pill.
-        let state = yororen_ui_core::renderer::ButtonRenderState::default();
-        let renderer: &dyn yororen_ui_core::renderer::ButtonRenderer =
+        let state = yororen_ui_renderer::renderers::ButtonRenderState::default();
+        let renderer: &dyn yororen_ui_renderer::renderers::ButtonRenderer =
             &**l.renderers.get_button().expect("ButtonRenderer registered");
         let r = renderer.border_radius(&state, &l);
         assert!(

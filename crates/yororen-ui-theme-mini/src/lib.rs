@@ -22,7 +22,7 @@
 //! use yororen_ui_theme_mini as theme_mini;
 //!
 //! // Start with the default token-based registry, then swap 3 entries.
-//! let mut registry = yororen_ui_core::renderer::RendererRegistry::token_based();
+//! let mut registry = yororen_ui_renderer::renderers::RendererRegistry::token_based();
 //! registry = registry
 //!     .with_button(theme_mini::MiniButtonRenderer::arc())
 //!     .with_card(theme_mini::MiniCardRenderer::arc())
@@ -41,11 +41,11 @@
 use std::sync::Arc;
 
 use gpui::{App, Hsla, Pixels, WindowAppearance};
-use yororen_ui_core::renderer::{
+use yororen_ui_renderer::renderers::{
     ButtonRenderState, ButtonRenderer, CardRenderState, CardRenderer, ModalRenderState,
     ModalRenderer, RendererRegistry,
 };
-use yororen_ui_core::theme::{GlobalTheme, Theme};
+use yororen_ui_renderer::theme::{GlobalTheme, Theme};
 
 use yororen_ui_theme_system as theme_system;
 
@@ -96,7 +96,7 @@ impl MiniButtonRenderer {
 
 impl ButtonRenderer for MiniButtonRenderer {
     fn bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
-        use yororen_ui_core::theme::ActionVariantKind;
+        use yororen_ui_renderer::theme::ActionVariantKind;
         if state.disabled {
             theme.action_variant(state.variant).disabled_bg
         } else {
@@ -109,7 +109,7 @@ impl ButtonRenderer for MiniButtonRenderer {
     }
 
     fn fg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
-        use yororen_ui_core::theme::ActionVariantKind;
+        use yororen_ui_renderer::theme::ActionVariantKind;
         if state.disabled {
             theme.action_variant(state.variant).disabled_fg
         } else {
@@ -125,8 +125,8 @@ impl ButtonRenderer for MiniButtonRenderer {
         &self,
         _state: &ButtonRenderState,
         _theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::symmetric(gpui::px(20.), gpui::px(12.))
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::symmetric(gpui::px(20.), gpui::px(12.))
     }
 
     fn border_radius(&self, _state: &ButtonRenderState, _theme: &Theme) -> Pixels {
@@ -137,7 +137,7 @@ impl ButtonRenderer for MiniButtonRenderer {
         &self,
         _state: &ButtonRenderState,
         _theme: &Theme,
-    ) -> Option<yororen_ui_core::renderer::BorderSpec> {
+    ) -> Option<yororen_ui_renderer::renderers::BorderSpec> {
         None
     }
 
@@ -145,7 +145,7 @@ impl ButtonRenderer for MiniButtonRenderer {
         &self,
         _state: &ButtonRenderState,
         _theme: &Theme,
-    ) -> Option<yororen_ui_core::renderer::ShadowSpec> {
+    ) -> Option<yororen_ui_renderer::renderers::ShadowSpec> {
         None
     }
 
@@ -178,8 +178,8 @@ impl CardRenderer for MiniCardRenderer {
         &self,
         _state: &CardRenderState,
         _theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::all(gpui::px(20.))
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::all(gpui::px(20.))
     }
     fn border_radius(&self, _state: &CardRenderState, _theme: &Theme) -> Pixels {
         gpui::px(16.)
@@ -215,8 +215,8 @@ impl ModalRenderer for MiniModalRenderer {
         &self,
         _state: &ModalRenderState,
         _theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::all(gpui::px(28.))
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::all(gpui::px(28.))
     }
     fn panel_border_radius(&self, _state: &ModalRenderState, _theme: &Theme) -> Pixels {
         gpui::px(20.)
@@ -249,7 +249,7 @@ pub fn install(cx: &mut App, appearance: WindowAppearance) {
 // Re-export token fallback renderers so callers that want to extend
 // the mini registry don't have to import the core crate directly.
 #[allow(unused_imports)]
-pub use yororen_ui_core::renderer::{TokenButtonRenderer, TokenCardRenderer, TokenModalRenderer};
+pub use yororen_ui_renderer::renderers::{TokenButtonRenderer, TokenCardRenderer, TokenModalRenderer};
 
 #[cfg(test)]
 mod tests {
@@ -262,14 +262,14 @@ mod tests {
         // output for those entries must differ from the v0.4 default.
         let theme = theme_system::light();
         let state = ButtonRenderState {
-            variant: yororen_ui_core::theme::ActionVariantKind::Primary,
+            variant: yororen_ui_renderer::theme::ActionVariantKind::Primary,
             ..Default::default()
         };
         let mini_bg = reg
             .get_button()
             .expect("ButtonRenderer registered")
             .bg(&state, &theme);
-        let default_bg = yororen_ui_core::renderer::TokenButtonRenderer.bg(&state, &theme);
+        let default_bg = yororen_ui_renderer::renderers::TokenButtonRenderer.bg(&state, &theme);
         assert_ne!(mini_bg, default_bg);
 
         let card_state = CardRenderState::default();
@@ -277,7 +277,7 @@ mod tests {
             .get_card()
             .expect("CardRenderer registered")
             .bg(&card_state, &theme);
-        let default_card_bg = yororen_ui_core::renderer::TokenCardRenderer.bg(&card_state, &theme);
+        let default_card_bg = yororen_ui_renderer::renderers::TokenCardRenderer.bg(&card_state, &theme);
         assert_ne!(mini_card_bg, default_card_bg);
 
         let modal_state = ModalRenderState::default();
@@ -286,7 +286,7 @@ mod tests {
             .expect("ModalRenderer registered")
             .panel_bg(&modal_state, &theme);
         let default_modal_bg =
-            yororen_ui_core::renderer::TokenModalRenderer.panel_bg(&modal_state, &theme);
+            yororen_ui_renderer::renderers::TokenModalRenderer.panel_bg(&modal_state, &theme);
         assert_ne!(mini_modal_bg, default_modal_bg);
     }
 
@@ -295,7 +295,7 @@ mod tests {
         let theme = theme_system::light();
         let r = MiniButtonRenderer;
         let state = ButtonRenderState {
-            variant: yororen_ui_core::theme::ActionVariantKind::Primary,
+            variant: yororen_ui_renderer::theme::ActionVariantKind::Primary,
             ..Default::default()
         };
         assert_eq!(r.bg(&state, &theme), palette::cyan());
@@ -307,7 +307,7 @@ mod tests {
         let theme = theme_system::light();
         let r = MiniButtonRenderer;
         let state = ButtonRenderState {
-            variant: yororen_ui_core::theme::ActionVariantKind::Danger,
+            variant: yororen_ui_renderer::theme::ActionVariantKind::Danger,
             ..Default::default()
         };
         assert_eq!(r.bg(&state, &theme), palette::fuchsia());

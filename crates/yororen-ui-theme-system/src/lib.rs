@@ -18,7 +18,7 @@ use std::sync::Arc;
 use gpui::App;
 use gpui::WindowAppearance;
 
-use yororen_ui_core::theme::{GlobalTheme, Theme};
+use yororen_ui_renderer::theme::{GlobalTheme, Theme};
 
 mod dark;
 mod light;

@@ -68,13 +68,13 @@ pub fn yororen_ui_theme_material::palette::rgb((f32, f32, f32)) -> gpui::color::
 pub fn yororen_ui_theme_material::palette::shadow_for_elevation(u8, gpui::color::Hsla) -> gpui::color::Hsla
 pub mod yororen_ui_theme_material::renderer
 pub struct yororen_ui_theme_material::renderer::MaterialAvatarRenderer
-impl yororen_ui_core::renderer::avatar::AvatarRenderer for yororen_ui_theme_material::renderer::MaterialAvatarRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialAvatarRenderer::border_radius(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialAvatarRenderer::default_bg(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialAvatarRenderer::status_border_color(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialAvatarRenderer::status_border_w(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialAvatarRenderer::status_dot_size(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialAvatarRenderer::status_inset(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::avatar::AvatarRenderer for yororen_ui_theme_material::renderer::MaterialAvatarRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialAvatarRenderer::border_radius(&self, &yororen_ui_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialAvatarRenderer::default_bg(&self, &yororen_ui_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialAvatarRenderer::status_border_color(&self, &yororen_ui_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialAvatarRenderer::status_border_w(&self, &yororen_ui_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialAvatarRenderer::status_dot_size(&self, &yororen_ui_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialAvatarRenderer::status_inset(&self, &yororen_ui_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialAvatarRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialAvatarRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialAvatarRenderer
@@ -83,14 +83,14 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialAvatarRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialAvatarRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialBadgeRenderer
-impl yororen_ui_core::renderer::badge::BadgeRenderer for yororen_ui_theme_material::renderer::MaterialBadgeRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::bg(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::border_radius(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::fg(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::font_size(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::font_weight(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
-pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::height(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::padding_x(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::badge::BadgeRenderer for yororen_ui_theme_material::renderer::MaterialBadgeRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::bg(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::border_radius(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::fg(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::font_size(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::font_weight(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::text_system::FontWeight
+pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::height(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialBadgeRenderer::padding_x(&self, &yororen_ui_renderer::renderers::badge::BadgeRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialBadgeRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialBadgeRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialBadgeRenderer
@@ -99,15 +99,15 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialBadgeRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialBadgeRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialButtonRenderer
-impl yororen_ui_core::renderer::button::ButtonRenderer for yororen_ui_theme_material::renderer::MaterialButtonRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::bg(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::border(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> core::option::Option<yororen_ui_core::renderer::spec::BorderSpec>
-pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::border_radius(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::fg(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::min_height(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::padding(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::shadow(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> core::option::Option<yororen_ui_core::renderer::spec::ShadowSpec>
+impl yororen_ui_renderer::renderers::button::ButtonRenderer for yororen_ui_theme_material::renderer::MaterialButtonRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::bg(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::border(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> core::option::Option<yororen_ui_renderer::renderers::spec::BorderSpec>
+pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::border_radius(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::disabled_opacity(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::fg(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::min_height(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::padding(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_material::renderer::MaterialButtonRenderer::shadow(&self, &yororen_ui_renderer::renderers::button::ButtonRenderState, &yororen_ui_renderer::theme::Theme) -> core::option::Option<yororen_ui_renderer::renderers::spec::ShadowSpec>
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialButtonRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialButtonRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialButtonRenderer
@@ -116,12 +116,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialButtonRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialButtonRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialCardRenderer
-impl yororen_ui_core::renderer::card::CardRenderer for yororen_ui_theme_material::renderer::MaterialCardRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialCardRenderer::bg(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialCardRenderer::border(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialCardRenderer::border_radius(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialCardRenderer::padding(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_material::renderer::MaterialCardRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_renderer::renderers::card::CardRenderer for yororen_ui_theme_material::renderer::MaterialCardRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialCardRenderer::bg(&self, &yororen_ui_renderer::renderers::card::CardRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialCardRenderer::border(&self, &yororen_ui_renderer::renderers::card::CardRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialCardRenderer::border_radius(&self, &yororen_ui_renderer::renderers::card::CardRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialCardRenderer::padding(&self, &yororen_ui_renderer::renderers::card::CardRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_material::renderer::MaterialCardRenderer::shadow_alpha(&self, &yororen_ui_renderer::renderers::card::CardRenderState, &yororen_ui_renderer::theme::Theme) -> f32
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialCardRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialCardRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialCardRenderer
@@ -130,15 +130,15 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialCardRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialCardRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialCheckboxRenderer
-impl yororen_ui_core::renderer::checkbox::CheckboxRenderer for yororen_ui_theme_material::renderer::MaterialCheckboxRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::box_bg(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::box_border(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::box_hover_bg(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::box_size(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::check_fg(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::check_size(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::focus_color(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::checkbox::CheckboxRenderer for yororen_ui_theme_material::renderer::MaterialCheckboxRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::box_bg(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::box_border(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::box_hover_bg(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::box_size(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::check_fg(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::check_size(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::disabled_opacity(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_material::renderer::MaterialCheckboxRenderer::focus_color(&self, &yororen_ui_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialCheckboxRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialCheckboxRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialCheckboxRenderer
@@ -147,9 +147,9 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialCheckboxRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialCheckboxRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialDividerRenderer
-impl yororen_ui_core::renderer::divider::DividerRenderer for yororen_ui_theme_material::renderer::MaterialDividerRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialDividerRenderer::color(&self, &yororen_ui_core::renderer::divider::DividerRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialDividerRenderer::thickness(&self, &yororen_ui_core::renderer::divider::DividerRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::divider::DividerRenderer for yororen_ui_theme_material::renderer::MaterialDividerRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialDividerRenderer::color(&self, &yororen_ui_renderer::renderers::divider::DividerRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialDividerRenderer::thickness(&self, &yororen_ui_renderer::renderers::divider::DividerRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialDividerRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialDividerRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialDividerRenderer
@@ -158,9 +158,9 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialDividerRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialDividerRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialFocusRingRenderer
-impl yororen_ui_core::renderer::focus_ring::FocusRingRenderer for yororen_ui_theme_material::renderer::MaterialFocusRingRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialFocusRingRenderer::color(&self, &yororen_ui_core::renderer::focus_ring::FocusRingRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialFocusRingRenderer::width(&self, &yororen_ui_core::renderer::focus_ring::FocusRingRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::focus_ring::FocusRingRenderer for yororen_ui_theme_material::renderer::MaterialFocusRingRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialFocusRingRenderer::color(&self, &yororen_ui_renderer::renderers::focus_ring::FocusRingRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialFocusRingRenderer::width(&self, &yororen_ui_renderer::renderers::focus_ring::FocusRingRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialFocusRingRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialFocusRingRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialFocusRingRenderer
@@ -169,10 +169,10 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialFocusRingRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialFocusRingRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialHeadingRenderer
-impl yororen_ui_core::renderer::heading::HeadingRenderer for yororen_ui_theme_material::renderer::MaterialHeadingRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialHeadingRenderer::color(&self, &yororen_ui_core::renderer::heading::HeadingRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialHeadingRenderer::size(&self, &yororen_ui_core::renderer::heading::HeadingRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialHeadingRenderer::weight(&self, &yororen_ui_core::renderer::heading::HeadingRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
+impl yororen_ui_renderer::renderers::heading::HeadingRenderer for yororen_ui_theme_material::renderer::MaterialHeadingRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialHeadingRenderer::color(&self, &yororen_ui_renderer::renderers::heading::HeadingRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialHeadingRenderer::size(&self, &yororen_ui_renderer::renderers::heading::HeadingRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialHeadingRenderer::weight(&self, &yororen_ui_renderer::renderers::heading::HeadingRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::text_system::FontWeight
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialHeadingRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialHeadingRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialHeadingRenderer
@@ -181,12 +181,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialHeadingRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialHeadingRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialIconButtonRenderer
-impl yororen_ui_core::renderer::icon_button::IconButtonRenderer for yororen_ui_theme_material::renderer::MaterialIconButtonRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialIconButtonRenderer::bg(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialIconButtonRenderer::border_radius(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialIconButtonRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_material::renderer::MaterialIconButtonRenderer::hover_bg(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialIconButtonRenderer::size(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::icon_button::IconButtonRenderer for yororen_ui_theme_material::renderer::MaterialIconButtonRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialIconButtonRenderer::bg(&self, &yororen_ui_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialIconButtonRenderer::border_radius(&self, &yororen_ui_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialIconButtonRenderer::disabled_opacity(&self, &yororen_ui_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_material::renderer::MaterialIconButtonRenderer::hover_bg(&self, &yororen_ui_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialIconButtonRenderer::size(&self, &yororen_ui_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialIconButtonRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialIconButtonRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialIconButtonRenderer
@@ -195,10 +195,10 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialIconButtonRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialIconButtonRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialLabelRenderer
-impl yororen_ui_core::renderer::label::LabelRenderer for yororen_ui_theme_material::renderer::MaterialLabelRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialLabelRenderer::color(&self, &yororen_ui_core::renderer::label::LabelRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialLabelRenderer::family_mono(&self, &yororen_ui_core::renderer::label::LabelRenderState, &yororen_ui_core::theme::Theme) -> gpui::shared_string::SharedString
-pub fn yororen_ui_theme_material::renderer::MaterialLabelRenderer::strong_weight(&self, &yororen_ui_core::renderer::label::LabelRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
+impl yororen_ui_renderer::renderers::label::LabelRenderer for yororen_ui_theme_material::renderer::MaterialLabelRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialLabelRenderer::color(&self, &yororen_ui_renderer::renderers::label::LabelRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialLabelRenderer::family_mono(&self, &yororen_ui_renderer::renderers::label::LabelRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::shared_string::SharedString
+pub fn yororen_ui_theme_material::renderer::MaterialLabelRenderer::strong_weight(&self, &yororen_ui_renderer::renderers::label::LabelRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::text_system::FontWeight
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialLabelRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialLabelRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialLabelRenderer
@@ -207,14 +207,14 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialLabelRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialLabelRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialListItemRenderer
-impl yororen_ui_core::renderer::list_item::ListItemRenderer for yororen_ui_theme_material::renderer::MaterialListItemRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::bg(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::border_radius(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::fg(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::hover_bg(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::min_height(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::padding(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::selected_bg(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::list_item::ListItemRenderer for yororen_ui_theme_material::renderer::MaterialListItemRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::bg(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::border_radius(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::fg(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::hover_bg(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::min_height(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::padding(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_material::renderer::MaterialListItemRenderer::selected_bg(&self, &yororen_ui_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialListItemRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialListItemRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialListItemRenderer
@@ -223,13 +223,13 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialListItemRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialListItemRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialModalRenderer
-impl yororen_ui_core::renderer::modal::ModalRenderer for yororen_ui_theme_material::renderer::MaterialModalRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialModalRenderer::panel_bg(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialModalRenderer::panel_border(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialModalRenderer::panel_border_radius(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialModalRenderer::panel_padding(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_material::renderer::MaterialModalRenderer::panel_shadow_alpha(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_material::renderer::MaterialModalRenderer::scrim(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::modal::ModalRenderer for yororen_ui_theme_material::renderer::MaterialModalRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialModalRenderer::panel_bg(&self, &yororen_ui_renderer::renderers::modal::ModalRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialModalRenderer::panel_border(&self, &yororen_ui_renderer::renderers::modal::ModalRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialModalRenderer::panel_border_radius(&self, &yororen_ui_renderer::renderers::modal::ModalRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialModalRenderer::panel_padding(&self, &yororen_ui_renderer::renderers::modal::ModalRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_material::renderer::MaterialModalRenderer::panel_shadow_alpha(&self, &yororen_ui_renderer::renderers::modal::ModalRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_material::renderer::MaterialModalRenderer::scrim(&self, &yororen_ui_renderer::renderers::modal::ModalRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialModalRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialModalRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialModalRenderer
@@ -238,12 +238,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialModalRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialModalRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialPanelRenderer
-impl yororen_ui_core::renderer::panel::PanelRenderer for yororen_ui_theme_material::renderer::MaterialPanelRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialPanelRenderer::bg(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialPanelRenderer::border(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialPanelRenderer::border_radius(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialPanelRenderer::padding(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_material::renderer::MaterialPanelRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_renderer::renderers::panel::PanelRenderer for yororen_ui_theme_material::renderer::MaterialPanelRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialPanelRenderer::bg(&self, &yororen_ui_renderer::renderers::panel::PanelRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialPanelRenderer::border(&self, &yororen_ui_renderer::renderers::panel::PanelRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialPanelRenderer::border_radius(&self, &yororen_ui_renderer::renderers::panel::PanelRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialPanelRenderer::padding(&self, &yororen_ui_renderer::renderers::panel::PanelRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_material::renderer::MaterialPanelRenderer::shadow_alpha(&self, &yororen_ui_renderer::renderers::panel::PanelRenderState, &yororen_ui_renderer::theme::Theme) -> f32
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialPanelRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialPanelRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialPanelRenderer
@@ -252,12 +252,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialPanelRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialPanelRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialPopoverRenderer
-impl yororen_ui_core::renderer::popover::PopoverRenderer for yororen_ui_theme_material::renderer::MaterialPopoverRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialPopoverRenderer::bg(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialPopoverRenderer::border(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialPopoverRenderer::border_radius(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialPopoverRenderer::offset(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialPopoverRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_renderer::renderers::popover::PopoverRenderer for yororen_ui_theme_material::renderer::MaterialPopoverRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialPopoverRenderer::bg(&self, &yororen_ui_renderer::renderers::popover::PopoverRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialPopoverRenderer::border(&self, &yororen_ui_renderer::renderers::popover::PopoverRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialPopoverRenderer::border_radius(&self, &yororen_ui_renderer::renderers::popover::PopoverRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialPopoverRenderer::offset(&self, &yororen_ui_renderer::renderers::popover::PopoverRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialPopoverRenderer::shadow_alpha(&self, &yororen_ui_renderer::renderers::popover::PopoverRenderState, &yororen_ui_renderer::theme::Theme) -> f32
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialPopoverRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialPopoverRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialPopoverRenderer
@@ -266,15 +266,15 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialPopoverRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialPopoverRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialRadioRenderer
-impl yororen_ui_core::renderer::radio::RadioRenderer for yororen_ui_theme_material::renderer::MaterialRadioRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::dot_fg(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::dot_size(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::focus_color(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::ring_bg(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::ring_border(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::ring_hover_bg(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::ring_size(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::radio::RadioRenderer for yororen_ui_theme_material::renderer::MaterialRadioRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::disabled_opacity(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::dot_fg(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::dot_size(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::focus_color(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::ring_bg(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::ring_border(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::ring_hover_bg(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialRadioRenderer::ring_size(&self, &yororen_ui_renderer::renderers::radio::RadioRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialRadioRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialRadioRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialRadioRenderer
@@ -283,17 +283,17 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialRadioRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialRadioRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialSwitchRenderer
-impl yororen_ui_core::renderer::switch::SwitchRenderer for yororen_ui_theme_material::renderer::MaterialSwitchRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::focus_color(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::knob_bg(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::knob_size(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::padding(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::track_bg(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::track_border(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::track_h(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::track_hover_bg(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::track_w(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::switch::SwitchRenderer for yororen_ui_theme_material::renderer::MaterialSwitchRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::disabled_opacity(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::focus_color(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::knob_bg(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::knob_size(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::padding(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::track_bg(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::track_border(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::track_h(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::track_hover_bg(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialSwitchRenderer::track_w(&self, &yororen_ui_renderer::renderers::switch::SwitchRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialSwitchRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialSwitchRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialSwitchRenderer
@@ -302,16 +302,16 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialSwitchRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialSwitchRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialTagRenderer
-impl yororen_ui_core::renderer::tag::TagRenderer for yororen_ui_theme_material::renderer::MaterialTagRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::bg(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::border_radius(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::close_hover_bg(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::close_size(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::fg(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::font_size(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::font_weight(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
-pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::min_height(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::padding_x(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_renderer::renderers::tag::TagRenderer for yororen_ui_theme_material::renderer::MaterialTagRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::bg(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::border_radius(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::close_hover_bg(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::close_size(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::fg(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::font_size(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::font_weight(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::text_system::FontWeight
+pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::min_height(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialTagRenderer::padding_x(&self, &yororen_ui_renderer::renderers::tag::TagRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialTagRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialTagRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialTagRenderer
@@ -320,16 +320,16 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialTagRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialTagRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialTextInputRenderer
-impl yororen_ui_core::renderer::text_input::TextInputRenderer for yororen_ui_theme_material::renderer::MaterialTextInputRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::bg(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::border(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::border_radius(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::focus_border(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::hint_color(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::min_height(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::padding(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::text_color(&self, &yororen_ui_core::renderer::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_renderer::renderers::text_input::TextInputRenderer for yororen_ui_theme_material::renderer::MaterialTextInputRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::bg(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::border(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::border_radius(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::disabled_opacity(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> f32
+pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::focus_border(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::hint_color(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::min_height(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::padding(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_material::renderer::MaterialTextInputRenderer::text_color(&self, &yororen_ui_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialTextInputRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialTextInputRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialTextInputRenderer
@@ -338,13 +338,13 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialTextInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialTextInputRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialToastRenderer
-impl yororen_ui_core::renderer::toast::ToastRenderer for yororen_ui_theme_material::renderer::MaterialToastRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialToastRenderer::bg(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialToastRenderer::border(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialToastRenderer::border_radius(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialToastRenderer::fg(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialToastRenderer::padding(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_theme_material::renderer::MaterialToastRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_renderer::renderers::toast::ToastRenderer for yororen_ui_theme_material::renderer::MaterialToastRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialToastRenderer::bg(&self, &yororen_ui_renderer::renderers::toast::ToastRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialToastRenderer::border(&self, &yororen_ui_renderer::renderers::toast::ToastRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialToastRenderer::border_radius(&self, &yororen_ui_renderer::renderers::toast::ToastRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialToastRenderer::fg(&self, &yororen_ui_renderer::renderers::toast::ToastRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialToastRenderer::padding(&self, &yororen_ui_renderer::renderers::toast::ToastRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_theme_material::renderer::MaterialToastRenderer::shadow_alpha(&self, &yororen_ui_renderer::renderers::toast::ToastRenderState, &yororen_ui_renderer::theme::Theme) -> f32
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialToastRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialToastRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialToastRenderer
@@ -353,12 +353,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialToastRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialToastRenderer
 pub struct yororen_ui_theme_material::renderer::MaterialTooltipRenderer
-impl yororen_ui_core::renderer::tooltip::TooltipRenderer for yororen_ui_theme_material::renderer::MaterialTooltipRenderer
-pub fn yororen_ui_theme_material::renderer::MaterialTooltipRenderer::bg(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialTooltipRenderer::border_radius(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialTooltipRenderer::fg(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_theme_material::renderer::MaterialTooltipRenderer::font_size(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_theme_material::renderer::MaterialTooltipRenderer::padding(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+impl yororen_ui_renderer::renderers::tooltip::TooltipRenderer for yororen_ui_theme_material::renderer::MaterialTooltipRenderer
+pub fn yororen_ui_theme_material::renderer::MaterialTooltipRenderer::bg(&self, &yororen_ui_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialTooltipRenderer::border_radius(&self, &yororen_ui_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialTooltipRenderer::fg(&self, &yororen_ui_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_theme_material::renderer::MaterialTooltipRenderer::font_size(&self, &yororen_ui_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_renderer::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_theme_material::renderer::MaterialTooltipRenderer::padding(&self, &yororen_ui_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_renderer::theme::Theme) -> yororen_ui_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
 impl core::marker::Freeze for yororen_ui_theme_material::renderer::MaterialTooltipRenderer
 impl core::marker::Send for yororen_ui_theme_material::renderer::MaterialTooltipRenderer
 impl core::marker::Sync for yororen_ui_theme_material::renderer::MaterialTooltipRenderer
@@ -367,7 +367,7 @@ impl core::marker::UnsafeUnpin for yororen_ui_theme_material::renderer::Material
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_theme_material::renderer::MaterialTooltipRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_theme_material::renderer::MaterialTooltipRenderer
 pub const yororen_ui_theme_material::renderer::FOCUS_RING_WIDTH: f32
-pub fn yororen_ui_theme_material::renderer::material_registry() -> yororen_ui_core::renderer::registry::RendererRegistry
-pub fn yororen_ui_theme_material::dark() -> yororen_ui_core::theme::Theme
+pub fn yororen_ui_theme_material::renderer::material_registry() -> yororen_ui_renderer::renderers::registry::RendererRegistry
+pub fn yororen_ui_theme_material::dark() -> yororen_ui_renderer::theme::Theme
 pub fn yororen_ui_theme_material::install(&mut gpui::app::App, gpui::platform::WindowAppearance)
-pub fn yororen_ui_theme_material::light() -> yororen_ui_core::theme::Theme
+pub fn yororen_ui_theme_material::light() -> yororen_ui_renderer::theme::Theme

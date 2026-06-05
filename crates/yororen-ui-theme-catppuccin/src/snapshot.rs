@@ -46,7 +46,7 @@ use crate::renderer::{
     CatppuccinTextInputRenderer, CatppuccinToastRenderer, CatppuccinToggleButtonRenderer,
     CatppuccinTooltipRenderer, CatppuccinTreeItemRenderer,
 };
-use yororen_ui_core::renderer::{
+use yororen_ui_renderer::renderers::{
     AvatarRenderState, BadgeRenderState, ButtonRenderState, CardRenderState, CheckboxRenderState,
     ComboBoxRenderState, DisclosureRenderState, DividerRenderState, DropdownMenuRenderState,
     EmptyStateRenderState, FilePathInputRenderState, FocusRingRenderState, FormRenderState,
@@ -61,7 +61,7 @@ use yororen_ui_core::renderer::{
 
 // Bring each renderer's trait into scope as `_` so the renderer
 // methods (bg, fg, border, ...) are callable.
-use yororen_ui_core::renderer::{
+use yororen_ui_renderer::renderers::{
     AvatarRenderer, BadgeRenderer, ButtonRenderer, CardRenderer, CheckboxRenderer,
     ComboBoxRenderer, DisclosureRenderer, DividerRenderer, DropdownMenuRenderer,
     EmptyStateRenderer, FilePathInputRenderer, FocusRingRenderer, FormRenderer, HeadingRenderer,
@@ -72,8 +72,8 @@ use yororen_ui_core::renderer::{
     TextInputRenderer, ToastRenderer, ToggleButtonRenderer, TooltipRenderer, TreeItemRenderer,
 };
 
-use yororen_ui_core::component::HeadingLevel;
-use yororen_ui_core::renderer::spec::Edges;
+use yororen_ui_core::headless::heading::HeadingLevel;
+use yororen_ui_renderer::renderers::spec::Edges;
 
 /// Snapshot of one renderer's output for one flavor.
 #[derive(Clone, Debug)]
@@ -410,7 +410,7 @@ pub fn build_snapshot() -> SnapshotHash {
     h
 }
 
-use yororen_ui_core::theme::ActionVariantKind;
+use yororen_ui_renderer::theme::ActionVariantKind;
 fn btn(variant: ActionVariantKind) -> ButtonRenderState {
     ButtonRenderState {
         variant,

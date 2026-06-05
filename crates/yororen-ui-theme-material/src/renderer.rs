@@ -19,8 +19,8 @@ use std::sync::Arc;
 
 use gpui::{FontWeight, Hsla, Pixels, SharedString, px};
 
-use yororen_ui_core::renderer::spec::Edges;
-use yororen_ui_core::renderer::{
+use yororen_ui_renderer::renderers::spec::Edges;
+use yororen_ui_renderer::renderers::{
     AvatarRenderState, AvatarRenderer, BadgeRenderState, BadgeRenderer, ButtonRenderState,
     ButtonRenderer, CardRenderState, CardRenderer, CheckboxRenderState, CheckboxRenderer,
     DividerRenderState, DividerRenderer, FocusRingRenderState, FocusRingRenderer,
@@ -31,7 +31,7 @@ use yororen_ui_core::renderer::{
     TagRenderState, TagRenderer, TextInputRenderState, TextInputRenderer, ToastRenderState,
     ToastRenderer, TooltipRenderState, TooltipRenderer,
 };
-use yororen_ui_core::theme::Theme;
+use yororen_ui_renderer::theme::Theme;
 
 use crate::palette::{self, radii, state_layer};
 
@@ -54,7 +54,7 @@ pub struct MaterialButtonRenderer;
 impl ButtonRenderer for MaterialButtonRenderer {
     fn bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
         if let Some(s) = &state.custom_style {
-            return s.bg(&yororen_ui_core::renderer::VariantState {
+            return s.bg(&yororen_ui_renderer::renderers::VariantState {
                 disabled: state.disabled,
             });
         }
@@ -64,7 +64,7 @@ impl ButtonRenderer for MaterialButtonRenderer {
 
     fn fg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
         if let Some(s) = &state.custom_style {
-            return s.fg(&yororen_ui_core::renderer::VariantState {
+            return s.fg(&yororen_ui_renderer::renderers::VariantState {
                 disabled: state.disabled,
             });
         }
@@ -76,9 +76,9 @@ impl ButtonRenderer for MaterialButtonRenderer {
         &self,
         _state: &ButtonRenderState,
         theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
         let t = &theme.tokens.control.button;
-        yororen_ui_core::renderer::Edges::symmetric(
+        yororen_ui_renderer::renderers::Edges::symmetric(
             t.horizontal_padding,
             t.horizontal_padding / 2.4,
         )
@@ -92,7 +92,7 @@ impl ButtonRenderer for MaterialButtonRenderer {
         &self,
         _state: &ButtonRenderState,
         _theme: &Theme,
-    ) -> Option<yororen_ui_core::renderer::BorderSpec> {
+    ) -> Option<yororen_ui_renderer::renderers::BorderSpec> {
         None
     }
 
@@ -100,7 +100,7 @@ impl ButtonRenderer for MaterialButtonRenderer {
         &self,
         _state: &ButtonRenderState,
         _theme: &Theme,
-    ) -> Option<yororen_ui_core::renderer::ShadowSpec> {
+    ) -> Option<yororen_ui_renderer::renderers::ShadowSpec> {
         None
     }
 
@@ -170,8 +170,8 @@ impl CardRenderer for MaterialCardRenderer {
         &self,
         _state: &CardRenderState,
         _theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::all(px(16.0))
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::all(px(16.0))
     }
     fn border_radius(&self, _state: &CardRenderState, _theme: &Theme) -> Pixels {
         px(radii::LG)
@@ -210,8 +210,8 @@ impl ModalRenderer for MaterialModalRenderer {
         &self,
         _state: &ModalRenderState,
         _theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::all(px(24.0))
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::all(px(24.0))
     }
     fn panel_border_radius(&self, _state: &ModalRenderState, _theme: &Theme) -> Pixels {
         px(28.0)
@@ -309,8 +309,8 @@ impl TextInputRenderer for MaterialTextInputRenderer {
         &self,
         _state: &TextInputRenderState,
         theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::symmetric(
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::symmetric(
             theme.tokens.control.input.horizontal_padding,
             theme.tokens.control.input.vertical_padding,
         )
@@ -495,8 +495,8 @@ impl ToastRenderer for MaterialToastRenderer {
         &self,
         _state: &ToastRenderState,
         theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::symmetric(
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::symmetric(
             theme.tokens.spacing.inset_md,
             theme.tokens.spacing.inset_sm,
         )
@@ -627,8 +627,8 @@ impl ListItemRenderer for MaterialListItemRenderer {
         &self,
         _state: &ListItemRenderState,
         theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::symmetric(
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::symmetric(
             theme.tokens.spacing.inset_md,
             theme.tokens.spacing.inset_xs,
         )
@@ -682,8 +682,8 @@ impl TooltipRenderer for MaterialTooltipRenderer {
         &self,
         _state: &TooltipRenderState,
         _theme: &Theme,
-    ) -> yororen_ui_core::renderer::Edges<Pixels> {
-        yororen_ui_core::renderer::Edges::all(px(8.0))
+    ) -> yororen_ui_renderer::renderers::Edges<Pixels> {
+        yororen_ui_renderer::renderers::Edges::all(px(8.0))
     }
     fn font_size(&self, _state: &TooltipRenderState, theme: &Theme) -> Pixels {
         theme.tokens.typography.font_size_sm
@@ -844,7 +844,7 @@ pub fn material_registry() -> RendererRegistry {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use yororen_ui_core::theme::ActionVariantKind;
+    use yororen_ui_renderer::theme::ActionVariantKind;
 
     fn test_state() -> ButtonRenderState {
         ButtonRenderState {
