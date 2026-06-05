@@ -15,6 +15,15 @@ use gpui::{
     StatefulInteractiveElement, Window,
 };
 
+use crate::renderer::RendererMarker;
+
+/// Marker for the `Button` component. The renderer crate (built-in
+/// or third-party) registers its `ButtonRenderer` impl against
+/// this marker; render-time code retrieves it via
+/// `cx.renderer_arc::<Button, dyn ButtonRenderer>()`.
+pub struct Button;
+impl RendererMarker for Button {}
+
 /// Click handler shared by every interactive headless primitive.
 pub type ClickCallback = Arc<dyn Fn(&ClickEvent, &mut Window, &mut App) + Send + Sync>;
 

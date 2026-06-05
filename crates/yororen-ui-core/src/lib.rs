@@ -29,5 +29,6 @@ pub mod assets;
 pub mod headless;
 pub mod i18n;
 pub mod notification;
+pub mod renderer;
 pub mod rtl;
 pub mod theme;

@@ -881,6 +881,15 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::badg
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::badge::BadgeProps
 pub fn yororen_ui_core::headless::badge::badge(impl core::convert::Into<gpui::window::ElementId>, impl core::convert::Into<alloc::string::String>, &mut gpui::app::App) -> yororen_ui_core::headless::badge::BadgeProps
 pub mod yororen_ui_core::headless::button
+pub struct yororen_ui_core::headless::button::Button
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::headless::button::Button
+impl core::marker::Freeze for yororen_ui_core::headless::button::Button
+impl core::marker::Send for yororen_ui_core::headless::button::Button
+impl core::marker::Sync for yororen_ui_core::headless::button::Button
+impl core::marker::Unpin for yororen_ui_core::headless::button::Button
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::button::Button
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::button::Button
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::button::Button
 pub struct yororen_ui_core::headless::button::ButtonProps
 pub yororen_ui_core::headless::button::ButtonProps::clickable: bool
 pub yororen_ui_core::headless::button::ButtonProps::disabled: bool
@@ -3709,6 +3718,38 @@ impl core::marker::Unpin for yororen_ui_core::notification::NotificationId
 impl core::marker::UnsafeUnpin for yororen_ui_core::notification::NotificationId
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::notification::NotificationId
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::notification::NotificationId
+pub mod yororen_ui_core::renderer
+pub struct yororen_ui_core::renderer::RendererRegistry
+impl yororen_ui_core::renderer::RendererRegistry
+pub fn yororen_ui_core::renderer::RendererRegistry::contains<T: yororen_ui_core::renderer::RendererMarker>(&self) -> bool
+pub fn yororen_ui_core::renderer::RendererRegistry::is_empty(&self) -> bool
+pub fn yororen_ui_core::renderer::RendererRegistry::len(&self) -> usize
+pub fn yororen_ui_core::renderer::RendererRegistry::new() -> Self
+pub fn yororen_ui_core::renderer::RendererRegistry::register_arc<T: yororen_ui_core::renderer::RendererMarker, R: ?core::marker::Sized + core::marker::Send + core::marker::Sync + 'static>(&mut self, alloc::sync::Arc<R>)
+pub fn yororen_ui_core::renderer::RendererRegistry::renderer_arc<T: yororen_ui_core::renderer::RendererMarker, R: ?core::marker::Sized + core::marker::Send + core::marker::Sync + 'static>(&self) -> core::option::Option<&alloc::sync::Arc<R>>
+impl core::default::Default for yororen_ui_core::renderer::RendererRegistry
+pub fn yororen_ui_core::renderer::RendererRegistry::default() -> yororen_ui_core::renderer::RendererRegistry
+impl core::fmt::Debug for yororen_ui_core::renderer::RendererRegistry
+pub fn yororen_ui_core::renderer::RendererRegistry::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl gpui::global::Global for yororen_ui_core::renderer::RendererRegistry
+impl core::marker::Freeze for yororen_ui_core::renderer::RendererRegistry
+impl core::marker::Send for yororen_ui_core::renderer::RendererRegistry
+impl core::marker::Sync for yororen_ui_core::renderer::RendererRegistry
+impl core::marker::Unpin for yororen_ui_core::renderer::RendererRegistry
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::RendererRegistry
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::RendererRegistry
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::RendererRegistry
+pub trait yororen_ui_core::renderer::RendererContext
+pub fn yororen_ui_core::renderer::RendererContext::has_renderer<T: yororen_ui_core::renderer::RendererMarker>(&self) -> bool
+pub fn yororen_ui_core::renderer::RendererContext::register_renderer_arc<T: yororen_ui_core::renderer::RendererMarker, R: ?core::marker::Sized + core::marker::Send + core::marker::Sync + 'static>(&mut self, alloc::sync::Arc<R>)
+pub fn yororen_ui_core::renderer::RendererContext::renderer_arc<T: yororen_ui_core::renderer::RendererMarker, R: ?core::marker::Sized + core::marker::Send + core::marker::Sync + 'static>(&self) -> core::option::Option<&alloc::sync::Arc<R>>
+impl yororen_ui_core::renderer::RendererContext for gpui::app::App
+pub fn gpui::app::App::has_renderer<T: yororen_ui_core::renderer::RendererMarker>(&self) -> bool
+pub fn gpui::app::App::register_renderer_arc<T: yororen_ui_core::renderer::RendererMarker, R: ?core::marker::Sized + core::marker::Send + core::marker::Sync + 'static>(&mut self, alloc::sync::Arc<R>)
+pub fn gpui::app::App::renderer_arc<T: yororen_ui_core::renderer::RendererMarker, R: ?core::marker::Sized + core::marker::Send + core::marker::Sync + 'static>(&self) -> core::option::Option<&alloc::sync::Arc<R>>
+pub trait yororen_ui_core::renderer::RendererMarker: 'static
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::headless::button::Button
+pub fn yororen_ui_core::renderer::init_renderer_registry(&mut gpui::app::App)
 pub mod yororen_ui_core::rtl
 pub fn yororen_ui_core::rtl::corner_radius_end(&mut gpui::style::StyleRefinement, yororen_ui_core::i18n::locale::TextDirection, impl core::convert::Into<gpui::geometry::AbsoluteLength>)
 pub fn yororen_ui_core::rtl::corner_radius_end_none(&mut gpui::style::StyleRefinement, yororen_ui_core::i18n::locale::TextDirection)
