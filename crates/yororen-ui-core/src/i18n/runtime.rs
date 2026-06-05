@@ -123,19 +123,17 @@ impl I18n {
     /// English string instead of leaking the raw `common.cancel`
     /// key path into the UI.
     pub fn t(&self, key: &str) -> Option<&str> {
-        if let Some(map) = self.translations.get(&self.current_locale) {
-            if let Some(value) = map.get(key) {
-                return Some(value);
-            }
+        if let Some(map) = self.translations.get(&self.current_locale)
+            && let Some(value) = map.get(key)
+        {
+            return Some(value);
         }
-        if let Some(fallback) = &self.fallback_locale {
-            if fallback != &self.current_locale {
-                if let Some(map) = self.translations.get(fallback) {
-                    if let Some(value) = map.get(key) {
-                        return Some(value);
-                    }
-                }
-            }
+        if let Some(fallback) = &self.fallback_locale
+            && fallback != &self.current_locale
+            && let Some(map) = self.translations.get(fallback)
+            && let Some(value) = map.get(key)
+        {
+            return Some(value);
         }
         None
     }
@@ -440,10 +438,7 @@ mod tests {
         let zh = Locale::new("zh-CN").unwrap();
         let en = Locale::new("en").unwrap();
         let mut i18n = I18n::with_locale_fallback(zh.clone(), en.clone());
-        i18n.load_translations(
-            zh,
-            map_with(&[("common.save", "保存")]),
-        );
+        i18n.load_translations(zh, map_with(&[("common.save", "保存")]));
         i18n.load_translations(
             en,
             map_with(&[("common.save", "Save"), ("common.cancel", "Cancel")]),

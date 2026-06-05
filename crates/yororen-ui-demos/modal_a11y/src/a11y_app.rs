@@ -206,7 +206,6 @@ fn build_standard_modal(
     modal()
         .id(modal_id)
         .title(title.clone())
-        .aria_label(title)
         .content(label(body))
         .actions(modal_actions_row(
             yororen_ui::i18n::TextDirection::Ltr,
@@ -237,8 +236,7 @@ mod tests {
 
     #[test]
     fn build_standard_modal_returns_any_element() {
-        let on_close: OverlayCloseCallback =
-            Arc::new(|_reason, _w, _cx| {});
+        let on_close: OverlayCloseCallback = Arc::new(|_reason, _w, _cx| {});
         let _: gpui::AnyElement = build_standard_modal("t", "b", on_close);
     }
 

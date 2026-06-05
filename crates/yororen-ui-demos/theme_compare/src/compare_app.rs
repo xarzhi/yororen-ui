@@ -92,11 +92,7 @@ fn panel(title: &str, bg: gpui::Hsla) -> gpui::AnyElement {
         .flex()
         .flex_col()
         .gap(px(12.))
-        .child(
-            label(title.to_string())
-                .strong(true)
-                .text_size(px(14.0)),
-        )
+        .child(label(title.to_string()).strong(true).text_size(px(14.0)))
         .child(
             div()
                 .flex()

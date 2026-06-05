@@ -23,13 +23,13 @@ use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::renderer::{
     AvatarRenderState, AvatarRenderer, BadgeRenderState, BadgeRenderer, ButtonRenderState,
     ButtonRenderer, CardRenderState, CardRenderer, CheckboxRenderState, CheckboxRenderer,
-    DividerRenderState, DividerRenderer, FocusRingRenderState, FocusRingRenderer, HeadingRenderState,
-    HeadingRenderer, IconButtonRenderState, IconButtonRenderer, LabelRenderState, LabelRenderer,
-    ListItemRenderState, ListItemRenderer, ModalRenderState, ModalRenderer, PanelRenderState,
-    PanelRenderer, PopoverRenderState, PopoverRenderer, RadioRenderState, RadioRenderer,
-    RendererRegistry, SwitchRenderState, SwitchRenderer, TagRenderState, TagRenderer,
-    TextInputRenderState, TextInputRenderer, ToastRenderState, ToastRenderer, TooltipRenderState,
-    TooltipRenderer,
+    DividerRenderState, DividerRenderer, FocusRingRenderState, FocusRingRenderer,
+    HeadingRenderState, HeadingRenderer, IconButtonRenderState, IconButtonRenderer,
+    LabelRenderState, LabelRenderer, ListItemRenderState, ListItemRenderer, ModalRenderState,
+    ModalRenderer, PanelRenderState, PanelRenderer, PopoverRenderState, PopoverRenderer,
+    RadioRenderState, RadioRenderer, RendererRegistry, SwitchRenderState, SwitchRenderer,
+    TagRenderState, TagRenderer, TextInputRenderState, TextInputRenderer, ToastRenderState,
+    ToastRenderer, TooltipRenderState, TooltipRenderer,
 };
 use yororen_ui_core::theme::Theme;
 
@@ -138,11 +138,7 @@ impl IconButtonRenderer for MaterialIconButtonRenderer {
         }
     }
     fn hover_bg(&self, _state: &IconButtonRenderState, theme: &Theme) -> Hsla {
-        palette::apply_state_layer(
-            theme.surface.base,
-            theme.border.focus,
-            state_layer::HOVER,
-        )
+        palette::apply_state_layer(theme.surface.base, theme.border.focus, state_layer::HOVER)
     }
     fn size(&self, _state: &IconButtonRenderState, _theme: &Theme) -> Pixels {
         px(40.0)
@@ -368,11 +364,7 @@ impl SwitchRenderer for MaterialSwitchRenderer {
                 state_layer::HOVER,
             )
         } else {
-            palette::apply_state_layer(
-                theme.surface.sunken,
-                theme.border.focus,
-                state_layer::HOVER,
-            )
+            palette::apply_state_layer(theme.surface.sunken, theme.border.focus, state_layer::HOVER)
         }
     }
     fn knob_bg(&self, _state: &SwitchRenderState, theme: &Theme) -> Hsla {
@@ -426,11 +418,7 @@ impl CheckboxRenderer for MaterialCheckboxRenderer {
                 state_layer::HOVER,
             )
         } else {
-            palette::apply_state_layer(
-                theme.surface.base,
-                theme.border.focus,
-                state_layer::HOVER,
-            )
+            palette::apply_state_layer(theme.surface.base, theme.border.focus, state_layer::HOVER)
         }
     }
     fn check_fg(&self, _state: &CheckboxRenderState, theme: &Theme) -> Hsla {
@@ -469,11 +457,7 @@ impl RadioRenderer for MaterialRadioRenderer {
         }
     }
     fn ring_hover_bg(&self, _state: &RadioRenderState, theme: &Theme) -> Hsla {
-        palette::apply_state_layer(
-            theme.surface.base,
-            theme.border.focus,
-            state_layer::HOVER,
-        )
+        palette::apply_state_layer(theme.surface.base, theme.border.focus, state_layer::HOVER)
     }
     fn dot_fg(&self, _state: &RadioRenderState, theme: &Theme) -> Hsla {
         theme.border.focus
@@ -544,11 +528,7 @@ pub struct MaterialTagRenderer;
 impl TagRenderer for MaterialTagRenderer {
     fn bg(&self, state: &TagRenderState, theme: &Theme) -> Hsla {
         if state.selected {
-            palette::apply_state_layer(
-                theme.surface.base,
-                theme.border.focus,
-                state_layer::PRESSED,
-            )
+            palette::apply_state_layer(theme.surface.base, theme.border.focus, state_layer::PRESSED)
         } else {
             theme.surface.base
         }
@@ -579,11 +559,7 @@ impl TagRenderer for MaterialTagRenderer {
         px(16.0)
     }
     fn close_hover_bg(&self, _state: &TagRenderState, theme: &Theme) -> Hsla {
-        palette::apply_state_layer(
-            theme.surface.base,
-            theme.border.focus,
-            state_layer::HOVER,
-        )
+        palette::apply_state_layer(theme.surface.base, theme.border.focus, state_layer::HOVER)
     }
 }
 
@@ -635,18 +611,10 @@ impl ListItemRenderer for MaterialListItemRenderer {
         theme.surface.base
     }
     fn hover_bg(&self, _state: &ListItemRenderState, theme: &Theme) -> Hsla {
-        palette::apply_state_layer(
-            theme.surface.base,
-            theme.border.focus,
-            state_layer::HOVER,
-        )
+        palette::apply_state_layer(theme.surface.base, theme.border.focus, state_layer::HOVER)
     }
     fn selected_bg(&self, _state: &ListItemRenderState, theme: &Theme) -> Hsla {
-        palette::apply_state_layer(
-            theme.surface.base,
-            theme.border.focus,
-            state_layer::PRESSED,
-        )
+        palette::apply_state_layer(theme.surface.base, theme.border.focus, state_layer::PRESSED)
     }
     fn fg(&self, state: &ListItemRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
@@ -815,11 +783,7 @@ pub struct MaterialAvatarRenderer;
 
 impl AvatarRenderer for MaterialAvatarRenderer {
     fn default_bg(&self, _state: &AvatarRenderState, theme: &Theme) -> Hsla {
-        palette::apply_state_layer(
-            theme.surface.base,
-            theme.border.focus,
-            0.20,
-        )
+        palette::apply_state_layer(theme.surface.base, theme.border.focus, 0.20)
     }
     fn border_radius(&self, state: &AvatarRenderState, theme: &Theme) -> Pixels {
         if state.is_circle {
@@ -895,7 +859,11 @@ mod tests {
         let r = MaterialButtonRenderer;
         let state = test_state();
         let radius = r.border_radius(&state, &theme);
-        assert!(radius.to_f64() > 100.0, "M3 button should be pill, got {}", radius.to_f64());
+        assert!(
+            radius.to_f64() > 100.0,
+            "M3 button should be pill, got {}",
+            radius.to_f64()
+        );
     }
 
     #[test]

@@ -216,7 +216,7 @@ pub fn validate(theme: &Theme) -> Vec<Issue> {
 /// "obvious garbage" such as f32::MAX leaking through arithmetic.
 fn validate_finite_pixels(token_path: &'static str, value: gpui::Pixels, issues: &mut Vec<Issue>) {
     let v: f32 = value.into();
-    if !v.is_finite() || v < 0.0 || v > 4096.0 {
+    if !v.is_finite() || !(0.0..=4096.0).contains(&v) {
         issues.push(Issue {
             kind: IssueKind::TokenOutOfRange {
                 token_path,

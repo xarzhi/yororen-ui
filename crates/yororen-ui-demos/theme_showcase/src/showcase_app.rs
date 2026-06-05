@@ -108,11 +108,7 @@ fn panel(title: &str, bg: gpui::Hsla) -> gpui::AnyElement {
         .flex()
         .flex_col()
         .gap(px(12.))
-        .child(
-            label(title.to_string())
-                .strong(true)
-                .text_size(px(14.0)),
-        )
+        .child(label(title.to_string()).strong(true).text_size(px(14.0)))
         .child(
             div()
                 .flex()
@@ -175,9 +171,7 @@ mod tests {
             k = match k {
                 RightThemeKind::System => RightThemeKind::Catppuccin,
                 RightThemeKind::Catppuccin => RightThemeKind::Material,
-                RightThemeKind::Material => {
-                    RightThemeKind::CatppuccinRenderersOnSystemPalette
-                }
+                RightThemeKind::Material => RightThemeKind::CatppuccinRenderersOnSystemPalette,
                 RightThemeKind::CatppuccinRenderersOnSystemPalette => RightThemeKind::System,
             };
         }
@@ -193,8 +187,16 @@ mod tests {
         };
         let cat_theme = catppuccin_theme(gpui::WindowAppearance::Dark);
         let sys_theme = system_theme(gpui::WindowAppearance::Dark);
-        let cat_bg = cat_theme.renderers.get_button().expect("ButtonRenderer registered").bg(&state, &cat_theme);
-        let sys_bg = cat_theme.renderers.get_button().expect("ButtonRenderer registered").bg(&state, &sys_theme);
+        let cat_bg = cat_theme
+            .renderers
+            .get_button()
+            .expect("ButtonRenderer registered")
+            .bg(&state, &cat_theme);
+        let sys_bg = cat_theme
+            .renderers
+            .get_button()
+            .expect("ButtonRenderer registered")
+            .bg(&state, &sys_theme);
         assert_ne!(cat_bg, sys_bg);
     }
 
@@ -206,7 +208,11 @@ mod tests {
             ..Default::default()
         };
         let mat_theme = material_theme(gpui::WindowAppearance::Dark);
-        let radius = mat_theme.renderers.get_button().expect("ButtonRenderer registered").border_radius(&state, &mat_theme);
+        let radius = mat_theme
+            .renderers
+            .get_button()
+            .expect("ButtonRenderer registered")
+            .border_radius(&state, &mat_theme);
         let radius_px = radius.to_f64();
         assert!(
             radius_px > 100.0,

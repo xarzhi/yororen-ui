@@ -29,15 +29,15 @@ use yororen_ui_core::renderer::{
     EmptyStateRenderState, EmptyStateRenderer, FilePathInputRenderState, FilePathInputRenderer,
     FocusRingRenderState, FocusRingRenderer, FormRenderState, FormRenderer, HeadingRenderState,
     HeadingRenderer, IconButtonRenderState, IconButtonRenderer, KeybindingInputRenderState,
-    KeybindingInputRenderer, LabelRenderState,
-    LabelRenderer, ListItemRenderState, ListItemRenderer, ModalRenderState, ModalRenderer,
-    NotificationRenderState, NotificationRenderer, NumberInputRenderState, NumberInputRenderer,
-    PanelRenderState, PanelRenderer, PasswordInputRenderState, PasswordInputRenderer,
-    PopoverRenderState, PopoverRenderer, ProgressBarRenderState, ProgressBarRenderer,
-    RadioRenderState, RadioRenderer, RendererRegistry, SearchInputRenderState, SearchInputRenderer,
-    SelectRenderState, SelectRenderer, SkeletonRenderState, SkeletonRenderer,
-    SplitButtonRenderState, SplitButtonRenderer, SwitchRenderState, SwitchRenderer, TagRenderState,
-    TagRenderer, TextAreaRenderState, TextAreaRenderer, TextInputRenderState, TextInputRenderer,
+    KeybindingInputRenderer, LabelRenderState, LabelRenderer, ListItemRenderState,
+    ListItemRenderer, ModalRenderState, ModalRenderer, NotificationRenderState,
+    NotificationRenderer, NumberInputRenderState, NumberInputRenderer, PanelRenderState,
+    PanelRenderer, PasswordInputRenderState, PasswordInputRenderer, PopoverRenderState,
+    PopoverRenderer, ProgressBarRenderState, ProgressBarRenderer, RadioRenderState, RadioRenderer,
+    RendererRegistry, SearchInputRenderState, SearchInputRenderer, SelectRenderState,
+    SelectRenderer, SkeletonRenderState, SkeletonRenderer, SplitButtonRenderState,
+    SplitButtonRenderer, SwitchRenderState, SwitchRenderer, TagRenderState, TagRenderer,
+    TextAreaRenderState, TextAreaRenderer, TextInputRenderState, TextInputRenderer,
     ToastRenderState, ToastRenderer, ToggleButtonRenderState, ToggleButtonRenderer,
     TooltipRenderState, TooltipRenderer, TreeItemRenderState, TreeItemRenderer,
 };
@@ -1757,33 +1757,53 @@ mod tests {
     fn registry_includes_twelve_custom_renderers() {
         let reg = catppuccin_registry();
         // All 12 of our overrides are in place.
-        let _ = reg.get_button().expect("ButtonRenderer registered").bg(&ButtonRenderState::default(), &cat_light());
-        let _ = reg.get_card().expect("CardRenderer registered").bg(&CardRenderState::default(), &cat_light());
         let _ = reg
-            .get_modal().expect("ModalRenderer registered")
+            .get_button()
+            .expect("ButtonRenderer registered")
+            .bg(&ButtonRenderState::default(), &cat_light());
+        let _ = reg
+            .get_card()
+            .expect("CardRenderer registered")
+            .bg(&CardRenderState::default(), &cat_light());
+        let _ = reg
+            .get_modal()
+            .expect("ModalRenderer registered")
             .panel_bg(&ModalRenderState::default(), &cat_light());
         let _ = reg
-            .get_focus_ring().expect("FocusRingRenderer registered")
+            .get_focus_ring()
+            .expect("FocusRingRenderer registered")
             .color(&FocusRingRenderState::default(), &cat_light());
         let _ = reg
-            .get_text_input().expect("TextInputRenderer registered")
+            .get_text_input()
+            .expect("TextInputRenderer registered")
             .bg(&TextInputRenderState::default(), &cat_light());
         let _ = reg
-            .get_switch().expect("SwitchRenderer registered")
+            .get_switch()
+            .expect("SwitchRenderer registered")
             .track_bg(&SwitchRenderState::default(), &cat_light());
         let _ = reg
-            .get_checkbox().expect("CheckboxRenderer registered")
+            .get_checkbox()
+            .expect("CheckboxRenderer registered")
             .box_bg(&CheckboxRenderState::default(), &cat_light());
         let _ = reg
-            .get_radio().expect("RadioRenderer registered")
+            .get_radio()
+            .expect("RadioRenderer registered")
             .ring_bg(&RadioRenderState::default(), &cat_light());
-        let _ = reg.get_toast().expect("ToastRenderer registered").bg(&ToastRenderState::default(), &cat_light());
-        let _ = reg.get_tag().expect("TagRenderer registered").bg(&TagRenderState::default(), &cat_light());
         let _ = reg
-            .get_list_item().expect("ListItemRenderer registered")
+            .get_toast()
+            .expect("ToastRenderer registered")
+            .bg(&ToastRenderState::default(), &cat_light());
+        let _ = reg
+            .get_tag()
+            .expect("TagRenderer registered")
+            .bg(&TagRenderState::default(), &cat_light());
+        let _ = reg
+            .get_list_item()
+            .expect("ListItemRenderer registered")
             .bg(&ListItemRenderState::default(), &cat_light());
         let _ = reg
-            .get_empty_state().expect("EmptyStateRenderer registered")
+            .get_empty_state()
+            .expect("EmptyStateRenderer registered")
             .icon_color(&EmptyStateRenderState::default(), &cat_light());
     }
 
@@ -1804,9 +1824,18 @@ mod tests {
         };
         let reg = catppuccin_registry();
         let theme = cat_light();
-        let _ = reg.get_avatar().expect("AvatarRenderer registered").default_bg(&AvatarRenderState::default(), &theme);
-        let _ = reg.get_badge().expect("BadgeRenderer registered").bg(&BadgeRenderState::default(), &theme);
-        let _ = reg.get_divider().expect("DividerRenderer registered").color(&DividerRenderState::default(), &theme);
+        let _ = reg
+            .get_avatar()
+            .expect("AvatarRenderer registered")
+            .default_bg(&AvatarRenderState::default(), &theme);
+        let _ = reg
+            .get_badge()
+            .expect("BadgeRenderer registered")
+            .bg(&BadgeRenderState::default(), &theme);
+        let _ = reg
+            .get_divider()
+            .expect("DividerRenderer registered")
+            .color(&DividerRenderState::default(), &theme);
         let _ = reg.get_heading().expect("HeadingRenderer registered").size(
             &HeadingRenderState {
                 level: HeadingLevel::H1,
@@ -1814,50 +1843,89 @@ mod tests {
             &theme,
         );
         let _ = reg
-            .get_icon_button().expect("IconButtonRenderer registered")
+            .get_icon_button()
+            .expect("IconButtonRenderer registered")
             .bg(&IconButtonRenderState::default(), &theme);
         let _ = reg
-            .get_toggle_button().expect("ToggleButtonRenderer registered")
+            .get_toggle_button()
+            .expect("ToggleButtonRenderer registered")
             .bg(&ToggleButtonRenderState::default(), &theme);
         let _ = reg
-            .get_progress_bar().expect("ProgressBarRenderer registered")
+            .get_progress_bar()
+            .expect("ProgressBarRenderer registered")
             .track(&ProgressBarRenderState::default(), &theme);
-        let _ = reg.get_skeleton().expect("SkeletonRenderer registered").bg(&SkeletonRenderState::default(), &theme);
-        let _ = reg.get_tooltip().expect("TooltipRenderer registered").bg(&TooltipRenderState::default(), &theme);
         let _ = reg
-            .get_notification().expect("NotificationRenderer registered")
+            .get_skeleton()
+            .expect("SkeletonRenderer registered")
+            .bg(&SkeletonRenderState::default(), &theme);
+        let _ = reg
+            .get_tooltip()
+            .expect("TooltipRenderer registered")
+            .bg(&TooltipRenderState::default(), &theme);
+        let _ = reg
+            .get_notification()
+            .expect("NotificationRenderer registered")
             .bg(&NotificationRenderState::default(), &theme);
-        let _ = reg.get_popover().expect("PopoverRenderer registered").bg(&PopoverRenderState::default(), &theme);
         let _ = reg
-            .get_dropdown_menu().expect("DropdownMenuRenderer registered")
+            .get_popover()
+            .expect("PopoverRenderer registered")
+            .bg(&PopoverRenderState::default(), &theme);
+        let _ = reg
+            .get_dropdown_menu()
+            .expect("DropdownMenuRenderer registered")
             .trigger_bg(&DropdownMenuRenderState::default(), &theme);
-        let _ = reg.get_select().expect("SelectRenderer registered").bg(&SelectRenderState::default(), &theme);
-        let _ = reg.get_combo_box().expect("ComboBoxRenderer registered").bg(&ComboBoxRenderState::default(), &theme);
-        let _ = reg.get_text_area().expect("TextAreaRenderer registered").bg(&TextAreaRenderState::default(), &theme);
         let _ = reg
-            .get_number_input().expect("NumberInputRenderer registered")
+            .get_select()
+            .expect("SelectRenderer registered")
+            .bg(&SelectRenderState::default(), &theme);
+        let _ = reg
+            .get_combo_box()
+            .expect("ComboBoxRenderer registered")
+            .bg(&ComboBoxRenderState::default(), &theme);
+        let _ = reg
+            .get_text_area()
+            .expect("TextAreaRenderer registered")
+            .bg(&TextAreaRenderState::default(), &theme);
+        let _ = reg
+            .get_number_input()
+            .expect("NumberInputRenderer registered")
             .bg(&NumberInputRenderState::default(), &theme);
         let _ = reg
-            .get_password_input().expect("PasswordInputRenderer registered")
+            .get_password_input()
+            .expect("PasswordInputRenderer registered")
             .bg(&PasswordInputRenderState::default(), &theme);
         let _ = reg
-            .get_file_path_input().expect("FilePathInputRenderer registered")
+            .get_file_path_input()
+            .expect("FilePathInputRenderer registered")
             .bg(&FilePathInputRenderState::default(), &theme);
         let _ = reg
-            .get_search_input().expect("SearchInputRenderer registered")
+            .get_search_input()
+            .expect("SearchInputRenderer registered")
             .bg(&SearchInputRenderState::default(), &theme);
         let _ = reg
-            .get_disclosure().expect("DisclosureRenderer registered")
+            .get_disclosure()
+            .expect("DisclosureRenderer registered")
             .trigger_bg(&DisclosureRenderState::default(), &theme);
         let _ = reg
-            .get_keybinding_input().expect("KeybindingInputRenderer registered")
+            .get_keybinding_input()
+            .expect("KeybindingInputRenderer registered")
             .bg(&KeybindingInputRenderState::default(), &theme);
         let _ = reg
-            .get_split_button().expect("SplitButtonRenderer registered")
+            .get_split_button()
+            .expect("SplitButtonRenderer registered")
             .primary_bg(&SplitButtonRenderState::default(), &theme);
-        let _ = reg.get_form().expect("FormRenderer registered").gap(&FormRenderState::default(), &theme);
-        let _ = reg.get_tree_item().expect("TreeItemRenderer registered").bg(&TreeItemRenderState::default(), &theme);
-        let _ = reg.get_label().expect("LabelRenderer registered").color(&LabelRenderState::default(), &theme);
+        let _ = reg
+            .get_form()
+            .expect("FormRenderer registered")
+            .gap(&FormRenderState::default(), &theme);
+        let _ = reg
+            .get_tree_item()
+            .expect("TreeItemRenderer registered")
+            .bg(&TreeItemRenderState::default(), &theme);
+        let _ = reg
+            .get_label()
+            .expect("LabelRenderer registered")
+            .color(&LabelRenderState::default(), &theme);
     }
 }
 

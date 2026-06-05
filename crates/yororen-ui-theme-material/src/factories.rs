@@ -25,40 +25,106 @@ fn elevated(base: Hsla, primary: Hsla, alpha: f32) -> Hsla {
     crate::palette::apply_state_layer(base, primary, alpha)
 }
 
-fn build_palette(light: bool) -> (SurfaceTheme, ContentTheme, BorderTheme, ActionTheme, StatusTheme, Hsla) {
+fn build_palette(
+    light: bool,
+) -> (
+    SurfaceTheme,
+    ContentTheme,
+    BorderTheme,
+    ActionTheme,
+    StatusTheme,
+    Hsla,
+) {
     let (primary, on_primary, _primary_container, _on_primary_container) = if light {
-        (rgb(light::PRIMARY), rgb(light::ON_PRIMARY), rgb(light::PRIMARY_CONTAINER), rgb(light::ON_PRIMARY_CONTAINER))
-    } else {
-        (rgb(dark::PRIMARY), rgb(dark::ON_PRIMARY), rgb(dark::PRIMARY_CONTAINER), rgb(dark::ON_PRIMARY_CONTAINER))
-    };
-    let (_secondary, _on_secondary, _secondary_container, _on_secondary_container) = if light {
-        (rgb(light::SECONDARY), rgb(light::ON_SECONDARY), rgb(light::SECONDARY_CONTAINER), rgb(light::ON_SECONDARY_CONTAINER))
-    } else {
-        (rgb(dark::SECONDARY), rgb(dark::ON_SECONDARY), rgb(dark::SECONDARY_CONTAINER), rgb(dark::ON_SECONDARY_CONTAINER))
-    };
-    let (_tertiary, _on_tertiary, _tertiary_container, _on_tertiary_container) = if light {
-        (rgb(light::TERTIARY), rgb(light::ON_TERTIARY), rgb(light::TERTIARY_CONTAINER), rgb(light::ON_TERTIARY_CONTAINER))
-    } else {
-        (rgb(dark::TERTIARY), rgb(dark::ON_TERTIARY), rgb(dark::TERTIARY_CONTAINER), rgb(dark::ON_TERTIARY_CONTAINER))
-    };
-    let (error, on_error, _error_container, _on_error_container) = if light {
-        (rgb(light::ERROR), rgb(light::ON_ERROR), rgb(light::ERROR_CONTAINER), rgb(light::ON_ERROR_CONTAINER))
-    } else {
-        (rgb(dark::ERROR), rgb(dark::ON_ERROR), rgb(dark::ERROR_CONTAINER), rgb(dark::ON_ERROR_CONTAINER))
-    };
-    let (background, on_background, surface, on_surface, _surface_variant, on_surface_variant, _outline, outline_variant) = if light {
         (
-            rgb(light::BACKGROUND), rgb(light::ON_BACKGROUND),
-            rgb(light::SURFACE), rgb(light::ON_SURFACE),
-            rgb(light::SURFACE_VARIANT), rgb(light::ON_SURFACE_VARIANT),
-            rgb(light::OUTLINE), rgb(light::OUTLINE_VARIANT),
+            rgb(light::PRIMARY),
+            rgb(light::ON_PRIMARY),
+            rgb(light::PRIMARY_CONTAINER),
+            rgb(light::ON_PRIMARY_CONTAINER),
         )
     } else {
         (
-            rgb(dark::BACKGROUND), rgb(dark::ON_BACKGROUND),
-            rgb(dark::SURFACE), rgb(dark::ON_SURFACE),
-            rgb(dark::SURFACE_VARIANT), rgb(dark::ON_SURFACE_VARIANT),
-            rgb(dark::OUTLINE), rgb(dark::OUTLINE_VARIANT),
+            rgb(dark::PRIMARY),
+            rgb(dark::ON_PRIMARY),
+            rgb(dark::PRIMARY_CONTAINER),
+            rgb(dark::ON_PRIMARY_CONTAINER),
+        )
+    };
+    let (_secondary, _on_secondary, _secondary_container, _on_secondary_container) = if light {
+        (
+            rgb(light::SECONDARY),
+            rgb(light::ON_SECONDARY),
+            rgb(light::SECONDARY_CONTAINER),
+            rgb(light::ON_SECONDARY_CONTAINER),
+        )
+    } else {
+        (
+            rgb(dark::SECONDARY),
+            rgb(dark::ON_SECONDARY),
+            rgb(dark::SECONDARY_CONTAINER),
+            rgb(dark::ON_SECONDARY_CONTAINER),
+        )
+    };
+    let (_tertiary, _on_tertiary, _tertiary_container, _on_tertiary_container) = if light {
+        (
+            rgb(light::TERTIARY),
+            rgb(light::ON_TERTIARY),
+            rgb(light::TERTIARY_CONTAINER),
+            rgb(light::ON_TERTIARY_CONTAINER),
+        )
+    } else {
+        (
+            rgb(dark::TERTIARY),
+            rgb(dark::ON_TERTIARY),
+            rgb(dark::TERTIARY_CONTAINER),
+            rgb(dark::ON_TERTIARY_CONTAINER),
+        )
+    };
+    let (error, on_error, _error_container, _on_error_container) = if light {
+        (
+            rgb(light::ERROR),
+            rgb(light::ON_ERROR),
+            rgb(light::ERROR_CONTAINER),
+            rgb(light::ON_ERROR_CONTAINER),
+        )
+    } else {
+        (
+            rgb(dark::ERROR),
+            rgb(dark::ON_ERROR),
+            rgb(dark::ERROR_CONTAINER),
+            rgb(dark::ON_ERROR_CONTAINER),
+        )
+    };
+    let (
+        background,
+        on_background,
+        surface,
+        on_surface,
+        _surface_variant,
+        on_surface_variant,
+        _outline,
+        outline_variant,
+    ) = if light {
+        (
+            rgb(light::BACKGROUND),
+            rgb(light::ON_BACKGROUND),
+            rgb(light::SURFACE),
+            rgb(light::ON_SURFACE),
+            rgb(light::SURFACE_VARIANT),
+            rgb(light::ON_SURFACE_VARIANT),
+            rgb(light::OUTLINE),
+            rgb(light::OUTLINE_VARIANT),
+        )
+    } else {
+        (
+            rgb(dark::BACKGROUND),
+            rgb(dark::ON_BACKGROUND),
+            rgb(dark::SURFACE),
+            rgb(dark::ON_SURFACE),
+            rgb(dark::SURFACE_VARIANT),
+            rgb(dark::ON_SURFACE_VARIANT),
+            rgb(dark::OUTLINE),
+            rgb(dark::OUTLINE_VARIANT),
         )
     };
 
@@ -144,7 +210,14 @@ fn build_palette(light: bool) -> (SurfaceTheme, ContentTheme, BorderTheme, Actio
             fg: on_background,
         },
     };
-    (surface_theme, content_theme, border_theme, action_theme, status_theme, primary)
+    (
+        surface_theme,
+        content_theme,
+        border_theme,
+        action_theme,
+        status_theme,
+        primary,
+    )
 }
 
 fn build_shadow(light: bool, primary: Hsla) -> ShadowTheme {
@@ -237,6 +310,10 @@ mod tests {
         let renderer: &dyn yororen_ui_core::renderer::ButtonRenderer =
             &**l.renderers.get_button().expect("ButtonRenderer registered");
         let r = renderer.border_radius(&state, &l);
-        assert!(r.to_f64() > 100.0, "expected pill radius (~999 px), got {}", r.to_f64());
+        assert!(
+            r.to_f64() > 100.0,
+            "expected pill radius (~999 px), got {}",
+            r.to_f64()
+        );
     }
 }

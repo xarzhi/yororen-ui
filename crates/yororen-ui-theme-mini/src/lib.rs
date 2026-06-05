@@ -265,17 +265,26 @@ mod tests {
             variant: yororen_ui_core::theme::ActionVariantKind::Primary,
             ..Default::default()
         };
-        let mini_bg = reg.get_button().expect("ButtonRenderer registered").bg(&state, &theme);
+        let mini_bg = reg
+            .get_button()
+            .expect("ButtonRenderer registered")
+            .bg(&state, &theme);
         let default_bg = yororen_ui_core::renderer::TokenButtonRenderer.bg(&state, &theme);
         assert_ne!(mini_bg, default_bg);
 
         let card_state = CardRenderState::default();
-        let mini_card_bg = reg.get_card().expect("CardRenderer registered").bg(&card_state, &theme);
+        let mini_card_bg = reg
+            .get_card()
+            .expect("CardRenderer registered")
+            .bg(&card_state, &theme);
         let default_card_bg = yororen_ui_core::renderer::TokenCardRenderer.bg(&card_state, &theme);
         assert_ne!(mini_card_bg, default_card_bg);
 
         let modal_state = ModalRenderState::default();
-        let mini_modal_bg = reg.get_modal().expect("ModalRenderer registered").panel_bg(&modal_state, &theme);
+        let mini_modal_bg = reg
+            .get_modal()
+            .expect("ModalRenderer registered")
+            .panel_bg(&modal_state, &theme);
         let default_modal_bg =
             yororen_ui_core::renderer::TokenModalRenderer.panel_bg(&modal_state, &theme);
         assert_ne!(mini_modal_bg, default_modal_bg);

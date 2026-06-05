@@ -47,6 +47,16 @@ use gpui::{
 use crate::component::ClickCallback;
 use crate::theme::ActiveTheme;
 
+/// Callback for toggle-style hooks (toggle_button / checkbox / switch / radio).
+///
+/// The `Option<&ClickEvent>` argument is `Some` for pointer clicks and
+/// `None` for keyboard activations so the handler can branch on
+/// input source.
+pub type ToggleCallback = Arc<dyn Fn(bool, Option<&ClickEvent>, &mut Window, &mut App)>;
+
+/// Callback for text input value changes.
+pub type TextChangeCallback = Arc<dyn Fn(String, &mut Window, &mut App)>;
+
 // ---------------------------------------------------------------------------
 // use_button
 // ---------------------------------------------------------------------------
@@ -136,15 +146,16 @@ impl ButtonProps {
         s = s.on_hover(move |hovered, _window, cx| {
             hover_state.update(cx, |s, _| s.hovered = *hovered);
         });
-        if clickable && !disabled {
-            if let Some(f) = click_fn {
-                s = s.on_click(move |ev, window, cx| {
-                    if disabled {
-                        return;
-                    }
-                    f(ev, window, cx);
-                });
-            }
+        if clickable
+            && !disabled
+            && let Some(f) = click_fn
+        {
+            s = s.on_click(move |ev, window, cx| {
+                if disabled {
+                    return;
+                }
+                f(ev, window, cx);
+            });
         }
         s
     }
@@ -251,7 +262,7 @@ pub struct SwitchProps {
     pub checked: bool,
     pub disabled: bool,
     pub focus_handle: FocusHandle,
-    pub on_toggle: Option<Arc<dyn Fn(bool, Option<&ClickEvent>, &mut Window, &mut App)>>,
+    pub on_toggle: Option<ToggleCallback>,
 }
 
 impl SwitchProps {
@@ -292,13 +303,13 @@ impl SwitchProps {
 
     pub fn apply(self, el: Div) -> gpui::Stateful<Div> {
         let mut s = el.id(self.id.clone()).track_focus(&self.focus_handle);
-        if !self.disabled {
-            if let Some(f) = self.on_toggle.clone() {
-                let checked = self.checked;
-                s = s.on_click(move |ev, window, cx| {
-                    f(!checked, Some(ev), window, cx);
-                });
-            }
+        if !self.disabled
+            && let Some(f) = self.on_toggle.clone()
+        {
+            let checked = self.checked;
+            s = s.on_click(move |ev, window, cx| {
+                f(!checked, Some(ev), window, cx);
+            });
         }
         s
     }
@@ -314,7 +325,7 @@ pub struct CheckboxProps {
     pub checked: bool,
     pub disabled: bool,
     pub focus_handle: FocusHandle,
-    pub on_toggle: Option<Arc<dyn Fn(bool, Option<&ClickEvent>, &mut Window, &mut App)>>,
+    pub on_toggle: Option<ToggleCallback>,
 }
 
 impl CheckboxProps {
@@ -355,13 +366,13 @@ impl CheckboxProps {
 
     pub fn apply(self, el: Div) -> gpui::Stateful<Div> {
         let mut s = el.id(self.id.clone()).track_focus(&self.focus_handle);
-        if !self.disabled {
-            if let Some(f) = self.on_toggle.clone() {
-                let checked = self.checked;
-                s = s.on_click(move |ev, window, cx| {
-                    f(!checked, Some(ev), window, cx);
-                });
-            }
+        if !self.disabled
+            && let Some(f) = self.on_toggle.clone()
+        {
+            let checked = self.checked;
+            s = s.on_click(move |ev, window, cx| {
+                f(!checked, Some(ev), window, cx);
+            });
         }
         s
     }
@@ -377,7 +388,7 @@ pub struct RadioProps {
     pub checked: bool,
     pub disabled: bool,
     pub focus_handle: FocusHandle,
-    pub on_toggle: Option<Arc<dyn Fn(bool, Option<&ClickEvent>, &mut Window, &mut App)>>,
+    pub on_toggle: Option<ToggleCallback>,
 }
 
 impl RadioProps {
@@ -418,13 +429,13 @@ impl RadioProps {
 
     pub fn apply(self, el: Div) -> gpui::Stateful<Div> {
         let mut s = el.id(self.id.clone()).track_focus(&self.focus_handle);
-        if !self.disabled {
-            if let Some(f) = self.on_toggle.clone() {
-                let checked = self.checked;
-                s = s.on_click(move |ev, window, cx| {
-                    f(!checked, Some(ev), window, cx);
-                });
-            }
+        if !self.disabled
+            && let Some(f) = self.on_toggle.clone()
+        {
+            let checked = self.checked;
+            s = s.on_click(move |ev, window, cx| {
+                f(!checked, Some(ev), window, cx);
+            });
         }
         s
     }
@@ -441,7 +452,7 @@ pub struct ToggleButtonProps {
     pub selected: bool,
     pub disabled: bool,
     pub focus_handle: FocusHandle,
-    pub on_toggle: Option<Arc<dyn Fn(bool, Option<&ClickEvent>, &mut Window, &mut App)>>,
+    pub on_toggle: Option<ToggleCallback>,
 }
 
 impl ToggleButtonProps {
@@ -487,13 +498,13 @@ impl ToggleButtonProps {
 
     pub fn apply(self, el: Div) -> gpui::Stateful<Div> {
         let mut s = el.id(self.id.clone()).track_focus(&self.focus_handle);
-        if !self.disabled {
-            if let Some(f) = self.on_toggle.clone() {
-                let selected = self.selected;
-                s = s.on_click(move |ev, window, cx| {
-                    f(!selected, Some(ev), window, cx);
-                });
-            }
+        if !self.disabled
+            && let Some(f) = self.on_toggle.clone()
+        {
+            let selected = self.selected;
+            s = s.on_click(move |ev, window, cx| {
+                f(!selected, Some(ev), window, cx);
+            });
         }
         s
     }
@@ -547,12 +558,10 @@ impl IconButtonProps {
         let click_fn = self.on_click.clone();
         let disabled = self.disabled;
         let mut s = el.id(self.id.clone()).track_focus(&focus_handle);
-        if !disabled {
-            if let Some(f) = click_fn {
-                s = s.on_click(move |ev, window, cx| {
-                    f(ev, window, cx);
-                });
-            }
+        if !disabled && let Some(f) = click_fn {
+            s = s.on_click(move |ev, window, cx| {
+                f(ev, window, cx);
+            });
         }
         s
     }
@@ -572,8 +581,8 @@ pub struct TextInputProps {
     pub placeholder: String,
     pub disabled: bool,
     pub focus_handle: FocusHandle,
-    pub on_change: Option<Arc<dyn Fn(String, &mut Window, &mut App)>>,
-    pub on_submit: Option<Arc<dyn Fn(String, &mut Window, &mut App)>>,
+    pub on_change: Option<TextChangeCallback>,
+    pub on_submit: Option<TextChangeCallback>,
     pub max_length: Option<usize>,
 }
 

@@ -63,6 +63,7 @@ impl ButtonGroup {
     /// - horizontal `connected`: classic toolbar pill.
     /// - vertical `connected`: tall stacked group sharing one
     ///   border-radius pair.
+    ///
     /// `gap()` is intentionally ignored in this mode.
     pub fn connected(mut self, connected: bool) -> Self {
         self.connected = connected;

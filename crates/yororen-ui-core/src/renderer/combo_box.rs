@@ -54,7 +54,7 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
         if state.disabled {
             theme.content.disabled
         } else if state.custom_fg.is_some() {
-            return state.custom_fg.unwrap();
+            state.custom_fg.unwrap()
         } else if state.has_value {
             theme.content.primary
         } else {

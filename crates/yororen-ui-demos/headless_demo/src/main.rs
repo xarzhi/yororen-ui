@@ -18,12 +18,11 @@ use gpui::{
 };
 
 use yororen_ui::assets::UiAsset;
+use yororen_ui::component::tooltip::TooltipPlacement;
 use yororen_ui::component::{
     ComboBoxOption, SelectOption, combo_box, init as init_component, label as label_comp, modal,
     panel, popover, select, tooltip,
 };
-use yororen_ui::component::tooltip::TooltipPlacement;
-use yororen_ui::component::button as button_comp;
 use yororen_ui::hooks::{
     self, ButtonProps, CheckboxProps, IconButtonProps, RadioProps, SwitchProps, TextInputProps,
     ToggleButtonProps,
@@ -32,6 +31,13 @@ use yororen_ui::locale_en;
 use yororen_ui::theme::ActiveTheme;
 
 use yororen_ui_theme_system as theme_system;
+
+/// Window/App callback shared between composite column layout and
+/// the modal close path. (`OverlayCloseCallback` and
+/// `ModalCloseCallback` are identical in shape, but the headless
+/// demo only needs this generic shape — neither calls into the
+/// modal-specific state.)
+type WindowAppCallback = Arc<dyn Fn(&mut Window, &mut App) + Send + Sync>;
 
 pub struct HeadlessDemoApp {
     pub counter: Entity<i32>,
@@ -252,7 +258,7 @@ impl Render for HeadlessDemoApp {
                 cx.notify();
             });
         });
-        let close_modal: Arc<dyn Fn(&mut Window, &mut App) + Send + Sync> = {
+        let close_modal: WindowAppCallback = {
             let me = me.clone();
             Arc::new(move |_w: &mut Window, cx: &mut App| {
                 me.update(cx, |s, cx| {
@@ -300,12 +306,9 @@ impl Render for HeadlessDemoApp {
                     .flex()
                     .items_center(),
             )
-            .on_mouse_down(
-                gpui::MouseButton::Left,
-                move |_ev, window, _cx| {
-                    text_input_focus.focus(window);
-                },
-            )
+            .on_mouse_down(gpui::MouseButton::Left, move |_ev, window, _cx| {
+                text_input_focus.focus(window);
+            })
             .on_key_down(move |event, window, cx| {
                 let ks = &event.keystroke;
                 // Only react to keys while the input holds focus.
@@ -370,9 +373,7 @@ impl Render for HeadlessDemoApp {
             .border_b_1()
             .border_color(theme.border.default)
             .bg(theme.surface.canvas)
-            .child(
-                label_comp("yororen-ui — Headless & Composite").strong(true),
-            )
+            .child(label_comp("yororen-ui — Headless & Composite").strong(true))
             .child(label_comp("Headless hooks + composite APIs").muted(true));
 
         let hooks_col = render_hooks_col(
@@ -417,10 +418,12 @@ impl Render for HeadlessDemoApp {
                 .on_close(move |w, cx| (close)(w, cx))
         };
 
-        let modal_renderer: &dyn yororen_ui::renderer::ModalRenderer =
-            &**theme.renderers.get_modal().expect("ModalRenderer registered");
-        let modal_scrim = modal_renderer
-            .scrim(&yororen_ui::renderer::ModalRenderState::default(), theme);
+        let modal_renderer: &dyn yororen_ui::renderer::ModalRenderer = &**theme
+            .renderers
+            .get_modal()
+            .expect("ModalRenderer registered");
+        let modal_scrim =
+            modal_renderer.scrim(&yororen_ui::renderer::ModalRenderState::default(), theme);
         let close_modal_for_scrim = close_modal.clone();
 
         div()
@@ -461,6 +464,7 @@ impl Render for HeadlessDemoApp {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn render_hooks_col(
     inc: &ButtonProps,
     dec: &ButtonProps,
@@ -476,63 +480,169 @@ fn render_hooks_col(
     icon_btn_clicks: u32,
     theme: &yororen_ui::theme::Theme,
 ) -> impl IntoElement {
-    panel("hooks-col")
-        .p(px(16.))
-        .child(
-            div()
-                .flex()
-                .flex_col()
-                .gap(px(8.))
-                .child(label_comp("1. Hooks (8 use_xxx)").strong(true))
-                .child(label_comp("use_button: counter").muted(true))
-                .child(
-                    div()
-                        .flex()
-                        .flex_wrap()
-                        .items_center()
-                        .gap(px(8.))
-                        .child(dec.clone().apply(div().px(px(10.)).py(px(4.)).rounded(px(6.)).bg(theme.surface.hover)).child(label_comp("−").strong(true)))
-                        .child(label_comp(format!("Count: {count}")).strong(true))
-                        .child(inc.clone().apply(div().px(px(10.)).py(px(4.)).rounded(px(6.)).bg(theme.surface.hover)).child(label_comp("+").strong(true)))
-                        .child(reset.clone().apply(div().px(px(10.)).py(px(4.)).rounded(px(6.))).child(label_comp("reset").muted(true))),
-                )
-                .child(label_comp("use_switch").muted(true))
-                .child(div().flex().items_center().gap(px(8.)).child(switch.clone().apply(div().w(px(36.)).h(px(20.)).rounded(px(999.)).bg(if switch.checked { theme.action.primary.bg } else { theme.surface.sunken }))))
-                .child(label_comp("use_checkbox").muted(true))
-                .child(div().flex().items_center().gap(px(8.)).child(checkbox.clone().apply(div().w(px(18.)).h(px(18.)).rounded(px(4.)).bg(if checkbox.checked { theme.action.primary.bg } else { theme.surface.base }))))
-                .child(label_comp("use_radio").muted(true))
-                .child(
-                    div()
-                        .flex()
-                        .gap(px(12.))
-                        .child(radio_a.clone().apply(div().flex().items_center().gap(px(4.)).child(div().w(px(16.)).h(px(16.)).rounded(px(999.)).bg(if radio_a.checked { theme.action.primary.bg } else { theme.surface.base })).child(label_comp("Alpha"))))
-                        .child(radio_b.clone().apply(div().flex().items_center().gap(px(4.)).child(div().w(px(16.)).h(px(16.)).rounded(px(999.)).bg(if radio_b.checked { theme.action.primary.bg } else { theme.surface.base })).child(label_comp("Beta")))),
-                )
-                .child(label_comp("use_toggle_button").muted(true))
-                .child(toggle.clone().apply(div().px(px(10.)).py(px(4.)).rounded(px(6.)).bg(if toggle.selected { theme.action.primary.bg } else { theme.surface.hover })).child(label_comp(toggle.label.clone())))
-                .child(label_comp("use_text_input").muted(true))
-                .child(text_input)
-                .child(label_comp("use_icon_button").muted(true))
-                .child(
-                    div()
-                        .flex()
-                        .items_center()
-                        .gap(px(8.))
-                        // `flex()` on the apply target is what
-                        // makes `items_center` / `justify_center`
-                        // take effect (a non-flex div ignores
-                        // those). The hook's `apply()` only adds
-                        // focus + click; layout is up to us.
-                        .child(icon_btn.clone().apply(div().flex().w(px(32.)).h(px(32.)).rounded(px(999.)).bg(theme.surface.hover).items_center().justify_center()).child(label_comp("✕").strong(true)))
-                        .child(label_comp(format!("clicks: {icon_btn_clicks}")).muted(true)),
+    panel("hooks-col").p(px(16.)).child(
+        div()
+            .flex()
+            .flex_col()
+            .gap(px(8.))
+            .child(label_comp("1. Hooks (8 use_xxx)").strong(true))
+            .child(label_comp("use_button: counter").muted(true))
+            .child(
+                div()
+                    .flex()
+                    .flex_wrap()
+                    .items_center()
+                    .gap(px(8.))
+                    .child(
+                        dec.clone()
+                            .apply(
+                                div()
+                                    .px(px(10.))
+                                    .py(px(4.))
+                                    .rounded(px(6.))
+                                    .bg(theme.surface.hover),
+                            )
+                            .child(label_comp("−").strong(true)),
+                    )
+                    .child(label_comp(format!("Count: {count}")).strong(true))
+                    .child(
+                        inc.clone()
+                            .apply(
+                                div()
+                                    .px(px(10.))
+                                    .py(px(4.))
+                                    .rounded(px(6.))
+                                    .bg(theme.surface.hover),
+                            )
+                            .child(label_comp("+").strong(true)),
+                    )
+                    .child(
+                        reset
+                            .clone()
+                            .apply(div().px(px(10.)).py(px(4.)).rounded(px(6.)))
+                            .child(label_comp("reset").muted(true)),
+                    ),
+            )
+            .child(label_comp("use_switch").muted(true))
+            .child(
+                div().flex().items_center().gap(px(8.)).child(
+                    switch
+                        .clone()
+                        .apply(div().w(px(36.)).h(px(20.)).rounded(px(999.)).bg(
+                            if switch.checked {
+                                theme.action.primary.bg
+                            } else {
+                                theme.surface.sunken
+                            },
+                        )),
                 ),
-        )
+            )
+            .child(label_comp("use_checkbox").muted(true))
+            .child(
+                div().flex().items_center().gap(px(8.)).child(
+                    checkbox
+                        .clone()
+                        .apply(div().w(px(18.)).h(px(18.)).rounded(px(4.)).bg(
+                            if checkbox.checked {
+                                theme.action.primary.bg
+                            } else {
+                                theme.surface.base
+                            },
+                        )),
+                ),
+            )
+            .child(label_comp("use_radio").muted(true))
+            .child(
+                div()
+                    .flex()
+                    .gap(px(12.))
+                    .child(
+                        radio_a.clone().apply(
+                            div()
+                                .flex()
+                                .items_center()
+                                .gap(px(4.))
+                                .child(div().w(px(16.)).h(px(16.)).rounded(px(999.)).bg(
+                                    if radio_a.checked {
+                                        theme.action.primary.bg
+                                    } else {
+                                        theme.surface.base
+                                    },
+                                ))
+                                .child(label_comp("Alpha")),
+                        ),
+                    )
+                    .child(
+                        radio_b.clone().apply(
+                            div()
+                                .flex()
+                                .items_center()
+                                .gap(px(4.))
+                                .child(div().w(px(16.)).h(px(16.)).rounded(px(999.)).bg(
+                                    if radio_b.checked {
+                                        theme.action.primary.bg
+                                    } else {
+                                        theme.surface.base
+                                    },
+                                ))
+                                .child(label_comp("Beta")),
+                        ),
+                    ),
+            )
+            .child(label_comp("use_toggle_button").muted(true))
+            .child(
+                toggle
+                    .clone()
+                    .apply(
+                        div()
+                            .px(px(10.))
+                            .py(px(4.))
+                            .rounded(px(6.))
+                            .bg(if toggle.selected {
+                                theme.action.primary.bg
+                            } else {
+                                theme.surface.hover
+                            }),
+                    )
+                    .child(label_comp(toggle.label.clone())),
+            )
+            .child(label_comp("use_text_input").muted(true))
+            .child(text_input)
+            .child(label_comp("use_icon_button").muted(true))
+            .child(
+                div()
+                    .flex()
+                    .items_center()
+                    .gap(px(8.))
+                    // `flex()` on the apply target is what
+                    // makes `items_center` / `justify_center`
+                    // take effect (a non-flex div ignores
+                    // those). The hook's `apply()` only adds
+                    // focus + click; layout is up to us.
+                    .child(
+                        icon_btn
+                            .clone()
+                            .apply(
+                                div()
+                                    .flex()
+                                    .w(px(32.))
+                                    .h(px(32.))
+                                    .rounded(px(999.))
+                                    .bg(theme.surface.hover)
+                                    .items_center()
+                                    .justify_center(),
+                            )
+                            .child(label_comp("✕").strong(true)),
+                    )
+                    .child(label_comp(format!("clicks: {icon_btn_clicks}")).muted(true)),
+            ),
+    )
 }
 
 fn render_composite_col(
     popover_btn: &ButtonProps,
     modal_btn: &ButtonProps,
-    close_modal: Arc<dyn Fn(&mut Window, &mut App) + Send + Sync>,
+    close_modal: WindowAppCallback,
     popover_open: bool,
     modal_open: bool,
     radio_choice: &str,
@@ -593,66 +703,80 @@ fn render_composite_col(
         ])
         .placeholder("Pick a city");
 
-    let tooltip_root = tooltip("This is a TooltipRoot popup")
-        .placement(TooltipPlacement::Bottom);
+    let tooltip_root = tooltip("This is a TooltipRoot popup").placement(TooltipPlacement::Bottom);
 
-    panel("composite-col")
-        .p(px(16.))
-        .child(
-            div()
-                .flex()
-                .flex_col()
-                .gap(px(8.))
-                .child(label_comp("2. Composites (6 XxxRoot)").strong(true))
-                .child(label_comp("PopoverRoot").muted(true))
-                .child(popover_root)
-                .child(label_comp("ModalRoot").muted(true))
-                .child(
-                    modal_btn
-                        .clone()
-                        .apply(
-                            div()
-                                .px(px(10.))
-                                .py(px(4.))
-                                .rounded(px(6.))
-                                .bg(theme.surface.hover)
-                                .items_center()
-                                .justify_center(),
-                        )
-                        .child(label_comp("Open modal").strong(true)),
-                )
-                .child(label_comp(if modal_open { "(modal overlay is open)" } else { "(modal closed)" }).muted(true))
-                .child(label_comp("DropdownMenuRoot").muted(true))
-                .child(dropdown_root)
-                .child(label_comp("SelectRoot").muted(true))
-                .child(select_root)
-                .child(label_comp("ComboBoxRoot").muted(true))
-                .child(combo_root)
-                .child(label_comp("TooltipRoot (hover the button)").muted(true))
-                .child(tooltip_root)
-                .child(label_comp(format!("radio_choice = {radio_choice}")).muted(true)),
-        )
+    panel("composite-col").p(px(16.)).child(
+        div()
+            .flex()
+            .flex_col()
+            .gap(px(8.))
+            .child(label_comp("2. Composites (6 XxxRoot)").strong(true))
+            .child(label_comp("PopoverRoot").muted(true))
+            .child(popover_root)
+            .child(label_comp("ModalRoot").muted(true))
+            .child(
+                modal_btn
+                    .clone()
+                    .apply(
+                        div()
+                            .px(px(10.))
+                            .py(px(4.))
+                            .rounded(px(6.))
+                            .bg(theme.surface.hover)
+                            .items_center()
+                            .justify_center(),
+                    )
+                    .child(label_comp("Open modal").strong(true)),
+            )
+            .child(
+                label_comp(if modal_open {
+                    "(modal overlay is open)"
+                } else {
+                    "(modal closed)"
+                })
+                .muted(true),
+            )
+            .child(label_comp("DropdownMenuRoot").muted(true))
+            .child(dropdown_root)
+            .child(label_comp("SelectRoot").muted(true))
+            .child(select_root)
+            .child(label_comp("ComboBoxRoot").muted(true))
+            .child(combo_root)
+            .child(label_comp("TooltipRoot (hover the button)").muted(true))
+            .child(tooltip_root)
+            .child(label_comp(format!("radio_choice = {radio_choice}")).muted(true)),
+    )
 }
 
 fn render_info_col(theme: &yororen_ui::theme::Theme) -> impl IntoElement {
-    panel("info-col")
-        .p(px(16.))
-        .child(
-            div()
-                .flex()
-                .flex_col()
-                .gap(px(8.))
-                .child(label_comp("3. About this demo").strong(true))
-                .child(label_comp("8 use_xxx hooks").strong(true))
-                .child(label_comp("6 XxxRoot composite APIs").strong(true))
-                .child(label_comp("Switch themes via the meta-crate's feature flags:").muted(true))
-                .child(label_comp("  yororen-ui = { version = \"0.3\", features = [\"catppuccin\"] }").muted(true))
-                .child(label_comp("  yororen-ui = { version = \"0.3\", features = [\"material\"] }").muted(true))
-                .child(label_comp("See HOOK_GUIDE.md for the full API walkthrough.").muted(true))
-                .child(label_comp("Active theme:").muted(true))
-                .child(label_comp(format!("surface.base: {:?}", theme.surface.base)))
-                .child(label_comp(format!("action.primary: {:?}", theme.action.primary.bg))),
-        )
+    panel("info-col").p(px(16.)).child(
+        div()
+            .flex()
+            .flex_col()
+            .gap(px(8.))
+            .child(label_comp("3. About this demo").strong(true))
+            .child(label_comp("8 use_xxx hooks").strong(true))
+            .child(label_comp("6 XxxRoot composite APIs").strong(true))
+            .child(label_comp("Switch themes via the meta-crate's feature flags:").muted(true))
+            .child(
+                label_comp("  yororen-ui = { version = \"0.3\", features = [\"catppuccin\"] }")
+                    .muted(true),
+            )
+            .child(
+                label_comp("  yororen-ui = { version = \"0.3\", features = [\"material\"] }")
+                    .muted(true),
+            )
+            .child(label_comp("See HOOK_GUIDE.md for the full API walkthrough.").muted(true))
+            .child(label_comp("Active theme:").muted(true))
+            .child(label_comp(format!(
+                "surface.base: {:?}",
+                theme.surface.base
+            )))
+            .child(label_comp(format!(
+                "action.primary: {:?}",
+                theme.action.primary.bg
+            ))),
+    )
 }
 
 fn main() {

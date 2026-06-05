@@ -92,12 +92,7 @@ pub fn rgb(rgb: (f32, f32, f32)) -> Hsla {
     let r = rgb.0 / 255.0;
     let g = rgb.1 / 255.0;
     let b = rgb.2 / 255.0;
-    let rgba = gpui::Rgba {
-        r,
-        g,
-        b,
-        a: 1.0,
-    };
+    let rgba = gpui::Rgba { r, g, b, a: 1.0 };
     <gpui::Hsla as From<gpui::Rgba>>::from(rgba)
 }
 
@@ -205,4 +200,3 @@ mod tests {
         assert!(layered_rgba.r >= base_rgba.r - 0.001);
     }
 }
-

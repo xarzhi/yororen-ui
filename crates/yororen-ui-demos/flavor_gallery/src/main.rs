@@ -173,8 +173,16 @@ mod tests {
             variant: yororen_ui::theme::ActionVariantKind::Primary,
             ..Default::default()
         };
-        let mat_bg = mat.renderers.get_button().expect("ButtonRenderer registered").bg(&state, &mat);
-        let sys_bg = sys.renderers.get_button().expect("ButtonRenderer registered").bg(&state, &sys);
+        let mat_bg = mat
+            .renderers
+            .get_button()
+            .expect("ButtonRenderer registered")
+            .bg(&state, &mat);
+        let sys_bg = sys
+            .renderers
+            .get_button()
+            .expect("ButtonRenderer registered")
+            .bg(&state, &sys);
         // M3 uses primary accent; system uses dark action.bg.
         // They should differ.
         assert_ne!(mat_bg, sys_bg);

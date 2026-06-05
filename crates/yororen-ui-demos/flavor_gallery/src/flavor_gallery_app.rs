@@ -8,8 +8,7 @@
 
 use gpui::prelude::FluentBuilder;
 use gpui::{
-    Context, Entity, IntoElement, ParentElement, Render, SharedString, Styled,
-    Window, div, px,
+    Context, Entity, IntoElement, ParentElement, Render, SharedString, Styled, Window, div, px,
 };
 
 use yororen_ui::component::{
@@ -137,7 +136,9 @@ fn render_column(kind: FlavorKind, state_for_open: Entity<ActiveModal>) -> gpui:
                 ])
                 .placeholder("Pick a pet…"),
         )
-        .child(label("Modal dialog: full a11y shell (focus trap, Esc, scrim, X)."))
+        .child(label(
+            "Modal dialog: full a11y shell (focus trap, Esc, scrim, X).",
+        ))
         .child(
             button(inner_button_id.clone())
                 .variant(ActionVariantKind::Primary)

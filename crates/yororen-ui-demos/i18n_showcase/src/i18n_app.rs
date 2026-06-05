@@ -1,8 +1,6 @@
 //! Root component for the i18n showcase demo.
 
-use gpui::{
-    Context, IntoElement, ParentElement, Render, Styled, Window, div, prelude::FluentBuilder, px,
-};
+use gpui::{Context, IntoElement, ParentElement, Render, Styled, Window, div, px};
 
 use yororen_ui::component::{SelectOption, button, label, select, text_input};
 use yororen_ui::i18n::{I18nContext, PlaceholderContext, PlaceholderKey, Translate};
