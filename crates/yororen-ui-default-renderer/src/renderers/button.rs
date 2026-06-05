@@ -30,7 +30,6 @@ use yororen_ui_core::theme::Theme;
 
 use super::spec::{BorderSpec, Edges, ShadowSpec};
 use super::variant::{VariantState, VariantStyle};
-use crate::renderers::theme_path::{self, action_color};
 
 /// State passed to a `ButtonRenderer`. Fields are deliberately minimal —
 /// a renderer can read more from the `Theme` if it needs to.
@@ -114,7 +113,8 @@ impl ButtonRenderer for TokenButtonRenderer {
             });
         }
         let field = if state.disabled { "disabled_bg" } else { "bg" };
-        action_color(theme, state.variant, field)
+        let key = format!("action.{}.{}", state.variant.as_str(), field);
+        theme.get_color(&key).unwrap_or_default()
     }
 
     fn fg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
@@ -124,20 +124,27 @@ impl ButtonRenderer for TokenButtonRenderer {
             });
         }
         let field = if state.disabled { "disabled_fg" } else { "fg" };
-        action_color(theme, state.variant, field)
+        let key = format!("action.{}.{}", state.variant.as_str(), field);
+        theme.get_color(&key).unwrap_or_default()
     }
 
     fn padding(&self, _state: &ButtonRenderState, theme: &Theme) -> Edges<Pixels> {
-        let h = theme_path::control_button(theme, "horizontal_padding").unwrap_or(12.0);
-        let v = theme_path::control_button(theme, "vertical_padding").unwrap_or(h / 2.0);
-        Edges::symmetric(gpui::px(h as f32), gpui::px(v as f32))
+        let h = theme
+            .get_number("tokens.control.button.horizontal_padding")
+            .unwrap_or(12.0) as f32;
+        let v = theme
+            .get_number("tokens.control.button.vertical_padding")
+            .unwrap_or((h as f64) / 2.0) as f32;
+        Edges::symmetric(gpui::px(h), gpui::px(v))
     }
 
     fn border_radius(&self, _state: &ButtonRenderState, theme: &Theme) -> Pixels {
-        theme_path::control_button(theme, "radius")
-            .or_else(|| theme_path::radii_md(theme))
-            .unwrap_or(6.0)
-            .into()
+        gpui::px(
+            theme
+                .get_number("tokens.control.button.radius")
+                .or_else(|| theme.get_number("tokens.radii.md"))
+                .unwrap_or(6.0) as f32,
+        )
     }
 
     fn border(&self, _state: &ButtonRenderState, _theme: &Theme) -> Option<BorderSpec> {
@@ -153,9 +160,11 @@ impl ButtonRenderer for TokenButtonRenderer {
     }
 
     fn min_height(&self, _state: &ButtonRenderState, theme: &Theme) -> Pixels {
-        theme_path::control_button(theme, "min_height")
-            .unwrap_or(36.0)
-            .into()
+        gpui::px(
+            theme
+                .get_number("tokens.control.button.min_height")
+                .unwrap_or(36.0) as f32,
+        )
     }
 
     fn disabled_opacity(&self, state: &ButtonRenderState, _theme: &Theme) -> f32 {
@@ -175,7 +184,7 @@ pub fn arc<T: ButtonRenderer + 'static>(r: T) -> Arc<dyn ButtonRenderer> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::renderers::theme_path;
+    use yororen_ui_core::theme::Theme;
 
     fn fixture() -> Theme {
         let json = include_str!("../../themes/system-dark.json");
@@ -279,15 +288,26 @@ mod tests {
         let _ = r.min_height(&state, &theme);
     }
 
-    // Smoke-test the path helpers used above.
+    // Smoke-test that the renderer's bg/fg read the same path
+    // values the theme JSON declares. (The renderer's
+    // `bg` calls `theme.get_color("action.<variant>.<field>")`
+    // directly, so this is a direct equality check.)
     #[test]
     fn action_color_helper_reads_correct_path() {
         let theme = fixture();
+        let r = TokenButtonRenderer;
+        let state = ButtonRenderState {
+            variant: ActionVariantKind::Primary,
+            ..Default::default()
+        };
         assert_eq!(
-            action_color(&theme, ActionVariantKind::Primary, "bg"),
+            r.bg(&state, &theme),
             theme.get_color("action.primary.bg").unwrap(),
         );
-        let _ = theme_path::control_button(&theme, "min_height");
+        assert_eq!(
+            r.fg(&state, &theme),
+            theme.get_color("action.primary.fg").unwrap(),
+        );
     }
 }
 

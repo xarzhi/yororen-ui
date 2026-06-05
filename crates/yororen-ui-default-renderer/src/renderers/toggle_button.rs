@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
-use crate::theme::ActionVariantKind;
+use crate::renderers::button::ActionVariantKind;
 use yororen_ui_core::theme::Theme;
 
 use super::variant::{VariantState, VariantStyle};

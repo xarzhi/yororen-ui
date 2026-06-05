@@ -38,7 +38,6 @@ pub mod switch;
 pub mod tag;
 pub mod text_area;
 pub mod text_input;
-pub mod theme_path;
 pub mod toast;
 pub mod toggle_button;
 pub mod tooltip;

@@ -1,9 +1,9 @@
 //! Default renderer for [`yororen_ui_core`] headless primitives.
 //!
-//! This crate holds the *visual* layer of yororen-ui — the 38
-//! `XxxRenderer` traits and their `TokenXxxRenderer` default
-//! implementations, the `DesignTokens` token tree, and the
-//! `Theme` / `GlobalTheme` types.
+//! This crate holds the *visual* layer of yororen-ui: the 38
+//! `XxxRenderer` traits, their `TokenXxxRenderer` default
+//! implementations, the bundled `system-light.json` /
+//! `system-dark.json` themes, and a one-call install helper.
 //!
 //! Each `renderers/<name>.rs` file is the home of three things:
 //!
@@ -12,16 +12,23 @@
 //! - the `DefaultXxx` extension trait (the `headless::XxxProps` →
 //!   `Stateful<Div>` sugar that reads this renderer).
 //!
-//! Apps depend on this crate when they want a stock look. Apps that
-//! want full visual control depend on `yororen-ui-core` only.
+//! Apps depend on this crate when they want a stock look.
+//! Third-party renderer crates depend on `yororen-ui-core`
+//! and call `cx.register_renderer_arc::<markers::X, dyn XxxRenderer>(...)`
+//! at install time.
 //!
 //! Three-layer architecture:
 //!
 //! ```text
-//! theme-* ──▶ renderer ──▶ core ──▶ gpui-ce
+//! themes/*.json ──▶ default-renderer ──▶ core ──▶ gpui-ce
 //! ```
 
-#![warn(missing_docs)]
+// The renderer traits are documented at the public meta
+// level (`yororen_ui::renderer::XxxRenderer`); the
+// per-renderer file docstrings are kept terse here to avoid
+// maintaining two copies. The 38 `TokenXxxRenderer` impl
+// bodies are not user-facing and stay undocumented to keep
+// the implementation files readable.
 
 pub mod renderers;
 pub mod themes;
@@ -38,14 +45,5 @@ pub use renderers::{
     ButtonRenderState, ButtonRenderer, IconButtonRenderState, IconButtonRenderer,
     LabelRenderState, LabelRenderer, ToggleButtonRenderState, ToggleButtonRenderer,
 };
-
-// Re-export the v0.3 core `Theme` (the JSON-backed, no-schema
-// value) under both the v0.3 `Theme` symbol and the
-// `renderer::Theme` alias for backward-compat imports.
 pub use yororen_ui_core::theme::Theme;
-pub mod theme {
-    pub use yororen_ui_core::theme::*;
-    pub use crate::renderers::button::ActionVariantKind;
-}
-
 pub use themes::{install, install_with, register_default_renderers, system_dark, system_for, system_light};
