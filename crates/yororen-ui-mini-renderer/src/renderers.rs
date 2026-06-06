@@ -28,10 +28,20 @@ impl MiniPalette {
     /// Read the single `themeColor` field from the v0.3
     /// JSON-backed theme. Returns a zeroed `Hsla` if the path
     /// is missing.
+    ///
+    /// When the host theme uses the v0.3 dot-path schema
+    /// (e.g. `surface.hover`) instead of the mini's flat
+    /// 5-field schema, we fall back to `surface.hover`.
+    /// Note: we deliberately do *not* fall back to
+    /// `action.primary.bg` — in dark mode that field holds a
+    /// foreground tint (light on dark), which would render
+    /// the button near-invisible.
     pub fn from_theme(theme: &Theme) -> Self {
-        Self {
-            base: theme.get_color("themeColor").unwrap_or_default(),
-        }
+        let base = theme
+            .get_color("themeColor")
+            .or_else(|| theme.get_color("surface.hover"))
+            .unwrap_or_default();
+        Self { base }
     }
 }
 
@@ -66,6 +76,22 @@ impl ButtonRenderer for MiniButtonRenderer {
     fn bg(&self, _state: &ButtonRenderState, _theme: &Theme) -> Hsla {
         if _state.disabled {
             // A subtle grey, completely independent of the theme.
+            gpui::hsla(0.0, 0.0, 0.5, 0.6)
+        } else {
+            self.base
+        }
+    }
+    fn hover_bg(&self, _state: &ButtonRenderState, _theme: &Theme) -> Hsla {
+        // Mini doesn't differentiate hover from base — the
+        // override is a "minimal" renderer.
+        if _state.disabled {
+            gpui::hsla(0.0, 0.0, 0.5, 0.6)
+        } else {
+            self.base
+        }
+    }
+    fn active_bg(&self, _state: &ButtonRenderState, _theme: &Theme) -> Hsla {
+        if _state.disabled {
             gpui::hsla(0.0, 0.0, 0.5, 0.6)
         } else {
             self.base
@@ -109,6 +135,7 @@ impl IconButtonRenderer for MiniIconButtonRenderer {
         // No hover differentiation in the mini.
         self.base
     }
+    fn active_bg(&self, _state: &IconButtonRenderState, _theme: &Theme) -> Hsla { self.base }
     fn size(&self, _state: &IconButtonRenderState, _theme: &Theme) -> Pixels { min_h() }
     fn border_radius(&self, _state: &IconButtonRenderState, _theme: &Theme) -> Pixels { radius() }
     fn disabled_opacity(&self, _state: &IconButtonRenderState, _theme: &Theme) -> f32 { 1.0 }
@@ -126,6 +153,13 @@ pub struct MiniToggleButtonRenderer {
 impl ToggleButtonRenderer for MiniToggleButtonRenderer {
     fn bg(&self, state: &ToggleButtonRenderState, _theme: &Theme) -> Hsla {
         if state.selected { self.base } else { gpui::hsla(0.0, 0.0, 0.95, 1.0) }
+    }
+    fn hover_bg(&self, state: &ToggleButtonRenderState, _theme: &Theme) -> Hsla {
+        // Mini: hover mirrors base. (Future: differentiate.)
+        if state.selected { self.base } else { gpui::hsla(0.0, 0.0, 0.95, 1.0) }
+    }
+    fn active_bg(&self, state: &ToggleButtonRenderState, _theme: &Theme) -> Hsla {
+        if state.selected { self.base } else { gpui::hsla(0.0, 0.0, 0.9, 1.0) }
     }
     fn fg(&self, state: &ToggleButtonRenderState, _theme: &Theme) -> Hsla {
         if state.selected { gpui::hsla(0.0, 0.0, 1.0, 1.0) } else { gpui::hsla(0.0, 0.0, 0.1, 1.0) }
@@ -157,4 +191,39 @@ impl LabelRenderer for MiniLabelRenderer {
 #[allow(dead_code)]
 fn _force_imports(_: Arc<()>) {
     let _ = MiniPalette::from_theme;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn mini_palette_reads_theme_color_when_present() {
+        let theme = yororen_ui_core::theme::Theme::from_value(serde_json::json!({
+            "themeColor": "#abcdef"
+        }));
+        let p = MiniPalette::from_theme(&theme);
+        assert!(p.base.a > 0.5, "expected opaque base, got {:?}", p.base);
+    }
+
+    #[test]
+    fn mini_palette_falls_back_to_surface_hover() {
+        let theme = yororen_ui_core::theme::Theme::from_value(serde_json::json!({
+            "surface": { "hover": "#654321" }
+        }));
+        let p = MiniPalette::from_theme(&theme);
+        // Should fall back to surface.hover (#654321 → opaque
+        // dark-ish color) rather than the default
+        // `action.primary.bg` (which in dark mode is a
+        // foreground tint, not a button bg).
+        assert!(p.base.a > 0.5, "expected opaque fallback, got {:?}", p.base);
+    }
+
+    #[test]
+    fn mini_palette_yields_zero_when_no_relevant_key() {
+        let theme =
+            yororen_ui_core::theme::Theme::from_value(serde_json::json!({}));
+        let p = MiniPalette::from_theme(&theme);
+        assert_eq!(p.base.a, 0.0);
+    }
 }

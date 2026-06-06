@@ -24,6 +24,8 @@ pub struct RadioProps {
     /// ring color. `None` → renderer falls back to
     /// `action.primary.bg`.
     pub custom_tone: Option<gpui::Hsla>,
+    /// See `headless::button::ButtonProps::raw_hover`.
+    pub raw_hover: bool,
 }
 
 pub fn radio(id: impl Into<ElementId>, cx: &mut App) -> RadioProps {
@@ -35,6 +37,7 @@ pub fn radio(id: impl Into<ElementId>, cx: &mut App) -> RadioProps {
         on_toggle: None,
         has_custom_tone: false,
         custom_tone: None,
+        raw_hover: true,
     }
 }
 
@@ -69,9 +72,18 @@ impl RadioProps {
         self.on_toggle = Some(Arc::new(f));
         self
     }
+    pub fn raw_hover(mut self, raw: bool) -> Self {
+        self.raw_hover = raw;
+        self
+    }
 
     pub fn apply(self, el: Div) -> Stateful<Div> {
         let mut s = el.id(self.id.clone()).track_focus(&self.focus_handle);
+        if self.raw_hover && !self.disabled {
+            s = s
+                .hover(|mut style| { style.opacity = Some(0.9); style })
+                .active(|mut style| { style.opacity = Some(0.85); style });
+        }
         if !self.disabled
             && let Some(f) = self.on_toggle.clone()
         {

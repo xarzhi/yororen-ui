@@ -1,25 +1,18 @@
 //! Headless `text_area` — multi-line text input.
 //!
-//! Wraps the same `TextInputState` as `text_input`; the only
+//! Reuses `TextInputState` (renderer-minted); the only
 //! behavioural difference is that `Enter` inserts a newline
 //! instead of firing `on_submit`.
 
 use std::sync::Arc;
 
-use gpui::{
-    App, AppContext, Div, ElementId, Entity, FocusHandle, Hsla, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Window,
-};
-
-use super::text_input::TextInputState;
+use gpui::{App, Hsla};
 
 /// `TextArea` is a multi-line text input. It reuses
 /// `TextInputState` for value + caret.
 #[derive(Clone)]
 pub struct TextAreaProps {
-    pub id: ElementId,
-    pub focus_handle: FocusHandle,
-    pub state: Entity<TextInputState>,
+    pub id: gpui::ElementId,
     pub placeholder: String,
     pub disabled: bool,
     pub max_length: Option<usize>,
@@ -33,11 +26,9 @@ pub struct TextAreaProps {
     pub custom_text_color: Option<Hsla>,
 }
 
-pub fn text_area(id: impl Into<ElementId>, cx: &mut App) -> TextAreaProps {
+pub fn text_area(id: impl Into<gpui::ElementId>) -> TextAreaProps {
     TextAreaProps {
         id: id.into(),
-        focus_handle: cx.focus_handle(),
-        state: cx.new(|_| TextInputState::new()),
         placeholder: String::new(),
         disabled: false,
         max_length: None,
@@ -53,12 +44,6 @@ pub fn text_area(id: impl Into<ElementId>, cx: &mut App) -> TextAreaProps {
 }
 
 impl TextAreaProps {
-    pub fn focus_handle(&self) -> &FocusHandle {
-        &self.focus_handle
-    }
-    pub fn state(&self) -> &Entity<TextInputState> {
-        &self.state
-    }
     pub fn placeholder(mut self, v: impl Into<String>) -> Self {
         self.placeholder = v.into();
         self
@@ -73,7 +58,7 @@ impl TextAreaProps {
     }
     pub fn on_change<F>(mut self, f: F) -> Self
     where
-        F: 'static + Send + Sync + Fn(&str, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&str, &mut gpui::Window, &mut App),
     {
         self.on_change = Some(Arc::new(f));
         self
@@ -108,9 +93,5 @@ impl TextAreaProps {
     pub fn custom_text_color(mut self, c: Hsla) -> Self {
         self.custom_text_color = Some(c);
         self
-    }
-
-    pub fn apply(self, el: Div) -> Stateful<Div> {
-        el.id(self.id).track_focus(&self.focus_handle)
     }
 }

@@ -53,10 +53,28 @@ use renderers::{
 /// overridden by the mini crate (button, icon_button,
 /// toggle_button, label); every other component continues to
 /// come from the default renderer installed earlier.
+///
+/// Color schema (in priority order, first hit wins):
+/// 1. `themeColor` — the mini's flat schema (used by
+///    `mini-default.json`).
+/// 2. `surface.hover` — a v0.3 surface color (always a
+///    sensible *button* bg, in both light and dark modes).
+///    We deliberately don't fall back to `action.primary.bg`
+///    because in dark mode that path holds a *foreground*
+///    tint (light gray on dark surface) and would render
+///    a near-invisible button.
+/// 3. `Hsla::default()` — fully transparent; the user
+///    sees a debug-friendly blank instead of a hard crash.
 pub fn install(cx: &mut App) {
     let theme = cx.theme();
-    let base = theme.get_color("themeColor").unwrap_or_else(gpui::Hsla::default);
-    let accent = theme.get_color("accentColor").unwrap_or(base);
+    let base = theme
+        .get_color("themeColor")
+        .or_else(|| theme.get_color("surface.hover"))
+        .unwrap_or_else(gpui::Hsla::default);
+    let accent = theme
+        .get_color("accentColor")
+        .or_else(|| theme.get_color("surface.hover"))
+        .unwrap_or(base);
     let _ = accent; // currently unused; future button-renderer fields can use it
 
     cx.register_renderer_arc::<markers::Button, dyn ButtonRenderer>(

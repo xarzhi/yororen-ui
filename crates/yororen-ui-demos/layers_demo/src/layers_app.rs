@@ -15,7 +15,7 @@
 //!    while the surrounding label / div still come from
 //!    default-renderer.
 
-use gpui::{Context, IntoElement, ParentElement, Render, Styled, Window, div, px};
+use gpui::{Context, InteractiveElement, IntoElement, ParentElement, Render, StatefulInteractiveElement, Styled, Window, div, px};
 use yororen_ui::headless::button::button;
 use yororen_ui::headless::label::label;
 use yororen_ui::renderer::DefaultButton;
@@ -31,44 +31,78 @@ impl LayersApp {
 }
 
 impl Render for LayersApp {
-    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        // Column 1: pure headless — caller draws a red
-        // square. No renderer is read at all; the button's
-        // `.apply(div())` is just plumbing.
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        // Column 1: pure headless — caller draws a black
+        // square. The button's `.apply(div())` is just
+        // plumbing for focus + click; the visible
+        // hover/active feedback is `apply`'s built-in
+        // opacity dip (light → 0.9 on hover, → 0.85 on
+        // press), so even a bare caller `div()` shows
+        // *some* interaction. Caller sets `text_color`
+        // explicitly — without it, the text inherits the
+        // gpui default (black) and disappears against a
+        // black bg.
         let headless_btn = button("headless-only", &mut **cx)
             .on_click(|_, _, _| {})
-            .apply(div().bg(gpui::hsla(0.0, 0.6, 0.5, 1.0)).p_2().rounded(px(4.)).child("click me"));
+            .apply(
+                div()
+                    .bg(gpui::hsla(0.0, 0.0, 0.05, 1.0))
+                    .text_color(gpui::hsla(0.0, 0.0, 1.0, 1.0))
+                    .p_2()
+                    .rounded(px(4.))
+                    .child("click me"),
+            );
 
-        // Column 2: headless + default-renderer sugar. The
-        // default variant is `Neutral` (light gray) which
-        // disappears against a near-white page; we use
-        // `Primary` here so the default-rendered button is
-        // visibly the dark action color from the JSON theme.
+        // Column 2: headless + default-renderer sugar. Uses
+        // the demo theme's `Neutral` action palette — pure
+        // black `#0A0A0A`, hover `#2A2A2A`, active `#1A1A1A`
+        // (modern monochrome, ~8% lightness delta on
+        // hover).
         let default_btn = button("default-render", &mut **cx)
-            .variant(ActionVariantKind::Primary)
+            .variant(ActionVariantKind::Neutral)
             .default_render(cx)
             .child("Click me");
 
-        // Column 3: headless + default-renderer + mini
-        // override. The `default_render` call now resolves
-        // to `MiniButtonRenderer` because it was installed
-        // last and overwrites the same `markers::Button` key.
-        // Variant is set to `Primary` so the visible surface
-        // matches the `TokenButtonRenderer`'s dark action
-        // color; the mini adds its own padding/radius/height
-        // on top.
-        let mini_btn = button("mini-override", &mut **cx)
-            .variant(ActionVariantKind::Primary)
-            .default_render(cx)
-            .child("Click me");
+        // Column 3: headless + caller fully custom. The
+        // caller paints its own background, border, padding
+        // and radius — and owns the hover/active styling too
+        // (so it can pick a visibly-different transition;
+        // the apply's built-in opacity dip is too subtle on
+        // a white surface). `.raw_hover(false)` disables
+        // `apply`'s default feedback; the caller chains
+        // `.hover() / .active()` after `apply(el)`.
+        let custom_btn = button("custom", &mut **cx)
+            .variant(ActionVariantKind::Danger)
+            .raw_hover(false)
+            .apply(
+                div()
+                    .bg(gpui::hsla(0.0, 0.0, 1.0, 1.0))
+                    .border_1()
+                    .border_color(gpui::hsla(0.0, 0.0, 0.1, 1.0))
+                    .px(px(16.))
+                    .py(px(8.))
+                    .rounded(px(8.))
+                    .text_color(gpui::hsla(0.0, 0.0, 0.05, 1.0))
+                    .child("Click me"),
+            )
+            .hover(|s| {
+                s.bg(gpui::hsla(0.0, 0.0, 0.92, 1.0))
+                    .border_color(gpui::hsla(0.0, 0.0, 0.0, 1.0))
+            })
+            .active(|s| {
+                s.bg(gpui::hsla(0.0, 0.0, 0.85, 1.0))
+                    .border_color(gpui::hsla(0.0, 0.0, 0.0, 1.0))
+            });
 
         div()
+            .id("layers-scroll")
             .size_full()
             .bg(gpui::hsla(0.0, 0.0, 0.97, 1.0))
             .flex()
-            .flex_row()
+            .flex_col()
             .gap(px(24.))
             .p(px(24.))
+            .overflow_y_scroll()
             .child(panel_body(
                 "1. Headless only",
                 "Caller writes every visual: bg, padding, radius, text. The button is just a focus + click handler.",
@@ -92,17 +126,45 @@ impl Render for LayersApp {
                 cx,
             ))
             .child(panel_body(
-                "3. + Mini override",
-                "Same call as column 2, but a MiniButtonRenderer was registered after the default. The mini wins because it was last to register.",
+                "3. + Caller custom",
+                "headless::button + caller-owned div: bg, border, padding, radius all written by the user. The renderer is bypassed; headless only wires a11y + click.",
                 div()
                     .flex()
                     .flex_col()
                     .gap_2()
-                    .child(mini_btn)
-                    .child(label("caption", "mini caption", &mut **cx).default_render(cx)),
+                    .child(custom_btn)
+                    .child(label("caption", "custom caption", &mut **cx).default_render(cx)),
                 cx,
             ))
+            .child({
+                // Bind inputs_strip to a local first so the
+                // `&mut **cx` borrow is released before
+                // `panel_body` re-borrows `cx` for its own
+                // label/div wiring.
+                let inputs = text_input_strip(window, cx);
+                panel_body(
+                    "4. Inputs (hover border)",
+                    "TextInput: border defaults to `border.default`, hover → `border.muted`, press → `border.default` (deeper). Hover to see.",
+                    inputs,
+                    cx,
+                )
+            })
     }
+}
+
+fn text_input_strip(window: &mut Window, cx: &mut Context<LayersApp>) -> impl IntoElement + use<> {
+    use yororen_ui::headless::text_input::text_input;
+    use yororen_ui::renderer::DefaultTextInput;
+    div()
+        .flex()
+        .flex_col()
+        .gap_2()
+        .w_full()
+        .child(
+            text_input("demo-text-input")
+                .placeholder("Type here…")
+                .default_render(cx, window),
+        )
 }
 
 fn panel_body(
@@ -112,14 +174,13 @@ fn panel_body(
     cx: &mut Context<LayersApp>,
 ) -> impl IntoElement {
     div()
-        .flex_1()
+        .w_full()
         .bg(gpui::hsla(0.0, 0.0, 1.0, 1.0))
         .rounded(px(8.))
         .p(px(16.))
         .flex()
         .flex_col()
         .gap_2()
-        .max_w(px(420.))
         .child(
             label("title", title, &mut **cx)
                 .strong(true)
@@ -130,7 +191,7 @@ fn panel_body(
                 .wrap()
                 .default_render(cx)
                 .text_size(gpui::px(13.))
-                .w(gpui::px(360.)),
+                .w_full(),
         )
         .child(body)
 }

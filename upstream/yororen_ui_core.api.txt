@@ -913,6 +913,7 @@ pub yororen_ui_core::headless::button::ButtonProps::disabled: bool
 pub yororen_ui_core::headless::button::ButtonProps::focus_handle: gpui::window::FocusHandle
 pub yororen_ui_core::headless::button::ButtonProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::button::ButtonProps::on_click: core::option::Option<yororen_ui_core::headless::button::ClickCallback>
+pub yororen_ui_core::headless::button::ButtonProps::raw_hover: bool
 pub yororen_ui_core::headless::button::ButtonProps::variant: yororen_ui_core::renderer::ActionVariantKind
 impl yororen_ui_core::headless::button::ButtonProps
 pub fn yororen_ui_core::headless::button::ButtonProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
@@ -921,6 +922,7 @@ pub fn yororen_ui_core::headless::button::ButtonProps::disabled(self, bool) -> S
 pub fn yororen_ui_core::headless::button::ButtonProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::button::ButtonProps::is_focused(&self, &gpui::window::Window) -> bool
 pub fn yororen_ui_core::headless::button::ButtonProps::on_click<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::button::ButtonProps::raw_hover(self, bool) -> Self
 pub fn yororen_ui_core::headless::button::ButtonProps::variant(self, yororen_ui_core::renderer::ActionVariantKind) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::button::ButtonProps
 pub fn yororen_ui_core::headless::button::ButtonProps::clone(&self) -> yororen_ui_core::headless::button::ButtonProps
@@ -1005,6 +1007,7 @@ pub yororen_ui_core::headless::checkbox::CheckboxProps::focus_handle: gpui::wind
 pub yororen_ui_core::headless::checkbox::CheckboxProps::has_custom_tone: bool
 pub yororen_ui_core::headless::checkbox::CheckboxProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::checkbox::CheckboxProps::on_toggle: core::option::Option<yororen_ui_core::headless::switch::ToggleCallback>
+pub yororen_ui_core::headless::checkbox::CheckboxProps::raw_hover: bool
 impl yororen_ui_core::headless::checkbox::CheckboxProps
 pub fn yororen_ui_core::headless::checkbox::CheckboxProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::checkbox::CheckboxProps::checked(self, bool) -> Self
@@ -1014,6 +1017,7 @@ pub fn yororen_ui_core::headless::checkbox::CheckboxProps::focus_handle(&self) -
 pub fn yororen_ui_core::headless::checkbox::CheckboxProps::has_custom_tone(self, bool) -> Self
 pub fn yororen_ui_core::headless::checkbox::CheckboxProps::is_focused(&self, &gpui::window::Window) -> bool
 pub fn yororen_ui_core::headless::checkbox::CheckboxProps::on_toggle<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(bool, core::option::Option<&gpui::interactive::ClickEvent>, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::checkbox::CheckboxProps::raw_hover(self, bool) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::checkbox::CheckboxProps
 pub fn yororen_ui_core::headless::checkbox::CheckboxProps::clone(&self) -> yororen_ui_core::headless::checkbox::CheckboxProps
 impl core::marker::Freeze for yororen_ui_core::headless::checkbox::CheckboxProps
@@ -1312,7 +1316,6 @@ pub yororen_ui_core::headless::file_path_input::FilePathInputProps::custom_borde
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::custom_focus_border: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::custom_text_color: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::disabled: bool
-pub yororen_ui_core::headless::file_path_input::FilePathInputProps::focus_handle: gpui::window::FocusHandle
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_bg: bool
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_border: bool
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_focus_border: bool
@@ -1320,23 +1323,19 @@ pub yororen_ui_core::headless::file_path_input::FilePathInputProps::id: gpui::wi
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::on_browse: core::option::Option<alloc::sync::Arc<(dyn core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>>
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::on_change: core::option::Option<alloc::sync::Arc<(dyn core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>>
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::placeholder: alloc::string::String
-pub yororen_ui_core::headless::file_path_input::FilePathInputProps::state: gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::value: alloc::string::String
 impl yororen_ui_core::headless::file_path_input::FilePathInputProps
-pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::custom_bg(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::custom_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::custom_focus_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::custom_text_color(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::disabled(self, bool) -> Self
-pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_bg(self, bool) -> Self
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_border(self, bool) -> Self
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_focus_border(self, bool) -> Self
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::on_browse<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::on_change<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
-pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::state(&self) -> &gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::value(self, impl core::convert::Into<alloc::string::String>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::file_path_input::FilePathInputProps
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::clone(&self) -> yororen_ui_core::headless::file_path_input::FilePathInputProps
@@ -1347,7 +1346,7 @@ impl core::marker::Unpin for yororen_ui_core::headless::file_path_input::FilePat
 impl core::marker::UnsafeUnpin for yororen_ui_core::headless::file_path_input::FilePathInputProps
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::file_path_input::FilePathInputProps
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::file_path_input::FilePathInputProps
-pub fn yororen_ui_core::headless::file_path_input::file_path_input(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::file_path_input::FilePathInputProps
+pub fn yororen_ui_core::headless::file_path_input::file_path_input(impl core::convert::Into<gpui::window::ElementId>) -> yororen_ui_core::headless::file_path_input::FilePathInputProps
 pub mod yororen_ui_core::headless::focus_ring
 pub struct yororen_ui_core::headless::focus_ring::FocusRingProps
 pub yororen_ui_core::headless::focus_ring::FocusRingProps::focus_handle: gpui::window::FocusHandle
@@ -1498,6 +1497,7 @@ pub yororen_ui_core::headless::icon_button::IconButtonProps::disabled: bool
 pub yororen_ui_core::headless::icon_button::IconButtonProps::focus_handle: gpui::window::FocusHandle
 pub yororen_ui_core::headless::icon_button::IconButtonProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::icon_button::IconButtonProps::on_click: core::option::Option<yororen_ui_core::headless::icon_button::ClickCallback>
+pub yororen_ui_core::headless::icon_button::IconButtonProps::raw_hover: bool
 pub yororen_ui_core::headless::icon_button::IconButtonProps::variant: yororen_ui_core::renderer::ActionVariantKind
 impl yororen_ui_core::headless::icon_button::IconButtonProps
 pub fn yororen_ui_core::headless::icon_button::IconButtonProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
@@ -1505,6 +1505,7 @@ pub fn yororen_ui_core::headless::icon_button::IconButtonProps::disabled(self, b
 pub fn yororen_ui_core::headless::icon_button::IconButtonProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::icon_button::IconButtonProps::is_focused(&self, &gpui::window::Window) -> bool
 pub fn yororen_ui_core::headless::icon_button::IconButtonProps::on_click<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::icon_button::IconButtonProps::raw_hover(self, bool) -> Self
 pub fn yororen_ui_core::headless::icon_button::IconButtonProps::variant(self, yororen_ui_core::renderer::ActionVariantKind) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::icon_button::IconButtonProps
 pub fn yororen_ui_core::headless::icon_button::IconButtonProps::clone(&self) -> yororen_ui_core::headless::icon_button::IconButtonProps
@@ -1597,7 +1598,6 @@ pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::custom_bo
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::custom_focus_border: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::custom_text_color: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::disabled: bool
-pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::focus_handle: gpui::window::FocusHandle
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::has_custom_bg: bool
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::has_custom_border: bool
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::has_custom_focus_border: bool
@@ -1607,15 +1607,12 @@ pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_cancel
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_change: core::option::Option<yororen_ui_core::headless::keybinding_input::KeybindingChangeCallback>
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_start_capture: core::option::Option<alloc::sync::Arc<(dyn core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>>
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::placeholder: alloc::string::String
-pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::state: gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 impl yororen_ui_core::headless::keybinding_input::KeybindingInputProps
-pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::custom_bg(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::custom_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::custom_focus_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::custom_text_color(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::disabled(self, bool) -> Self
-pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::has_custom_bg(self, bool) -> Self
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::has_custom_border(self, bool) -> Self
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::has_custom_focus_border(self, bool) -> Self
@@ -1624,7 +1621,6 @@ pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_can
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_change<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_start_capture<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
-pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::state(&self) -> &gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 impl core::clone::Clone for yororen_ui_core::headless::keybinding_input::KeybindingInputProps
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::clone(&self) -> yororen_ui_core::headless::keybinding_input::KeybindingInputProps
 impl core::marker::Freeze for yororen_ui_core::headless::keybinding_input::KeybindingInputProps
@@ -1634,7 +1630,7 @@ impl core::marker::Unpin for yororen_ui_core::headless::keybinding_input::Keybin
 impl core::marker::UnsafeUnpin for yororen_ui_core::headless::keybinding_input::KeybindingInputProps
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::keybinding_input::KeybindingInputProps
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::keybinding_input::KeybindingInputProps
-pub fn yororen_ui_core::headless::keybinding_input::keybinding_input(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::keybinding_input::KeybindingInputProps
+pub fn yororen_ui_core::headless::keybinding_input::keybinding_input(impl core::convert::Into<gpui::window::ElementId>) -> yororen_ui_core::headless::keybinding_input::KeybindingInputProps
 pub type yororen_ui_core::headless::keybinding_input::KeybindingChangeCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
 pub mod yororen_ui_core::headless::label
 pub struct yororen_ui_core::headless::label::LabelProps
@@ -2618,7 +2614,6 @@ pub yororen_ui_core::headless::number_input::NumberInputProps::custom_border: co
 pub yororen_ui_core::headless::number_input::NumberInputProps::custom_focus_border: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::number_input::NumberInputProps::custom_text_color: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::number_input::NumberInputProps::disabled: bool
-pub yororen_ui_core::headless::number_input::NumberInputProps::focus_handle: gpui::window::FocusHandle
 pub yororen_ui_core::headless::number_input::NumberInputProps::has_custom_bg: bool
 pub yororen_ui_core::headless::number_input::NumberInputProps::has_custom_border: bool
 pub yororen_ui_core::headless::number_input::NumberInputProps::has_custom_focus_border: bool
@@ -2629,17 +2624,14 @@ pub yororen_ui_core::headless::number_input::NumberInputProps::on_change: core::
 pub yororen_ui_core::headless::number_input::NumberInputProps::on_decrement: core::option::Option<yororen_ui_core::headless::number_input::NumberChangeCallback>
 pub yororen_ui_core::headless::number_input::NumberInputProps::on_increment: core::option::Option<yororen_ui_core::headless::number_input::NumberChangeCallback>
 pub yororen_ui_core::headless::number_input::NumberInputProps::placeholder: alloc::string::String
-pub yororen_ui_core::headless::number_input::NumberInputProps::state: gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 pub yororen_ui_core::headless::number_input::NumberInputProps::step: f64
 pub yororen_ui_core::headless::number_input::NumberInputProps::value: f64
 impl yororen_ui_core::headless::number_input::NumberInputProps
-pub fn yororen_ui_core::headless::number_input::NumberInputProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::custom_bg(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::custom_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::custom_focus_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::custom_text_color(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::disabled(self, bool) -> Self
-pub fn yororen_ui_core::headless::number_input::NumberInputProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::has_custom_bg(self, bool) -> Self
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::has_custom_border(self, bool) -> Self
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::has_custom_focus_border(self, bool) -> Self
@@ -2649,7 +2641,6 @@ pub fn yororen_ui_core::headless::number_input::NumberInputProps::on_change<F>(s
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::on_decrement<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(f64, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::on_increment<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(f64, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
-pub fn yororen_ui_core::headless::number_input::NumberInputProps::state(&self) -> &gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::step(self, f64) -> Self
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::value(self, f64) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::number_input::NumberInputProps
@@ -2661,7 +2652,7 @@ impl core::marker::Unpin for yororen_ui_core::headless::number_input::NumberInpu
 impl core::marker::UnsafeUnpin for yororen_ui_core::headless::number_input::NumberInputProps
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::number_input::NumberInputProps
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::number_input::NumberInputProps
-pub fn yororen_ui_core::headless::number_input::number_input(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::number_input::NumberInputProps
+pub fn yororen_ui_core::headless::number_input::number_input(impl core::convert::Into<gpui::window::ElementId>) -> yororen_ui_core::headless::number_input::NumberInputProps
 pub type yororen_ui_core::headless::number_input::NumberChangeCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(f64, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
 pub mod yororen_ui_core::headless::overlay
 pub enum yororen_ui_core::headless::overlay::OverlayCloseReason
@@ -2743,7 +2734,6 @@ pub yororen_ui_core::headless::password_input::PasswordInputProps::custom_border
 pub yororen_ui_core::headless::password_input::PasswordInputProps::custom_focus_border: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::password_input::PasswordInputProps::custom_text_color: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::password_input::PasswordInputProps::disabled: bool
-pub yororen_ui_core::headless::password_input::PasswordInputProps::focus_handle: gpui::window::FocusHandle
 pub yororen_ui_core::headless::password_input::PasswordInputProps::has_custom_bg: bool
 pub yororen_ui_core::headless::password_input::PasswordInputProps::has_custom_border: bool
 pub yororen_ui_core::headless::password_input::PasswordInputProps::has_custom_focus_border: bool
@@ -2753,15 +2743,12 @@ pub yororen_ui_core::headless::password_input::PasswordInputProps::max_length: c
 pub yororen_ui_core::headless::password_input::PasswordInputProps::on_change: core::option::Option<yororen_ui_core::headless::text_input::TextChangeCallback>
 pub yororen_ui_core::headless::password_input::PasswordInputProps::on_submit: core::option::Option<yororen_ui_core::headless::text_input::TextChangeCallback>
 pub yororen_ui_core::headless::password_input::PasswordInputProps::placeholder: alloc::string::String
-pub yororen_ui_core::headless::password_input::PasswordInputProps::state: gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 impl yororen_ui_core::headless::password_input::PasswordInputProps
-pub fn yororen_ui_core::headless::password_input::PasswordInputProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::custom_bg(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::custom_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::custom_focus_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::custom_text_color(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::disabled(self, bool) -> Self
-pub fn yororen_ui_core::headless::password_input::PasswordInputProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::has_custom_bg(self, bool) -> Self
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::has_custom_border(self, bool) -> Self
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::has_custom_focus_border(self, bool) -> Self
@@ -2770,7 +2757,6 @@ pub fn yororen_ui_core::headless::password_input::PasswordInputProps::max_length
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::on_change<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::on_submit<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
-pub fn yororen_ui_core::headless::password_input::PasswordInputProps::state(&self) -> &gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 impl core::clone::Clone for yororen_ui_core::headless::password_input::PasswordInputProps
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::clone(&self) -> yororen_ui_core::headless::password_input::PasswordInputProps
 impl core::marker::Freeze for yororen_ui_core::headless::password_input::PasswordInputProps
@@ -2780,7 +2766,7 @@ impl core::marker::Unpin for yororen_ui_core::headless::password_input::Password
 impl core::marker::UnsafeUnpin for yororen_ui_core::headless::password_input::PasswordInputProps
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::password_input::PasswordInputProps
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::password_input::PasswordInputProps
-pub fn yororen_ui_core::headless::password_input::password_input(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::password_input::PasswordInputProps
+pub fn yororen_ui_core::headless::password_input::password_input(impl core::convert::Into<gpui::window::ElementId>) -> yororen_ui_core::headless::password_input::PasswordInputProps
 pub mod yororen_ui_core::headless::popover
 pub use yororen_ui_core::headless::popover::AnchorPoint
 pub enum yororen_ui_core::headless::popover::PopoverPlacement
@@ -2892,6 +2878,7 @@ pub yororen_ui_core::headless::radio::RadioProps::focus_handle: gpui::window::Fo
 pub yororen_ui_core::headless::radio::RadioProps::has_custom_tone: bool
 pub yororen_ui_core::headless::radio::RadioProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::radio::RadioProps::on_toggle: core::option::Option<yororen_ui_core::headless::switch::ToggleCallback>
+pub yororen_ui_core::headless::radio::RadioProps::raw_hover: bool
 impl yororen_ui_core::headless::radio::RadioProps
 pub fn yororen_ui_core::headless::radio::RadioProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::radio::RadioProps::checked(self, bool) -> Self
@@ -2901,6 +2888,7 @@ pub fn yororen_ui_core::headless::radio::RadioProps::focus_handle(&self) -> &gpu
 pub fn yororen_ui_core::headless::radio::RadioProps::has_custom_tone(self, bool) -> Self
 pub fn yororen_ui_core::headless::radio::RadioProps::is_focused(&self, &gpui::window::Window) -> bool
 pub fn yororen_ui_core::headless::radio::RadioProps::on_toggle<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(bool, core::option::Option<&gpui::interactive::ClickEvent>, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::radio::RadioProps::raw_hover(self, bool) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::radio::RadioProps
 pub fn yororen_ui_core::headless::radio::RadioProps::clone(&self) -> yororen_ui_core::headless::radio::RadioProps
 impl core::marker::Freeze for yororen_ui_core::headless::radio::RadioProps
@@ -2940,7 +2928,6 @@ pub yororen_ui_core::headless::search_input::SearchInputProps::custom_border: co
 pub yororen_ui_core::headless::search_input::SearchInputProps::custom_focus_border: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::search_input::SearchInputProps::custom_text_color: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::search_input::SearchInputProps::disabled: bool
-pub yororen_ui_core::headless::search_input::SearchInputProps::focus_handle: gpui::window::FocusHandle
 pub yororen_ui_core::headless::search_input::SearchInputProps::has_custom_bg: bool
 pub yororen_ui_core::headless::search_input::SearchInputProps::has_custom_border: bool
 pub yororen_ui_core::headless::search_input::SearchInputProps::has_custom_focus_border: bool
@@ -2949,16 +2936,13 @@ pub yororen_ui_core::headless::search_input::SearchInputProps::on_change: core::
 pub yororen_ui_core::headless::search_input::SearchInputProps::on_clear: core::option::Option<alloc::sync::Arc<(dyn core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>>
 pub yororen_ui_core::headless::search_input::SearchInputProps::on_submit: core::option::Option<yororen_ui_core::headless::search_input::SearchChangeCallback>
 pub yororen_ui_core::headless::search_input::SearchInputProps::placeholder: alloc::string::String
-pub yororen_ui_core::headless::search_input::SearchInputProps::state: gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 pub yororen_ui_core::headless::search_input::SearchInputProps::value: alloc::string::String
 impl yororen_ui_core::headless::search_input::SearchInputProps
-pub fn yororen_ui_core::headless::search_input::SearchInputProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::custom_bg(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::custom_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::custom_focus_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::custom_text_color(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::disabled(self, bool) -> Self
-pub fn yororen_ui_core::headless::search_input::SearchInputProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::has_custom_bg(self, bool) -> Self
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::has_custom_border(self, bool) -> Self
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::has_custom_focus_border(self, bool) -> Self
@@ -2966,7 +2950,6 @@ pub fn yororen_ui_core::headless::search_input::SearchInputProps::on_change<F>(s
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::on_clear<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::on_submit<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
-pub fn yororen_ui_core::headless::search_input::SearchInputProps::state(&self) -> &gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::value(self, impl core::convert::Into<alloc::string::String>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::search_input::SearchInputProps
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::clone(&self) -> yororen_ui_core::headless::search_input::SearchInputProps
@@ -2977,7 +2960,7 @@ impl core::marker::Unpin for yororen_ui_core::headless::search_input::SearchInpu
 impl core::marker::UnsafeUnpin for yororen_ui_core::headless::search_input::SearchInputProps
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::search_input::SearchInputProps
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::search_input::SearchInputProps
-pub fn yororen_ui_core::headless::search_input::search_input(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::search_input::SearchInputProps
+pub fn yororen_ui_core::headless::search_input::search_input(impl core::convert::Into<gpui::window::ElementId>) -> yororen_ui_core::headless::search_input::SearchInputProps
 pub type yororen_ui_core::headless::search_input::SearchChangeCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
 pub mod yororen_ui_core::headless::select
 pub struct yororen_ui_core::headless::select::SelectOption
@@ -3161,6 +3144,7 @@ pub yororen_ui_core::headless::switch::SwitchProps::focus_handle: gpui::window::
 pub yororen_ui_core::headless::switch::SwitchProps::has_custom_tone: bool
 pub yororen_ui_core::headless::switch::SwitchProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::switch::SwitchProps::on_toggle: core::option::Option<yororen_ui_core::headless::switch::ToggleCallback>
+pub yororen_ui_core::headless::switch::SwitchProps::raw_hover: bool
 impl yororen_ui_core::headless::switch::SwitchProps
 pub fn yororen_ui_core::headless::switch::SwitchProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::switch::SwitchProps::checked(self, bool) -> Self
@@ -3170,6 +3154,7 @@ pub fn yororen_ui_core::headless::switch::SwitchProps::focus_handle(&self) -> &g
 pub fn yororen_ui_core::headless::switch::SwitchProps::has_custom_tone(self, bool) -> Self
 pub fn yororen_ui_core::headless::switch::SwitchProps::is_focused(&self, &gpui::window::Window) -> bool
 pub fn yororen_ui_core::headless::switch::SwitchProps::on_toggle<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(bool, core::option::Option<&gpui::interactive::ClickEvent>, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::switch::SwitchProps::raw_hover(self, bool) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::switch::SwitchProps
 pub fn yororen_ui_core::headless::switch::SwitchProps::clone(&self) -> yororen_ui_core::headless::switch::SwitchProps
 impl core::marker::Freeze for yororen_ui_core::headless::switch::SwitchProps
@@ -3281,7 +3266,6 @@ pub yororen_ui_core::headless::text_area::TextAreaProps::custom_border: core::op
 pub yororen_ui_core::headless::text_area::TextAreaProps::custom_focus_border: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::text_area::TextAreaProps::custom_text_color: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::text_area::TextAreaProps::disabled: bool
-pub yororen_ui_core::headless::text_area::TextAreaProps::focus_handle: gpui::window::FocusHandle
 pub yororen_ui_core::headless::text_area::TextAreaProps::has_custom_bg: bool
 pub yororen_ui_core::headless::text_area::TextAreaProps::has_custom_border: bool
 pub yororen_ui_core::headless::text_area::TextAreaProps::has_custom_focus_border: bool
@@ -3289,22 +3273,18 @@ pub yororen_ui_core::headless::text_area::TextAreaProps::id: gpui::window::Eleme
 pub yororen_ui_core::headless::text_area::TextAreaProps::max_length: core::option::Option<usize>
 pub yororen_ui_core::headless::text_area::TextAreaProps::on_change: core::option::Option<yororen_ui_core::headless::text_input::TextChangeCallback>
 pub yororen_ui_core::headless::text_area::TextAreaProps::placeholder: alloc::string::String
-pub yororen_ui_core::headless::text_area::TextAreaProps::state: gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 impl yororen_ui_core::headless::text_area::TextAreaProps
-pub fn yororen_ui_core::headless::text_area::TextAreaProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::custom_bg(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::custom_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::custom_focus_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::custom_text_color(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::disabled(self, bool) -> Self
-pub fn yororen_ui_core::headless::text_area::TextAreaProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::has_custom_bg(self, bool) -> Self
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::has_custom_border(self, bool) -> Self
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::has_custom_focus_border(self, bool) -> Self
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::max_length(self, usize) -> Self
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::on_change<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
-pub fn yororen_ui_core::headless::text_area::TextAreaProps::state(&self) -> &gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 impl core::clone::Clone for yororen_ui_core::headless::text_area::TextAreaProps
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::clone(&self) -> yororen_ui_core::headless::text_area::TextAreaProps
 impl core::marker::Freeze for yororen_ui_core::headless::text_area::TextAreaProps
@@ -3314,15 +3294,419 @@ impl core::marker::Unpin for yororen_ui_core::headless::text_area::TextAreaProps
 impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_area::TextAreaProps
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_area::TextAreaProps
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_area::TextAreaProps
-pub fn yororen_ui_core::headless::text_area::text_area(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::text_area::TextAreaProps
+pub fn yororen_ui_core::headless::text_area::text_area(impl core::convert::Into<gpui::window::ElementId>) -> yororen_ui_core::headless::text_area::TextAreaProps
 pub mod yororen_ui_core::headless::text_input
+pub struct yororen_ui_core::headless::text_input::Backspace
+impl core::clone::Clone for yororen_ui_core::headless::text_input::Backspace
+pub fn yororen_ui_core::headless::text_input::Backspace::clone(&self) -> yororen_ui_core::headless::text_input::Backspace
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::Backspace
+pub fn yororen_ui_core::headless::text_input::Backspace::eq(&self, &yororen_ui_core::headless::text_input::Backspace) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::Backspace
+pub fn yororen_ui_core::headless::text_input::Backspace::default() -> yororen_ui_core::headless::text_input::Backspace
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::Backspace
+pub fn yororen_ui_core::headless::text_input::Backspace::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::Backspace
+impl gpui::action::Action for yororen_ui_core::headless::text_input::Backspace
+pub fn yororen_ui_core::headless::text_input::Backspace::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::Backspace::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::Backspace::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::Backspace::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::Backspace::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Backspace::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Backspace::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::Backspace::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::Backspace::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::Backspace
+impl core::marker::Send for yororen_ui_core::headless::text_input::Backspace
+impl core::marker::Sync for yororen_ui_core::headless::text_input::Backspace
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::Backspace
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::Backspace
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::Backspace
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::Backspace
+pub struct yororen_ui_core::headless::text_input::Copy
+impl core::clone::Clone for yororen_ui_core::headless::text_input::Copy
+pub fn yororen_ui_core::headless::text_input::Copy::clone(&self) -> yororen_ui_core::headless::text_input::Copy
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::Copy
+pub fn yororen_ui_core::headless::text_input::Copy::eq(&self, &yororen_ui_core::headless::text_input::Copy) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::Copy
+pub fn yororen_ui_core::headless::text_input::Copy::default() -> yororen_ui_core::headless::text_input::Copy
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::Copy
+pub fn yororen_ui_core::headless::text_input::Copy::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::Copy
+impl gpui::action::Action for yororen_ui_core::headless::text_input::Copy
+pub fn yororen_ui_core::headless::text_input::Copy::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::Copy::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::Copy::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::Copy::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::Copy::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Copy::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Copy::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::Copy::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::Copy::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::Copy
+impl core::marker::Send for yororen_ui_core::headless::text_input::Copy
+impl core::marker::Sync for yororen_ui_core::headless::text_input::Copy
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::Copy
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::Copy
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::Copy
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::Copy
+pub struct yororen_ui_core::headless::text_input::Cut
+impl core::clone::Clone for yororen_ui_core::headless::text_input::Cut
+pub fn yororen_ui_core::headless::text_input::Cut::clone(&self) -> yororen_ui_core::headless::text_input::Cut
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::Cut
+pub fn yororen_ui_core::headless::text_input::Cut::eq(&self, &yororen_ui_core::headless::text_input::Cut) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::Cut
+pub fn yororen_ui_core::headless::text_input::Cut::default() -> yororen_ui_core::headless::text_input::Cut
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::Cut
+pub fn yororen_ui_core::headless::text_input::Cut::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::Cut
+impl gpui::action::Action for yororen_ui_core::headless::text_input::Cut
+pub fn yororen_ui_core::headless::text_input::Cut::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::Cut::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::Cut::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::Cut::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::Cut::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Cut::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Cut::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::Cut::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::Cut::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::Cut
+impl core::marker::Send for yororen_ui_core::headless::text_input::Cut
+impl core::marker::Sync for yororen_ui_core::headless::text_input::Cut
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::Cut
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::Cut
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::Cut
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::Cut
+pub struct yororen_ui_core::headless::text_input::Delete
+impl core::clone::Clone for yororen_ui_core::headless::text_input::Delete
+pub fn yororen_ui_core::headless::text_input::Delete::clone(&self) -> yororen_ui_core::headless::text_input::Delete
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::Delete
+pub fn yororen_ui_core::headless::text_input::Delete::eq(&self, &yororen_ui_core::headless::text_input::Delete) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::Delete
+pub fn yororen_ui_core::headless::text_input::Delete::default() -> yororen_ui_core::headless::text_input::Delete
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::Delete
+pub fn yororen_ui_core::headless::text_input::Delete::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::Delete
+impl gpui::action::Action for yororen_ui_core::headless::text_input::Delete
+pub fn yororen_ui_core::headless::text_input::Delete::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::Delete::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::Delete::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::Delete::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::Delete::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Delete::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Delete::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::Delete::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::Delete::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::Delete
+impl core::marker::Send for yororen_ui_core::headless::text_input::Delete
+impl core::marker::Sync for yororen_ui_core::headless::text_input::Delete
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::Delete
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::Delete
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::Delete
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::Delete
+pub struct yororen_ui_core::headless::text_input::End
+impl core::clone::Clone for yororen_ui_core::headless::text_input::End
+pub fn yororen_ui_core::headless::text_input::End::clone(&self) -> yororen_ui_core::headless::text_input::End
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::End
+pub fn yororen_ui_core::headless::text_input::End::eq(&self, &yororen_ui_core::headless::text_input::End) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::End
+pub fn yororen_ui_core::headless::text_input::End::default() -> yororen_ui_core::headless::text_input::End
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::End
+pub fn yororen_ui_core::headless::text_input::End::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::End
+impl gpui::action::Action for yororen_ui_core::headless::text_input::End
+pub fn yororen_ui_core::headless::text_input::End::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::End::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::End::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::End::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::End::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::End::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::End::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::End::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::End::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::End
+impl core::marker::Send for yororen_ui_core::headless::text_input::End
+impl core::marker::Sync for yororen_ui_core::headless::text_input::End
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::End
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::End
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::End
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::End
+pub struct yororen_ui_core::headless::text_input::Enter
+impl core::clone::Clone for yororen_ui_core::headless::text_input::Enter
+pub fn yororen_ui_core::headless::text_input::Enter::clone(&self) -> yororen_ui_core::headless::text_input::Enter
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::Enter
+pub fn yororen_ui_core::headless::text_input::Enter::eq(&self, &yororen_ui_core::headless::text_input::Enter) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::Enter
+pub fn yororen_ui_core::headless::text_input::Enter::default() -> yororen_ui_core::headless::text_input::Enter
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::Enter
+pub fn yororen_ui_core::headless::text_input::Enter::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::Enter
+impl gpui::action::Action for yororen_ui_core::headless::text_input::Enter
+pub fn yororen_ui_core::headless::text_input::Enter::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::Enter::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::Enter::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::Enter::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::Enter::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Enter::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Enter::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::Enter::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::Enter::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::Enter
+impl core::marker::Send for yororen_ui_core::headless::text_input::Enter
+impl core::marker::Sync for yororen_ui_core::headless::text_input::Enter
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::Enter
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::Enter
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::Enter
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::Enter
+pub struct yororen_ui_core::headless::text_input::Escape
+impl core::clone::Clone for yororen_ui_core::headless::text_input::Escape
+pub fn yororen_ui_core::headless::text_input::Escape::clone(&self) -> yororen_ui_core::headless::text_input::Escape
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::Escape
+pub fn yororen_ui_core::headless::text_input::Escape::eq(&self, &yororen_ui_core::headless::text_input::Escape) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::Escape
+pub fn yororen_ui_core::headless::text_input::Escape::default() -> yororen_ui_core::headless::text_input::Escape
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::Escape
+pub fn yororen_ui_core::headless::text_input::Escape::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::Escape
+impl gpui::action::Action for yororen_ui_core::headless::text_input::Escape
+pub fn yororen_ui_core::headless::text_input::Escape::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::Escape::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::Escape::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::Escape::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::Escape::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Escape::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Escape::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::Escape::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::Escape::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::Escape
+impl core::marker::Send for yororen_ui_core::headless::text_input::Escape
+impl core::marker::Sync for yororen_ui_core::headless::text_input::Escape
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::Escape
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::Escape
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::Escape
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::Escape
+pub struct yororen_ui_core::headless::text_input::Home
+impl core::clone::Clone for yororen_ui_core::headless::text_input::Home
+pub fn yororen_ui_core::headless::text_input::Home::clone(&self) -> yororen_ui_core::headless::text_input::Home
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::Home
+pub fn yororen_ui_core::headless::text_input::Home::eq(&self, &yororen_ui_core::headless::text_input::Home) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::Home
+pub fn yororen_ui_core::headless::text_input::Home::default() -> yororen_ui_core::headless::text_input::Home
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::Home
+pub fn yororen_ui_core::headless::text_input::Home::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::Home
+impl gpui::action::Action for yororen_ui_core::headless::text_input::Home
+pub fn yororen_ui_core::headless::text_input::Home::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::Home::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::Home::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::Home::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::Home::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Home::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Home::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::Home::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::Home::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::Home
+impl core::marker::Send for yororen_ui_core::headless::text_input::Home
+impl core::marker::Sync for yororen_ui_core::headless::text_input::Home
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::Home
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::Home
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::Home
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::Home
+pub struct yororen_ui_core::headless::text_input::Left
+impl core::clone::Clone for yororen_ui_core::headless::text_input::Left
+pub fn yororen_ui_core::headless::text_input::Left::clone(&self) -> yororen_ui_core::headless::text_input::Left
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::Left
+pub fn yororen_ui_core::headless::text_input::Left::eq(&self, &yororen_ui_core::headless::text_input::Left) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::Left
+pub fn yororen_ui_core::headless::text_input::Left::default() -> yororen_ui_core::headless::text_input::Left
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::Left
+pub fn yororen_ui_core::headless::text_input::Left::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::Left
+impl gpui::action::Action for yororen_ui_core::headless::text_input::Left
+pub fn yororen_ui_core::headless::text_input::Left::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::Left::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::Left::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::Left::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::Left::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Left::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Left::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::Left::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::Left::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::Left
+impl core::marker::Send for yororen_ui_core::headless::text_input::Left
+impl core::marker::Sync for yororen_ui_core::headless::text_input::Left
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::Left
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::Left
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::Left
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::Left
+pub struct yororen_ui_core::headless::text_input::Paste
+impl core::clone::Clone for yororen_ui_core::headless::text_input::Paste
+pub fn yororen_ui_core::headless::text_input::Paste::clone(&self) -> yororen_ui_core::headless::text_input::Paste
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::Paste
+pub fn yororen_ui_core::headless::text_input::Paste::eq(&self, &yororen_ui_core::headless::text_input::Paste) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::Paste
+pub fn yororen_ui_core::headless::text_input::Paste::default() -> yororen_ui_core::headless::text_input::Paste
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::Paste
+pub fn yororen_ui_core::headless::text_input::Paste::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::Paste
+impl gpui::action::Action for yororen_ui_core::headless::text_input::Paste
+pub fn yororen_ui_core::headless::text_input::Paste::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::Paste::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::Paste::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::Paste::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::Paste::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Paste::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Paste::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::Paste::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::Paste::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::Paste
+impl core::marker::Send for yororen_ui_core::headless::text_input::Paste
+impl core::marker::Sync for yororen_ui_core::headless::text_input::Paste
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::Paste
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::Paste
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::Paste
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::Paste
+pub struct yororen_ui_core::headless::text_input::Right
+impl core::clone::Clone for yororen_ui_core::headless::text_input::Right
+pub fn yororen_ui_core::headless::text_input::Right::clone(&self) -> yororen_ui_core::headless::text_input::Right
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::Right
+pub fn yororen_ui_core::headless::text_input::Right::eq(&self, &yororen_ui_core::headless::text_input::Right) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::Right
+pub fn yororen_ui_core::headless::text_input::Right::default() -> yororen_ui_core::headless::text_input::Right
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::Right
+pub fn yororen_ui_core::headless::text_input::Right::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::Right
+impl gpui::action::Action for yororen_ui_core::headless::text_input::Right
+pub fn yororen_ui_core::headless::text_input::Right::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::Right::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::Right::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::Right::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::Right::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Right::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::Right::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::Right::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::Right::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::Right
+impl core::marker::Send for yororen_ui_core::headless::text_input::Right
+impl core::marker::Sync for yororen_ui_core::headless::text_input::Right
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::Right
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::Right
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::Right
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::Right
+pub struct yororen_ui_core::headless::text_input::SelectAll
+impl core::clone::Clone for yororen_ui_core::headless::text_input::SelectAll
+pub fn yororen_ui_core::headless::text_input::SelectAll::clone(&self) -> yororen_ui_core::headless::text_input::SelectAll
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::SelectAll
+pub fn yororen_ui_core::headless::text_input::SelectAll::eq(&self, &yororen_ui_core::headless::text_input::SelectAll) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::SelectAll
+pub fn yororen_ui_core::headless::text_input::SelectAll::default() -> yororen_ui_core::headless::text_input::SelectAll
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::SelectAll
+pub fn yororen_ui_core::headless::text_input::SelectAll::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::SelectAll
+impl gpui::action::Action for yororen_ui_core::headless::text_input::SelectAll
+pub fn yororen_ui_core::headless::text_input::SelectAll::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::SelectAll::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::SelectAll::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::SelectAll::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::SelectAll::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::SelectAll::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::SelectAll::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::SelectAll::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::SelectAll::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::SelectAll
+impl core::marker::Send for yororen_ui_core::headless::text_input::SelectAll
+impl core::marker::Sync for yororen_ui_core::headless::text_input::SelectAll
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::SelectAll
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::SelectAll
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::SelectAll
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::SelectAll
+pub struct yororen_ui_core::headless::text_input::SelectLeft
+impl core::clone::Clone for yororen_ui_core::headless::text_input::SelectLeft
+pub fn yororen_ui_core::headless::text_input::SelectLeft::clone(&self) -> yororen_ui_core::headless::text_input::SelectLeft
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::SelectLeft
+pub fn yororen_ui_core::headless::text_input::SelectLeft::eq(&self, &yororen_ui_core::headless::text_input::SelectLeft) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::SelectLeft
+pub fn yororen_ui_core::headless::text_input::SelectLeft::default() -> yororen_ui_core::headless::text_input::SelectLeft
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::SelectLeft
+pub fn yororen_ui_core::headless::text_input::SelectLeft::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::SelectLeft
+impl gpui::action::Action for yororen_ui_core::headless::text_input::SelectLeft
+pub fn yororen_ui_core::headless::text_input::SelectLeft::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::SelectLeft::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::SelectLeft::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::SelectLeft::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::SelectLeft::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::SelectLeft::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::SelectLeft::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::SelectLeft::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::SelectLeft::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::SelectLeft
+impl core::marker::Send for yororen_ui_core::headless::text_input::SelectLeft
+impl core::marker::Sync for yororen_ui_core::headless::text_input::SelectLeft
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::SelectLeft
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::SelectLeft
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::SelectLeft
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::SelectLeft
+pub struct yororen_ui_core::headless::text_input::SelectRight
+impl core::clone::Clone for yororen_ui_core::headless::text_input::SelectRight
+pub fn yororen_ui_core::headless::text_input::SelectRight::clone(&self) -> yororen_ui_core::headless::text_input::SelectRight
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::SelectRight
+pub fn yororen_ui_core::headless::text_input::SelectRight::eq(&self, &yororen_ui_core::headless::text_input::SelectRight) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::SelectRight
+pub fn yororen_ui_core::headless::text_input::SelectRight::default() -> yororen_ui_core::headless::text_input::SelectRight
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::SelectRight
+pub fn yororen_ui_core::headless::text_input::SelectRight::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::SelectRight
+impl gpui::action::Action for yororen_ui_core::headless::text_input::SelectRight
+pub fn yororen_ui_core::headless::text_input::SelectRight::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::SelectRight::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::SelectRight::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::SelectRight::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::SelectRight::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::SelectRight::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::SelectRight::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::SelectRight::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::SelectRight::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::SelectRight
+impl core::marker::Send for yororen_ui_core::headless::text_input::SelectRight
+impl core::marker::Sync for yororen_ui_core::headless::text_input::SelectRight
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::SelectRight
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::SelectRight
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::SelectRight
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::SelectRight
+pub struct yororen_ui_core::headless::text_input::ShowCharacterPalette
+impl core::clone::Clone for yororen_ui_core::headless::text_input::ShowCharacterPalette
+pub fn yororen_ui_core::headless::text_input::ShowCharacterPalette::clone(&self) -> yororen_ui_core::headless::text_input::ShowCharacterPalette
+impl core::cmp::PartialEq for yororen_ui_core::headless::text_input::ShowCharacterPalette
+pub fn yororen_ui_core::headless::text_input::ShowCharacterPalette::eq(&self, &yororen_ui_core::headless::text_input::ShowCharacterPalette) -> bool
+impl core::default::Default for yororen_ui_core::headless::text_input::ShowCharacterPalette
+pub fn yororen_ui_core::headless::text_input::ShowCharacterPalette::default() -> yororen_ui_core::headless::text_input::ShowCharacterPalette
+impl core::fmt::Debug for yororen_ui_core::headless::text_input::ShowCharacterPalette
+pub fn yororen_ui_core::headless::text_input::ShowCharacterPalette::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for yororen_ui_core::headless::text_input::ShowCharacterPalette
+impl gpui::action::Action for yororen_ui_core::headless::text_input::ShowCharacterPalette
+pub fn yororen_ui_core::headless::text_input::ShowCharacterPalette::action_json_schema(&mut schemars::generate::SchemaGenerator) -> core::option::Option<schemars::schema::Schema>
+pub fn yororen_ui_core::headless::text_input::ShowCharacterPalette::boxed_clone(&self) -> alloc::boxed::Box<dyn gpui::action::Action>
+pub fn yororen_ui_core::headless::text_input::ShowCharacterPalette::build(serde_json::value::Value) -> anyhow::Result<alloc::boxed::Box<dyn gpui::action::Action>>
+pub fn yororen_ui_core::headless::text_input::ShowCharacterPalette::deprecated_aliases() -> &'static [&'static str]
+pub fn yororen_ui_core::headless::text_input::ShowCharacterPalette::deprecation_message() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::ShowCharacterPalette::documentation() -> core::option::Option<&'static str>
+pub fn yororen_ui_core::headless::text_input::ShowCharacterPalette::name(&self) -> &'static str
+pub fn yororen_ui_core::headless::text_input::ShowCharacterPalette::name_for_type() -> &'static str where Self: core::marker::Sized
+pub fn yororen_ui_core::headless::text_input::ShowCharacterPalette::partial_eq(&self, &dyn gpui::action::Action) -> bool
+impl core::marker::Freeze for yororen_ui_core::headless::text_input::ShowCharacterPalette
+impl core::marker::Send for yororen_ui_core::headless::text_input::ShowCharacterPalette
+impl core::marker::Sync for yororen_ui_core::headless::text_input::ShowCharacterPalette
+impl core::marker::Unpin for yororen_ui_core::headless::text_input::ShowCharacterPalette
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::ShowCharacterPalette
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::ShowCharacterPalette
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::ShowCharacterPalette
 pub struct yororen_ui_core::headless::text_input::TextInputProps
 pub yororen_ui_core::headless::text_input::TextInputProps::custom_bg: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::text_input::TextInputProps::custom_border: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::text_input::TextInputProps::custom_focus_border: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::text_input::TextInputProps::custom_text_color: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::text_input::TextInputProps::disabled: bool
-pub yororen_ui_core::headless::text_input::TextInputProps::focus_handle: gpui::window::FocusHandle
 pub yororen_ui_core::headless::text_input::TextInputProps::has_custom_bg: bool
 pub yororen_ui_core::headless::text_input::TextInputProps::has_custom_border: bool
 pub yororen_ui_core::headless::text_input::TextInputProps::has_custom_focus_border: bool
@@ -3331,24 +3715,19 @@ pub yororen_ui_core::headless::text_input::TextInputProps::max_length: core::opt
 pub yororen_ui_core::headless::text_input::TextInputProps::on_change: core::option::Option<yororen_ui_core::headless::text_input::TextChangeCallback>
 pub yororen_ui_core::headless::text_input::TextInputProps::on_submit: core::option::Option<yororen_ui_core::headless::text_input::TextChangeCallback>
 pub yororen_ui_core::headless::text_input::TextInputProps::placeholder: alloc::string::String
-pub yororen_ui_core::headless::text_input::TextInputProps::state: gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 impl yororen_ui_core::headless::text_input::TextInputProps
-pub fn yororen_ui_core::headless::text_input::TextInputProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::text_input::TextInputProps::custom_bg(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::text_input::TextInputProps::custom_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::text_input::TextInputProps::custom_focus_border(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::text_input::TextInputProps::custom_text_color(self, gpui::color::Hsla) -> Self
 pub fn yororen_ui_core::headless::text_input::TextInputProps::disabled(self, bool) -> Self
-pub fn yororen_ui_core::headless::text_input::TextInputProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::text_input::TextInputProps::has_custom_bg(self, bool) -> Self
 pub fn yororen_ui_core::headless::text_input::TextInputProps::has_custom_border(self, bool) -> Self
 pub fn yororen_ui_core::headless::text_input::TextInputProps::has_custom_focus_border(self, bool) -> Self
-pub fn yororen_ui_core::headless::text_input::TextInputProps::is_focused(&self, &gpui::window::Window) -> bool
 pub fn yororen_ui_core::headless::text_input::TextInputProps::max_length(self, usize) -> Self
 pub fn yororen_ui_core::headless::text_input::TextInputProps::on_change<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::text_input::TextInputProps::on_submit<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::text_input::TextInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
-pub fn yororen_ui_core::headless::text_input::TextInputProps::state(&self) -> &gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
 impl core::clone::Clone for yororen_ui_core::headless::text_input::TextInputProps
 pub fn yororen_ui_core::headless::text_input::TextInputProps::clone(&self) -> yororen_ui_core::headless::text_input::TextInputProps
 impl core::marker::Freeze for yororen_ui_core::headless::text_input::TextInputProps
@@ -3360,32 +3739,81 @@ impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::tex
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::TextInputProps
 pub struct yororen_ui_core::headless::text_input::TextInputState
 pub yororen_ui_core::headless::text_input::TextInputState::caret: usize
+pub yororen_ui_core::headless::text_input::TextInputState::cursor_blink_epoch: usize
+pub yororen_ui_core::headless::text_input::TextInputState::cursor_visible: bool
+pub yororen_ui_core::headless::text_input::TextInputState::is_selecting: bool
+pub yororen_ui_core::headless::text_input::TextInputState::last_bounds: core::option::Option<gpui::geometry::Bounds<gpui::geometry::Pixels>>
+pub yororen_ui_core::headless::text_input::TextInputState::last_layout: core::option::Option<gpui::text_system::line::ShapedLine>
+pub yororen_ui_core::headless::text_input::TextInputState::max_length: core::option::Option<usize>
+pub yororen_ui_core::headless::text_input::TextInputState::on_change: core::option::Option<yororen_ui_core::headless::text_input::TextChangeCallback>
+pub yororen_ui_core::headless::text_input::TextInputState::on_submit: core::option::Option<yororen_ui_core::headless::text_input::TextChangeCallback>
+pub yororen_ui_core::headless::text_input::TextInputState::placeholder: gpui::shared_string::SharedString
+pub yororen_ui_core::headless::text_input::TextInputState::scroll_x: gpui::geometry::Pixels
+pub yororen_ui_core::headless::text_input::TextInputState::selection_end: usize
+pub yororen_ui_core::headless::text_input::TextInputState::selection_start: usize
 pub yororen_ui_core::headless::text_input::TextInputState::value: alloc::string::String
 impl yororen_ui_core::headless::text_input::TextInputState
-pub fn yororen_ui_core::headless::text_input::TextInputState::backspace(&mut self)
-pub fn yororen_ui_core::headless::text_input::TextInputState::delete_forward(&mut self)
+pub fn yororen_ui_core::headless::text_input::TextInputState::backspace(&mut self, &yororen_ui_core::headless::text_input::Backspace, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::copy(&mut self, &yororen_ui_core::headless::text_input::Copy, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::cut(&mut self, &yororen_ui_core::headless::text_input::Cut, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::delete(&mut self, &yororen_ui_core::headless::text_input::Delete, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::end(&mut self, &yororen_ui_core::headless::text_input::End, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::focus_in(&mut self, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::home(&mut self, &yororen_ui_core::headless::text_input::Home, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::left(&mut self, &yororen_ui_core::headless::text_input::Left, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::on_mouse_down(&mut self, gpui::geometry::Point<gpui::geometry::Pixels>, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::on_mouse_move(&mut self, &gpui::interactive::MouseMoveEvent, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::on_mouse_up(&mut self, &gpui::interactive::MouseUpEvent, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::paste(&mut self, &yororen_ui_core::headless::text_input::Paste, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::right(&mut self, &yororen_ui_core::headless::text_input::Right, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::select_all(&mut self, &yororen_ui_core::headless::text_input::SelectAll, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::select_left(&mut self, &yororen_ui_core::headless::text_input::SelectLeft, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::select_right(&mut self, &yororen_ui_core::headless::text_input::SelectRight, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::show_character_palette(&mut self, &yororen_ui_core::headless::text_input::ShowCharacterPalette, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+impl yororen_ui_core::headless::text_input::TextInputState
+pub fn yororen_ui_core::headless::text_input::TextInputState::bounds_for_range_inner(&self, core::ops::range::Range<usize>, gpui::geometry::Bounds<gpui::geometry::Pixels>) -> core::option::Option<gpui::geometry::Bounds<gpui::geometry::Pixels>>
+pub fn yororen_ui_core::headless::text_input::TextInputState::character_index_for_point_inner(&self, gpui::geometry::Point<gpui::geometry::Pixels>) -> core::option::Option<usize>
+pub fn yororen_ui_core::headless::text_input::TextInputState::content(&self) -> alloc::string::String
+pub fn yororen_ui_core::headless::text_input::TextInputState::focus_handle(&self) -> gpui::window::FocusHandle
+pub fn yororen_ui_core::headless::text_input::TextInputState::has_selection(&self) -> bool
 pub fn yororen_ui_core::headless::text_input::TextInputState::insert_text(&mut self, &str)
-pub fn yororen_ui_core::headless::text_input::TextInputState::move_caret_left(&mut self)
-pub fn yororen_ui_core::headless::text_input::TextInputState::move_caret_right(&mut self)
-pub fn yororen_ui_core::headless::text_input::TextInputState::move_caret_to_end(&mut self)
-pub fn yororen_ui_core::headless::text_input::TextInputState::move_caret_to_start(&mut self)
-pub fn yororen_ui_core::headless::text_input::TextInputState::new() -> Self
-pub fn yororen_ui_core::headless::text_input::TextInputState::with_value(impl core::convert::Into<alloc::string::String>) -> Self
-impl core::clone::Clone for yororen_ui_core::headless::text_input::TextInputState
-pub fn yororen_ui_core::headless::text_input::TextInputState::clone(&self) -> yororen_ui_core::headless::text_input::TextInputState
-impl core::default::Default for yororen_ui_core::headless::text_input::TextInputState
-pub fn yororen_ui_core::headless::text_input::TextInputState::default() -> Self
-impl core::fmt::Debug for yororen_ui_core::headless::text_input::TextInputState
-pub fn yororen_ui_core::headless::text_input::TextInputState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+pub fn yororen_ui_core::headless::text_input::TextInputState::move_to(&mut self, usize)
+pub fn yororen_ui_core::headless::text_input::TextInputState::new(&mut gpui::app::App) -> Self
+pub fn yororen_ui_core::headless::text_input::TextInputState::next_boundary(&self, usize) -> usize
+pub fn yororen_ui_core::headless::text_input::TextInputState::offset_to_utf16(&self, usize) -> usize
+pub fn yororen_ui_core::headless::text_input::TextInputState::prev_boundary(&self, usize) -> usize
+pub fn yororen_ui_core::headless::text_input::TextInputState::range_from_utf16(&self, &core::ops::range::Range<usize>) -> core::ops::range::Range<usize>
+pub fn yororen_ui_core::headless::text_input::TextInputState::range_to_utf16(&self, &core::ops::range::Range<usize>) -> core::ops::range::Range<usize>
+pub fn yororen_ui_core::headless::text_input::TextInputState::replace_and_mark_text_in_range_bytes(&mut self, core::option::Option<core::ops::range::Range<usize>>, &str, core::option::Option<core::ops::range::Range<usize>>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::replace_text(&mut self, usize, usize, &str)
+pub fn yororen_ui_core::headless::text_input::TextInputState::replace_text_in_range_bytes(&mut self, core::option::Option<core::ops::range::Range<usize>>, &str) -> bool
+pub fn yororen_ui_core::headless::text_input::TextInputState::select_to(&mut self, usize)
+pub fn yororen_ui_core::headless::text_input::TextInputState::selected_range(&self) -> core::ops::range::Range<usize>
+pub fn yororen_ui_core::headless::text_input::TextInputState::selected_text_range_inner(&self) -> gpui::platform::UTF16Selection
+pub fn yororen_ui_core::headless::text_input::TextInputState::set_value(&mut self, impl core::convert::Into<alloc::string::String>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::text_for_range_inner(&self, core::ops::range::Range<usize>) -> (alloc::string::String, core::ops::range::Range<usize>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::text_for_range_utf16(&self, core::ops::range::Range<usize>) -> (alloc::string::String, core::ops::range::Range<usize>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::utf16_to_offset(&self, usize) -> usize
+impl gpui::input::EntityInputHandler for yororen_ui_core::headless::text_input::TextInputState
+pub fn yororen_ui_core::headless::text_input::TextInputState::bounds_for_range(&mut self, core::ops::range::Range<usize>, gpui::geometry::Bounds<gpui::geometry::Pixels>, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>) -> core::option::Option<gpui::geometry::Bounds<gpui::geometry::Pixels>>
+pub fn yororen_ui_core::headless::text_input::TextInputState::character_index_for_point(&mut self, gpui::geometry::Point<gpui::geometry::Pixels>, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>) -> core::option::Option<usize>
+pub fn yororen_ui_core::headless::text_input::TextInputState::marked_text_range(&self, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>) -> core::option::Option<core::ops::range::Range<usize>>
+pub fn yororen_ui_core::headless::text_input::TextInputState::replace_and_mark_text_in_range(&mut self, core::option::Option<core::ops::range::Range<usize>>, &str, core::option::Option<core::ops::range::Range<usize>>, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::replace_text_in_range(&mut self, core::option::Option<core::ops::range::Range<usize>>, &str, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+pub fn yororen_ui_core::headless::text_input::TextInputState::selected_text_range(&mut self, bool, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>) -> core::option::Option<gpui::platform::UTF16Selection>
+pub fn yororen_ui_core::headless::text_input::TextInputState::text_for_range(&mut self, core::ops::range::Range<usize>, &mut core::option::Option<core::ops::range::Range<usize>>, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>) -> core::option::Option<alloc::string::String>
+pub fn yororen_ui_core::headless::text_input::TextInputState::unmark_text(&mut self, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
+impl gpui::window::Focusable for yororen_ui_core::headless::text_input::TextInputState
+pub fn yororen_ui_core::headless::text_input::TextInputState::focus_handle(&self, &gpui::app::App) -> gpui::window::FocusHandle
 impl core::marker::Freeze for yororen_ui_core::headless::text_input::TextInputState
 impl core::marker::Send for yororen_ui_core::headless::text_input::TextInputState
 impl core::marker::Sync for yororen_ui_core::headless::text_input::TextInputState
 impl core::marker::Unpin for yororen_ui_core::headless::text_input::TextInputState
 impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input::TextInputState
-impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::TextInputState
-impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::TextInputState
-pub fn yororen_ui_core::headless::text_input::text_input(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::text_input::TextInputProps
-pub fn yororen_ui_core::headless::text_input::text_input_with_state(impl core::convert::Into<gpui::window::ElementId>, gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>, &mut gpui::app::App) -> yororen_ui_core::headless::text_input::TextInputProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input::TextInputState
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input::TextInputState
+pub fn yororen_ui_core::headless::text_input::init(&mut gpui::app::App)
+pub fn yororen_ui_core::headless::text_input::text_input(impl core::convert::Into<gpui::window::ElementId>) -> yororen_ui_core::headless::text_input::TextInputProps
 pub type yororen_ui_core::headless::text_input::TextChangeCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
 pub mod yororen_ui_core::headless::toggle_button
 pub struct yororen_ui_core::headless::toggle_button::ToggleButtonProps
@@ -3393,6 +3821,7 @@ pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::disabled: bool
 pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::focus_handle: gpui::window::FocusHandle
 pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::on_toggle: core::option::Option<yororen_ui_core::headless::switch::ToggleCallback>
+pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::raw_hover: bool
 pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::selected: bool
 pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::variant: yororen_ui_core::renderer::ActionVariantKind
 impl yororen_ui_core::headless::toggle_button::ToggleButtonProps
@@ -3401,6 +3830,7 @@ pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::disabled(sel
 pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::is_focused(&self, &gpui::window::Window) -> bool
 pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::on_toggle<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(bool, core::option::Option<&gpui::interactive::ClickEvent>, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::raw_hover(self, bool) -> Self
 pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::selected(self, bool) -> Self
 pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::variant(self, yororen_ui_core::renderer::ActionVariantKind) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::toggle_button::ToggleButtonProps
@@ -3653,7 +4083,7 @@ pub fn yororen_ui_core::headless::slider(impl core::convert::Into<gpui::window::
 pub fn yororen_ui_core::headless::switch(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::switch::SwitchProps
 pub fn yororen_ui_core::headless::tag(impl core::convert::Into<gpui::window::ElementId>, impl core::convert::Into<alloc::string::String>, &mut gpui::app::App) -> yororen_ui_core::headless::tag::TagProps
 pub fn yororen_ui_core::headless::text(impl core::convert::Into<gpui::window::ElementId>, impl core::convert::Into<gpui::shared_string::SharedString>, &mut gpui::app::App) -> yororen_ui_core::headless::text::TextProps
-pub fn yororen_ui_core::headless::text_input(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::text_input::TextInputProps
+pub fn yororen_ui_core::headless::text_input(impl core::convert::Into<gpui::window::ElementId>) -> yororen_ui_core::headless::text_input::TextInputProps
 pub fn yororen_ui_core::headless::toggle_button(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::toggle_button::ToggleButtonProps
 pub mod yororen_ui_core::i18n
 pub mod yororen_ui_core::i18n::format
@@ -6727,3 +7157,4 @@ impl<'a, T> yororen_ui_core::theme::ActiveTheme for gpui::app::context::Context<
 pub fn gpui::app::context::Context<'a, T>::theme(&self) -> &alloc::sync::Arc<yororen_ui_core::theme::Theme>
 pub fn yororen_ui_core::theme::install(&mut gpui::app::App, yororen_ui_core::theme::Theme)
 pub fn yororen_ui_core::theme::value_to_hsla(&serde_json::value::Value) -> core::option::Option<gpui::color::Hsla>
+pub macro yororen_ui_core::action_handler!

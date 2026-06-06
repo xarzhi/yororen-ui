@@ -25,6 +25,7 @@ pub trait CheckboxRenderer: Any + Send + Sync {
     fn box_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
     fn box_border(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
     fn box_hover_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
+    fn box_active_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
     fn check_fg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
     fn focus_color(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
     fn disabled_opacity(&self, state: &CheckboxRenderState, theme: &Theme) -> f32;
@@ -70,6 +71,13 @@ impl CheckboxRenderer for TokenCheckboxRenderer {
             theme.get_color("surface.hover").unwrap_or_default()
         }
     }
+    fn box_active_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
+        if state.checked {
+            theme.get_color("action.primary.active_bg").unwrap_or_default()
+        } else {
+            theme.get_color("surface.sunken").unwrap_or_default()
+        }
+    }
     fn check_fg(&self, _state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         theme.get_color("action.primary.fg").unwrap_or_default()
     }
@@ -89,7 +97,7 @@ pub fn arc_checkbox<T: CheckboxRenderer + 'static>(r: T) -> Arc<dyn CheckboxRend
 // `DefaultCheckbox` — `headless::CheckboxProps` sugar.
 // =====================================================================
 
-use gpui::{div, App, ParentElement, Stateful, Styled, px};
+use gpui::{div, App, InteractiveElement, ParentElement, Stateful, StatefulInteractiveElement, Styled, px};
 use yororen_ui_core::headless::checkbox::CheckboxProps;
 use yororen_ui_core::renderer::{markers, RendererContext};
 use yororen_ui_core::theme::ActiveTheme;
@@ -126,7 +134,12 @@ impl DefaultCheckbox for CheckboxProps {
         if self.checked {
             el = el.child(div().bg(border).size(check_size).rounded(px(2.)));
         }
-        self.apply(el)
+        let hover_bg = r.box_hover_bg(&state, theme);
+        let active_bg = r.box_active_bg(&state, theme);
+        self.raw_hover(false)
+            .apply(el)
+            .hover(|s| s.bg(hover_bg))
+            .active(|s| s.bg(active_bg))
     }
 }
 

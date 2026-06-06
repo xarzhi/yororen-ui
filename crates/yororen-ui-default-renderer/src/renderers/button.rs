@@ -70,6 +70,12 @@ pub trait ButtonRenderer: Any + Send + Sync {
     fn shadow(&self, state: &ButtonRenderState, theme: &Theme) -> Option<ShadowSpec>;
     fn min_height(&self, state: &ButtonRenderState, theme: &Theme) -> Pixels;
     fn disabled_opacity(&self, state: &ButtonRenderState, theme: &Theme) -> f32;
+    /// Background colour while the mouse is hovering. Used
+    /// by `default_render`'s `.hover(|s| s.bg(…))`.
+    fn hover_bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla;
+    /// Background colour while the button is being
+    /// pressed. Used by `default_render`'s `.active(|s| …)`.
+    fn active_bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla;
 }
 
 use std::any::Any;
@@ -153,6 +159,28 @@ impl ButtonRenderer for TokenButtonRenderer {
             return s.disabled_opacity();
         }
         1.0
+    }
+
+    fn hover_bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
+        if let Some(s) = &state.custom_style {
+            return s.bg(&VariantState {
+                disabled: state.disabled,
+            });
+        }
+        let field = if state.disabled { "disabled_bg" } else { "hover_bg" };
+        let key = format!("action.{}.{}", state.variant.as_str(), field);
+        theme.get_color(&key).unwrap_or_default()
+    }
+
+    fn active_bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
+        if let Some(s) = &state.custom_style {
+            return s.bg(&VariantState {
+                disabled: state.disabled,
+            });
+        }
+        let field = if state.disabled { "disabled_bg" } else { "active_bg" };
+        let key = format!("action.{}.{}", state.variant.as_str(), field);
+        theme.get_color(&key).unwrap_or_default()
     }
 }
 
@@ -253,6 +281,32 @@ mod tests {
     }
 
     #[test]
+    fn hover_and_active_bg_read_action_hover_and_active_paths() {
+        // Regression: `default_render` chains `.hover(|s| s.bg(r.hover_bg(&state, theme)))`
+        // and `.active(|s| s.bg(r.active_bg(&state, theme)))`. If the
+        // renderer's `hover_bg` / `active_bg` are missing, the
+        // closures compile but apply `Hsla::default()` — making
+        // the button look identical to its base state on hover.
+        let theme = fixture();
+        let r = TokenButtonRenderer;
+        let state = ButtonRenderState {
+            variant: ActionVariantKind::Primary,
+            ..Default::default()
+        };
+        assert_eq!(
+            r.hover_bg(&state, &theme),
+            theme.get_color("action.primary.hover_bg").unwrap(),
+        );
+        assert_eq!(
+            r.active_bg(&state, &theme),
+            theme.get_color("action.primary.active_bg").unwrap(),
+        );
+        // And the three colours really are distinct.
+        assert_ne!(r.bg(&state, &theme), r.hover_bg(&state, &theme));
+        assert_ne!(r.hover_bg(&state, &theme), r.active_bg(&state, &theme));
+    }
+
+    #[test]
     fn missing_path_yields_zero_color_doesnt_panic() {
         // Theme with only one path — everything else returns None.
         let theme = Theme::from_value(serde_json::json!({}));
@@ -298,7 +352,7 @@ mod tests {
 // it is the `headless`-shaped entry point for *this* renderer.
 // =====================================================================
 
-use gpui::{div, App, Stateful, Styled};
+use gpui::{div, App, InteractiveElement, Stateful, StatefulInteractiveElement, Styled};
 use yororen_ui_core::headless::button::ButtonProps;
 use yororen_ui_core::renderer::RendererContext;
 use yororen_ui_core::theme::ActiveTheme;
@@ -333,7 +387,9 @@ impl DefaultButton for ButtonProps {
         } else {
             1.0
         };
-        let div = div()
+        let hover_bg = r.hover_bg(&state, theme);
+        let active_bg = r.active_bg(&state, theme);
+        let el = div()
             .bg(bg)
             .text_color(fg)
             .px(padding.left)
@@ -344,6 +400,20 @@ impl DefaultButton for ButtonProps {
             .items_center()
             .justify_center()
             .opacity(opacity);
-        self.apply(div)
+        // `self.apply(el)` returns `Stateful<Div>` which
+        // implements `StatefulInteractiveElement` and so
+        // gains `.hover(...)`, `.active(...)`. The hover /
+        // active closures read the renderer's `hover_bg` /
+        // `active_bg` and apply them as style overrides.
+        //
+        // `.raw_hover(false)` disables `apply`'s built-in
+        // opacity dip — the renderer is going to set its
+        // own hover/active style from the theme, and we
+        // don't want the debug-assert
+        // (`hover style already set`) in gpui-ce 0.3.
+        self.raw_hover(false)
+            .apply(el)
+            .hover(|s| s.bg(hover_bg))
+            .active(|s| s.bg(active_bg))
     }
 }

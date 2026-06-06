@@ -1,29 +1,23 @@
 //! Headless `search_input` — text input with a search-icon
-//! and a clear-button. Reuses `TextInputState`.
+//! and a clear-button. Reuses `TextInputState` (the renderer
+//! mints the state via `use_keyed_state`).
 
 use std::sync::Arc;
 
-use gpui::{
-    App, AppContext, Div, ElementId, Entity, FocusHandle, Hsla, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Window,
-};
-
-use super::text_input::TextInputState;
+use gpui::{App, Hsla, Window};
 
 pub type SearchChangeCallback =
     Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>;
 
 #[derive(Clone)]
 pub struct SearchInputProps {
-    pub id: ElementId,
-    pub focus_handle: FocusHandle,
-    pub state: Entity<TextInputState>,
+    pub id: gpui::ElementId,
     pub placeholder: String,
     pub disabled: bool,
     pub value: String,
     pub on_change: Option<SearchChangeCallback>,
     pub on_submit: Option<SearchChangeCallback>,
-    pub on_clear: Option<Arc<dyn Fn(&mut Window, &mut App) + Send + Sync>>,
+    pub on_clear: Option<Arc<dyn Fn(&mut gpui::Window, &mut App) + Send + Sync>>,
     pub has_custom_bg: bool,
     pub has_custom_border: bool,
     pub has_custom_focus_border: bool,
@@ -33,11 +27,9 @@ pub struct SearchInputProps {
     pub custom_text_color: Option<Hsla>,
 }
 
-pub fn search_input(id: impl Into<ElementId>, cx: &mut App) -> SearchInputProps {
+pub fn search_input(id: impl Into<gpui::ElementId>) -> SearchInputProps {
     SearchInputProps {
         id: id.into(),
-        focus_handle: cx.focus_handle(),
-        state: cx.new(|_| TextInputState::new()),
         placeholder: "Search…".to_string(),
         disabled: false,
         value: String::new(),
@@ -55,12 +47,6 @@ pub fn search_input(id: impl Into<ElementId>, cx: &mut App) -> SearchInputProps 
 }
 
 impl SearchInputProps {
-    pub fn focus_handle(&self) -> &FocusHandle {
-        &self.focus_handle
-    }
-    pub fn state(&self) -> &Entity<TextInputState> {
-        &self.state
-    }
     pub fn placeholder(mut self, v: impl Into<String>) -> Self {
         self.placeholder = v.into();
         self
@@ -75,21 +61,21 @@ impl SearchInputProps {
     }
     pub fn on_change<F>(mut self, f: F) -> Self
     where
-        F: 'static + Send + Sync + Fn(&str, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&str, &mut gpui::Window, &mut App),
     {
         self.on_change = Some(Arc::new(f));
         self
     }
     pub fn on_submit<F>(mut self, f: F) -> Self
     where
-        F: 'static + Send + Sync + Fn(&str, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&str, &mut gpui::Window, &mut App),
     {
         self.on_submit = Some(Arc::new(f));
         self
     }
     pub fn on_clear<F>(mut self, f: F) -> Self
     where
-        F: 'static + Send + Sync + Fn(&mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&mut gpui::Window, &mut App),
     {
         self.on_clear = Some(Arc::new(f));
         self
@@ -124,8 +110,5 @@ impl SearchInputProps {
     pub fn custom_text_color(mut self, c: Hsla) -> Self {
         self.custom_text_color = Some(c);
         self
-    }
-    pub fn apply(self, el: Div) -> Stateful<Div> {
-        el.id(self.id).track_focus(&self.focus_handle)
     }
 }

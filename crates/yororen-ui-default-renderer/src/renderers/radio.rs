@@ -25,6 +25,7 @@ pub trait RadioRenderer: Any + Send + Sync {
     fn ring_bg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
     fn ring_border(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
     fn ring_hover_bg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
+    fn ring_active_bg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
     fn dot_fg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
     fn focus_color(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
     fn disabled_opacity(&self, state: &RadioRenderState, theme: &Theme) -> f32;
@@ -60,6 +61,9 @@ impl RadioRenderer for TokenRadioRenderer {
     fn ring_hover_bg(&self, _state: &RadioRenderState, theme: &Theme) -> Hsla {
         theme.get_color("surface.hover").unwrap_or_default()
     }
+    fn ring_active_bg(&self, _state: &RadioRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("surface.sunken").unwrap_or_default()
+    }
     fn dot_fg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla {
         if state.has_custom_tone {
             state.custom_tone.unwrap_or_default()
@@ -83,7 +87,7 @@ pub fn arc_radio<T: RadioRenderer + 'static>(r: T) -> Arc<dyn RadioRenderer> {
 // `DefaultRadio` — `headless::RadioProps` sugar.
 // =====================================================================
 
-use gpui::{div, App, ParentElement, Stateful, Styled};
+use gpui::{div, App, InteractiveElement, ParentElement, Stateful, StatefulInteractiveElement, Styled};
 use yororen_ui_core::headless::radio::RadioProps;
 use yororen_ui_core::renderer::{markers, RendererContext};
 use yororen_ui_core::theme::ActiveTheme;
@@ -122,7 +126,12 @@ impl DefaultRadio for RadioProps {
         if self.checked {
             el = el.child(div().bg(dot_fg).size(dot_size).rounded(pill_radius));
         }
-        self.apply(el)
+        let hover_bg = r.ring_hover_bg(&state, theme);
+        let active_bg = r.ring_active_bg(&state, theme);
+        self.raw_hover(false)
+            .apply(el)
+            .hover(|s| s.bg(hover_bg))
+            .active(|s| s.bg(active_bg))
     }
 }
 

@@ -27,6 +27,7 @@ pub trait SwitchRenderer: Any + Send + Sync {
     fn track_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
     fn track_border(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
     fn track_hover_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
+    fn track_active_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
     fn knob_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
     fn focus_color(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
     fn disabled_opacity(&self, state: &SwitchRenderState, theme: &Theme) -> f32;
@@ -75,6 +76,13 @@ impl SwitchRenderer for TokenSwitchRenderer {
             theme.get_color("surface.base").unwrap_or_default()
         }
     }
+    fn track_active_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
+        if state.checked {
+            theme.get_color("action.primary.active_bg").unwrap_or_default()
+        } else {
+            theme.get_color("surface.sunken").unwrap_or_default()
+        }
+    }
     fn knob_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.get_color("content.disabled").unwrap_or_default()
@@ -100,7 +108,7 @@ pub fn arc_switch<T: SwitchRenderer + 'static>(r: T) -> Arc<dyn SwitchRenderer> 
 // `DefaultSwitch` — `headless::SwitchProps` sugar.
 // =====================================================================
 
-use gpui::{div, App, ParentElement, Stateful, Styled};
+use gpui::{div, App, InteractiveElement, ParentElement, Stateful, StatefulInteractiveElement, Styled};
 use yororen_ui_core::headless::switch::SwitchProps;
 use yororen_ui_core::renderer::{markers, RendererContext};
 use yororen_ui_core::theme::ActiveTheme;
@@ -142,7 +150,12 @@ impl DefaultSwitch for SwitchProps {
             el = el.justify_start();
         }
         el = el.child(div().bg(knob).size(knob_size).rounded(pill_radius));
-        self.apply(el)
+        let track_hover = r.track_hover_bg(&state, theme);
+        let track_active = r.track_active_bg(&state, theme);
+        self.raw_hover(false)
+            .apply(el)
+            .hover(|s| s.bg(track_hover))
+            .active(|s| s.bg(track_active))
     }
 }
 

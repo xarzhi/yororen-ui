@@ -1,12 +1,39 @@
 //! `TextInputRenderer` — visual side of `TextInput`.
+//!
+//! v0.3 implementation follows the v0.2 pattern: the renderer
+//! mints a `TextInputState` via `window.use_keyed_state`, the
+//! wrapper `div` carries `track_focus` + `key_context` + 14
+//! `.on_action(...)` handlers, and the inner `TextInputElement`
+//! is a custom `gpui::Element` that shapes the text, paints the
+//! selection quad, paints the line, and calls
+//! `window.handle_input(&focus_handle, ElementInputHandler::new(bounds, state.clone()), cx)`
+//! in `paint` to register the IME / clipboard pipeline.
 
 use std::any::Any;
 use std::sync::Arc;
+use std::time::Duration;
 
-use gpui::{Hsla, Pixels};
+use gpui::{
+    div, fill, hsla, point, px, relative, size, AnyElement, App, Bounds, CursorStyle, Div, Element,
+    ElementId, ElementInputHandler, FocusHandle, GlobalElementId, Hsla, InteractiveElement,
+    IntoElement, LayoutId, MouseButton, MouseDownEvent, MouseMoveEvent, MouseUpEvent, ParentElement,
+    Pixels, PaintQuad, ShapedLine, SharedString, Stateful, StatefulInteractiveElement, Style,
+    Styled, TextRun, Window,
+};
+use yororen_ui_core::action_handler;
+use yororen_ui_core::headless::text_input::{
+    Backspace, Copy, Cut, Delete, End, Enter, Home, Left, Paste, Right, SelectAll, SelectLeft,
+    SelectRight, ShowCharacterPalette, TextInputProps, TextInputState,
+};
+use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 use crate::renderers::spec::Edges;
-use yororen_ui_core::theme::Theme;
+
+// =====================================================================
+// `TextInputRenderer` trait — visual contract (bg / border / colors /
+// spacing). Unchanged from the v0.3 simplified version.
+// =====================================================================
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct TextInputRenderState {
@@ -15,9 +42,6 @@ pub struct TextInputRenderState {
     pub has_custom_bg: bool,
     pub has_custom_border: bool,
     pub has_custom_focus_border: bool,
-    /// Caller-supplied overrides. When the corresponding
-    /// `has_custom_*` is true, the renderer returns this color
-    /// instead of the built-in token path.
     pub custom_bg: Option<Hsla>,
     pub custom_border: Option<Hsla>,
     pub custom_focus_border: Option<Hsla>,
@@ -28,8 +52,12 @@ pub trait TextInputRenderer: Any + Send + Sync {
     fn bg(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
+    fn hover_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
+    fn active_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
     fn text_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
     fn hint_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
+    fn cursor_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
+    fn selection_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
     fn min_height(&self, state: &TextInputRenderState, theme: &Theme) -> Pixels;
     fn padding(&self, state: &TextInputRenderState, theme: &Theme) -> Edges<Pixels>;
     fn border_radius(&self, state: &TextInputRenderState, theme: &Theme) -> Pixels;
@@ -70,6 +98,12 @@ impl TextInputRenderer for TokenTextInputRenderer {
             theme.get_color("border.focus").unwrap_or_default()
         }
     }
+    fn hover_border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("border.muted").unwrap_or_default()
+    }
+    fn active_border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("border.default").unwrap_or_default()
+    }
     fn text_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.get_color("content.disabled").unwrap_or_default()
@@ -82,17 +116,30 @@ impl TextInputRenderer for TokenTextInputRenderer {
     fn hint_color(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("content.tertiary").unwrap_or_default()
     }
+    fn cursor_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
+        if state.has_custom_focus_border {
+            state
+                .custom_focus_border
+                .unwrap_or_else(|| theme.get_color("border.focus").unwrap_or_default())
+        } else {
+            theme.get_color("border.focus").unwrap_or_default()
+        }
+    }
+    fn selection_color(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
+        let c = theme.get_color("border.focus").unwrap_or_default();
+        hsla(c.h, c.s, c.l, 0.25)
+    }
     fn min_height(&self, _state: &TextInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.input.min_height").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.control.input.min_height").unwrap_or(0.0) as f32)
     }
     fn padding(&self, _state: &TextInputRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(
-            gpui::px(theme.get_number("tokens.control.input.horizontal_padding").unwrap_or(0.0) as f32),
-            gpui::px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
+            px(theme.get_number("tokens.control.input.horizontal_padding").unwrap_or(0.0) as f32),
+            px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
         )
     }
     fn border_radius(&self, _state: &TextInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
     }
     fn disabled_opacity(&self, state: &TextInputRenderState, _theme: &Theme) -> f32 {
         if state.disabled { 0.6 } else { 1.0 }
@@ -104,51 +151,369 @@ pub fn arc_text_input<T: TextInputRenderer + 'static>(r: T) -> Arc<dyn TextInput
 }
 
 // =====================================================================
-// `DefaultTextInput` — `headless::TextInputProps` sugar.
+// `TextInputElement` — the inner `gpui::Element` that shapes the
+// text, paints selection / line / cursor, and registers the IME
+// handler. Mirrors v0.2's `TextLineElement`. **Public** so the
+// derived input renderers (search / password / number / file_path
+// / keybinding) can embed it inside their own wrapper divs.
 // =====================================================================
 
-use gpui::{
-    div, App, InteractiveElement, KeyDownEvent, MouseButton, ParentElement, Stateful, Styled,
-    Window,
-};
-use yororen_ui_core::headless::text_input::TextInputProps;
-use yororen_ui_core::renderer::{markers, RendererContext};
-use yororen_ui_core::theme::ActiveTheme;
+/// How often the caret blinks while focused. 500ms matches the
+/// gpui / WebKit convention.
+pub const CURSOR_BLINK_INTERVAL: Duration = Duration::from_millis(500);
+
+/// The inner element for any single-line text-input component.
+/// Public so the derived renderers can embed it.
+pub struct TextInputElement {
+    pub state: gpui::Entity<TextInputState>,
+    pub focus_handle: FocusHandle,
+    pub disabled: bool,
+    pub text_color: Hsla,
+    pub hint_color: Hsla,
+    pub cursor_color: Hsla,
+    pub selection_color: Hsla,
+    pub placeholder: SharedString,
+}
+
+pub struct PrepaintState {
+    pub line: Option<ShapedLine>,
+    pub selection: Option<PaintQuad>,
+    pub cursor: Option<PaintQuad>,
+    pub scroll_x: Pixels,
+    pub display_text: SharedString,
+    pub cursor_visible: bool,
+}
+
+impl IntoElement for TextInputElement {
+    type Element = Self;
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}
+
+impl Element for TextInputElement {
+    type RequestLayoutState = ();
+    type PrepaintState = PrepaintState;
+
+    fn id(&self) -> Option<ElementId> {
+        None
+    }
+    fn source_location(&self) -> Option<&'static core::panic::Location<'static>> {
+        None
+    }
+
+    fn request_layout(
+        &mut self,
+        _id: Option<&GlobalElementId>,
+        _inspector_id: Option<&gpui::InspectorElementId>,
+        window: &mut Window,
+        cx: &mut App,
+    ) -> (LayoutId, Self::RequestLayoutState) {
+        let mut style = Style::default();
+        style.size.width = relative(1.).into();
+        style.size.height = window.line_height().into();
+        (window.request_layout(style, [], cx), ())
+    }
+
+    fn prepaint(
+        &mut self,
+        _id: Option<&GlobalElementId>,
+        _inspector_id: Option<&gpui::InspectorElementId>,
+        bounds: Bounds<Pixels>,
+        _request_layout: &mut Self::RequestLayoutState,
+        window: &mut Window,
+        cx: &mut App,
+    ) -> Self::PrepaintState {
+        let input = self.state.read(cx);
+        let value = input.value.clone();
+        let caret = input.caret;
+        let selection = input.selected_range();
+        let placeholder = input.placeholder.clone();
+        let scroll_x_input = input.scroll_x;
+        let cursor_visible = input.cursor_visible;
+
+        let is_empty = value.is_empty();
+        let (display_text, run_color) = if is_empty {
+            (placeholder, self.hint_color)
+        } else {
+            (SharedString::from(value), self.text_color)
+        };
+
+        let style = window.text_style();
+        let font_size = style.font_size.to_pixels(window.rem_size());
+        let run = TextRun {
+            len: display_text.len(),
+            font: style.font(),
+            color: run_color,
+            background_color: None,
+            underline: None,
+            strikethrough: None,
+        };
+        let line = window
+            .text_system()
+            .shape_line(display_text.clone(), font_size, &[run], None);
+
+        let caret_x_line = line.x_for_index(caret);
+        let cursor_thickness = px(2.0);
+        let max_cursor_x = (bounds.size.width - cursor_thickness).max(Pixels::ZERO);
+        let max_scroll_x = (line.width - max_cursor_x).max(Pixels::ZERO);
+        let mut scroll_x = scroll_x_input.clamp(Pixels::ZERO, max_scroll_x);
+        if caret_x_line < scroll_x {
+            scroll_x = caret_x_line;
+        } else if caret_x_line > scroll_x + max_cursor_x {
+            scroll_x = caret_x_line - max_cursor_x;
+        }
+        scroll_x = scroll_x.clamp(Pixels::ZERO, max_scroll_x);
+
+        let (selection_quad, cursor_quad) = if !selection.is_empty() && !is_empty {
+            let start_x = line.x_for_index(selection.start);
+            let end_x = line.x_for_index(selection.end);
+            let quad = fill(
+                Bounds::from_corners(
+                    point(
+                        bounds.left() + start_x.min(end_x) - scroll_x,
+                        bounds.top(),
+                    ),
+                    point(
+                        bounds.left() + start_x.max(end_x) - scroll_x,
+                        bounds.bottom(),
+                    ),
+                ),
+                self.selection_color,
+            );
+            (Some(quad), None)
+        } else {
+            let cursor_paint_x = bounds.left() + caret_x_line - scroll_x;
+            let quad = fill(
+                Bounds::new(
+                    point(cursor_paint_x, bounds.top()),
+                    size(cursor_thickness, bounds.bottom() - bounds.top()),
+                ),
+                self.cursor_color,
+            );
+            (None, Some(quad))
+        };
+
+        PrepaintState {
+            line: Some(line),
+            selection: selection_quad,
+            cursor: cursor_quad,
+            scroll_x,
+            display_text,
+            cursor_visible,
+        }
+    }
+
+    fn paint(
+        &mut self,
+        _id: Option<&GlobalElementId>,
+        _inspector_id: Option<&gpui::InspectorElementId>,
+        bounds: Bounds<Pixels>,
+        _request_layout: &mut Self::RequestLayoutState,
+        prepaint: &mut Self::PrepaintState,
+        window: &mut Window,
+        cx: &mut App,
+    ) {
+        if !self.disabled {
+            window.handle_input(
+                &self.focus_handle,
+                ElementInputHandler::new(bounds, self.state.clone()),
+                cx,
+            );
+        }
+
+        if let Some(sel) = prepaint.selection.take() {
+            window.paint_quad(sel);
+        }
+
+        let line = prepaint
+            .line
+            .take()
+            .expect("prepaint always produces a line");
+        let origin_x = bounds.left() - prepaint.scroll_x;
+        let _ = line.paint(point(origin_x, bounds.top()), window.line_height(), window, cx);
+
+        let is_focused = self.focus_handle.is_focused(window);
+        if is_focused && prepaint.cursor_visible
+            && let Some(cur) = prepaint.cursor.take()
+        {
+            window.paint_quad(cur);
+        }
+
+        self.state.update(cx, |input, _cx| {
+            input.last_layout = Some(line);
+            input.last_bounds = Some(bounds);
+            input.scroll_x = prepaint.scroll_x;
+        });
+    }
+}
+
+// =====================================================================
+// `wire_input_keyboard` — shared helper. The 14 on_action handlers
+// are identical for all 7 input components; this function applies
+// them to a wrapper div. Plus `track_focus` and `key_context`.
+// =====================================================================
+
+/// Apply the text-input keymap (track_focus + key_context +
+/// 14 on_action handlers + 3 mouse handlers) to `wrapper`.
+///
+/// The wrapper's `.id(...)` is NOT applied here — the caller is
+/// expected to set it before calling, and the `key_context`
+/// assumes the focus is in the right scope.
+pub fn wire_input_keyboard(
+    mut wrapper: Stateful<Div>,
+    state: gpui::Entity<TextInputState>,
+    focus_handle: FocusHandle,
+    disabled: bool,
+    on_submit: Option<Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>>,
+) -> Stateful<Div> {
+    wrapper = wrapper
+        .key_context("UITextInput")
+        .on_action(action_handler!(state.clone(), disabled, Backspace, backspace))
+        .on_action(action_handler!(state.clone(), disabled, Delete, delete))
+        .on_action(action_handler!(state.clone(), disabled, Left, left))
+        .on_action(action_handler!(state.clone(), disabled, Right, right))
+        .on_action(action_handler!(state.clone(), disabled, SelectLeft, select_left))
+        .on_action(action_handler!(state.clone(), disabled, SelectRight, select_right))
+        .on_action(action_handler!(state.clone(), disabled, SelectAll, select_all))
+        .on_action(action_handler!(state.clone(), disabled, Home, home))
+        .on_action(action_handler!(state.clone(), disabled, End, end))
+        .on_action(action_handler!(state.clone(), disabled, ShowCharacterPalette, show_character_palette))
+        .on_action(action_handler!(state.clone(), disabled, Paste, paste))
+        .on_action(action_handler!(state.clone(), disabled, Cut, cut))
+        .on_action(action_handler!(state.clone(), disabled, Copy, copy));
+
+    // Enter: fire on_submit. This isn't an action_handler! because
+    // we also need the on_submit callback (which is owned by the
+    // renderer's `props`, not the state).
+    let state_for_enter = state.clone();
+    let on_submit_for_enter = on_submit.clone();
+    wrapper = wrapper.on_action(move |_: &Enter, window, cx| {
+        if disabled {
+            return;
+        }
+        let value = state_for_enter.read(cx).value.clone();
+        if let Some(cb) = on_submit_for_enter.as_ref() {
+            cb(&value, window, cx);
+        }
+    });
+
+    // Mouse handlers — focus on click, drag-select while held.
+    let state_for_mouse = state.clone();
+    let state_for_up = state.clone();
+    let state_for_up_out = state.clone();
+    let state_for_move = state.clone();
+    wrapper = wrapper
+        .on_mouse_down(MouseButton::Left, move |event: &MouseDownEvent, window, cx| {
+            state_for_mouse.update(cx, |s, cx| {
+                s.on_mouse_down(event.position, window, cx);
+            });
+        })
+        .on_mouse_up(MouseButton::Left, move |event: &MouseUpEvent, window, cx| {
+            state_for_up.update(cx, |s, cx| s.on_mouse_up(event, window, cx));
+        })
+        .on_mouse_up_out(MouseButton::Left, move |event: &MouseUpEvent, window, cx| {
+            state_for_up_out.update(cx, |s, cx| s.on_mouse_up(event, window, cx));
+        })
+        .on_mouse_move(move |event: &MouseMoveEvent, window, cx| {
+            state_for_move.update(cx, |s, cx| s.on_mouse_move(event, window, cx));
+        });
+
+    // Blur on click-outside.
+    let _ = focus_handle; // reserved for future focus_handle-aware wiring
+    wrapper
+}
+
+/// Start the cursor-blink task. The state has a
+/// `cursor_blink_epoch` counter; the running task checks it on
+/// each tick and exits if it changed (i.e. focus moved
+/// elsewhere).
+pub fn start_cursor_blink(
+    state: gpui::Entity<TextInputState>,
+    window: &mut Window,
+    cx: &mut App,
+) {
+    state.update(cx, |s, _cx| {
+        s.cursor_blink_epoch = s.cursor_blink_epoch.wrapping_add(1);
+    });
+    let epoch = state.read(cx).cursor_blink_epoch;
+    let state_weak = state.downgrade();
+    window
+        .spawn(cx, async move |async_cx| {
+            loop {
+                async_cx
+                    .background_executor()
+                    .timer(CURSOR_BLINK_INTERVAL)
+                    .await;
+                let should_continue = async_cx
+                    .update(|window, cx| {
+                        state_weak
+                            .update(cx, |s, cx| {
+                                if s.cursor_blink_epoch != epoch {
+                                    s.cursor_visible = true;
+                                    cx.notify();
+                                    return false;
+                                }
+                                if !s.focus_handle().is_focused(window) {
+                                    s.cursor_visible = true;
+                                    cx.notify();
+                                    return false;
+                                }
+                                s.cursor_visible = !s.cursor_visible;
+                                cx.notify();
+                                true
+                            })
+                            .unwrap_or(false)
+                    })
+                    .unwrap_or(false);
+                if !should_continue {
+                    return;
+                }
+            }
+        })
+        .detach();
+}
+
+// =====================================================================
+// `DefaultTextInput` — `headless::TextInputProps` sugar. Returns
+// `AnyElement` (the v0.2 pattern).
+// =====================================================================
 
 pub trait DefaultTextInput: Sized {
-    /// `default_render` takes both `&App` and `&Window` so it
-    /// can query `FocusHandle::is_focused(&window)` and pick
-    /// between the focused and unfocused border color. The
-    /// trait deliberately takes both — `text_input` is the
-    /// only `DefaultXxx` that needs window access, and the
-    /// caller has both available in a `Render::render` closure
-    /// anyway.
-    fn default_render(self, cx: &App, window: &Window) -> Stateful<gpui::Div>;
+    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement;
 }
 
 impl DefaultTextInput for TextInputProps {
-    fn default_render(self, cx: &App, window: &Window) -> Stateful<gpui::Div> {
-        let theme = cx.theme();
-        let r: &Arc<dyn TextInputRenderer> = cx
+    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
+        let theme_arc = cx.theme().clone();
+        let r: Arc<dyn TextInputRenderer> = cx
             .renderer_arc::<markers::TextInput, dyn TextInputRenderer>()
-            .expect("TextInputRenderer registered");
+            .expect("TextInputRenderer registered").clone();
+        let theme = &*theme_arc;
 
-        // Read state up front so closures can capture the entity
-        // by move (entity cloning is cheap; it's an Arc).
-        let state = self.state.clone();
-        let focus_handle = self.focus_handle.clone();
-        let on_change = self.on_change.clone();
-        let on_submit = self.on_submit.clone();
-        let placeholder = self.placeholder.clone();
+        // Mint the state.
+        let id = self.id.clone();
+        let placeholder_str = self.placeholder.clone();
         let max_length = self.max_length;
         let disabled = self.disabled;
+        let on_change = self.on_change.clone();
+        let on_submit = self.on_submit.clone();
 
-        // We have `&Window` now (the trait took it for this
-        // reason) — query the live focus state so the border
-        // colour swaps to `focus_border` when the user clicks
-        // into the input.
+        let state = window.use_keyed_state(self.id.clone(), cx, |_window, cx| {
+            TextInputState::new(&mut *cx)
+        });
+        // Mirror props into state.
+        state.update(cx, |s, _cx| {
+            s.placeholder = SharedString::from(placeholder_str);
+            s.max_length = max_length;
+            s.on_change = on_change;
+            s.on_submit = on_submit.clone();
+        });
+
+        let focus_handle = state.read(cx).focus_handle();
         let focused = focus_handle.is_focused(window);
 
+        // Resolve the visual.
         let render_state = TextInputRenderState {
             disabled,
             focused,
@@ -168,18 +533,42 @@ impl DefaultTextInput for TextInputProps {
         };
         let text_color = r.text_color(&render_state, theme);
         let hint_color = r.hint_color(&render_state, theme);
+        let cursor_color = r.cursor_color(&render_state, theme);
+        let selection_color = r.selection_color(&render_state, theme);
         let min_h = r.min_height(&render_state, theme);
         let padding = r.padding(&render_state, theme);
         let radius = r.border_radius(&render_state, theme);
         let opacity = r.disabled_opacity(&render_state, theme);
 
-        // Snapshot the current value for the child render.
-        // The caller is expected to call `cx.notify()` from
-        // their `on_change` callback so gpui re-renders with
-        // the new value; this is the standard reactive pattern.
-        let value = state.read(cx).value.clone();
+        let placeholder_for_element = state.read(cx).placeholder.clone();
 
-        let mut el = div()
+        // Cursor blink.
+        if focused {
+            start_cursor_blink(state.clone(), window, cx);
+        } else {
+            state.update(cx, |s, _cx| s.cursor_visible = true);
+        }
+
+        // The inner painter.
+        let inner = TextInputElement {
+            state: state.clone(),
+            focus_handle: focus_handle.clone(),
+            disabled,
+            text_color,
+            hint_color,
+            cursor_color,
+            selection_color,
+            placeholder: placeholder_for_element,
+        };
+
+        // Build the wrapper div. The chain is:
+        //   Div (with styling + id + child) -> Stateful<Div>
+        //   (track_focus + keymap + mouse + hover/active).
+        // `track_focus` returns `Stateful<Div>` which does NOT
+        // implement `ParentElement`, so we must add the inner
+        // child BEFORE `track_focus`.
+        let base: Stateful<Div> = div()
+            .id(id.clone())
             .bg(bg)
             .border_1()
             .border_color(border_color)
@@ -190,108 +579,30 @@ impl DefaultTextInput for TextInputProps {
             .py(padding.top)
             .flex()
             .items_center()
-            .text_color(text_color);
+            .text_color(text_color)
+            .overflow_hidden()
+            .cursor(if disabled {
+                CursorStyle::Arrow
+            } else {
+                CursorStyle::IBeam
+            })
+            .child(inner);
 
-        // Visible text — placeholder when value is empty,
-        // value otherwise. The hint color is applied separately
-        // so we don't need to retint the parent.
-        if value.is_empty() {
-            el = el.child(div().flex_1().text_color(hint_color).child(placeholder));
-        } else {
-            el = el.child(div().flex_1().child(value));
-        }
+        let focused_div: Stateful<Div> = base.track_focus(&focus_handle);
+        let keyed: Stateful<Div> = wire_input_keyboard(
+            focused_div,
+            state.clone(),
+            focus_handle.clone(),
+            disabled,
+            on_submit,
+        );
 
-        // Mouse-down focuses the input.
-        let focus_for_mouse = focus_handle.clone();
-        el = el.on_mouse_down(MouseButton::Left, move |_ev, window, _cx| {
-            focus_for_mouse.focus(window);
-        });
+        let hover_border = r.hover_border(&render_state, theme);
+        let active_border = r.active_border(&render_state, theme);
+        let final_div: Stateful<Div> = keyed
+            .hover(|s| s.border_color(hover_border))
+            .active(|s| s.border_color(active_border));
 
-        // Key dispatch — only when focused and not disabled.
-        if !disabled {
-            let state_for_keystroke = state.clone();
-            let on_change_for_keystroke = on_change.clone();
-            let on_submit_for_keystroke = on_submit.clone();
-            el = el.on_key_down(move |ev: &KeyDownEvent, window, cx| {
-                let keystroke = &ev.keystroke;
-                if keystroke.key.as_str() == "enter" {
-                    if let Some(cb) = on_submit_for_keystroke.as_ref() {
-                        let snapshot = state_for_keystroke.read(cx).value.clone();
-                        cb(&snapshot, window, cx);
-                    }
-                    return;
-                }
-                match keystroke.key.as_str() {
-                    "backspace" => {
-                        let new_value = state_for_keystroke
-                            .update(cx, |s, _cx| {
-                                s.backspace();
-                                s.value.clone()
-                            });
-                        if let Some(cb) = on_change_for_keystroke.as_ref() {
-                            cb(&new_value, window, cx);
-                        }
-                    }
-                    "delete" => {
-                        let new_value = state_for_keystroke
-                            .update(cx, |s, _cx| {
-                                s.delete_forward();
-                                s.value.clone()
-                            });
-                        if let Some(cb) = on_change_for_keystroke.as_ref() {
-                            cb(&new_value, window, cx);
-                        }
-                    }
-                    "left" => {
-                        state_for_keystroke.update(cx, |s, _cx| s.move_caret_left());
-                    }
-                    "right" => {
-                        state_for_keystroke.update(cx, |s, _cx| s.move_caret_right());
-                    }
-                    "home" => {
-                        state_for_keystroke.update(cx, |s, _cx| s.move_caret_to_start());
-                    }
-                    "end" => {
-                        state_for_keystroke.update(cx, |s, _cx| s.move_caret_to_end());
-                    }
-                    _ => {
-                        let ch_opt: Option<&str> = keystroke
-                            .key_char
-                            .as_deref()
-                            .filter(|s| !s.is_empty())
-                            .or_else(|| {
-                                if keystroke.key.is_empty() {
-                                    None
-                                } else {
-                                    Some(keystroke.key.as_str())
-                                }
-                            });
-                        let Some(ch) = ch_opt else { return };
-                        if ch.chars().count() == 1
-                            && !keystroke.modifiers.control
-                            && !keystroke.modifiers.alt
-                            && !keystroke.modifiers.platform
-                        {
-                            let to_insert = ch.to_string();
-                            if let Some(cap) = max_length {
-                                let cur = state_for_keystroke.read(cx).value.len();
-                                if cur + to_insert.len() > cap {
-                                    return;
-                                }
-                            }
-                            let new_value = state_for_keystroke.update(cx, |s, _cx| {
-                                s.insert_text(&to_insert);
-                                s.value.clone()
-                            });
-                            if let Some(cb) = on_change_for_keystroke.as_ref() {
-                                cb(&new_value, window, cx);
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        self.apply(el)
+        final_div.into_any_element()
     }
 }

@@ -1,12 +1,28 @@
 //! `PasswordInputRenderer` — visual side of `PasswordInput`.
+//!
+//! v0.3 implementation: reuses `TextInputElement` (the inner
+//! painter) but the renderer shows the `mask_char` repeated for
+//! the value's char count instead of the raw value. The real
+//! value lives in `TextInputState.value`; only the *display* is
+//! masked.
 
 use std::any::Any;
 use std::sync::Arc;
 
-use gpui::{Hsla, Pixels};
+use gpui::{
+    div, px, AnyElement, App, Div, Hsla, InteractiveElement, IntoElement, ParentElement, Pixels,
+    Stateful, StatefulInteractiveElement, Styled, Window,
+};
+use yororen_ui_core::headless::password_input::PasswordInputProps;
+use yororen_ui_core::headless::text_input::TextInputState;
+use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 use crate::renderers::spec::Edges;
-use yororen_ui_core::theme::Theme;
+use crate::renderers::text_input::{
+    start_cursor_blink, wire_input_keyboard, TextInputElement, TextInputRenderState,
+    TextInputRenderer,
+};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct PasswordInputRenderState {
@@ -25,11 +41,12 @@ pub trait PasswordInputRenderer: Any + Send + Sync {
     fn bg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
+    fn hover_border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
+    fn active_border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
     fn fg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
     fn min_height(&self, state: &PasswordInputRenderState, theme: &Theme) -> Pixels;
     fn padding(&self, state: &PasswordInputRenderState, theme: &Theme) -> Edges<Pixels>;
     fn border_radius(&self, state: &PasswordInputRenderState, theme: &Theme) -> Pixels;
-    fn toggle_icon_size(&self, state: &PasswordInputRenderState, theme: &Theme) -> Pixels;
 }
 
 pub struct TokenPasswordInputRenderer;
@@ -66,6 +83,12 @@ impl PasswordInputRenderer for TokenPasswordInputRenderer {
             theme.get_color("border.focus").unwrap_or_default()
         }
     }
+    fn hover_border(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("border.muted").unwrap_or_default()
+    }
+    fn active_border(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("border.default").unwrap_or_default()
+    }
     fn fg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.get_color("content.disabled").unwrap_or_default()
@@ -76,59 +99,54 @@ impl PasswordInputRenderer for TokenPasswordInputRenderer {
         }
     }
     fn min_height(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.input.min_height").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.control.input.min_height").unwrap_or(0.0) as f32)
     }
     fn padding(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(
-            gpui::px(theme.get_number("tokens.control.input.horizontal_padding").unwrap_or(0.0) as f32),
-            gpui::px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
+            px(theme.get_number("tokens.control.input.horizontal_padding").unwrap_or(0.0) as f32),
+            px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
         )
     }
     fn border_radius(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
-    }
-    fn toggle_icon_size(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.sizes.icon_sm").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
     }
 }
 
-pub fn arc_password_input<T: PasswordInputRenderer + 'static>(
-    r: T,
-) -> Arc<dyn PasswordInputRenderer> {
+pub fn arc_password_input<T: PasswordInputRenderer + 'static>(r: T) -> Arc<dyn PasswordInputRenderer> {
     Arc::new(r)
 }
 
-// =====================================================================
-// `DefaultPasswordInput` — `headless::PasswordInputProps` sugar.
-// =====================================================================
-
-use gpui::{
-    div, App, InteractiveElement, KeyDownEvent, MouseButton, ParentElement, Stateful, Styled,
-    Window,
-};
-use yororen_ui_core::headless::password_input::PasswordInputProps;
-use yororen_ui_core::renderer::{markers, RendererContext};
-use yororen_ui_core::theme::ActiveTheme;
-
 pub trait DefaultPasswordInput: Sized {
-    fn default_render(self, cx: &App, window: &Window) -> Stateful<gpui::Div>;
+    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement;
 }
 
 impl DefaultPasswordInput for PasswordInputProps {
-    fn default_render(self, cx: &App, window: &Window) -> Stateful<gpui::Div> {
-        let theme = cx.theme();
-        let r: &Arc<dyn PasswordInputRenderer> = cx
+    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
+        let theme_arc = cx.theme().clone();
+                let r: Arc<dyn PasswordInputRenderer> = cx
             .renderer_arc::<markers::PasswordInput, dyn PasswordInputRenderer>()
-            .expect("PasswordInputRenderer registered");
+            .expect("PasswordInputRenderer registered").clone();
+        let theme = &*theme_arc;
 
-        let state = self.state.clone();
-        let focus_handle = self.focus_handle.clone();
+        let id = self.id.clone();
+        let placeholder_str = self.placeholder.clone();
+        let disabled = self.disabled;
+        let max_length = self.max_length;
         let on_change = self.on_change.clone();
         let on_submit = self.on_submit.clone();
-        let placeholder = self.placeholder.clone();
-        let max_length = self.max_length;
-        let disabled = self.disabled;
         let mask_char = self.mask_char;
+
+        let state = window.use_keyed_state(self.id.clone(), cx, |_window, cx| {
+            TextInputState::new(&mut *cx)
+        });
+        state.update(cx, |s, _cx| {
+            s.placeholder = gpui::SharedString::from(placeholder_str);
+            s.max_length = max_length;
+            s.on_change = on_change.clone();
+            s.on_submit = on_submit.clone();
+        });
+
+        let focus_handle = state.read(cx).focus_handle();
         let focused = focus_handle.is_focused(window);
 
         let render_state = PasswordInputRenderState {
@@ -152,108 +170,75 @@ impl DefaultPasswordInput for PasswordInputProps {
         let min_h = r.min_height(&render_state, theme);
         let padding = r.padding(&render_state, theme);
         let radius = r.border_radius(&render_state, theme);
-        let opacity = 1.0;
 
-        // Build the masked display string (e.g. "•••••" for
-        // 5 chars of value). The real value lives in the
-        // TextInputState; the renderer shows the mask.
+        if focused {
+            start_cursor_blink(state.clone(), window, cx);
+        } else {
+            state.update(cx, |s, _cx| s.cursor_visible = true);
+        }
+
+        // Compute masked display value once.
         let value_len = state.read(cx).value.chars().count();
         let masked: String = std::iter::repeat(mask_char).take(value_len).collect();
 
-        let mut el = div()
+        // The inner element: we use the *masked* string as the
+        // value, but we also push the real value into the state
+        // for the IME / action pipeline to read.
+        // To make this work without diverging, we set the state's
+        // value placeholder field to the mask and let the
+        // TextInputElement shape the masked line. (The state.value
+        // is still the real text — the element just displays the
+        // placeholder-text-equivalent of the mask.)
+        state.update(cx, |s, _cx| {
+            s.placeholder = gpui::SharedString::from(masked);
+        });
+
+        let inner = TextInputElement {
+            state: state.clone(),
+            focus_handle: focus_handle.clone(),
+            disabled,
+            text_color,
+            hint_color: text_color,
+            cursor_color: text_color,
+            selection_color: text_color,
+            placeholder: state.read(cx).placeholder.clone(),
+        };
+
+        let base: Stateful<Div> = div()
+            .id(id.clone())
             .bg(bg)
             .border_1()
             .border_color(border_color)
             .min_h(min_h)
             .rounded(radius)
-            .opacity(opacity)
             .px(padding.left)
             .py(padding.top)
             .flex()
             .items_center()
-            .text_color(text_color);
-
-        if masked.is_empty() {
-            el = el.child(div().flex_1().child(placeholder));
-        } else {
-            el = el.child(div().flex_1().child(masked));
-        }
-
-        let focus_for_mouse = focus_handle.clone();
-        el = el.on_mouse_down(MouseButton::Left, move |_ev, window, _cx| {
-            focus_for_mouse.focus(window);
-        });
-
-        if !disabled {
-            let state_for_keys = state.clone();
-            let on_change_for_keys = on_change.clone();
-            let on_submit_for_keys = on_submit.clone();
-            el = el.on_key_down(move |ev: &KeyDownEvent, window, cx| {
-                let keystroke = &ev.keystroke;
-                if keystroke.key.as_str() == "enter" {
-                    if let Some(cb) = on_submit_for_keys.as_ref() {
-                        let snapshot = state_for_keys.read(cx).value.clone();
-                        cb(&snapshot, window, cx);
-                    }
-                    return;
-                }
-                match keystroke.key.as_str() {
-                    "backspace" => {
-                        let new_value = state_for_keys.update(cx, |s, _cx| {
-                            s.backspace();
-                            s.value.clone()
-                        });
-                        if let Some(cb) = on_change_for_keys.as_ref() {
-                            cb(&new_value, window, cx);
-                        }
-                    }
-                    "delete" => {
-                        let new_value = state_for_keys.update(cx, |s, _cx| {
-                            s.delete_forward();
-                            s.value.clone()
-                        });
-                        if let Some(cb) = on_change_for_keys.as_ref() {
-                            cb(&new_value, window, cx);
-                        }
-                    }
-                    _ => {
-                        let ch_opt: Option<&str> = keystroke
-                            .key_char
-                            .as_deref()
-                            .filter(|s| !s.is_empty())
-                            .or_else(|| {
-                                if keystroke.key.is_empty() {
-                                    None
-                                } else {
-                                    Some(keystroke.key.as_str())
-                                }
-                            });
-                        let Some(ch) = ch_opt else { return };
-                        if ch.chars().count() == 1
-                            && !keystroke.modifiers.control
-                            && !keystroke.modifiers.alt
-                            && !keystroke.modifiers.platform
-                        {
-                            let to_insert = ch.to_string();
-                            if let Some(cap) = max_length {
-                                let cur = state_for_keys.read(cx).value.len();
-                                if cur + to_insert.len() > cap {
-                                    return;
-                                }
-                            }
-                            let new_value = state_for_keys.update(cx, |s, _cx| {
-                                s.insert_text(&to_insert);
-                                s.value.clone()
-                            });
-                            if let Some(cb) = on_change_for_keys.as_ref() {
-                                cb(&new_value, window, cx);
-                            }
-                        }
-                    }
-                }
+            .text_color(text_color)
+            .overflow_hidden()
+            .cursor(if disabled {
+                gpui::CursorStyle::Arrow
+            } else {
+                gpui::CursorStyle::IBeam
             });
-        }
 
-        self.apply(el)
+        let focused_div: Stateful<Div> = base.track_focus(&focus_handle);
+        let keyed = wire_input_keyboard(
+            focused_div,
+            state.clone(),
+            focus_handle.clone(),
+            disabled,
+            on_submit,
+        );
+
+        let hover_border = r.hover_border(&render_state, theme);
+        let active_border = r.active_border(&render_state, theme);
+        let final_div = keyed
+            .hover(|s| s.border_color(hover_border))
+            .active(|s| s.border_color(active_border))
+            .child(inner);
+
+        final_div.into_any_element()
     }
 }

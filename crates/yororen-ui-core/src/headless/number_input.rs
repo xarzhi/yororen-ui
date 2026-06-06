@@ -1,26 +1,18 @@
 //! Headless `number_input` — numeric input with stepper buttons.
 //!
-//! Reuses `TextInputState` (raw text) and parses to `f64` on
-//! demand. The renderer adds +/- stepper buttons that call
-//! `on_increment` / `on_decrement`.
+//! Reuses `TextInputState` (renderer-minted); the renderer
+//! parses the text to `f64` and adds +/- stepper buttons.
 
 use std::sync::Arc;
 
-use gpui::{
-    App, AppContext, Div, ElementId, Entity, FocusHandle, Hsla, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Window,
-};
-
-use super::text_input::TextInputState;
+use gpui::{App, Hsla};
 
 pub type NumberChangeCallback =
-    Arc<dyn Fn(f64, &mut Window, &mut App) + Send + Sync>;
+    Arc<dyn Fn(f64, &mut gpui::Window, &mut App) + Send + Sync>;
 
 #[derive(Clone)]
 pub struct NumberInputProps {
-    pub id: ElementId,
-    pub focus_handle: FocusHandle,
-    pub state: Entity<TextInputState>,
+    pub id: gpui::ElementId,
     pub placeholder: String,
     pub disabled: bool,
     pub min: Option<f64>,
@@ -39,11 +31,9 @@ pub struct NumberInputProps {
     pub custom_text_color: Option<Hsla>,
 }
 
-pub fn number_input(id: impl Into<ElementId>, cx: &mut App) -> NumberInputProps {
+pub fn number_input(id: impl Into<gpui::ElementId>) -> NumberInputProps {
     NumberInputProps {
         id: id.into(),
-        focus_handle: cx.focus_handle(),
-        state: cx.new(|_| TextInputState::new()),
         placeholder: String::new(),
         disabled: false,
         min: None,
@@ -64,12 +54,6 @@ pub fn number_input(id: impl Into<ElementId>, cx: &mut App) -> NumberInputProps 
 }
 
 impl NumberInputProps {
-    pub fn focus_handle(&self) -> &FocusHandle {
-        &self.focus_handle
-    }
-    pub fn state(&self) -> &Entity<TextInputState> {
-        &self.state
-    }
     pub fn placeholder(mut self, v: impl Into<String>) -> Self {
         self.placeholder = v.into();
         self
@@ -96,21 +80,21 @@ impl NumberInputProps {
     }
     pub fn on_change<F>(mut self, f: F) -> Self
     where
-        F: 'static + Send + Sync + Fn(f64, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(f64, &mut gpui::Window, &mut App),
     {
         self.on_change = Some(Arc::new(f));
         self
     }
     pub fn on_increment<F>(mut self, f: F) -> Self
     where
-        F: 'static + Send + Sync + Fn(f64, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(f64, &mut gpui::Window, &mut App),
     {
         self.on_increment = Some(Arc::new(f));
         self
     }
     pub fn on_decrement<F>(mut self, f: F) -> Self
     where
-        F: 'static + Send + Sync + Fn(f64, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(f64, &mut gpui::Window, &mut App),
     {
         self.on_decrement = Some(Arc::new(f));
         self
@@ -145,8 +129,5 @@ impl NumberInputProps {
     pub fn custom_text_color(mut self, c: Hsla) -> Self {
         self.custom_text_color = Some(c);
         self
-    }
-    pub fn apply(self, el: Div) -> Stateful<Div> {
-        el.id(self.id).track_focus(&self.focus_handle)
     }
 }

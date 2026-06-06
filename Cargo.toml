@@ -16,6 +16,7 @@ members = [
     "crates/yororen-ui-locale-zh-CN",
     "crates/yororen-ui-locale-ar",
     "crates/yororen-ui-demos/counter",
+    "crates/yororen-ui-demos/inputs_demo",
     "crates/yororen-ui-demos/layers_demo",
     "crates/yororen-ui-demos/mini_renderer_demo",
     "crates/yororen-ui-demos/theme_showcase",

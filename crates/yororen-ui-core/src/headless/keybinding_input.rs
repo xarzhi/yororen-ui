@@ -3,15 +3,10 @@
 
 use std::sync::Arc;
 
-use gpui::{
-    App, AppContext, Div, ElementId, Entity, FocusHandle, Hsla, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Window,
-};
-
-use super::text_input::TextInputState;
+use gpui::{App, Hsla};
 
 pub type KeybindingChangeCallback =
-    Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>;
+    Arc<dyn Fn(&str, &mut gpui::Window, &mut App) + Send + Sync>;
 
 /// `KeybindingInput` is in one of two states: idle (user is
 /// typing) or capturing (next keystroke is recorded as a
@@ -25,15 +20,13 @@ pub enum KeybindingInputMode {
 
 #[derive(Clone)]
 pub struct KeybindingInputProps {
-    pub id: ElementId,
-    pub focus_handle: FocusHandle,
-    pub state: Entity<TextInputState>,
+    pub id: gpui::ElementId,
     pub mode: KeybindingInputMode,
     pub disabled: bool,
     pub placeholder: String,
     pub on_change: Option<KeybindingChangeCallback>,
-    pub on_start_capture: Option<Arc<dyn Fn(&mut Window, &mut App) + Send + Sync>>,
-    pub on_cancel_capture: Option<Arc<dyn Fn(&mut Window, &mut App) + Send + Sync>>,
+    pub on_start_capture: Option<Arc<dyn Fn(&mut gpui::Window, &mut App) + Send + Sync>>,
+    pub on_cancel_capture: Option<Arc<dyn Fn(&mut gpui::Window, &mut App) + Send + Sync>>,
     pub has_custom_bg: bool,
     pub has_custom_border: bool,
     pub has_custom_focus_border: bool,
@@ -43,11 +36,9 @@ pub struct KeybindingInputProps {
     pub custom_text_color: Option<Hsla>,
 }
 
-pub fn keybinding_input(id: impl Into<ElementId>, cx: &mut App) -> KeybindingInputProps {
+pub fn keybinding_input(id: impl Into<gpui::ElementId>) -> KeybindingInputProps {
     KeybindingInputProps {
         id: id.into(),
-        focus_handle: cx.focus_handle(),
-        state: cx.new(|_| TextInputState::new()),
         mode: KeybindingInputMode::Idle,
         disabled: false,
         placeholder: "Press a key combo…".to_string(),
@@ -65,12 +56,6 @@ pub fn keybinding_input(id: impl Into<ElementId>, cx: &mut App) -> KeybindingInp
 }
 
 impl KeybindingInputProps {
-    pub fn focus_handle(&self) -> &FocusHandle {
-        &self.focus_handle
-    }
-    pub fn state(&self) -> &Entity<TextInputState> {
-        &self.state
-    }
     pub fn mode(mut self, m: KeybindingInputMode) -> Self {
         self.mode = m;
         self
@@ -85,21 +70,21 @@ impl KeybindingInputProps {
     }
     pub fn on_change<F>(mut self, f: F) -> Self
     where
-        F: 'static + Send + Sync + Fn(&str, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&str, &mut gpui::Window, &mut App),
     {
         self.on_change = Some(Arc::new(f));
         self
     }
     pub fn on_start_capture<F>(mut self, f: F) -> Self
     where
-        F: 'static + Send + Sync + Fn(&mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&mut gpui::Window, &mut App),
     {
         self.on_start_capture = Some(Arc::new(f));
         self
     }
     pub fn on_cancel_capture<F>(mut self, f: F) -> Self
     where
-        F: 'static + Send + Sync + Fn(&mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&mut gpui::Window, &mut App),
     {
         self.on_cancel_capture = Some(Arc::new(f));
         self
@@ -134,8 +119,5 @@ impl KeybindingInputProps {
     pub fn custom_text_color(mut self, c: Hsla) -> Self {
         self.custom_text_color = Some(c);
         self
-    }
-    pub fn apply(self, el: Div) -> Stateful<Div> {
-        el.id(self.id).track_focus(&self.focus_handle)
     }
 }

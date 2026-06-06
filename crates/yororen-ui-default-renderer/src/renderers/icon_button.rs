@@ -24,6 +24,7 @@ pub struct IconButtonRenderState {
 pub trait IconButtonRenderer: Any + Send + Sync {
     fn bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla;
     fn hover_bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla;
+    fn active_bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla;
     fn size(&self, state: &IconButtonRenderState, theme: &Theme) -> Pixels;
     fn border_radius(&self, state: &IconButtonRenderState, theme: &Theme) -> Pixels;
     fn disabled_opacity(&self, state: &IconButtonRenderState, theme: &Theme) -> f32;
@@ -63,6 +64,13 @@ impl IconButtonRenderer for TokenIconButtonRenderer {
         let key = action_variant_key(state.variant);
         theme.get_color(&format!("action.{}.hover_bg", key)).unwrap_or_default()
     }
+    fn active_bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla {
+        if let Some(s) = &state.custom_style {
+            return s.bg(&VariantState { disabled: state.disabled });
+        }
+        let key = action_variant_key(state.variant);
+        theme.get_color(&format!("action.{}.active_bg", key)).unwrap_or_default()
+    }
     fn size(&self, _state: &IconButtonRenderState, theme: &Theme) -> Pixels {
         gpui::px(theme.get_number("tokens.control.button.icon_button_min_size").unwrap_or(0.0) as f32)
     }
@@ -85,7 +93,7 @@ pub fn arc_icon_button<T: IconButtonRenderer + 'static>(r: T) -> Arc<dyn IconBut
 // `DefaultIconButton` — `headless::IconButtonProps` sugar.
 // =====================================================================
 
-use gpui::{div, App, Stateful, Styled};
+use gpui::{div, App, InteractiveElement, Stateful, StatefulInteractiveElement, Styled};
 use yororen_ui_core::headless::icon_button::IconButtonProps;
 use yororen_ui_core::renderer::{markers, RendererContext};
 use yororen_ui_core::theme::ActiveTheme;
@@ -122,6 +130,14 @@ impl DefaultIconButton for IconButtonProps {
             .flex()
             .items_center()
             .justify_center();
-        self.apply(el)
+        let hover_bg = r.hover_bg(&state, theme);
+        let active_bg = r.active_bg(&state, theme);
+        // `.raw_hover(false)` disables the headless `apply`'s
+        // built-in opacity dip; the renderer is setting its
+        // own hover/active style from the theme.
+        self.raw_hover(false)
+            .apply(el)
+            .hover(|s| s.bg(hover_bg))
+            .active(|s| s.bg(active_bg))
     }
 }

@@ -1,12 +1,27 @@
 //! `NumberInputRenderer` — visual side of `NumberInput`.
+//!
+//! v0.3 implementation: reuses `TextInputElement` (the inner
+//! painter). The caller owns the canonical numeric value; the
+//! renderer's on_change fires with the parsed `f64` (or the
+//! current value if parsing fails). `-` / `+` stepper buttons
+//! at the trailing edge call `on_decrement` / `on_increment`.
 
 use std::any::Any;
 use std::sync::Arc;
 
-use gpui::{Hsla, Pixels};
+use gpui::{
+    div, px, AnyElement, App, Div, Hsla, InteractiveElement, IntoElement, MouseButton,
+    ParentElement, Pixels, Stateful, StatefulInteractiveElement, Styled, Window,
+};
+use yororen_ui_core::headless::number_input::NumberInputProps;
+use yororen_ui_core::headless::text_input::TextInputState;
+use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 use crate::renderers::spec::Edges;
-use yororen_ui_core::theme::Theme;
+use crate::renderers::text_input::{
+    start_cursor_blink, wire_input_keyboard, TextInputElement,
+};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct NumberInputRenderState {
@@ -22,12 +37,11 @@ pub trait NumberInputRenderer: Any + Send + Sync {
     fn bg(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
-    fn stepper_bg(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
-    fn stepper_fg(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
+    fn hover_border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
+    fn active_border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
     fn min_height(&self, state: &NumberInputRenderState, theme: &Theme) -> Pixels;
     fn padding(&self, state: &NumberInputRenderState, theme: &Theme) -> Edges<Pixels>;
     fn stepper_button_size(&self, state: &NumberInputRenderState, theme: &Theme) -> Pixels;
-    fn stepper_icon_size(&self, state: &NumberInputRenderState, theme: &Theme) -> Pixels;
     fn border_radius(&self, state: &NumberInputRenderState, theme: &Theme) -> Pixels;
 }
 
@@ -43,29 +57,26 @@ impl NumberInputRenderer for TokenNumberInputRenderer {
     fn focus_border(&self, _state: &NumberInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.focus").unwrap_or_default()
     }
-    fn stepper_bg(&self, _state: &NumberInputRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("action.neutral.bg").unwrap_or_default()
+    fn hover_border(&self, _state: &NumberInputRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("border.muted").unwrap_or_default()
     }
-    fn stepper_fg(&self, _state: &NumberInputRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("action.neutral.fg").unwrap_or_default()
+    fn active_border(&self, _state: &NumberInputRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("border.default").unwrap_or_default()
     }
     fn min_height(&self, _state: &NumberInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.number_input.min_height").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.control.number_input.min_height").unwrap_or(0.0) as f32)
     }
     fn padding(&self, _state: &NumberInputRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(
-            gpui::px(theme.get_number("tokens.control.number_input.horizontal_padding").unwrap_or(0.0) as f32),
-            gpui::px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
+            px(theme.get_number("tokens.control.number_input.horizontal_padding").unwrap_or(0.0) as f32),
+            px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
         )
     }
     fn stepper_button_size(&self, _state: &NumberInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.number_input.stepper_button_size").unwrap_or(0.0) as f32)
-    }
-    fn stepper_icon_size(&self, _state: &NumberInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.number_input.stepper_icon_size").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.control.number_input.stepper_button_size").unwrap_or(0.0) as f32)
     }
     fn border_radius(&self, _state: &NumberInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
     }
 }
 
@@ -73,143 +84,164 @@ pub fn arc_number_input<T: NumberInputRenderer + 'static>(r: T) -> Arc<dyn Numbe
     Arc::new(r)
 }
 
-// =====================================================================
-// `DefaultNumberInput` — `headless::NumberInputProps` sugar.
-// =====================================================================
-
-use gpui::{
-    div, App, InteractiveElement, MouseButton, ParentElement, Stateful, Styled, Window,
-};
-use yororen_ui_core::headless::number_input::NumberInputProps;
-use yororen_ui_core::renderer::RendererContext;
-use yororen_ui_core::theme::ActiveTheme;
-
 pub trait DefaultNumberInput: Sized {
-    fn default_render(self, cx: &App, window: &Window) -> Stateful<gpui::Div>;
+    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement;
 }
 
 impl DefaultNumberInput for NumberInputProps {
-    fn default_render(self, cx: &App, window: &Window) -> Stateful<gpui::Div> {
-        let theme = cx.theme();
-        let r: &Arc<dyn NumberInputRenderer> = cx
-            .renderer_arc::<yororen_ui_core::renderer::markers::NumberInput, dyn NumberInputRenderer>(
-            )
-            .expect("NumberInputRenderer registered");
+    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
+        let theme_arc = cx.theme().clone();
+                let r: Arc<dyn NumberInputRenderer> = cx
+            .renderer_arc::<markers::NumberInput, dyn NumberInputRenderer>()
+            .expect("NumberInputRenderer registered").clone();
+        let theme = &*theme_arc;
 
-        let state = NumberInputRenderState {
-            disabled: self.disabled,
-            focused: self.focus_handle.is_focused(window),
+        let id = self.id.clone();
+        let placeholder_str = self.placeholder.clone();
+        let disabled = self.disabled;
+        let on_change = self.on_change.clone();
+        let on_increment = self.on_increment.clone();
+        let on_decrement = self.on_decrement.clone();
+        let value = self.value;
+        let step = self.step;
+        let min = self.min;
+        let max = self.max;
+
+        let state = window.use_keyed_state(self.id.clone(), cx, |_window, cx| {
+            TextInputState::new(&mut *cx)
+        });
+        // Initialise the state's value with the formatted numeric value
+        // (one-time — user typing overrides this).
+        if state.read(cx).value.is_empty() {
+            state.update(cx, |s, _cx| {
+                s.value = format!("{}", value);
+                s.caret = s.value.len();
+            });
+        }
+        state.update(cx, |s, _cx| {
+            s.placeholder = gpui::SharedString::from(placeholder_str);
+            s.on_change = Some(Arc::new(move |new_value: &str, window: &mut gpui::Window, cx: &mut gpui::App| {
+                if let Some(cb) = on_change.as_ref() {
+                    let parsed = new_value.parse::<f64>().unwrap_or(value);
+                    cb(parsed, window, cx);
+                }
+            }));
+        });
+
+        let focus_handle = state.read(cx).focus_handle();
+        let focused = focus_handle.is_focused(window);
+
+        let render_state = NumberInputRenderState {
+            disabled,
+            focused,
             custom_bg: self.custom_bg,
             custom_border: self.custom_border,
             custom_focus_border: self.custom_focus_border,
             custom_fg: self.custom_text_color,
         };
-        let bg = r.bg(&state, theme);
-        let border_color = r.border(&state, theme);
-        let min_h = r.min_height(&state, theme);
-        let padding = r.padding(&state, theme);
-        let stepper_size = r.stepper_button_size(&state, theme);
-        let radius = r.border_radius(&state, theme);
+        let bg = r.bg(&render_state, theme);
+        let border_color = if focused {
+            r.focus_border(&render_state, theme)
+        } else {
+            r.border(&render_state, theme)
+        };
+        let text_color = theme.get_color("content.primary").unwrap_or_default();
+        let min_h = r.min_height(&render_state, theme);
+        let padding = r.padding(&render_state, theme);
+        let radius = r.border_radius(&render_state, theme);
+        let stepper_size = r.stepper_button_size(&render_state, theme);
 
-        // Display the current numeric value as text. We re-read
-        // the underlying text-input state to honour user edits.
-        let value_text = state_to_value_text(&self, cx);
+        if focused {
+            start_cursor_blink(state.clone(), window, cx);
+        } else {
+            state.update(cx, |s, _cx| s.cursor_visible = true);
+        }
 
-        let focus_for_mouse = self.focus_handle.clone();
-        let on_inc = self.on_increment.clone();
-        let on_dec = self.on_decrement.clone();
-        let on_change = self.on_change.clone();
-        let step = self.step;
-        let min = self.min;
-        let max = self.max;
-        let value = self.value;
+        let inner = TextInputElement {
+            state: state.clone(),
+            focus_handle: focus_handle.clone(),
+            disabled,
+            text_color,
+            hint_color: text_color,
+            cursor_color: text_color,
+            selection_color: text_color,
+            placeholder: state.read(cx).placeholder.clone(),
+        };
 
-        let mut el = div()
+        let base: Stateful<Div> = div()
+            .id(id.clone())
             .bg(bg)
             .border_1()
             .border_color(border_color)
             .min_h(min_h)
             .rounded(radius)
             .px(padding.left)
+            .py(padding.top)
             .flex()
             .items_center()
-            .text_color(r.border(&state, theme))
-            .child(div().flex_1().child(value_text));
+            .text_color(text_color)
+            .overflow_hidden()
+            .cursor(if disabled {
+                gpui::CursorStyle::Arrow
+            } else {
+                gpui::CursorStyle::IBeam
+            });
 
-        if !self.disabled {
-            // Decrement stepper.
-            let on_dec_clone = on_dec.clone();
-            let step_dec = step;
-            let min_dec = min;
-            let value_dec = value;
-            el = el.child(
+        let focused_div: Stateful<Div> = base.track_focus(&focus_handle);
+        let keyed = wire_input_keyboard(
+            focused_div,
+            state.clone(),
+            focus_handle.clone(),
+            disabled,
+            None, // no on_submit for numbers
+        );
+
+        let hover_border = r.hover_border(&render_state, theme);
+        let active_border = r.active_border(&render_state, theme);
+
+        let on_inc_clone = on_increment.clone();
+        let on_dec_clone = on_decrement.clone();
+        let final_div = keyed
+            .hover(|s| s.border_color(hover_border))
+            .active(|s| s.border_color(active_border))
+            .child(div().flex_1().min_w(px(0.)).child(inner))
+            .child(
                 div()
                     .size(stepper_size)
                     .flex()
                     .items_center()
                     .justify_center()
-                    .child("-")
-                    .on_mouse_down(MouseButton::Left, move |_ev, _window, cx| {
-                        let next = value_dec - step_dec;
-                        let clamped = match min_dec {
+                    .child("−")
+                    .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
+                        let next = value - step;
+                        let clamped = match min {
                             Some(m) => next.max(m),
                             None => next,
                         };
                         if let Some(cb) = on_dec_clone.as_ref() {
-                            cb(clamped, _window, cx);
+                            cb(clamped, window, cx);
                         }
                     }),
-            );
-            // Increment stepper.
-            let on_inc_clone = on_inc.clone();
-            let step_inc = step;
-            let max_inc = max;
-            let value_inc = value;
-            el = el.child(
+            )
+            .child(
                 div()
                     .size(stepper_size)
                     .flex()
                     .items_center()
                     .justify_center()
                     .child("+")
-                    .on_mouse_down(MouseButton::Left, move |_ev, _window, cx| {
-                        let next = value_inc + step_inc;
-                        let clamped = match max_inc {
+                    .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
+                        let next = value + step;
+                        let clamped = match max {
                             Some(m) => next.min(m),
                             None => next,
                         };
                         if let Some(cb) = on_inc_clone.as_ref() {
-                            cb(clamped, _window, cx);
+                            cb(clamped, window, cx);
                         }
                     }),
             );
-        }
 
-        // Mouse-down on the whole input focuses it.
-        el = el.on_mouse_down(MouseButton::Left, move |_ev, window, _cx| {
-            focus_for_mouse.focus(window);
-        });
-
-        // Note: we don't wire text editing through the
-        // NumberInputState — the caller is expected to track
-        // the numeric value in their own state entity and
-        // call `value(v)` on next render. `on_change` fires
-        // when the user finishes editing (focus loss / Enter
-        // / stepper press).
-        let _ = on_change;
-        let _ = state;
-        self.apply(el)
-    }
-}
-
-fn state_to_value_text(props: &NumberInputProps, cx: &App) -> String {
-    // Prefer the underlying text-input state if non-empty
-    // (so the user can type negative numbers etc.); fall
-    // back to the numeric value formatted as a string.
-    let text_state = props.state.read(cx);
-    if !text_state.value.is_empty() {
-        text_state.value.clone()
-    } else {
-        format!("{}", props.value)
+        final_div.into_any_element()
     }
 }

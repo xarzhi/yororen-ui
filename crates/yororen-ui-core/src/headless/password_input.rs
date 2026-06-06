@@ -1,23 +1,15 @@
 //! Headless `password_input` — text input that masks the value.
 //!
-//! Reuses `TextInputState` for value + caret; the renderer
-//! shows `*` (or a custom `mask_char`) instead of the actual
-//! value at paint time.
+//! Reuses `TextInputState` (the renderer mints it via
+//! `use_keyed_state`); the visual masks the value with `mask_char`.
 
 use std::sync::Arc;
 
-use gpui::{
-    App, AppContext, Div, ElementId, Entity, FocusHandle, Hsla, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Window,
-};
-
-use super::text_input::TextInputState;
+use gpui::{App, Hsla};
 
 #[derive(Clone)]
 pub struct PasswordInputProps {
-    pub id: ElementId,
-    pub focus_handle: FocusHandle,
-    pub state: Entity<TextInputState>,
+    pub id: gpui::ElementId,
     pub placeholder: String,
     pub disabled: bool,
     pub max_length: Option<usize>,
@@ -35,11 +27,9 @@ pub struct PasswordInputProps {
     pub custom_text_color: Option<Hsla>,
 }
 
-pub fn password_input(id: impl Into<ElementId>, cx: &mut App) -> PasswordInputProps {
+pub fn password_input(id: impl Into<gpui::ElementId>) -> PasswordInputProps {
     PasswordInputProps {
         id: id.into(),
-        focus_handle: cx.focus_handle(),
-        state: cx.new(|_| TextInputState::new()),
         placeholder: String::new(),
         disabled: false,
         max_length: None,
@@ -57,12 +47,6 @@ pub fn password_input(id: impl Into<ElementId>, cx: &mut App) -> PasswordInputPr
 }
 
 impl PasswordInputProps {
-    pub fn focus_handle(&self) -> &FocusHandle {
-        &self.focus_handle
-    }
-    pub fn state(&self) -> &Entity<TextInputState> {
-        &self.state
-    }
     pub fn placeholder(mut self, v: impl Into<String>) -> Self {
         self.placeholder = v.into();
         self
@@ -81,14 +65,14 @@ impl PasswordInputProps {
     }
     pub fn on_change<F>(mut self, f: F) -> Self
     where
-        F: 'static + Send + Sync + Fn(&str, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&str, &mut gpui::Window, &mut App),
     {
         self.on_change = Some(Arc::new(f));
         self
     }
     pub fn on_submit<F>(mut self, f: F) -> Self
     where
-        F: 'static + Send + Sync + Fn(&str, &mut Window, &mut App),
+        F: 'static + Send + Sync + Fn(&str, &mut gpui::Window, &mut App),
     {
         self.on_submit = Some(Arc::new(f));
         self
@@ -123,8 +107,5 @@ impl PasswordInputProps {
     pub fn custom_text_color(mut self, c: Hsla) -> Self {
         self.custom_text_color = Some(c);
         self
-    }
-    pub fn apply(self, el: Div) -> Stateful<Div> {
-        el.id(self.id).track_focus(&self.focus_handle)
     }
 }

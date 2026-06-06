@@ -1,12 +1,28 @@
 //! `SearchInputRenderer` — visual side of `SearchInput`.
+//!
+//! v0.3 implementation: reuses `TextInputElement` (the inner
+//! painter) plus a search icon at the leading edge and a
+//! clear-button at the trailing edge. Escape key clears the
+//! value.
 
 use std::any::Any;
 use std::sync::Arc;
 
-use gpui::{Hsla, Pixels};
+use gpui::{
+    div, px, AnyElement, App, Div, Hsla, InteractiveElement, IntoElement, MouseButton, ParentElement,
+    Pixels, Stateful, StatefulInteractiveElement, Styled, Window,
+};
+use gpui::prelude::FluentBuilder;
+use yororen_ui_core::headless::search_input::SearchInputProps;
+use yororen_ui_core::headless::text_input::{Escape, TextInputState};
+use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 use crate::renderers::spec::Edges;
-use yororen_ui_core::theme::Theme;
+use crate::renderers::text_input::{
+    start_cursor_blink, wire_input_keyboard, TextInputElement, TextInputRenderState,
+    TextInputRenderer,
+};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct SearchInputRenderState {
@@ -22,6 +38,8 @@ pub trait SearchInputRenderer: Any + Send + Sync {
     fn bg(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
+    fn hover_border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
+    fn active_border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
     fn icon_color(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
     fn fg(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
     fn min_height(&self, state: &SearchInputRenderState, theme: &Theme) -> Pixels;
@@ -43,6 +61,12 @@ impl SearchInputRenderer for TokenSearchInputRenderer {
     fn focus_border(&self, _state: &SearchInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.focus").unwrap_or_default()
     }
+    fn hover_border(&self, _state: &SearchInputRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("border.muted").unwrap_or_default()
+    }
+    fn active_border(&self, _state: &SearchInputRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("border.default").unwrap_or_default()
+    }
     fn icon_color(&self, _state: &SearchInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("content.tertiary").unwrap_or_default()
     }
@@ -50,22 +74,22 @@ impl SearchInputRenderer for TokenSearchInputRenderer {
         theme.get_color("content.primary").unwrap_or_default()
     }
     fn min_height(&self, _state: &SearchInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.search_input.min_height").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.control.search_input.min_height").unwrap_or(0.0) as f32)
     }
     fn padding(&self, _state: &SearchInputRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(
-            gpui::px(theme.get_number("tokens.control.search_input.horizontal_padding").unwrap_or(0.0) as f32),
-            gpui::px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
+            px(theme.get_number("tokens.control.search_input.horizontal_padding").unwrap_or(0.0) as f32),
+            px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
         )
     }
     fn border_radius(&self, _state: &SearchInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
     }
     fn input_gap(&self, _state: &SearchInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.search_input.input_gap").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.control.search_input.input_gap").unwrap_or(0.0) as f32)
     }
     fn icon_size(&self, _state: &SearchInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.search_input.icon_size").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.control.search_input.icon_size").unwrap_or(0.0) as f32)
     }
 }
 
@@ -73,37 +97,35 @@ pub fn arc_search_input<T: SearchInputRenderer + 'static>(r: T) -> Arc<dyn Searc
     Arc::new(r)
 }
 
-// =====================================================================
-// `DefaultSearchInput` — `headless::SearchInputProps` sugar.
-// =====================================================================
-
-use gpui::{
-    div, App, InteractiveElement, KeyDownEvent, MouseButton, ParentElement, Stateful, Styled,
-    Window,
-};
-use yororen_ui_core::headless::search_input::SearchInputProps;
-use yororen_ui_core::renderer::RendererContext;
-use yororen_ui_core::theme::ActiveTheme;
-
 pub trait DefaultSearchInput: Sized {
-    fn default_render(self, cx: &App, window: &Window) -> Stateful<gpui::Div>;
+    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement;
 }
 
 impl DefaultSearchInput for SearchInputProps {
-    fn default_render(self, cx: &App, window: &Window) -> Stateful<gpui::Div> {
-        let theme = cx.theme();
-        let r: &Arc<dyn SearchInputRenderer> = cx
-            .renderer_arc::<yororen_ui_core::renderer::markers::SearchInput, dyn SearchInputRenderer>(
-            )
-            .expect("SearchInputRenderer registered");
+    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
+        let theme_arc = cx.theme().clone();
+                let r: Arc<dyn SearchInputRenderer> = cx
+            .renderer_arc::<markers::SearchInput, dyn SearchInputRenderer>()
+            .expect("SearchInputRenderer registered").clone();
+        let theme = &*theme_arc;
 
-        let state = self.state.clone();
-        let focus_handle = self.focus_handle.clone();
+        let id = self.id.clone();
+        let placeholder_str = self.placeholder.clone();
+        let disabled = self.disabled;
         let on_change = self.on_change.clone();
         let on_submit = self.on_submit.clone();
         let on_clear = self.on_clear.clone();
-        let placeholder = self.placeholder.clone();
-        let disabled = self.disabled;
+
+        let state = window.use_keyed_state(self.id.clone(), cx, |_window, cx| {
+            TextInputState::new(&mut *cx)
+        });
+        state.update(cx, |s, _cx| {
+            s.placeholder = gpui::SharedString::from(placeholder_str);
+            s.on_change = on_change.clone();
+            s.on_submit = on_submit.clone();
+        });
+
+        let focus_handle = state.read(cx).focus_handle();
         let focused = focus_handle.is_focused(window);
 
         let render_state = SearchInputRenderState {
@@ -121,15 +143,32 @@ impl DefaultSearchInput for SearchInputProps {
             r.border(&render_state, theme)
         };
         let text_color = r.fg(&render_state, theme);
+        let icon_color = r.icon_color(&render_state, theme);
         let min_h = r.min_height(&render_state, theme);
         let padding = r.padding(&render_state, theme);
         let radius = r.border_radius(&render_state, theme);
         let input_gap = r.input_gap(&render_state, theme);
         let icon_size = r.icon_size(&render_state, theme);
 
-        let value = state.read(cx).value.clone();
-        let has_value = !value.is_empty();
-        let mut el = div()
+        if focused {
+            start_cursor_blink(state.clone(), window, cx);
+        } else {
+            state.update(cx, |s, _cx| s.cursor_visible = true);
+        }
+
+        let inner = TextInputElement {
+            state: state.clone(),
+            focus_handle: focus_handle.clone(),
+            disabled,
+            text_color,
+            hint_color: icon_color,
+            cursor_color: text_color,
+            selection_color: text_color,
+            placeholder: state.read(cx).placeholder.clone(),
+        };
+
+        let base: Stateful<Div> = div()
+            .id(id.clone())
             .bg(bg)
             .border_1()
             .border_color(border_color)
@@ -140,113 +179,68 @@ impl DefaultSearchInput for SearchInputProps {
             .flex()
             .items_center()
             .gap(input_gap)
-            .text_color(text_color);
+            .text_color(text_color)
+            .overflow_hidden()
+            .cursor(if disabled {
+                gpui::CursorStyle::Arrow
+            } else {
+                gpui::CursorStyle::IBeam
+            });
 
-        el = el.child(div().size(icon_size).flex().items_center().justify_center().child("🔍"));
+        let focused_div: Stateful<Div> = base.track_focus(&focus_handle);
 
-        if has_value {
-            el = el.child(div().flex_1().child(value));
-        } else {
-            el = el.child(div().flex_1().text_color(r.icon_color(&render_state, theme)).child(placeholder));
-        }
-
-        if has_value {
-            let on_clear_clone = on_clear.clone();
-            el = el.child(
-                div()
-                    .size(icon_size)
-                    .flex()
-                    .items_center()
-                    .justify_center()
-                    .child("×")
-                    .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
-                        if let Some(cb) = on_clear_clone.as_ref() {
-                            cb(window, cx);
-                        }
-                    }),
-            );
-        }
-
-        let focus_for_mouse = focus_handle.clone();
-        el = el.on_mouse_down(MouseButton::Left, move |_ev, window, _cx| {
-            focus_for_mouse.focus(window);
-        });
-
-        if !disabled {
-            let state_for_keys = state.clone();
-            let on_change_for_keys = on_change.clone();
-            let on_submit_for_keys = on_submit.clone();
-            el = el.on_key_down(move |ev: &KeyDownEvent, window, cx| {
-                let keystroke = &ev.keystroke;
-                if keystroke.key.as_str() == "enter" {
-                    if let Some(cb) = on_submit_for_keys.as_ref() {
-                        let snapshot = state_for_keys.read(cx).value.clone();
-                        cb(&snapshot, window, cx);
-                    }
+        // Search-specific: Escape clears the value.
+        let state_for_escape = state.clone();
+        let on_change_for_escape = on_change.clone();
+        let keyed = wire_input_keyboard(focused_div, state.clone(), focus_handle.clone(), disabled, on_submit)
+            .on_action(move |_: &Escape, _window, cx| {
+                if disabled {
                     return;
                 }
-                if keystroke.key.as_str() == "escape" {
-                    let new_value = state_for_keys.update(cx, |s, _cx| {
-                        s.value.clear();
-                        s.caret = 0;
-                        s.value.clone()
-                    });
-                    if let Some(cb) = on_change_for_keys.as_ref() {
-                        cb(&new_value, window, cx);
-                    }
-                    return;
-                }
-                match keystroke.key.as_str() {
-                    "backspace" => {
-                        let new_value = state_for_keys.update(cx, |s, _cx| {
-                            s.backspace();
-                            s.value.clone()
-                        });
-                        if let Some(cb) = on_change_for_keys.as_ref() {
-                            cb(&new_value, window, cx);
-                        }
-                    }
-                    "delete" => {
-                        let new_value = state_for_keys.update(cx, |s, _cx| {
-                            s.delete_forward();
-                            s.value.clone()
-                        });
-                        if let Some(cb) = on_change_for_keys.as_ref() {
-                            cb(&new_value, window, cx);
-                        }
-                    }
-                    _ => {
-                        let ch_opt: Option<&str> = keystroke
-                            .key_char
-                            .as_deref()
-                            .filter(|s| !s.is_empty())
-                            .or_else(|| {
-                                if keystroke.key.is_empty() {
-                                    None
-                                } else {
-                                    Some(keystroke.key.as_str())
-                                }
-                            });
-                        let Some(ch) = ch_opt else { return };
-                        if ch.chars().count() == 1
-                            && !keystroke.modifiers.control
-                            && !keystroke.modifiers.alt
-                            && !keystroke.modifiers.platform
-                        {
-                            let to_insert = ch.to_string();
-                            let new_value = state_for_keys.update(cx, |s, _cx| {
-                                s.insert_text(&to_insert);
-                                s.value.clone()
-                            });
-                            if let Some(cb) = on_change_for_keys.as_ref() {
-                                cb(&new_value, window, cx);
-                            }
-                        }
+                let before = state_for_escape.read(cx).value.clone();
+                state_for_escape.update(cx, |s, cx| {
+                    s.value.clear();
+                    s.caret = 0;
+                    s.selection_start = 0;
+                    s.selection_end = 0;
+                    cx.notify();
+                });
+                if let Some(cb) = on_change_for_escape.as_ref() {
+                    let after = state_for_escape.read(cx).value.clone();
+                    if before != after {
+                        cb(&after, _window, cx);
                     }
                 }
             });
-        }
 
-        self.apply(el)
+        let hover_border = r.hover_border(&render_state, theme);
+        let active_border = r.active_border(&render_state, theme);
+
+        // Compose children: search icon, inner element, clear button.
+        let state_for_clear = state.clone();
+        let on_clear_clone = on_clear.clone();
+        let final_div = keyed
+            .hover(|s| s.border_color(hover_border))
+            .active(|s| s.border_color(active_border))
+            .child(div().size(icon_size).flex().items_center().justify_center().child("🔍"))
+            .child(div().flex_1().min_w(px(0.)).child(inner))
+            .when(!state_for_clear.read(cx).value.is_empty(), |d| {
+                d.child(
+                    div()
+                        .size(icon_size)
+                        .flex()
+                        .items_center()
+                        .justify_center()
+                        .text_color(icon_color)
+                        .child("×")
+                        .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
+                            if let Some(cb) = on_clear_clone.as_ref() {
+                                cb(window, cx);
+                            }
+                        }),
+                )
+            });
+
+        final_div.into_any_element()
     }
 }

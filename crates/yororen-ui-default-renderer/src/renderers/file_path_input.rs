@@ -1,12 +1,27 @@
 //! `FilePathInputRenderer` — visual side of `FilePathInput`.
+//!
+//! v0.3 implementation: reuses `TextInputElement` plus a folder
+//! icon at the leading edge and a "browse" button at the
+//! trailing edge. The browse button calls the caller's
+//! `on_browse` callback (which is expected to open a file
+//! dialog via the platform API).
 
 use std::any::Any;
 use std::sync::Arc;
 
-use gpui::{Hsla, Pixels};
+use gpui::{
+    div, px, AnyElement, App, Div, Hsla, InteractiveElement, IntoElement, MouseButton,
+    ParentElement, Pixels, Stateful, StatefulInteractiveElement, Styled, Window,
+};
+use yororen_ui_core::headless::file_path_input::FilePathInputProps;
+use yororen_ui_core::headless::text_input::TextInputState;
+use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 use crate::renderers::spec::Edges;
-use yororen_ui_core::theme::Theme;
+use crate::renderers::text_input::{
+    start_cursor_blink, wire_input_keyboard, TextInputElement,
+};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct FilePathInputRenderState {
@@ -22,6 +37,8 @@ pub trait FilePathInputRenderer: Any + Send + Sync {
     fn bg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
     fn border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
     fn focus_border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
+    fn hover_border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
+    fn active_border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
     fn button_bg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
     fn button_fg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
     fn min_height(&self, state: &FilePathInputRenderState, theme: &Theme) -> Pixels;
@@ -43,6 +60,12 @@ impl FilePathInputRenderer for TokenFilePathInputRenderer {
     fn focus_border(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.focus").unwrap_or_default()
     }
+    fn hover_border(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("border.muted").unwrap_or_default()
+    }
+    fn active_border(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("border.default").unwrap_or_default()
+    }
     fn button_bg(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("action.neutral.bg").unwrap_or_default()
     }
@@ -50,61 +73,59 @@ impl FilePathInputRenderer for TokenFilePathInputRenderer {
         theme.get_color("action.neutral.fg").unwrap_or_default()
     }
     fn min_height(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.file_path_input.min_height").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.control.file_path_input.min_height").unwrap_or(0.0) as f32)
     }
     fn padding(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(
-            gpui::px(theme.get_number("tokens.control.file_path_input.horizontal_padding").unwrap_or(0.0) as f32),
-            gpui::px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
+            px(theme.get_number("tokens.control.file_path_input.horizontal_padding").unwrap_or(0.0) as f32),
+            px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
         )
     }
     fn action_gap(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.file_path_input.action_gap").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.control.file_path_input.action_gap").unwrap_or(0.0) as f32)
     }
     fn border_radius(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
     }
     fn icon_size(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.file_path_input.icon_size").unwrap_or(0.0) as f32)
+        px(theme.get_number("tokens.control.file_path_input.icon_size").unwrap_or(0.0) as f32)
     }
 }
 
-pub fn arc_file_path_input<T: FilePathInputRenderer + 'static>(
-    r: T,
-) -> Arc<dyn FilePathInputRenderer> {
+pub fn arc_file_path_input<T: FilePathInputRenderer + 'static>(r: T) -> Arc<dyn FilePathInputRenderer> {
     Arc::new(r)
 }
 
-// =====================================================================
-// `DefaultFilePathInput` — `headless::FilePathInputProps` sugar.
-// =====================================================================
-
-use gpui::{
-    div, App, InteractiveElement, KeyDownEvent, MouseButton, ParentElement, Stateful, Styled,
-    Window,
-};
-use yororen_ui_core::headless::file_path_input::FilePathInputProps;
-use yororen_ui_core::renderer::RendererContext;
-use yororen_ui_core::theme::ActiveTheme;
-
 pub trait DefaultFilePathInput: Sized {
-    fn default_render(self, cx: &App, window: &Window) -> Stateful<gpui::Div>;
+    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement;
 }
 
 impl DefaultFilePathInput for FilePathInputProps {
-    fn default_render(self, cx: &App, window: &Window) -> Stateful<gpui::Div> {
-        let theme = cx.theme();
-        let r: &Arc<dyn FilePathInputRenderer> = cx
-            .renderer_arc::<yororen_ui_core::renderer::markers::FilePathInput, dyn FilePathInputRenderer>(
-            )
-            .expect("FilePathInputRenderer registered");
+    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
+        // Copy the theme Arc up front so the `cx.theme()` borrow
+        // doesn't conflict with later `cx.renderer_arc` /
+        // `cx.use_keyed_state` mutable calls.
+        let theme_arc = cx.theme().clone();
+        let r: Arc<dyn FilePathInputRenderer> = cx
+            .renderer_arc::<markers::FilePathInput, dyn FilePathInputRenderer>()
+            .expect("FilePathInputRenderer registered").clone();
+        let theme = &*theme_arc;
 
-        let state = self.state.clone();
-        let focus_handle = self.focus_handle.clone();
+        let id = self.id.clone();
+        let placeholder_str = self.placeholder.clone();
+        let disabled = self.disabled;
         let on_change = self.on_change.clone();
         let on_browse = self.on_browse.clone();
-        let placeholder = self.placeholder.clone();
-        let disabled = self.disabled;
+
+        let state = window.use_keyed_state(self.id.clone(), cx, |_window, cx| {
+            TextInputState::new(&mut *cx)
+        });
+        state.update(cx, |s, _cx| {
+            s.placeholder = gpui::SharedString::from(placeholder_str);
+            s.on_change = on_change.clone();
+        });
+
+        let focus_handle = state.read(cx).focus_handle();
         let focused = focus_handle.is_focused(window);
 
         let render_state = FilePathInputRenderState {
@@ -121,15 +142,34 @@ impl DefaultFilePathInput for FilePathInputProps {
         } else {
             r.border(&render_state, theme)
         };
+        let text_color = theme.get_color("content.primary").unwrap_or_default();
+        let button_fg = r.button_fg(&render_state, theme);
+        let button_bg = r.button_bg(&render_state, theme);
         let min_h = r.min_height(&render_state, theme);
         let padding = r.padding(&render_state, theme);
         let radius = r.border_radius(&render_state, theme);
         let action_gap = r.action_gap(&render_state, theme);
         let icon_size = r.icon_size(&render_state, theme);
-        let button_size = icon_size; // share
 
-        let value = state.read(cx).value.clone();
-        let mut el = div()
+        if focused {
+            start_cursor_blink(state.clone(), window, cx);
+        } else {
+            state.update(cx, |s, _cx| s.cursor_visible = true);
+        }
+
+        let inner = TextInputElement {
+            state: state.clone(),
+            focus_handle: focus_handle.clone(),
+            disabled,
+            text_color,
+            hint_color: text_color,
+            cursor_color: text_color,
+            selection_color: text_color,
+            placeholder: state.read(cx).placeholder.clone(),
+        };
+
+        let base: Stateful<Div> = div()
+            .id(id.clone())
             .bg(bg)
             .border_1()
             .border_color(border_color)
@@ -140,97 +180,49 @@ impl DefaultFilePathInput for FilePathInputProps {
             .flex()
             .items_center()
             .gap(action_gap)
-            .text_color(r.button_fg(&render_state, theme));
+            .text_color(text_color)
+            .overflow_hidden()
+            .cursor(if disabled {
+                gpui::CursorStyle::Arrow
+            } else {
+                gpui::CursorStyle::IBeam
+            });
 
-        el = el.child(div().size(icon_size).flex().items_center().justify_center().child("📁"));
-
-        if value.is_empty() {
-            el = el.child(div().flex_1().text_color(r.button_fg(&render_state, theme)).child(placeholder));
-        } else {
-            el = el.child(div().flex_1().child(value));
-        }
-
-        // Browse button.
-        let on_browse_clone = on_browse.clone();
-        el = el.child(
-            div()
-                .size(button_size)
-                .bg(r.button_bg(&render_state, theme))
-                .rounded(px(4.0))
-                .flex()
-                .items_center()
-                .justify_center()
-                .child("…")
-                .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
-                    if let Some(cb) = on_browse_clone.as_ref() {
-                        cb(window, cx);
-                    }
-                }),
+        let focused_div: Stateful<Div> = base.track_focus(&focus_handle);
+        let keyed = wire_input_keyboard(
+            focused_div,
+            state.clone(),
+            focus_handle.clone(),
+            disabled,
+            None,
         );
 
-        let focus_for_mouse = focus_handle.clone();
-        el = el.on_mouse_down(MouseButton::Left, move |_ev, window, _cx| {
-            focus_for_mouse.focus(window);
-        });
+        let hover_border = r.hover_border(&render_state, theme);
+        let active_border = r.active_border(&render_state, theme);
 
-        if !disabled {
-            let state_for_keys = state.clone();
-            let on_change_for_keys = on_change.clone();
-            el = el.on_key_down(move |ev: &KeyDownEvent, window, cx| {
-                let keystroke = &ev.keystroke;
-                match keystroke.key.as_str() {
-                    "backspace" => {
-                        let new_value = state_for_keys.update(cx, |s, _cx| {
-                            s.backspace();
-                            s.value.clone()
-                        });
-                        if let Some(cb) = on_change_for_keys.as_ref() {
-                            cb(&new_value, window, cx);
+        let on_browse_clone = on_browse.clone();
+        let final_div = keyed
+            .hover(|s| s.border_color(hover_border))
+            .active(|s| s.border_color(active_border))
+            .child(div().size(icon_size).flex().items_center().justify_center().child("📁"))
+            .child(div().flex_1().min_w(px(0.)).child(inner))
+            .child(
+                div()
+                    .size(icon_size)
+                    .bg(button_bg)
+                    .rounded(px(4.0))
+                    .flex()
+                    .items_center()
+                    .justify_center()
+                    .text_color(button_fg)
+                    .child("…")
+                    .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
+                        if let Some(cb) = on_browse_clone.as_ref() {
+                            cb(window, cx);
                         }
-                    }
-                    "delete" => {
-                        let new_value = state_for_keys.update(cx, |s, _cx| {
-                            s.delete_forward();
-                            s.value.clone()
-                        });
-                        if let Some(cb) = on_change_for_keys.as_ref() {
-                            cb(&new_value, window, cx);
-                        }
-                    }
-                    _ => {
-                        let ch_opt: Option<&str> = keystroke
-                            .key_char
-                            .as_deref()
-                            .filter(|s| !s.is_empty())
-                            .or_else(|| {
-                                if keystroke.key.is_empty() {
-                                    None
-                                } else {
-                                    Some(keystroke.key.as_str())
-                                }
-                            });
-                        let Some(ch) = ch_opt else { return };
-                        if ch.chars().count() == 1
-                            && !keystroke.modifiers.control
-                            && !keystroke.modifiers.alt
-                            && !keystroke.modifiers.platform
-                        {
-                            let to_insert = ch.to_string();
-                            let new_value = state_for_keys.update(cx, |s, _cx| {
-                                s.insert_text(&to_insert);
-                                s.value.clone()
-                            });
-                            if let Some(cb) = on_change_for_keys.as_ref() {
-                                cb(&new_value, window, cx);
-                            }
-                        }
-                    }
-                }
-            });
-        }
+                    }),
+            );
 
-        self.apply(el)
+        final_div.into_any_element()
     }
 }
-
-use gpui::px;
