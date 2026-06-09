@@ -1,14 +1,13 @@
 //! 38 component renderers grouped by visual category.
 //!
-//! Submodules are populated in subsequent commits; this is a
-//! skeleton that compiles cleanly with the rest of the crate.
+//! Each submodule implements the `XxxRenderer` traits from
+//! `yororen_ui_default_renderer::renderers` with brutalist visual
+//! values: sharp corners, thick black borders, hard offset shadows,
+//! monospace typography, and high-contrast solid colors.
+//!
+//! Colors are read from the theme (so light/dark variants work);
+//! geometry is hardcoded in the [`style`] module so the 38
+//! renderers stay in stylistic lockstep.
 
-// Submodule groups (filled in commits 3-6).
-// pub mod actions;
-// pub mod display;
-// pub mod surfaces;
-// pub mod inputs;
-// pub mod controls;
-// pub mod overlays;
-// pub mod notifications;
-// pub mod lists;
+pub mod actions;
+pub mod display;
