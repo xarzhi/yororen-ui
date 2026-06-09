@@ -123,7 +123,7 @@ impl Render for VariantApp {
             .hover(|s| s.bg(danger_hover_bg))
             .active(|s| s.bg(danger_active_bg));
 
-        let neutral = button("neutral-btn", cx).default_render(cx);
+        let neutral = button("neutral-btn", cx).default_render(cx).child("Neutral");
 
         div()
             .size_full()
