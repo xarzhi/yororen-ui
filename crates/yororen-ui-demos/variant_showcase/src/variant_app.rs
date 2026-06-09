@@ -1,11 +1,17 @@
 //! yororen-ui Variant Showcase Demo
 //!
-//! Three side-by-side buttons, one per `ActionVariantKind`.
-//! The renderer reads `action.<variant>.<field>` paths from
-//! the theme JSON, so the only thing the variant changes
-//! here is the `ButtonRenderState.variant` field.
+//! Three side-by-side buttons showing that swapping
+//! `ActionVariantKind` (Neutral / Primary / Danger) on the
+//! *same* `headless::button` factory re-routes the
+//! `ButtonRenderer` through different `action.<key>.*` token
+//! paths in the theme JSON.
+//!
+//! A fourth button demonstrates the `apply` escape hatch:
+//! when you need a shape that `default_render` doesn't
+//! provide (e.g. a fixed-size pill), you can read the same
+//! renderer tokens by hand and compose your own `div`,
+//! then wire it back to the headless button via `apply(...)`.
 
-use gpui::div as gpui_div;
 use gpui::{
     Context, InteractiveElement, IntoElement, ParentElement, Render, StatefulInteractiveElement,
     Styled, Window, div, px,
@@ -30,20 +36,11 @@ impl VariantApp {
 
 impl Render for VariantApp {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        // Pull the registered ButtonRenderer + theme once and
-        // resolve every per-variant color / size upfront. Both
-        // `r` and `theme` are immutable borrows of `cx`; we
-        // scope them to this block so they're gone before we
-        // call the headless factories (which need `&mut App`).
-        let (
-            primary_bg,
-            primary_fg,
-            primary_pad,
-            primary_radius,
-            primary_min_h,
-            primary_hover_bg,
-            primary_active_bg,
-        ) = {
+        // Read Primary tokens once for the override example
+        // below. Scoped to a block so the immutable borrow of
+        // `cx` is released before we call the headless factories
+        // (which need `&mut App`).
+        let (primary_bg, primary_fg, primary_hover_bg, primary_active_bg) = {
             let r: &Arc<dyn ButtonRenderer> = cx
                 .renderer_arc::<ButtonMarker, dyn ButtonRenderer>()
                 .expect("ButtonRenderer registered");
@@ -55,75 +52,54 @@ impl Render for VariantApp {
             (
                 r.bg(&state, theme),
                 r.fg(&state, theme),
-                r.padding(&state, theme),
-                r.border_radius(&state, theme),
-                r.min_height(&state, theme),
                 r.hover_bg(&state, theme),
                 r.active_bg(&state, theme),
             )
         };
 
-        let (
-            danger_bg,
-            danger_fg,
-            danger_pad,
-            danger_radius,
-            danger_min_h,
-            danger_hover_bg,
-            danger_active_bg,
-        ) = {
-            let r: &Arc<dyn ButtonRenderer> = cx
-                .renderer_arc::<ButtonMarker, dyn ButtonRenderer>()
-                .expect("ButtonRenderer registered");
-            let theme: &Theme = cx.theme();
-            let state = ButtonRenderState {
-                variant: ActionVariantKind::Danger,
-                ..Default::default()
-            };
-            (
-                r.bg(&state, theme),
-                r.fg(&state, theme),
-                r.padding(&state, theme),
-                r.border_radius(&state, theme),
-                r.min_height(&state, theme),
-                r.hover_bg(&state, theme),
-                r.active_bg(&state, theme),
-            )
-        };
+        // === Three "default_render" buttons: same factory,
+        // different variant. Only `ButtonRenderState.variant`
+        // changes, which re-routes the renderer to a different
+        // `action.<key>.*` token path. ===
+        let neutral = button("neutral-btn", cx)
+            .variant(ActionVariantKind::Neutral)
+            .default_render(cx)
+            .child("Neutral");
 
         let primary = button("primary-btn", cx)
+            .variant(ActionVariantKind::Primary)
+            .default_render(cx)
+            .child("Primary");
+
+        let danger = button("danger-btn", cx)
+            .variant(ActionVariantKind::Danger)
+            .default_render(cx)
+            .child("Danger");
+
+        // === Escape hatch: same Primary tokens, but a shape
+        // that `default_render` doesn't expose — fixed 220×56
+        // pill. We pull the theme colors from the renderer by
+        // hand, build our own `div`, and wire a11y/click back
+        // through `apply`. The hover/active overrides re-use
+        // the renderer's own hover/active tokens, so the
+        // visual feedback stays theme-driven. ===
+        let pill = button("pill-btn", cx)
             .on_click(|_, _, _| {})
             .apply(
-                gpui_div()
+                div()
                     .bg(primary_bg)
                     .text_color(primary_fg)
-                    .px(primary_pad.left)
-                    .py(primary_pad.top)
-                    .rounded(primary_radius)
-                    .min_h(primary_min_h)
+                    .w(px(220.))
+                    .h(px(56.))
+                    .rounded(px(28.))
                     .cursor(gpui::CursorStyle::PointingHand)
-                    .child("Primary"),
+                    .flex()
+                    .items_center()
+                    .justify_center()
+                    .child("Pill - custom shape"),
             )
             .hover(|s| s.bg(primary_hover_bg))
             .active(|s| s.bg(primary_active_bg));
-
-        let danger = button("danger-btn", cx)
-            .on_click(|_, _, _| {})
-            .apply(
-                gpui_div()
-                    .bg(danger_bg)
-                    .text_color(danger_fg)
-                    .px(danger_pad.left)
-                    .py(danger_pad.top)
-                    .rounded(danger_radius)
-                    .min_h(danger_min_h)
-                    .cursor(gpui::CursorStyle::PointingHand)
-                    .child("Danger"),
-            )
-            .hover(|s| s.bg(danger_hover_bg))
-            .active(|s| s.bg(danger_active_bg));
-
-        let neutral = button("neutral-btn", cx).default_render(cx).child("Neutral");
 
         div()
             .size_full()
@@ -151,15 +127,29 @@ impl Render for VariantApp {
                 div()
                     .flex()
                     .gap_2()
-                    .child(label("p", "Primary (hand-rolled apply):", cx).default_render(cx))
+                    .child(label("p", "Primary (default_render):", cx).default_render(cx))
                     .child(primary),
             )
             .child(
                 div()
                     .flex()
                     .gap_2()
-                    .child(label("d", "Danger (hand-rolled apply):", cx).default_render(cx))
+                    .child(label("d", "Danger (default_render):", cx).default_render(cx))
                     .child(danger),
+            )
+            .child(
+                div()
+                    .flex()
+                    .gap_2()
+                    .child(
+                        label(
+                            "o",
+                            "Override (apply + custom shape):",
+                            cx,
+                        )
+                        .default_render(cx),
+                    )
+                    .child(pill),
             )
     }
 }
