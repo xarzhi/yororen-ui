@@ -16,6 +16,7 @@ pub mod file_path_input;
 pub mod focus_ring;
 pub mod form;
 pub mod heading;
+pub mod icon;
 pub mod icon_button;
 pub mod keybinding_input;
 pub mod label;
@@ -60,6 +61,7 @@ pub use file_path_input::{
 pub use focus_ring::{FocusRingRenderState, FocusRingRenderer, TokenFocusRingRenderer};
 pub use form::{FormRenderState, FormRenderer, TokenFormRenderer};
 pub use heading::{HeadingRenderState, HeadingRenderer, TokenHeadingRenderer};
+pub use icon::DefaultIcon;
 pub use icon_button::{IconButtonRenderState, IconButtonRenderer, TokenIconButtonRenderer};
 pub use keybinding_input::{
     KeybindingInputRenderState, KeybindingInputRenderer, TokenKeybindingInputRenderer,

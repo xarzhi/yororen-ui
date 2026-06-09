@@ -9,15 +9,17 @@ use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{
-    div, px, AnyElement, App, Div, Hsla, InteractiveElement, IntoElement, MouseButton, ParentElement,
-    Pixels, Stateful, StatefulInteractiveElement, Styled, Window,
+    div, px, AnyElement, App, Div, Hsla, InteractiveElement, IntoElement, MouseButton,
+    ParentElement, Pixels, Stateful, StatefulInteractiveElement, Styled, Window,
 };
 use gpui::prelude::FluentBuilder;
+use yororen_ui_core::headless::icon::{icon, IconSource};
 use yororen_ui_core::headless::search_input::SearchInputProps;
 use yororen_ui_core::headless::text_input::{Escape, TextInputState};
 use yororen_ui_core::renderer::{markers, RendererContext};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
+use crate::renderers::icon::DefaultIcon;
 use crate::renderers::spec::Edges;
 use crate::renderers::text_input::{
     start_cursor_blink, wire_input_keyboard, TextInputElement, TextInputRenderState,
@@ -161,7 +163,7 @@ impl DefaultSearchInput for SearchInputProps {
             focus_handle: focus_handle.clone(),
             disabled,
             text_color,
-            hint_color: icon_color,
+            hint_color: theme.get_color("content.tertiary").unwrap_or_default(),
             cursor_color: text_color,
             selection_color: text_color,
             placeholder: state.read(cx).placeholder.clone(),
@@ -224,21 +226,30 @@ impl DefaultSearchInput for SearchInputProps {
         let final_div = keyed
             .hover(|s| s.border_color(hover_border))
             .active(|s| s.border_color(active_border))
-            .child(div().size(icon_size).flex().items_center().justify_center().child("🔍"))
+            .child(
+                icon(
+                    "search-input-leading-icon",
+                    IconSource::Builtin("search".into()),
+                    &mut *cx,
+                )
+                .size(icon_size)
+                .color(text_color)
+                .default_render(&mut *cx, window),
+            )
             .child(div().flex_1().min_w(px(0.)).child(inner))
             .when(!state_for_clear.read(cx).value.is_empty(), |d| {
                 d.child(
                     div()
+                        .id("search-input-clear")
                         .size(icon_size)
                         .flex()
                         .items_center()
                         .justify_center()
                         .text_color(icon_color)
-                        .child("×")
                         .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
                             // The × clears the live `state.value`
                             // first (so the input visually empties
-                            // and the `×` disappears via the
+                            // and the icon disappears via the
                             // `.when(...)` re-eval), then fires
                             // `on_change` with "", then
                             // `on_clear` for the caller to do
@@ -256,7 +267,17 @@ impl DefaultSearchInput for SearchInputProps {
                             if let Some(cb) = on_clear_clone.as_ref() {
                                 cb(window, cx);
                             }
-                        }),
+                        })
+                        .child(
+                            icon(
+                                "search-input-clear-icon",
+                                IconSource::Builtin("close".into()),
+                                &mut *cx,
+                            )
+                            .size(icon_size)
+                            .color(icon_color)
+                            .default_render(&mut *cx, window),
+                        ),
                 )
             });
 

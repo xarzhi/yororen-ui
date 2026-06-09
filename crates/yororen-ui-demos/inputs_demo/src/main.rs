@@ -79,9 +79,9 @@ const DEMO_THEME_JSON: &str = r##"{
   "tokens": {
     "control": {
       "input":              { "min_height": 36, "horizontal_padding": 12, "vertical_padding": 8 },
-      "search_input":       { "min_height": 36, "horizontal_padding": 12, "input_gap": 8, "icon_size": 18 },
+      "search_input":       { "min_height": 36, "horizontal_padding": 12, "input_gap": 8, "icon_size": 16 },
       "number_input":       { "min_height": 36, "horizontal_padding": 12, "stepper_button_size": 32 },
-      "file_path_input":    { "min_height": 36, "horizontal_padding": 12, "action_gap": 8, "icon_size": 18 },
+      "file_path_input":    { "min_height": 36, "horizontal_padding": 12, "action_gap": 8, "icon_size": 16 },
       "keybinding_input":   { "icon_size": 18, "kbd_padding_x": 8, "kbd_padding_y": 4, "kbd_min_width": 80 },
       "button":             { "min_height": 36, "icon_button_min_size": 32, "horizontal_padding": 16, "vertical_padding": 8, "icon_gap": 8, "radius": 6 }
     },

@@ -2,22 +2,26 @@
 //!
 //! v0.3 implementation: reuses `TextInputElement` plus a folder
 //! icon at the leading edge and a "browse" button at the
-//! trailing edge. The browse button calls the caller's
-//! `on_browse` callback (which is expected to open a file
-//! dialog via the platform API).
+//! trailing edge. Clicking the browse button opens a native
+//! file dialog via `App::prompt_for_paths`; the chosen path
+//! is written to the state and fired through `on_change`.
+//! The user's `on_browse` becomes a post-pick hook that
+//! receives the selected path (empty string on cancel).
 
 use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{
-    div, px, AnyElement, App, Div, Hsla, InteractiveElement, IntoElement, MouseButton,
+    div, px, AnyElement, App, AppContext, Div, Hsla, InteractiveElement, IntoElement, MouseButton,
     ParentElement, Pixels, Stateful, StatefulInteractiveElement, Styled, Window,
 };
 use yororen_ui_core::headless::file_path_input::FilePathInputProps;
+use yororen_ui_core::headless::icon::{icon, IconSource};
 use yororen_ui_core::headless::text_input::TextInputState;
 use yororen_ui_core::renderer::{markers, RendererContext};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
+use crate::renderers::icon::DefaultIcon;
 use crate::renderers::spec::Edges;
 use crate::renderers::text_input::{
     start_cursor_blink, wire_input_keyboard, TextInputElement,
@@ -40,6 +44,7 @@ pub trait FilePathInputRenderer: Any + Send + Sync {
     fn hover_border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
     fn active_border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
     fn button_bg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
+    fn button_hover_bg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
     fn button_fg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
     fn min_height(&self, state: &FilePathInputRenderState, theme: &Theme) -> Pixels;
     fn padding(&self, state: &FilePathInputRenderState, theme: &Theme) -> Edges<Pixels>;
@@ -67,10 +72,20 @@ impl FilePathInputRenderer for TokenFilePathInputRenderer {
         theme.get_color("border.default").unwrap_or_default()
     }
     fn button_bg(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("action.neutral.bg").unwrap_or_default()
+        // The browse button is a small affordance inside the
+        // input, not a primary action. Match the input surface
+        // (white in light, dark gray in dark) so the icon
+        // doesn't compete with the typed path.
+        theme.get_color("surface.base").unwrap_or_default()
     }
     fn button_fg(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("action.neutral.fg").unwrap_or_default()
+        // Use the same color as the typed text. On hover, the
+        // theme can override via `custom_button_fg` or by
+        // registering a custom `FilePathInputRenderer`.
+        theme.get_color("content.primary").unwrap_or_default()
+    }
+    fn button_hover_bg(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("surface.hover").unwrap_or_default()
     }
     fn min_height(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Pixels {
         px(theme.get_number("tokens.control.file_path_input.min_height").unwrap_or(0.0) as f32)
@@ -145,6 +160,7 @@ impl DefaultFilePathInput for FilePathInputProps {
         let text_color = theme.get_color("content.primary").unwrap_or_default();
         let button_fg = r.button_fg(&render_state, theme);
         let button_bg = r.button_bg(&render_state, theme);
+        let button_hover_bg = r.button_hover_bg(&render_state, theme);
         let min_h = r.min_height(&render_state, theme);
         let padding = r.padding(&render_state, theme);
         let radius = r.border_radius(&render_state, theme);
@@ -162,7 +178,7 @@ impl DefaultFilePathInput for FilePathInputProps {
             focus_handle: focus_handle.clone(),
             disabled,
             text_color,
-            hint_color: text_color,
+            hint_color: theme.get_color("content.tertiary").unwrap_or_default(),
             cursor_color: text_color,
             selection_color: text_color,
             placeholder: state.read(cx).placeholder.clone(),
@@ -202,13 +218,25 @@ impl DefaultFilePathInput for FilePathInputProps {
         let active_border = r.active_border(&render_state, theme);
 
         let on_browse_clone = on_browse.clone();
+        let state_for_browse = state.clone();
+        let window_handle = window.window_handle();
         let final_div = keyed
             .hover(|s| s.border_color(hover_border))
             .active(|s| s.border_color(active_border))
-            .child(div().size(icon_size).flex().items_center().justify_center().child("📁"))
+            .child(
+                icon(
+                    "file-path-input-leading-icon",
+                    IconSource::Builtin("folder".into()),
+                    &mut *cx,
+                )
+                .size(icon_size)
+                .color(text_color)
+                .default_render(&mut *cx, window),
+            )
             .child(div().flex_1().min_w(px(0.)).child(inner))
             .child(
                 div()
+                    .id("file-path-input-browse")
                     .size(icon_size)
                     .bg(button_bg)
                     .rounded(px(4.0))
@@ -216,12 +244,82 @@ impl DefaultFilePathInput for FilePathInputProps {
                     .items_center()
                     .justify_center()
                     .text_color(button_fg)
-                    .child("…")
-                    .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
-                        if let Some(cb) = on_browse_clone.as_ref() {
-                            cb(window, cx);
+                    .hover(|s| s.bg(button_hover_bg))
+                    .on_mouse_down(MouseButton::Left, move |_ev, _window, cx| {
+                        if disabled {
+                            return;
                         }
-                    }),
+                        // Open the native file dialog and let
+                        // the user pick a single file. The
+                        // result is delivered asynchronously
+                        // via a oneshot channel, so we spawn
+                        // a task to update the state when it
+                        // arrives.
+                        let receiver = cx.prompt_for_paths(gpui::PathPromptOptions {
+                            files: true,
+                            directories: false,
+                            multiple: false,
+                            prompt: Some("Select a file".into()),
+                        });
+                        // Pull `on_change` out of the state
+                        // *now*, while the outer `cx` is still
+                        // in scope, then move the cloned value
+                        // into the spawn future (which must be
+                        // 'static and can't borrow the outer
+                        // `cx`).
+                        let on_change_for_async = state.read(cx).on_change.clone();
+                        let state_for_browse = state.clone();
+                        let on_browse_cb = on_browse_clone.clone();
+                        cx.spawn(async move |async_cx| {
+                            // `receiver.await` returns
+                            // `Result<Result<Option<Vec<PathBuf>>>, _>`
+                            // because the platform layer wraps its
+                            // own Result inside the oneshot's Result.
+                            let picked = match receiver.await {
+                                Ok(Ok(Some(paths))) => paths.into_iter().next(),
+                                _ => None,
+                            };
+                            if let Some(path) = picked {
+                                let path_str = path.to_string_lossy().to_string();
+                                let state_for_change = state_for_browse.clone();
+                                let on_browse_for_async = on_browse_cb.clone();
+                                let _ = async_cx
+                                    .update_window(window_handle, move |_, window, cx| {
+                                        state_for_change.update(cx, |s, cx| {
+                                            s.value = path_str.clone();
+                                            let end = s.value.len();
+                                            s.caret = end;
+                                            s.selection_start = end;
+                                            s.selection_end = end;
+                                            cx.notify();
+                                        });
+                                        // The state's on_change was set
+                                        // up by `default_render` from the
+                                        // props; firing it here keeps the
+                                        // browse-pick path in sync with the
+                                        // user-typed path so the caller's
+                                        // listener fires either way.
+                                        if let Some(cb) = on_change_for_async.as_ref() {
+                                            cb(&path_str, window, cx);
+                                        }
+                                        if let Some(cb) = on_browse_for_async.as_ref() {
+                                            cb(&path_str, window, cx);
+                                        }
+                                    });
+                            }
+                        })
+                        .detach();
+                    })
+                    .child(
+                        icon(
+                            "file-path-input-browse-icon",
+                            IconSource::Builtin("file".into()),
+                            &mut *cx,
+                        )
+                        .size(icon_size)
+                        .color(button_fg)
+                        .default_render(&mut *cx, window),
+                    ),
             );
 
         final_div.into_any_element()

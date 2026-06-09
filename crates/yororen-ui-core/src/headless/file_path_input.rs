@@ -12,7 +12,7 @@ pub struct FilePathInputProps {
     pub disabled: bool,
     pub value: String,
     pub on_change: Option<Arc<dyn Fn(&str, &mut gpui::Window, &mut App) + Send + Sync>>,
-    pub on_browse: Option<Arc<dyn Fn(&mut gpui::Window, &mut App) + Send + Sync>>,
+    pub on_browse: Option<Arc<dyn Fn(&str, &mut gpui::Window, &mut App) + Send + Sync>>,
     pub has_custom_bg: bool,
     pub has_custom_border: bool,
     pub has_custom_focus_border: bool,
@@ -62,7 +62,7 @@ impl FilePathInputProps {
     }
     pub fn on_browse<F>(mut self, f: F) -> Self
     where
-        F: 'static + Send + Sync + Fn(&mut gpui::Window, &mut App),
+        F: 'static + Send + Sync + Fn(&str, &mut gpui::Window, &mut App),
     {
         self.on_browse = Some(Arc::new(f));
         self

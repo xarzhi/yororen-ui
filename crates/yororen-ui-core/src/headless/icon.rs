@@ -1,12 +1,18 @@
 //! Headless `icon` — a `gpui::svg` with id. No state.
 
-use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
+use gpui::{Div, ElementId, Hsla, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct IconProps {
     pub id: ElementId,
     pub source: IconSource,
     pub size: Option<gpui::Pixels>,
+    /// Display color. `gpui::Svg` does not inherit `text_color`
+    /// from a parent element (it reads its own local style at
+    /// paint time), so the renderer applies this directly to the
+    /// SVG's `style.text.color`. `None` means the icon will not
+    /// paint — the caller is expected to pick a color.
+    pub color: Option<Hsla>,
 }
 
 #[derive(Clone, Debug)]
@@ -22,12 +28,17 @@ pub fn icon(id: impl Into<ElementId>, source: IconSource, _cx: &mut gpui::App) -
         id: id.into(),
         source,
         size: None,
+        color: None,
     }
 }
 
 impl IconProps {
     pub fn size(mut self, s: impl Into<gpui::Pixels>) -> Self {
         self.size = Some(s.into());
+        self
+    }
+    pub fn color(mut self, c: impl Into<Hsla>) -> Self {
+        self.color = Some(c.into());
         self
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {

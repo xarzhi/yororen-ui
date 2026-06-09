@@ -188,7 +188,7 @@ impl DefaultPasswordInput for PasswordInputProps {
             focus_handle: focus_handle.clone(),
             disabled,
             text_color,
-            hint_color: text_color,
+            hint_color: theme.get_color("content.tertiary").unwrap_or_default(),
             cursor_color: text_color,
             selection_color: text_color,
             placeholder: state.read(cx).placeholder.clone(),

@@ -1320,7 +1320,7 @@ pub yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_b
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_border: bool
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_focus_border: bool
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::id: gpui::window::ElementId
-pub yororen_ui_core::headless::file_path_input::FilePathInputProps::on_browse: core::option::Option<alloc::sync::Arc<(dyn core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>>
+pub yororen_ui_core::headless::file_path_input::FilePathInputProps::on_browse: core::option::Option<alloc::sync::Arc<(dyn core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>>
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::on_change: core::option::Option<alloc::sync::Arc<(dyn core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>>
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::placeholder: alloc::string::String
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::value: alloc::string::String
@@ -1333,7 +1333,7 @@ pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::disabled(
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_bg(self, bool) -> Self
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_border(self, bool) -> Self
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_focus_border(self, bool) -> Self
-pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::on_browse<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::on_browse<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::on_change<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::value(self, impl core::convert::Into<alloc::string::String>) -> Self
@@ -1473,11 +1473,13 @@ impl core::marker::UnsafeUnpin for yororen_ui_core::headless::icon::IconSource
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::icon::IconSource
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::icon::IconSource
 pub struct yororen_ui_core::headless::icon::IconProps
+pub yororen_ui_core::headless::icon::IconProps::color: core::option::Option<gpui::color::Hsla>
 pub yororen_ui_core::headless::icon::IconProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::icon::IconProps::size: core::option::Option<gpui::geometry::Pixels>
 pub yororen_ui_core::headless::icon::IconProps::source: yororen_ui_core::headless::icon::IconSource
 impl yororen_ui_core::headless::icon::IconProps
 pub fn yororen_ui_core::headless::icon::IconProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::icon::IconProps::color(self, impl core::convert::Into<gpui::color::Hsla>) -> Self
 pub fn yororen_ui_core::headless::icon::IconProps::size(self, impl core::convert::Into<gpui::geometry::Pixels>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::icon::IconProps
 pub fn yororen_ui_core::headless::icon::IconProps::clone(&self) -> yororen_ui_core::headless::icon::IconProps

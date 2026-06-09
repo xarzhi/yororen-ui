@@ -155,7 +155,7 @@ impl Render for InputsApp {
             // Panel 5: file_path_input.
             .child(panel_with_label(
                 "5. file_path_input",
-                "Folder icon at left, browse (⋯) button at right.",
+                "Folder icon at left, browse button at right. Click it to open a native file picker; the chosen path is written into the input.",
                 file_path_input("demo-file-path")
                     .placeholder("/path/to/file")
                     .on_change({
@@ -164,9 +164,13 @@ impl Render for InputsApp {
                             entity.update(cx, |s, _cx| s.file_path_value = new.to_string());
                         }
                     })
-                    .on_browse(|_window, _cx| {
-                        // The caller would call into the
-                        // platform's file dialog API here.
+                    .on_browse(|picked: &str, _window, _cx| {
+                        // Renderer already wrote the picked
+                        // path into the input's state and
+                        // fired `on_change`; this hook is
+                        // for the caller to do extra work
+                        // (e.g. log, validate, store).
+                        eprintln!("file_path_input picked: {picked:?}");
                     })
                     .default_render(cx, window),
                 cx,

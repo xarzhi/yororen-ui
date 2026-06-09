@@ -36,6 +36,7 @@ pub mod themes;
 pub use renderers::button::DefaultButton;
 pub use renderers::checkbox::DefaultCheckbox;
 pub use renderers::file_path_input::DefaultFilePathInput;
+pub use renderers::icon::DefaultIcon;
 pub use renderers::icon_button::DefaultIconButton;
 pub use renderers::keybinding_input::DefaultKeybindingInput;
 pub use renderers::label::DefaultLabel;
