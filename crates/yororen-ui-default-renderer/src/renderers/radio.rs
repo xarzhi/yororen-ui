@@ -128,8 +128,7 @@ impl DefaultRadio for RadioProps {
         }
         let hover_bg = r.ring_hover_bg(&state, theme);
         let active_bg = r.ring_active_bg(&state, theme);
-        self.raw_hover(false)
-            .apply(el)
+        self.apply(el)
             .hover(|s| s.bg(hover_bg))
             .active(|s| s.bg(active_bg))
     }

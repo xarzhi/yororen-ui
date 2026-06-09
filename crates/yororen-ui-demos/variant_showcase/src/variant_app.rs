@@ -5,7 +5,10 @@
 //! the theme JSON, so the only thing the variant changes
 //! here is the `ButtonRenderState.variant` field.
 
-use gpui::{Context, IntoElement, ParentElement, Render, Styled, Window, div, px};
+use gpui::{
+    Context, InteractiveElement, IntoElement, ParentElement, Render, StatefulInteractiveElement,
+    Styled, Window, div, px,
+};
 use yororen_ui::headless::button::button;
 use yororen_ui::headless::label::label;
 use yororen_ui::renderer::{
@@ -34,7 +37,7 @@ impl Render for VariantApp {
         // `r` and `theme` are immutable borrows of `cx`; we
         // scope them to this block so they're gone before we
         // call the headless factories (which need `&mut App`).
-        let (primary_bg, primary_fg, primary_pad, primary_radius, primary_min_h) = {
+        let (primary_bg, primary_fg, primary_pad, primary_radius, primary_min_h, primary_hover_bg, primary_active_bg) = {
             let r: &Arc<dyn ButtonRenderer> = cx
                 .renderer_arc::<ButtonMarker, dyn ButtonRenderer>()
                 .expect("ButtonRenderer registered");
@@ -49,10 +52,12 @@ impl Render for VariantApp {
                 r.padding(&state, theme),
                 r.border_radius(&state, theme),
                 r.min_height(&state, theme),
+                r.hover_bg(&state, theme),
+                r.active_bg(&state, theme),
             )
         };
 
-        let (danger_bg, danger_fg, danger_pad, danger_radius, danger_min_h) = {
+        let (danger_bg, danger_fg, danger_pad, danger_radius, danger_min_h, danger_hover_bg, danger_active_bg) = {
             let r: &Arc<dyn ButtonRenderer> = cx
                 .renderer_arc::<ButtonMarker, dyn ButtonRenderer>()
                 .expect("ButtonRenderer registered");
@@ -67,6 +72,8 @@ impl Render for VariantApp {
                 r.padding(&state, theme),
                 r.border_radius(&state, theme),
                 r.min_height(&state, theme),
+                r.hover_bg(&state, theme),
+                r.active_bg(&state, theme),
             )
         };
 
@@ -80,8 +87,11 @@ impl Render for VariantApp {
                     .py(primary_pad.top)
                     .rounded(primary_radius)
                     .min_h(primary_min_h)
+                    .cursor(gpui::CursorStyle::PointingHand)
                     .child("Primary"),
-            );
+            )
+            .hover(|s| s.bg(primary_hover_bg))
+            .active(|s| s.bg(primary_active_bg));
 
         let danger = button("danger-btn", &mut **cx)
             .on_click(|_, _, _| {})
@@ -93,8 +103,11 @@ impl Render for VariantApp {
                     .py(danger_pad.top)
                     .rounded(danger_radius)
                     .min_h(danger_min_h)
+                    .cursor(gpui::CursorStyle::PointingHand)
                     .child("Danger"),
-            );
+            )
+            .hover(|s| s.bg(danger_hover_bg))
+            .active(|s| s.bg(danger_active_bg));
 
         let neutral = button("neutral-btn", &mut **cx)
             .default_render(cx);

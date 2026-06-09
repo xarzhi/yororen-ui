@@ -400,19 +400,14 @@ impl DefaultButton for ButtonProps {
             .items_center()
             .justify_center()
             .opacity(opacity);
-        // `self.apply(el)` returns `Stateful<Div>` which
-        // implements `StatefulInteractiveElement` and so
-        // gains `.hover(...)`, `.active(...)`. The hover /
-        // active closures read the renderer's `hover_bg` /
-        // `active_bg` and apply them as style overrides.
-        //
-        // `.raw_hover(false)` disables `apply`'s built-in
-        // opacity dip — the renderer is going to set its
-        // own hover/active style from the theme, and we
-        // don't want the debug-assert
-        // (`hover style already set`) in gpui-ce 0.3.
-        self.raw_hover(false)
-            .apply(el)
+        // `self.apply(el)` is purely a11y (focus + click) and
+        // returns a `Stateful<Div>` that implements
+        // `StatefulInteractiveElement`, so we chain `.hover(...)`
+        // / `.active(...)` for the theme-driven visual
+        // feedback. The closures read the renderer's
+        // `hover_bg` / `active_bg` and apply them as style
+        // overrides.
+        self.apply(el)
             .hover(|s| s.bg(hover_bg))
             .active(|s| s.bg(active_bg))
     }

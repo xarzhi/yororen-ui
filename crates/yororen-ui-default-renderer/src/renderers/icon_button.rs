@@ -132,11 +132,10 @@ impl DefaultIconButton for IconButtonProps {
             .justify_center();
         let hover_bg = r.hover_bg(&state, theme);
         let active_bg = r.active_bg(&state, theme);
-        // `.raw_hover(false)` disables the headless `apply`'s
-        // built-in opacity dip; the renderer is setting its
-        // own hover/active style from the theme.
-        self.raw_hover(false)
-            .apply(el)
+        // `self.apply(el)` is purely a11y (focus + click);
+        // chain `.hover()` / `.active()` to apply the
+        // theme-driven hover/active bg.
+        self.apply(el)
             .hover(|s| s.bg(hover_bg))
             .active(|s| s.bg(active_bg))
     }

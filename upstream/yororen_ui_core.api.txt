@@ -913,7 +913,6 @@ pub yororen_ui_core::headless::button::ButtonProps::disabled: bool
 pub yororen_ui_core::headless::button::ButtonProps::focus_handle: gpui::window::FocusHandle
 pub yororen_ui_core::headless::button::ButtonProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::button::ButtonProps::on_click: core::option::Option<yororen_ui_core::headless::button::ClickCallback>
-pub yororen_ui_core::headless::button::ButtonProps::raw_hover: bool
 pub yororen_ui_core::headless::button::ButtonProps::variant: yororen_ui_core::renderer::ActionVariantKind
 impl yororen_ui_core::headless::button::ButtonProps
 pub fn yororen_ui_core::headless::button::ButtonProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
@@ -922,7 +921,6 @@ pub fn yororen_ui_core::headless::button::ButtonProps::disabled(self, bool) -> S
 pub fn yororen_ui_core::headless::button::ButtonProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::button::ButtonProps::is_focused(&self, &gpui::window::Window) -> bool
 pub fn yororen_ui_core::headless::button::ButtonProps::on_click<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App)
-pub fn yororen_ui_core::headless::button::ButtonProps::raw_hover(self, bool) -> Self
 pub fn yororen_ui_core::headless::button::ButtonProps::variant(self, yororen_ui_core::renderer::ActionVariantKind) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::button::ButtonProps
 pub fn yororen_ui_core::headless::button::ButtonProps::clone(&self) -> yororen_ui_core::headless::button::ButtonProps
@@ -1007,7 +1005,6 @@ pub yororen_ui_core::headless::checkbox::CheckboxProps::focus_handle: gpui::wind
 pub yororen_ui_core::headless::checkbox::CheckboxProps::has_custom_tone: bool
 pub yororen_ui_core::headless::checkbox::CheckboxProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::checkbox::CheckboxProps::on_toggle: core::option::Option<yororen_ui_core::headless::switch::ToggleCallback>
-pub yororen_ui_core::headless::checkbox::CheckboxProps::raw_hover: bool
 impl yororen_ui_core::headless::checkbox::CheckboxProps
 pub fn yororen_ui_core::headless::checkbox::CheckboxProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::checkbox::CheckboxProps::checked(self, bool) -> Self
@@ -1017,7 +1014,6 @@ pub fn yororen_ui_core::headless::checkbox::CheckboxProps::focus_handle(&self) -
 pub fn yororen_ui_core::headless::checkbox::CheckboxProps::has_custom_tone(self, bool) -> Self
 pub fn yororen_ui_core::headless::checkbox::CheckboxProps::is_focused(&self, &gpui::window::Window) -> bool
 pub fn yororen_ui_core::headless::checkbox::CheckboxProps::on_toggle<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(bool, core::option::Option<&gpui::interactive::ClickEvent>, &mut gpui::window::Window, &mut gpui::app::App)
-pub fn yororen_ui_core::headless::checkbox::CheckboxProps::raw_hover(self, bool) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::checkbox::CheckboxProps
 pub fn yororen_ui_core::headless::checkbox::CheckboxProps::clone(&self) -> yororen_ui_core::headless::checkbox::CheckboxProps
 impl core::marker::Freeze for yororen_ui_core::headless::checkbox::CheckboxProps
@@ -1499,7 +1495,6 @@ pub yororen_ui_core::headless::icon_button::IconButtonProps::disabled: bool
 pub yororen_ui_core::headless::icon_button::IconButtonProps::focus_handle: gpui::window::FocusHandle
 pub yororen_ui_core::headless::icon_button::IconButtonProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::icon_button::IconButtonProps::on_click: core::option::Option<yororen_ui_core::headless::icon_button::ClickCallback>
-pub yororen_ui_core::headless::icon_button::IconButtonProps::raw_hover: bool
 pub yororen_ui_core::headless::icon_button::IconButtonProps::variant: yororen_ui_core::renderer::ActionVariantKind
 impl yororen_ui_core::headless::icon_button::IconButtonProps
 pub fn yororen_ui_core::headless::icon_button::IconButtonProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
@@ -1507,7 +1502,6 @@ pub fn yororen_ui_core::headless::icon_button::IconButtonProps::disabled(self, b
 pub fn yororen_ui_core::headless::icon_button::IconButtonProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::icon_button::IconButtonProps::is_focused(&self, &gpui::window::Window) -> bool
 pub fn yororen_ui_core::headless::icon_button::IconButtonProps::on_click<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App)
-pub fn yororen_ui_core::headless::icon_button::IconButtonProps::raw_hover(self, bool) -> Self
 pub fn yororen_ui_core::headless::icon_button::IconButtonProps::variant(self, yororen_ui_core::renderer::ActionVariantKind) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::icon_button::IconButtonProps
 pub fn yororen_ui_core::headless::icon_button::IconButtonProps::clone(&self) -> yororen_ui_core::headless::icon_button::IconButtonProps
@@ -2880,7 +2874,6 @@ pub yororen_ui_core::headless::radio::RadioProps::focus_handle: gpui::window::Fo
 pub yororen_ui_core::headless::radio::RadioProps::has_custom_tone: bool
 pub yororen_ui_core::headless::radio::RadioProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::radio::RadioProps::on_toggle: core::option::Option<yororen_ui_core::headless::switch::ToggleCallback>
-pub yororen_ui_core::headless::radio::RadioProps::raw_hover: bool
 impl yororen_ui_core::headless::radio::RadioProps
 pub fn yororen_ui_core::headless::radio::RadioProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::radio::RadioProps::checked(self, bool) -> Self
@@ -2890,7 +2883,6 @@ pub fn yororen_ui_core::headless::radio::RadioProps::focus_handle(&self) -> &gpu
 pub fn yororen_ui_core::headless::radio::RadioProps::has_custom_tone(self, bool) -> Self
 pub fn yororen_ui_core::headless::radio::RadioProps::is_focused(&self, &gpui::window::Window) -> bool
 pub fn yororen_ui_core::headless::radio::RadioProps::on_toggle<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(bool, core::option::Option<&gpui::interactive::ClickEvent>, &mut gpui::window::Window, &mut gpui::app::App)
-pub fn yororen_ui_core::headless::radio::RadioProps::raw_hover(self, bool) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::radio::RadioProps
 pub fn yororen_ui_core::headless::radio::RadioProps::clone(&self) -> yororen_ui_core::headless::radio::RadioProps
 impl core::marker::Freeze for yororen_ui_core::headless::radio::RadioProps
@@ -3146,7 +3138,6 @@ pub yororen_ui_core::headless::switch::SwitchProps::focus_handle: gpui::window::
 pub yororen_ui_core::headless::switch::SwitchProps::has_custom_tone: bool
 pub yororen_ui_core::headless::switch::SwitchProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::switch::SwitchProps::on_toggle: core::option::Option<yororen_ui_core::headless::switch::ToggleCallback>
-pub yororen_ui_core::headless::switch::SwitchProps::raw_hover: bool
 impl yororen_ui_core::headless::switch::SwitchProps
 pub fn yororen_ui_core::headless::switch::SwitchProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::switch::SwitchProps::checked(self, bool) -> Self
@@ -3156,7 +3147,6 @@ pub fn yororen_ui_core::headless::switch::SwitchProps::focus_handle(&self) -> &g
 pub fn yororen_ui_core::headless::switch::SwitchProps::has_custom_tone(self, bool) -> Self
 pub fn yororen_ui_core::headless::switch::SwitchProps::is_focused(&self, &gpui::window::Window) -> bool
 pub fn yororen_ui_core::headless::switch::SwitchProps::on_toggle<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(bool, core::option::Option<&gpui::interactive::ClickEvent>, &mut gpui::window::Window, &mut gpui::app::App)
-pub fn yororen_ui_core::headless::switch::SwitchProps::raw_hover(self, bool) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::switch::SwitchProps
 pub fn yororen_ui_core::headless::switch::SwitchProps::clone(&self) -> yororen_ui_core::headless::switch::SwitchProps
 impl core::marker::Freeze for yororen_ui_core::headless::switch::SwitchProps
@@ -3828,7 +3818,6 @@ pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::disabled: bool
 pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::focus_handle: gpui::window::FocusHandle
 pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::on_toggle: core::option::Option<yororen_ui_core::headless::switch::ToggleCallback>
-pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::raw_hover: bool
 pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::selected: bool
 pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::variant: yororen_ui_core::renderer::ActionVariantKind
 impl yororen_ui_core::headless::toggle_button::ToggleButtonProps
@@ -3837,7 +3826,6 @@ pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::disabled(sel
 pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::is_focused(&self, &gpui::window::Window) -> bool
 pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::on_toggle<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(bool, core::option::Option<&gpui::interactive::ClickEvent>, &mut gpui::window::Window, &mut gpui::app::App)
-pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::raw_hover(self, bool) -> Self
 pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::selected(self, bool) -> Self
 pub fn yororen_ui_core::headless::toggle_button::ToggleButtonProps::variant(self, yororen_ui_core::renderer::ActionVariantKind) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::toggle_button::ToggleButtonProps

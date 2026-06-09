@@ -1,19 +1,22 @@
 //! yororen-ui Layers Demo
 //!
-//! Three side-by-side panels showing the v0.3 three-layer
-//! architecture in action:
+//! Four panels demonstrating the v0.3 three-layer
+//! architecture: **headless** (a11y + state), **default
+//! renderer** (theme-driven visuals), and **caller custom**
+//! (caller-supplied visuals).
 //!
-//! 1. **Headless only** — every visual decision is the
-//!    caller's; the `headless::button` returns a `ButtonProps`
-//!    that the caller composes with a raw `div()`.
-//! 2. **Headless + default-renderer** — same `headless::button`,
-//!    but `.default_render(cx)` reads the registered
+//! 1. **Headless only** — `headless::button` returns a
+//!    `ButtonProps`; the caller paints a raw `div()`. The
+//!    button is just a focus + click handler.
+//! 2. **Headless + default-renderer** — same factory, but
+//!    `.default_render(cx)` reads the registered
 //!    `TokenButtonRenderer` and applies the default look.
-//! 3. **Headless + custom caller styles** — same
-//!    `headless::button` but the caller wires its own
-//!    `div().bg(...).rounded(...)` etc., demonstrating
-//!    that headless doesn't lock the caller into the
-//!    default renderer's look.
+//! 3. **Headless + caller custom** — same factory, no
+//!    `default_render`; the caller owns bg / border / padding /
+//!    radius / hover / active, bypassing the renderer entirely.
+//! 4. **Default renderer also covers inputs** — same idea as
+//!    panel 2, but for `headless::text_input`. Proves the
+//!    headless / renderer split is not button-specific.
 //!
 //! The `MiniButtonRenderer` is **not** installed in this
 //! demo. It lives in `mini_renderer_demo` and shows how a
@@ -98,8 +101,10 @@ const DEMO_THEME_JSON: &str = r##"{
   },
   "tokens": {
     "control": {
-      "button":          { "min_height": 36, "icon_button_min_size": 32, "horizontal_padding": 16, "vertical_padding": 8,  "icon_gap": 8, "radius": 6 }
-    }
+      "input":             { "min_height": 36, "horizontal_padding": 12, "vertical_padding": 8 },
+      "button":            { "min_height": 36, "icon_button_min_size": 32, "horizontal_padding": 16, "vertical_padding": 8,  "icon_gap": 8, "radius": 6 }
+    },
+    "radii":  { "md": 6 }
   }
 }"##;
 
@@ -107,6 +112,13 @@ fn main() {
     let app = Application::new().with_assets(UiAsset);
 
     app.run(|cx: &mut App| {
+        // Bind the text-input keymap once at startup. The
+        // renderer wires the actions (Backspace, Delete, Left,
+        // Right, Enter, etc.); this call only registers the
+        // keymap against the "UITextInput" key context
+        // (idempotent — see `headless::text_input::init`).
+        yororen_ui::headless::text_input::init(cx);
+
         // Demo-local theme: black/white/grey, with action
         // palette hover deltas of ~10% lightness so the
         // interactive states are visually obvious. The

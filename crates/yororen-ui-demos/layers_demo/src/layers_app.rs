@@ -32,16 +32,13 @@ impl LayersApp {
 
 impl Render for LayersApp {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        // Column 1: pure headless — caller draws a black
-        // square. The button's `.apply(div())` is just
-        // plumbing for focus + click; the visible
-        // hover/active feedback is `apply`'s built-in
-        // opacity dip (light → 0.9 on hover, → 0.85 on
-        // press), so even a bare caller `div()` shows
-        // *some* interaction. Caller sets `text_color`
-        // explicitly — without it, the text inherits the
-        // gpui default (black) and disappears against a
-        // black bg.
+        // Column 1: pure headless — caller writes every pixel.
+        // `apply` is purely a11y: focus + click. There is no
+        // built-in hover / active feedback. The only
+        // interactive signal is the cursor (we set it to
+        // PointingHand explicitly so it's visible). To get
+        // hover feedback, the caller must add their own
+        // `.hover(...).active(...)` — see panel 3.
         let headless_btn = button("headless-only", &mut **cx)
             .on_click(|_, _, _| {})
             .apply(
@@ -50,6 +47,7 @@ impl Render for LayersApp {
                     .text_color(gpui::hsla(0.0, 0.0, 1.0, 1.0))
                     .p_2()
                     .rounded(px(4.))
+                    .cursor(gpui::CursorStyle::PointingHand)
                     .child("click me"),
             );
 
@@ -66,14 +64,11 @@ impl Render for LayersApp {
         // Column 3: headless + caller fully custom. The
         // caller paints its own background, border, padding
         // and radius — and owns the hover/active styling too
-        // (so it can pick a visibly-different transition;
-        // the apply's built-in opacity dip is too subtle on
-        // a white surface). `.raw_hover(false)` disables
-        // `apply`'s default feedback; the caller chains
-        // `.hover() / .active()` after `apply(el)`.
+        // (panel 1 has none; this panel wires both). The
+        // caller's hover/active overrides go *after* the
+        // `apply(el)` call so they take precedence.
         let custom_btn = button("custom", &mut **cx)
             .variant(ActionVariantKind::Danger)
-            .raw_hover(false)
             .apply(
                 div()
                     .bg(gpui::hsla(0.0, 0.0, 1.0, 1.0))
@@ -83,6 +78,7 @@ impl Render for LayersApp {
                     .py(px(8.))
                     .rounded(px(8.))
                     .text_color(gpui::hsla(0.0, 0.0, 0.05, 1.0))
+                    .cursor(gpui::CursorStyle::PointingHand)
                     .child("Click me"),
             )
             .hover(|s| {
@@ -104,8 +100,8 @@ impl Render for LayersApp {
             .p(px(24.))
             .overflow_y_scroll()
             .child(panel_body(
-                "1. Headless only",
-                "Caller writes every visual: bg, padding, radius, text. The button is just a focus + click handler.",
+                "1. Headless only (no built-in feedback)",
+                "`headless::button` only wires a11y: focus + click. The button does **not** visually respond to hover or press — try hovering, nothing changes (only the cursor becomes a pointer). Visual feedback is the caller's responsibility; see panel 3 for the caller-painted version.",
                 div()
                     .flex()
                     .flex_col()
@@ -126,8 +122,8 @@ impl Render for LayersApp {
                 cx,
             ))
             .child(panel_body(
-                "3. + Caller custom",
-                "headless::button + caller-owned div: bg, border, padding, radius all written by the user. The renderer is bypassed; headless only wires a11y + click.",
+                "3. + Caller custom (caller paints hover/active)",
+                "Same headless factory as panel 1, but the caller paints the hover/active state explicitly with `.hover().active()`. The interactive feedback you see (bg lightens on hover, deepens on press) is 100% caller-supplied — the headless layer contributes nothing visual.",
                 div()
                     .flex()
                     .flex_col()
@@ -143,8 +139,8 @@ impl Render for LayersApp {
                 // label/div wiring.
                 let inputs = text_input_strip(window, cx);
                 panel_body(
-                    "4. Inputs (hover border)",
-                    "TextInput: border defaults to `border.default`, hover → `border.muted`, press → `border.default` (deeper). Hover to see.",
+                    "4. Default renderer also covers inputs",
+                    "Panels 1–3 prove the headless / renderer split for `button`. This panel proves it works the same for `text_input`: the headless factory is the same one inputs_demo uses, and `.default_render(cx, window)` reads `TokenTextInputRenderer` for bg / border / padding / focus styling. Hover to see `border.default` → `border.muted`, click to focus (border deepens to `border.focus`).",
                     inputs,
                     cx,
                 )

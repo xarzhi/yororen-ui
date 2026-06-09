@@ -1,5 +1,9 @@
 //! Headless `icon_button` — focusable clickable element with no
 //! bundled visual.
+//!
+//! `apply` is purely a11y: focus handle + click handler. The
+//! caller (or the renderer via `default_render`) owns every
+//! visual concern, including hover / active feedback.
 
 use std::sync::Arc;
 
@@ -18,11 +22,6 @@ pub struct IconButtonProps {
     pub on_click: Option<ClickCallback>,
     pub disabled: bool,
     pub variant: crate::renderer::ActionVariantKind,
-    /// When `true` (the default), `apply` adds a built-in
-    /// opacity hover/active feedback. See
-    /// `headless::button::ButtonProps::raw_hover` for the
-    /// rationale; same pattern.
-    pub raw_hover: bool,
 }
 
 pub fn icon_button(id: impl Into<ElementId>, cx: &mut App) -> IconButtonProps {
@@ -32,7 +31,6 @@ pub fn icon_button(id: impl Into<ElementId>, cx: &mut App) -> IconButtonProps {
         on_click: None,
         disabled: false,
         variant: crate::renderer::ActionVariantKind::default(),
-        raw_hover: true,
     }
 }
 
@@ -58,23 +56,16 @@ impl IconButtonProps {
         self.variant = v;
         self
     }
-    pub fn raw_hover(mut self, raw: bool) -> Self {
-        self.raw_hover = raw;
-        self
-    }
 
+    /// Wire the headless contract onto the caller's `el`.
+    ///
+    /// Purely a11y: id, focus, click. No visual feedback
+    /// injected — caller / renderer owns hover / active.
     pub fn apply(self, el: Div) -> Stateful<Div> {
         let focus_handle = self.focus_handle.clone();
         let on_click = self.on_click.clone();
         let disabled = self.disabled;
-        let raw_hover = self.raw_hover;
         let s = el.id(self.id.clone()).track_focus(&focus_handle);
-        let s = if raw_hover && !disabled {
-            s.hover(|mut style| { style.opacity = Some(0.9); style })
-                .active(|mut style| { style.opacity = Some(0.85); style })
-        } else {
-            s
-        };
         if !disabled && let Some(f) = on_click {
             s.on_click(move |ev, window, cx| f(ev, window, cx))
         } else {

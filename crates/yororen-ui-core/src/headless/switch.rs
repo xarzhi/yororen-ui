@@ -1,5 +1,9 @@
 //! Headless `switch` — checked / disabled state + on_toggle, no
 //! visual.
+//!
+//! `apply` is purely a11y: focus + click. The caller (or the
+//! renderer via `default_render`) owns every visual concern,
+//! including hover / active feedback.
 
 use std::sync::Arc;
 
@@ -28,8 +32,6 @@ pub struct SwitchProps {
     /// color. `None` → renderer falls back to
     /// `action.primary.bg`.
     pub custom_tone: Option<gpui::Hsla>,
-    /// See `headless::button::ButtonProps::raw_hover`.
-    pub raw_hover: bool,
 }
 
 pub fn switch(id: impl Into<ElementId>, cx: &mut App) -> SwitchProps {
@@ -41,7 +43,6 @@ pub fn switch(id: impl Into<ElementId>, cx: &mut App) -> SwitchProps {
         on_toggle: None,
         has_custom_tone: false,
         custom_tone: None,
-        raw_hover: true,
     }
 }
 
@@ -76,18 +77,14 @@ impl SwitchProps {
         self.on_toggle = Some(Arc::new(f));
         self
     }
-    pub fn raw_hover(mut self, raw: bool) -> Self {
-        self.raw_hover = raw;
-        self
-    }
 
+    /// Wire the headless contract onto the caller's `el`.
+    ///
+    /// Purely a11y: id, focus, click (which fires
+    /// `on_toggle(!checked, ...)`). No visual feedback
+    /// injected — caller / renderer owns hover / active.
     pub fn apply(self, el: Div) -> Stateful<Div> {
         let mut s = el.id(self.id.clone()).track_focus(&self.focus_handle);
-        if self.raw_hover && !self.disabled {
-            s = s
-                .hover(|mut style| { style.opacity = Some(0.9); style })
-                .active(|mut style| { style.opacity = Some(0.85); style });
-        }
         if !self.disabled
             && let Some(f) = self.on_toggle.clone()
         {

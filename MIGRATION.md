@@ -188,7 +188,6 @@ Apps that want full visual control can still use the
 
 ```rust
 use yororen_ui::headless::button;
-use yororen_ui::core::headless::button::ButtonProps;
 
 button("save", cx)
     .on_click(|_, _, _| { /* ... */ })
@@ -196,7 +195,12 @@ button("save", cx)
     .child("Save")
 ```
 
-This path is unchanged from v0.2.
+`apply` is purely a11y — it wires focus + click and nothing
+else. The caller owns every visual concern, including
+hover / active styling. To get an opacity dip on hover,
+chain `.hover(|s| s.opacity(0.9))` etc. after `apply`; the
+`.raw_hover(...)` knob from v0.3.0 has been removed because
+the headless core no longer injects any visual feedback.
 
 ---
 

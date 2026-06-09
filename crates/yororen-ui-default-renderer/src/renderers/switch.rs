@@ -152,8 +152,7 @@ impl DefaultSwitch for SwitchProps {
         el = el.child(div().bg(knob).size(knob_size).rounded(pill_radius));
         let track_hover = r.track_hover_bg(&state, theme);
         let track_active = r.track_active_bg(&state, theme);
-        self.raw_hover(false)
-            .apply(el)
+        self.apply(el)
             .hover(|s| s.bg(track_hover))
             .active(|s| s.bg(track_active))
     }
