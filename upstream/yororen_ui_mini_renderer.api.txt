@@ -1,3 +1,0 @@
-pub mod yororen_ui_mini_renderer
-pub fn yororen_ui_mini_renderer::install(&mut gpui::app::App)
-pub fn yororen_ui_mini_renderer::install_with_default_theme(&mut gpui::app::App)

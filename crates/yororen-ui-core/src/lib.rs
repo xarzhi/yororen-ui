@@ -22,9 +22,8 @@
 //! - [`rtl`] — `TextDirection` plumbing shared with `i18n`.
 //!
 //! Anything visual (palette, geometry tokens, renderer traits) lives
-//! in `yororen-ui-default-renderer` / `yororen-ui-mini-renderer`.
-//! Anything that *picks a concrete palette* lives in a JSON
-//! theme file (`themes/*.json`).
+//! in `yororen-ui-default-renderer`. Anything that *picks a
+//! concrete palette* lives in a JSON theme file (`themes/*.json`).
 
 // The 50+ headless modules each have their own doc comments
 // at the module level. The `XxxRenderState` struct fields and

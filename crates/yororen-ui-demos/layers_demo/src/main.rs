@@ -18,12 +18,6 @@
 //!    panel 2, but for `headless::text_input`. Proves the
 //!    headless / renderer split is not button-specific.
 //!
-//! The `MiniButtonRenderer` is **not** installed in this
-//! demo. It lives in `mini_renderer_demo` and shows how a
-//! third-party renderer can override the default by
-//! re-registering against the same `markers::Button` key
-//! (the v0.3 mechanism for "swap a default look").
-//!
 //! ## Theme
 //!
 //! The demo loads a *demo-local* black/white/grey theme via

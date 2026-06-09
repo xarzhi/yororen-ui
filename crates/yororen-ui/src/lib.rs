@@ -32,9 +32,6 @@ pub use yororen_ui_default_renderer::renderers::spec::{
     BorderSpec, Edges, IconPosition, ShadowSpec,
 };
 
-#[cfg(feature = "mini")]
-pub use yororen_ui_mini_renderer as mini_renderer;
-
 pub use yororen_ui_locale_ar as locale_ar;
 pub use yororen_ui_locale_en as locale_en;
 pub use yororen_ui_locale_zh_cn as locale_zh_cn;

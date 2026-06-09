@@ -10,7 +10,6 @@ repository.workspace = true
 [dependencies]
 yororen-ui-core = { package = "yororen_ui_core", path = "../yororen-ui-core", version = "0.3" }
 yororen-ui-default-renderer = { package = "yororen_ui_default_renderer", path = "../yororen-ui-default-renderer", version = "0.3" }
-yororen-ui-mini-renderer = { package = "yororen_ui_mini_renderer", path = "../yororen-ui-mini-renderer", version = "0.3", optional = true }
 yororen-ui-locale-en = { package = "yororen_ui_locale_en", path = "../yororen-ui-locale-en", version = "0.3" }
 yororen-ui-locale-zh-cn = { package = "yororen_ui_locale_zh_cn", path = "../yororen-ui-locale-zh-CN", version = "0.3" }
 yororen-ui-locale-ar = { package = "yororen_ui_locale_ar", path = "../yororen-ui-locale-ar", version = "0.3" }
@@ -18,4 +17,3 @@ gpui = { package = "gpui-ce", version = "0.3" }
 
 [features]
 default = []
-mini = ["dep:yororen-ui-mini-renderer"]

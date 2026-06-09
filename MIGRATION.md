@@ -23,8 +23,6 @@ crates register themselves against the new core
 | `yororen-ui-theme-catppuccin` (Rust crate) | `themes/catppuccin-*.json` (your own file) |
 | `yororen-ui-theme-material` (Rust crate) | `themes/material-*.json` (your own file) |
 | `yororen-ui-theme-mini` (Rust crate) | (no theme file — mini only needs 2 colors) |
-| `yororen-ui-renderer` | `yororen-ui-default-renderer` (renamed) |
-| — | `yororen-ui-mini-renderer` (new, opt-in) |
 
 The 4 theme-* crates are deleted. The default-renderer ships
 two JSON files (`system-light.json` / `system-dark.json`)
@@ -93,7 +91,7 @@ let theme_json = serde_json::json!({
         "primary": { "bg": "#3b82f6", "fg": "#ffffff" }
     },
     "tokens": { "control": { "button": { "min_height": 36 } } },
-    "themeColor": "#3b82f6"   // mini-renderer reads this
+    "themeColor": "#3b82f6"   // example primary color
 });
 let theme = Theme::from_value(theme_json);
 renderer::install_with(cx, theme);
@@ -135,32 +133,7 @@ use the `cx.renderer_arc` API.
 
 ---
 
-## 5. Optional: mini renderer
-
-If you want the smallest possible skin — 2 colors + hardcoded
-geometry — opt into the mini renderer:
-
-```toml
-[dependencies]
-yororen-ui = { version = "0.3", features = ["mini"] }
-```
-
-```rust
-// After the default install, layer mini on top.
-yororen_ui::renderer::install(cx, appearance);
-yororen_ui::mini_renderer::install(cx);
-```
-
-The mini renderer overrides the 4 components it cares about
-(`Button`, `IconButton`, `ToggleButton`, `Label`); every
-other component continues to come from the default
-renderer. Themes are still JSON — `themes/mini-default.json`
-ships in the mini renderer and is loaded via
-`mini_renderer::install_with_default_theme(cx)`.
-
----
-
-## 6. Removed: `yororen-ui-theme-system` etc.
+## 5. Removed: `yororen-ui-theme-system` etc.
 
 The 4 separate theme crates are gone. The default system
 theme is now `themes/system-light.json` /
@@ -176,7 +149,7 @@ yororen_ui::renderer::install_with(cx, theme);
 
 ---
 
-## 7. Headless API is unchanged
+## 6. Headless API is unchanged
 
 `headless::button("id", cx).on_click(...).default_render(cx)`
 still works — `default_render` is provided by the
@@ -204,11 +177,10 @@ the headless core no longer injects any visual feedback.
 
 ---
 
-## 8. Summary checklist
+## 7. Summary checklist
 
 - [ ] Bump `yororen-ui` to `0.3` in your `Cargo.toml`
 - [ ] Drop the `yororen-ui-theme-*` deps
 - [ ] Replace `theme_system::install(cx, ...)` with `yororen_ui::renderer::install(cx, ...)`
 - [ ] Move custom theme Rust code into a JSON file under `themes/`
 - [ ] If you wrote a custom renderer trait, register it via `cx.register_renderer_arc::<markers::X, dyn XxxRenderer>(...)`
-- [ ] (Optional) Opt into the mini renderer with the `mini` feature for a 2-color skin
