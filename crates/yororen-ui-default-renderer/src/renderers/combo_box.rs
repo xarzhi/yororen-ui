@@ -5,30 +5,9 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
-use crate::renderers::spec::Edges;
+pub use yororen_ui_core::renderer::combo_box::{ComboBoxRenderState, ComboBoxRenderer};
+use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct ComboBoxRenderState {
-    pub open: bool,
-    pub disabled: bool,
-    pub has_value: bool,
-    pub custom_bg: Option<Hsla>,
-    pub custom_border: Option<Hsla>,
-    pub custom_focus_border: Option<Hsla>,
-    pub custom_fg: Option<Hsla>,
-}
-
-pub trait ComboBoxRenderer: Any + Send + Sync {
-    fn bg(&self, state: &ComboBoxRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &ComboBoxRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &ComboBoxRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &ComboBoxRenderState, theme: &Theme) -> Hsla;
-    fn search_bg(&self, state: &ComboBoxRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &ComboBoxRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &ComboBoxRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &ComboBoxRenderState, theme: &Theme) -> Pixels;
-}
 
 pub struct TokenComboBoxRenderer;
 

@@ -32,8 +32,6 @@
 use gpui::{Context, IntoElement, ParentElement, Render, Styled, Window, div};
 use yororen_ui::headless::button::button;
 use yororen_ui::headless::label::label;
-use yororen_ui::renderer::DefaultButton;
-use yororen_ui::renderer::DefaultLabel;
 
 use crate::state::CounterState;
 
@@ -62,13 +60,13 @@ impl Render for CounterApp {
             .child(
                 label("subtitle", "Counter Demo", cx)
                     .strong(true)
-                    .default_render(cx)
+                    .render(cx)
                     .text_size(gpui::px(28.))
                     .into_any_element(),
             )
             .child(
                 label("count", count.to_string(), cx)
-                    .default_render(cx)
+                    .render(cx)
                     .text_size(gpui::px(20.))
                     .into_any_element(),
             )
@@ -84,7 +82,7 @@ impl Render for CounterApp {
                                     cx.notify();
                                 });
                             })
-                            .default_render(cx)
+                            .render(cx)
                             .child("-"),
                     )
                     .child(
@@ -95,7 +93,7 @@ impl Render for CounterApp {
                                     cx.notify();
                                 });
                             })
-                            .default_render(cx)
+                            .render(cx)
                             .child("Reset"),
                     )
                     .child(
@@ -106,7 +104,7 @@ impl Render for CounterApp {
                                     cx.notify();
                                 });
                             })
-                            .default_render(cx)
+                            .render(cx)
                             .child("+"),
                     ),
             )

@@ -5,19 +5,9 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
-use crate::renderers::spec::Edges;
+pub use yororen_ui_core::renderer::notification::{NotificationRenderState, NotificationRenderer};
+use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct NotificationRenderState {}
-
-pub trait NotificationRenderer: Any + Send + Sync {
-    fn bg(&self, state: &NotificationRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &NotificationRenderState, theme: &Theme) -> Hsla;
-    fn padding(&self, state: &NotificationRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &NotificationRenderState, theme: &Theme) -> Pixels;
-    fn shadow_alpha(&self, state: &NotificationRenderState, theme: &Theme) -> f32;
-}
 
 pub struct TokenNotificationRenderer;
 

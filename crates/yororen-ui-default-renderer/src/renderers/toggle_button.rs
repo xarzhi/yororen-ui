@@ -5,38 +5,12 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
-use crate::renderers::button::ActionVariantKind;
+use yororen_ui_core::renderer::variant::ActionVariantKind;
 use yororen_ui_core::theme::Theme;
 
-use super::variant::{VariantState, VariantStyle};
+use yororen_ui_core::renderer::variant::{VariantState, VariantStyle};
 
-#[derive(Clone, Debug, Default)]
-pub struct ToggleButtonRenderState {
-    pub variant: ActionVariantKind,
-    pub selected: bool,
-    pub disabled: bool,
-    /// Pre-resolved custom variant from the global `VariantRegistry`.
-    /// When `Some`, the renderer uses it for the *unselected* colors
-    /// (the selected appearance still maps to the action.primary slot
-    /// so toggle semantics stay intact). Disabled colors are
-    /// automatically handled by the variant's own `disabled` branch.
-    pub custom_style: Option<Arc<dyn VariantStyle>>,
-}
-
-pub trait ToggleButtonRenderer: Any + Send + Sync {
-    fn bg(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Hsla;
-    /// Background while the cursor is over the toggle. The
-    /// renderer reads from the same `action.<variant>`
-    /// palette as `bg`, but via `hover_bg`.
-    fn hover_bg(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Hsla;
-    /// Background while the toggle is being pressed. Read
-    /// from `action.<variant>.active_bg`.
-    fn active_bg(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Pixels;
-    fn disabled_opacity(&self, state: &ToggleButtonRenderState, theme: &Theme) -> f32;
-}
+pub use yororen_ui_core::renderer::toggle_button::{ToggleButtonRenderState, ToggleButtonRenderer};
 
 pub struct TokenToggleButtonRenderer;
 
@@ -143,11 +117,11 @@ use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
 pub trait DefaultToggleButton: Sized {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div>;
+    fn render(self, cx: &App) -> Stateful<gpui::Div>;
 }
 
 impl DefaultToggleButton for ToggleButtonProps {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div> {
+    fn render(self, cx: &App) -> Stateful<gpui::Div> {
         let theme = cx.theme();
         let r: &Arc<dyn ToggleButtonRenderer> = cx
             .renderer_arc::<markers::ToggleButton, dyn ToggleButtonRenderer>()

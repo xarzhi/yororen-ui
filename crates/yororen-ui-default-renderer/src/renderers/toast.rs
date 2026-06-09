@@ -5,23 +5,9 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
-use crate::renderers::spec::Edges;
+use yororen_ui_core::renderer::spec::Edges;
+pub use yororen_ui_core::renderer::toast::{ToastRenderState, ToastRenderer};
 use yororen_ui_core::theme::Theme;
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct ToastRenderState {
-    /// `true` if the toast has a custom override color.
-    pub has_custom_color: bool,
-}
-
-pub trait ToastRenderer: Any + Send + Sync {
-    fn bg(&self, state: &ToastRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &ToastRenderState, theme: &Theme) -> Hsla;
-    fn padding(&self, state: &ToastRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &ToastRenderState, theme: &Theme) -> Pixels;
-    fn border(&self, state: &ToastRenderState, theme: &Theme) -> Hsla;
-    fn shadow_alpha(&self, state: &ToastRenderState, theme: &Theme) -> f32;
-}
 
 pub struct TokenToastRenderer;
 

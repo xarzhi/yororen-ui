@@ -5,18 +5,8 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
+pub use yororen_ui_core::renderer::focus_ring::{FocusRingRenderState, FocusRingRenderer};
 use yororen_ui_core::theme::Theme;
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct FocusRingRenderState {
-    /// `true` if the user supplied `.color(...)`.
-    pub has_custom_color: bool,
-}
-
-pub trait FocusRingRenderer: Any + Send + Sync {
-    fn color(&self, state: &FocusRingRenderState, theme: &Theme) -> Hsla;
-    fn width(&self, state: &FocusRingRenderState, theme: &Theme) -> Pixels;
-}
 
 pub struct TokenFocusRingRenderer;
 

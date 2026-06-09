@@ -26,8 +26,6 @@ use yororen_ui::headless::button::button;
 use yororen_ui::headless::label::label;
 use yororen_ui::theme as theme_mod;
 use yororen_ui::theme::ActiveTheme;
-use yororen_ui_default_renderer::DefaultButton;
-use yororen_ui_default_renderer::DefaultLabel;
 
 pub struct ThemeApp {
     themes: Vec<(&'static str, &'static str)>,
@@ -138,7 +136,7 @@ impl Render for ThemeApp {
                     cx.notify();
                 });
             })
-            .default_render(cx)
+            .render(cx)
             .child(format!("Next theme → ({}/{})", current + 1, total));
 
         div()
@@ -154,11 +152,9 @@ impl Render for ThemeApp {
                     format!("Theme showcase ({}/{})", current + 1, total),
                     cx,
                 )
-                .default_render(cx),
+                .render(cx),
             )
-            .child(
-                label("blurb", format!("Currently: {} — {}", name, blurb), cx).default_render(cx),
-            )
+            .child(label("blurb", format!("Currently: {} — {}", name, blurb), cx).render(cx))
             .child(next_btn)
     }
 }

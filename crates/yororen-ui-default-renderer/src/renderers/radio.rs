@@ -7,29 +7,7 @@ use gpui::{Hsla, Pixels};
 
 use yororen_ui_core::theme::Theme;
 
-#[derive(Clone, Copy, Debug, Default)]
-pub struct RadioRenderState {
-    pub checked: bool,
-    pub disabled: bool,
-    /// `true` if the caller supplied `.custom_tone(...)`.
-    pub has_custom_tone: bool,
-    /// Caller-supplied override for the checked-state dot /
-    /// ring color. When `None`, the renderer falls back to
-    /// `action.primary.bg`.
-    pub custom_tone: Option<Hsla>,
-}
-
-pub trait RadioRenderer: Any + Send + Sync {
-    fn ring_size(&self, state: &RadioRenderState, theme: &Theme) -> Pixels;
-    fn dot_size(&self, state: &RadioRenderState, theme: &Theme) -> Pixels;
-    fn ring_bg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
-    fn ring_border(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
-    fn ring_hover_bg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
-    fn ring_active_bg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
-    fn dot_fg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
-    fn focus_color(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
-    fn disabled_opacity(&self, state: &RadioRenderState, theme: &Theme) -> f32;
-}
+pub use yororen_ui_core::renderer::radio::{RadioRenderState, RadioRenderer};
 
 pub struct TokenRadioRenderer;
 
@@ -103,11 +81,11 @@ use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
 pub trait DefaultRadio: Sized {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div>;
+    fn render(self, cx: &App) -> Stateful<gpui::Div>;
 }
 
 impl DefaultRadio for RadioProps {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div> {
+    fn render(self, cx: &App) -> Stateful<gpui::Div> {
         let theme = cx.theme();
         let r: &Arc<dyn RadioRenderer> = cx
             .renderer_arc::<markers::Radio, dyn RadioRenderer>()

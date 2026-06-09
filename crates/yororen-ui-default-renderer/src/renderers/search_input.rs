@@ -20,33 +20,9 @@ use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 use crate::renderers::icon::DefaultIcon;
-use crate::renderers::spec::Edges;
 use crate::renderers::text_input::{TextInputElement, start_cursor_blink, wire_input_keyboard};
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct SearchInputRenderState {
-    pub disabled: bool,
-    pub focused: bool,
-    pub custom_bg: Option<Hsla>,
-    pub custom_border: Option<Hsla>,
-    pub custom_focus_border: Option<Hsla>,
-    pub custom_fg: Option<Hsla>,
-}
-
-pub trait SearchInputRenderer: Any + Send + Sync {
-    fn bg(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn hover_border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn active_border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn icon_color(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &SearchInputRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &SearchInputRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &SearchInputRenderState, theme: &Theme) -> Pixels;
-    fn input_gap(&self, state: &SearchInputRenderState, theme: &Theme) -> Pixels;
-    fn icon_size(&self, state: &SearchInputRenderState, theme: &Theme) -> Pixels;
-}
+pub use yororen_ui_core::renderer::search_input::{SearchInputRenderState, SearchInputRenderer};
+use yororen_ui_core::renderer::spec::Edges;
 
 pub struct TokenSearchInputRenderer;
 
@@ -107,11 +83,11 @@ pub fn arc_search_input<T: SearchInputRenderer + 'static>(r: T) -> Arc<dyn Searc
 }
 
 pub trait DefaultSearchInput: Sized {
-    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement;
+    fn render(self, cx: &mut App, window: &mut Window) -> AnyElement;
 }
 
 impl DefaultSearchInput for SearchInputProps {
-    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
+    fn render(self, cx: &mut App, window: &mut Window) -> AnyElement {
         let theme_arc = cx.theme().clone();
         let r: Arc<dyn SearchInputRenderer> = cx
             .renderer_arc::<markers::SearchInput, dyn SearchInputRenderer>()
@@ -248,7 +224,7 @@ impl DefaultSearchInput for SearchInputProps {
                 )
                 .size(icon_size)
                 .color(text_color)
-                .default_render(&mut *cx, window),
+                .render(&mut *cx, window),
             )
             .child(div().flex_1().min_w(px(0.)).child(inner))
             .when(!state_for_clear.read(cx).value.is_empty(), |d| {
@@ -290,7 +266,7 @@ impl DefaultSearchInput for SearchInputProps {
                             )
                             .size(icon_size)
                             .color(icon_color)
-                            .default_render(&mut *cx, window),
+                            .render(&mut *cx, window),
                         ),
                 )
             });

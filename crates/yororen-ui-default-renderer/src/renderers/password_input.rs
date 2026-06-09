@@ -18,33 +18,11 @@ use yororen_ui_core::headless::text_input::TextInputState;
 use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
-use crate::renderers::spec::Edges;
 use crate::renderers::text_input::{TextInputElement, start_cursor_blink, wire_input_keyboard};
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct PasswordInputRenderState {
-    pub disabled: bool,
-    pub focused: bool,
-    pub has_custom_bg: bool,
-    pub has_custom_border: bool,
-    pub has_custom_focus_border: bool,
-    pub custom_bg: Option<Hsla>,
-    pub custom_border: Option<Hsla>,
-    pub custom_focus_border: Option<Hsla>,
-    pub custom_fg: Option<Hsla>,
-}
-
-pub trait PasswordInputRenderer: Any + Send + Sync {
-    fn bg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
-    fn hover_border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
-    fn active_border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &PasswordInputRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &PasswordInputRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &PasswordInputRenderState, theme: &Theme) -> Pixels;
-}
+pub use yororen_ui_core::renderer::password_input::{
+    PasswordInputRenderState, PasswordInputRenderer,
+};
+use yororen_ui_core::renderer::spec::Edges;
 
 pub struct TokenPasswordInputRenderer;
 
@@ -122,11 +100,11 @@ pub fn arc_password_input<T: PasswordInputRenderer + 'static>(
 }
 
 pub trait DefaultPasswordInput: Sized {
-    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement;
+    fn render(self, cx: &mut App, window: &mut Window) -> AnyElement;
 }
 
 impl DefaultPasswordInput for PasswordInputProps {
-    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
+    fn render(self, cx: &mut App, window: &mut Window) -> AnyElement {
         let theme_arc = cx.theme().clone();
         let r: Arc<dyn PasswordInputRenderer> = cx
             .renderer_arc::<markers::PasswordInput, dyn PasswordInputRenderer>()

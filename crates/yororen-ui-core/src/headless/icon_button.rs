@@ -9,8 +9,13 @@ use std::sync::Arc;
 
 use gpui::{
     App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Window,
+    StatefulInteractiveElement, Styled, Window, div,
 };
+
+use crate::renderer::RendererContext;
+use crate::renderer::icon_button::{IconButtonRenderState, IconButtonRenderer};
+use crate::renderer::markers::IconButton as IconButtonMarker;
+use crate::theme::ActiveTheme;
 
 /// Click handler shared by every interactive headless primitive.
 pub type ClickCallback = Arc<dyn Fn(&ClickEvent, &mut Window, &mut App) + Send + Sync>;
@@ -71,5 +76,40 @@ impl IconButtonProps {
         } else {
             s
         }
+    }
+
+    /// Render the icon button using the registered `IconButtonRenderer`.
+    pub fn render(self, cx: &App) -> Stateful<Div> {
+        let theme = cx.theme();
+        let r: &Arc<dyn IconButtonRenderer> = cx
+            .renderer_arc::<IconButtonMarker, dyn IconButtonRenderer>()
+            .expect("IconButtonRenderer registered");
+        let state = IconButtonRenderState {
+            variant: self.variant,
+            disabled: self.disabled,
+            has_custom_bg: false,
+            has_custom_hover_bg: false,
+            custom_style: None,
+        };
+        let bg = r.bg(&state, theme);
+        let radius = r.border_radius(&state, theme);
+        let opacity = if self.disabled {
+            r.disabled_opacity(&state, theme)
+        } else {
+            1.0
+        };
+        let el = div()
+            .bg(bg)
+            .rounded(radius)
+            .size(gpui::px(36.))
+            .opacity(opacity)
+            .flex()
+            .items_center()
+            .justify_center();
+        let hover_bg = r.hover_bg(&state, theme);
+        let active_bg = r.active_bg(&state, theme);
+        self.apply(el)
+            .hover(|s| s.bg(hover_bg))
+            .active(|s| s.bg(active_bg))
     }
 }

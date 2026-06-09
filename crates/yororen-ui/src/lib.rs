@@ -11,6 +11,7 @@
 //! theme package is needed. See `yororen_ui_default_renderer::themes`
 //! for the bundled `system_light`, `system_dark`, etc. loaders.
 
+pub use yororen_ui_core::renderer::spec::{BorderSpec, Edges, IconPosition, ShadowSpec};
 pub use yororen_ui_core::renderer::{
     BuiltinVariantKey, ButtonVariant, GlobalVariantRegistry, RendererContext, RendererMarker,
     RendererRegistry, TokenVariantStyle, VariantKey, VariantRegistry, VariantState, VariantStyle,
@@ -28,8 +29,10 @@ pub use yororen_ui_default_renderer as renderer;
 /// (the canonical home in v0.3). Also reachable via
 /// `yororen_ui::renderer::ActionVariantKind`.
 pub use yororen_ui_default_renderer::renderers::button::ActionVariantKind;
-pub use yororen_ui_default_renderer::renderers::spec::{
-    BorderSpec, Edges, IconPosition, ShadowSpec,
+pub use yororen_ui_default_renderer::renderers::{
+    DefaultCheckbox, DefaultFilePathInput, DefaultIcon, DefaultIconButton, DefaultKeybindingInput,
+    DefaultNumberInput, DefaultPasswordInput, DefaultRadio, DefaultSearchInput, DefaultSwitch,
+    DefaultTextArea, DefaultTextInput, DefaultToggleButton,
 };
 
 #[cfg(feature = "brutalism")]

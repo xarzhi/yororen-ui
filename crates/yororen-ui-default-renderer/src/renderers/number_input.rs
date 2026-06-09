@@ -18,30 +18,9 @@ use yororen_ui_core::headless::text_input::TextInputState;
 use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
-use crate::renderers::spec::Edges;
 use crate::renderers::text_input::{TextInputElement, start_cursor_blink, wire_input_keyboard};
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct NumberInputRenderState {
-    pub disabled: bool,
-    pub focused: bool,
-    pub custom_bg: Option<Hsla>,
-    pub custom_border: Option<Hsla>,
-    pub custom_focus_border: Option<Hsla>,
-    pub custom_fg: Option<Hsla>,
-}
-
-pub trait NumberInputRenderer: Any + Send + Sync {
-    fn bg(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
-    fn hover_border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
-    fn active_border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &NumberInputRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &NumberInputRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn stepper_button_size(&self, state: &NumberInputRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &NumberInputRenderState, theme: &Theme) -> Pixels;
-}
+pub use yororen_ui_core::renderer::number_input::{NumberInputRenderState, NumberInputRenderer};
+use yororen_ui_core::renderer::spec::Edges;
 
 pub struct TokenNumberInputRenderer;
 
@@ -91,11 +70,11 @@ pub fn arc_number_input<T: NumberInputRenderer + 'static>(r: T) -> Arc<dyn Numbe
 }
 
 pub trait DefaultNumberInput: Sized {
-    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement;
+    fn render(self, cx: &mut App, window: &mut Window) -> AnyElement;
 }
 
 impl DefaultNumberInput for NumberInputProps {
-    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
+    fn render(self, cx: &mut App, window: &mut Window) -> AnyElement {
         let theme_arc = cx.theme().clone();
         let r: Arc<dyn NumberInputRenderer> = cx
             .renderer_arc::<markers::NumberInput, dyn NumberInputRenderer>()

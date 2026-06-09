@@ -30,7 +30,7 @@ fn main() {
         // `themes/brutalism-light.json`) AND registers all 38
         // `BrutalXxxRenderer` impls against the core
         // `RendererRegistry`. After this call every
-        // `headless::Xxx` factory's `.default_render(cx)` is
+        // `headless::Xxx` factory's `.render(cx)` is
         // routed through the brutalist look.
         brutalism::install_with_default_theme(cx);
         locale_en::install(cx);

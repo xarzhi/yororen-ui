@@ -5,21 +5,8 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
+pub use yororen_ui_core::renderer::skeleton::{SkeletonRenderState, SkeletonRenderer};
 use yororen_ui_core::theme::Theme;
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct SkeletonRenderState {
-    /// `true` for `SkeletonBlock`; `false` for `SkeletonLine`.
-    pub block: bool,
-    /// `true` if the block was configured with `.rounded(false)`.
-    pub block_sharp: bool,
-}
-
-pub trait SkeletonRenderer: Any + Send + Sync {
-    fn bg(&self, state: &SkeletonRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &SkeletonRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &SkeletonRenderState, theme: &Theme) -> Pixels;
-}
 
 pub struct TokenSkeletonRenderer;
 

@@ -9,7 +9,7 @@
 //!    `ButtonProps`; the caller paints a raw `div()`. The
 //!    button is just a focus + click handler.
 //! 2. **Headless + default-renderer** — same factory, but
-//!    `.default_render(cx)` reads the registered
+//!    `.render(cx)` reads the registered
 //!    `TokenButtonRenderer` and applies the default look.
 //! 3. **Headless + caller custom** — same factory, no
 //!    `default_render`; the caller owns bg / border / padding /

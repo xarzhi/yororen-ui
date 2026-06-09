@@ -24,7 +24,7 @@ use yororen_ui::Theme;
 use yororen_ui::headless::button::button;
 use yororen_ui::headless::label::label;
 use yororen_ui::markers::Button as ButtonMarker;
-use yororen_ui::renderer::{ButtonRenderState, ButtonRenderer, DefaultButton, DefaultLabel};
+use yororen_ui::renderer::{ButtonRenderState, ButtonRenderer};
 
 pub struct VariantApp;
 
@@ -63,17 +63,17 @@ impl Render for VariantApp {
         // `action.<key>.*` token path. ===
         let neutral = button("neutral-btn", cx)
             .variant(ActionVariantKind::Neutral)
-            .default_render(cx)
+            .render(cx)
             .child("Neutral");
 
         let primary = button("primary-btn", cx)
             .variant(ActionVariantKind::Primary)
-            .default_render(cx)
+            .render(cx)
             .child("Primary");
 
         let danger = button("danger-btn", cx)
             .variant(ActionVariantKind::Danger)
-            .default_render(cx)
+            .render(cx)
             .child("Danger");
 
         // === Escape hatch: same Primary tokens, but a shape
@@ -107,34 +107,34 @@ impl Render for VariantApp {
             .flex()
             .flex_col()
             .gap_3()
-            .child(label("title", "Variant showcase", cx).default_render(cx))
+            .child(label("title", "Variant showcase", cx).render(cx))
             .child(
                 label(
                     "blurb",
                     "Same headless::button, different ButtonRenderState.variant → different action.<key>.* paths from the JSON.",
                     cx,
                 )
-                .default_render(cx),
+                .render(cx),
             )
             .child(
                 div()
                     .flex()
                     .gap_2()
-                    .child(label("n", "Neutral (default_render):", cx).default_render(cx))
+                    .child(label("n", "Neutral (default_render):", cx).render(cx))
                     .child(neutral),
             )
             .child(
                 div()
                     .flex()
                     .gap_2()
-                    .child(label("p", "Primary (default_render):", cx).default_render(cx))
+                    .child(label("p", "Primary (default_render):", cx).render(cx))
                     .child(primary),
             )
             .child(
                 div()
                     .flex()
                     .gap_2()
-                    .child(label("d", "Danger (default_render):", cx).default_render(cx))
+                    .child(label("d", "Danger (default_render):", cx).render(cx))
                     .child(danger),
             )
             .child(
@@ -147,7 +147,7 @@ impl Render for VariantApp {
                             "Override (apply + custom shape):",
                             cx,
                         )
-                        .default_render(cx),
+                        .render(cx),
                     )
                     .child(pill),
             )

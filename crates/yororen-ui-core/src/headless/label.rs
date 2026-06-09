@@ -1,6 +1,13 @@
 //! Headless `label` — pure text + flag set, no visual.
 
-use gpui::{App, Div, ElementId, InteractiveElement, Stateful};
+use std::sync::Arc;
+
+use gpui::{App, Div, ElementId, InteractiveElement, ParentElement, Stateful, Styled};
+
+use crate::renderer::RendererContext;
+use crate::renderer::label::{LabelRenderState, LabelRenderer};
+use crate::renderer::markers::Label as LabelMarker;
+use crate::theme::ActiveTheme;
 
 #[derive(Clone, Debug)]
 pub struct LabelProps {
@@ -64,5 +71,51 @@ impl LabelProps {
     /// the caller via `props.text` and composed as a child of `el`.
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the label using the registered `LabelRenderer`.
+    ///
+    /// Looks up the renderer via
+    /// `cx.renderer_arc::<LabelMarker, dyn LabelRenderer>()` and
+    /// consumes all of its tokens (color / strong_weight /
+    /// family_mono) to build the `Stateful<Div>`.
+    pub fn render(self, cx: &App) -> Stateful<Div> {
+        let theme = cx.theme();
+        let r: &Arc<dyn LabelRenderer> = cx
+            .renderer_arc::<LabelMarker, dyn LabelRenderer>()
+            .expect("LabelRenderer registered");
+        let state = LabelRenderState {
+            muted: self.muted,
+            strong: self.strong,
+            mono: self.mono,
+            inherit_color: self.inherit_color,
+            ellipsis: self.ellipsis,
+            wrap: self.wrap,
+            max_lines: self.max_lines,
+        };
+        let color = r.color(&state, theme);
+        let weight = r.strong_weight(&state, theme);
+        let family = r.family_mono(&state, theme);
+        let mut el = gpui::div();
+        if !self.inherit_color {
+            el = el.text_color(color);
+        }
+        if self.strong {
+            el = el.font_weight(weight);
+        }
+        if self.mono {
+            el = el.font_family(family);
+        }
+        if self.ellipsis {
+            el = el.overflow_hidden().text_ellipsis().whitespace_nowrap();
+        }
+        if self.wrap {
+            el = el.whitespace_normal();
+        }
+        if let Some(n) = self.max_lines {
+            el = el.line_clamp(n).overflow_hidden();
+        }
+        el = el.child(self.text.clone());
+        self.apply(el)
     }
 }

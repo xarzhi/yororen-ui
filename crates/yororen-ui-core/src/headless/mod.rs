@@ -13,7 +13,7 @@
 //! div().bg(red).rounded(8).apply(button("save", cx).on_click(...)).child("Save")
 //!
 //! // Default rendered — uses the installed GlobalTheme:
-//! button("save", cx).on_click(...).default_render(cx)
+//! button("save", cx).on_click(...).render(cx)
 //! ```
 //!
 //! The `headless/` module is the **only** way to construct

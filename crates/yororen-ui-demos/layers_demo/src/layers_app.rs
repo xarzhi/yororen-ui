@@ -7,7 +7,7 @@
 //!    caller's; the `headless::button` returns a `ButtonProps`
 //!    that the caller composes with a raw `div()`.
 //! 2. **Headless + default-renderer** — same `headless::button`,
-//!    but `.default_render(cx)` reads the registered
+//!    but `.render(cx)` reads the registered
 //!    `TokenButtonRenderer` and applies the default look.
 //! 3. **Headless + caller custom (Material ripple)** — same
 //!    `headless::button` factory, but the caller paints a
@@ -24,8 +24,6 @@ use gpui::{
 use yororen_ui::ActionVariantKind;
 use yororen_ui::headless::button::button;
 use yororen_ui::headless::label::label;
-use yororen_ui::renderer::DefaultButton;
-use yororen_ui::renderer::DefaultLabel;
 
 use crate::material_button::material_button;
 
@@ -63,7 +61,7 @@ impl Render for LayersApp {
         // hover).
         let default_btn = button("default-render", cx)
             .variant(ActionVariantKind::Neutral)
-            .default_render(cx)
+            .render(cx)
             .child("Click me");
 
         // Column 3: headless + caller fully custom. The caller
@@ -100,18 +98,18 @@ impl Render for LayersApp {
                     .flex_col()
                     .gap_2()
                     .child(headless_btn)
-                    .child(label("caption", "headless caption", cx).default_render(cx)),
+                    .child(label("caption", "headless caption", cx).render(cx)),
                 cx,
             ))
             .child(panel_body(
                 "2. + Default renderer",
-                "headless::button + .default_render(cx) uses the installed TokenButtonRenderer. Padding, radius, bg all come from the JSON theme.",
+                "headless::button + .render(cx) uses the installed TokenButtonRenderer. Padding, radius, bg all come from the JSON theme.",
                 div()
                     .flex()
                     .flex_col()
                     .gap_2()
                     .child(default_btn)
-                    .child(label("caption", "default caption", cx).default_render(cx)),
+                    .child(label("caption", "default caption", cx).render(cx)),
                 cx,
             ))
             .child(panel_body(
@@ -122,7 +120,7 @@ impl Render for LayersApp {
                     .flex_col()
                     .gap_2()
                     .child(custom_btn)
-                    .child(label("caption", "material caption", cx).default_render(cx)),
+                    .child(label("caption", "material caption", cx).render(cx)),
                 cx,
             ))
             .child({
@@ -133,7 +131,7 @@ impl Render for LayersApp {
                 let inputs = text_input_strip(window, cx);
                 panel_body(
                     "4. Default renderer also covers inputs",
-                    "Panels 1–3 prove the headless / renderer split for `button`. This panel proves it works the same for `text_input`: the headless factory is the same one inputs_demo uses, and `.default_render(cx, window)` reads `TokenTextInputRenderer` for bg / border / padding / focus styling. Hover to see `border.default` → `border.muted`, click to focus (border deepens to `border.focus`).",
+                    "Panels 1–3 prove the headless / renderer split for `button`. This panel proves it works the same for `text_input`: the headless factory is the same one inputs_demo uses, and `.render(cx, window)` reads `TokenTextInputRenderer` for bg / border / padding / focus styling. Hover to see `border.default` → `border.muted`, click to focus (border deepens to `border.focus`).",
                     inputs,
                     cx,
                 )
@@ -142,12 +140,12 @@ impl Render for LayersApp {
 }
 
 fn text_input_strip(window: &mut Window, cx: &mut Context<LayersApp>) -> impl IntoElement + use<> {
+    use yororen_ui::DefaultTextInput;
     use yororen_ui::headless::text_input::text_input;
-    use yororen_ui::renderer::DefaultTextInput;
     div().flex().flex_col().gap_2().w_full().child(
         text_input("demo-text-input")
             .placeholder("Type here…")
-            .default_render(cx, window),
+            .render(cx, window),
     )
 }
 
@@ -165,11 +163,11 @@ fn panel_body(
         .flex()
         .flex_col()
         .gap_2()
-        .child(label("title", title, cx).strong(true).default_render(cx))
+        .child(label("title", title, cx).strong(true).render(cx))
         .child(
             label("blurb", blurb, cx)
                 .wrap()
-                .default_render(cx)
+                .render(cx)
                 .text_size(gpui::px(13.))
                 .w_full(),
         )

@@ -2,10 +2,10 @@
 //! `ToggleButton`, `SplitButton`.
 
 use gpui::{Hsla, Pixels, px};
+use yororen_ui_core::renderer::spec::{BorderSpec, Edges, ShadowSpec};
+use yororen_ui_core::renderer::variant::ActionVariantKind;
+use yororen_ui_core::renderer::variant::VariantState;
 use yororen_ui_core::theme::Theme;
-use yororen_ui_default_renderer::renderers::button::ActionVariantKind;
-use yororen_ui_default_renderer::renderers::spec::{BorderSpec, Edges, ShadowSpec};
-use yororen_ui_default_renderer::renderers::variant::VariantState;
 
 use crate::style::{
     BRUTAL_BORDER, BRUTAL_BORDER_WIDTH, BRUTAL_DISABLED_OPACITY, BRUTAL_RADIUS,
@@ -16,7 +16,7 @@ use crate::style::{
 // Button
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::button::{ButtonRenderState, ButtonRenderer};
+pub use yororen_ui_core::renderer::button::{ButtonRenderState, ButtonRenderer};
 
 pub struct BrutalButtonRenderer;
 
@@ -128,9 +128,7 @@ fn action_variant_key(variant: ActionVariantKind) -> &'static str {
 // IconButton
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::icon_button::{
-    IconButtonRenderState, IconButtonRenderer,
-};
+pub use yororen_ui_core::renderer::icon_button::{IconButtonRenderState, IconButtonRenderer};
 
 pub struct BrutalIconButtonRenderer;
 
@@ -194,9 +192,7 @@ impl IconButtonRenderer for BrutalIconButtonRenderer {
 // ToggleButton
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::toggle_button::{
-    ToggleButtonRenderState, ToggleButtonRenderer,
-};
+pub use yororen_ui_core::renderer::toggle_button::{ToggleButtonRenderState, ToggleButtonRenderer};
 
 pub struct BrutalToggleButtonRenderer;
 
@@ -305,9 +301,7 @@ impl ToggleButtonRenderer for BrutalToggleButtonRenderer {
 // SplitButton
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::split_button::{
-    SplitButtonRenderState, SplitButtonRenderer,
-};
+pub use yororen_ui_core::renderer::split_button::{SplitButtonRenderState, SplitButtonRenderer};
 
 pub struct BrutalSplitButtonRenderer;
 

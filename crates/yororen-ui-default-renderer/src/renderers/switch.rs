@@ -7,31 +7,7 @@ use gpui::{Hsla, Pixels};
 
 use yororen_ui_core::theme::Theme;
 
-#[derive(Clone, Copy, Debug, Default)]
-pub struct SwitchRenderState {
-    pub checked: bool,
-    pub disabled: bool,
-    /// `true` if the caller supplied `.custom_tone(...)`.
-    pub has_custom_tone: bool,
-    /// Caller-supplied override for the checked-state track
-    /// color. When `None`, the renderer falls back to
-    /// `action.primary.bg`.
-    pub custom_tone: Option<Hsla>,
-}
-
-pub trait SwitchRenderer: Any + Send + Sync {
-    fn track_w(&self, state: &SwitchRenderState, theme: &Theme) -> Pixels;
-    fn track_h(&self, state: &SwitchRenderState, theme: &Theme) -> Pixels;
-    fn knob_size(&self, state: &SwitchRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &SwitchRenderState, theme: &Theme) -> Pixels;
-    fn track_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
-    fn track_border(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
-    fn track_hover_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
-    fn track_active_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
-    fn knob_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
-    fn focus_color(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
-    fn disabled_opacity(&self, state: &SwitchRenderState, theme: &Theme) -> f32;
-}
+pub use yororen_ui_core::renderer::switch::{SwitchRenderState, SwitchRenderer};
 
 pub struct TokenSwitchRenderer;
 
@@ -136,11 +112,11 @@ use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
 pub trait DefaultSwitch: Sized {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div>;
+    fn render(self, cx: &App) -> Stateful<gpui::Div>;
 }
 
 impl DefaultSwitch for SwitchProps {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div> {
+    fn render(self, cx: &App) -> Stateful<gpui::Div> {
         let theme = cx.theme();
         let r: &Arc<dyn SwitchRenderer> = cx
             .renderer_arc::<markers::Switch, dyn SwitchRenderer>()

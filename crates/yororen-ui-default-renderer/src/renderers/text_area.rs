@@ -35,32 +35,9 @@ use yororen_ui_core::headless::text_input::{
 use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
-use crate::renderers::spec::Edges;
 use crate::renderers::text_input::start_cursor_blink;
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct TextAreaRenderState {
-    pub disabled: bool,
-    pub focused: bool,
-    pub has_custom_bg: bool,
-    pub custom_bg: Option<Hsla>,
-    pub custom_border: Option<Hsla>,
-    pub has_custom_focus_border: bool,
-    pub custom_focus_border: Option<Hsla>,
-    pub custom_text_color: Option<Hsla>,
-}
-
-pub trait TextAreaRenderer: Any + Send + Sync {
-    fn bg(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
-    fn hover_border(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
-    fn active_border(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
-    fn text_color(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &TextAreaRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &TextAreaRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &TextAreaRenderState, theme: &Theme) -> Pixels;
-}
+use yororen_ui_core::renderer::spec::Edges;
+pub use yororen_ui_core::renderer::text_area::{TextAreaRenderState, TextAreaRenderer};
 
 pub struct TokenTextAreaRenderer;
 
@@ -471,11 +448,11 @@ impl Element for TextAreaElement {
 // =====================================================================
 
 pub trait DefaultTextArea: Sized {
-    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement;
+    fn render(self, cx: &mut App, window: &mut Window) -> AnyElement;
 }
 
 impl DefaultTextArea for TextAreaProps {
-    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
+    fn render(self, cx: &mut App, window: &mut Window) -> AnyElement {
         let theme_arc = cx.theme().clone();
         let r: Arc<dyn TextAreaRenderer> = cx
             .renderer_arc::<markers::TextArea, dyn TextAreaRenderer>()

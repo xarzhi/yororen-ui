@@ -18,7 +18,7 @@ use std::sync::Arc;
 
 use gpui::{
     App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Window,
+    StatefulInteractiveElement, Styled, Window, div, px,
 };
 
 // The headless `Button` marker is the same type the
@@ -118,5 +118,119 @@ impl ButtonProps {
         } else {
             s
         }
+    }
+
+    /// Render the button using the registered `ButtonRenderer`.
+    ///
+    /// Looks up the `XxxRenderer` registered via
+    /// `cx.register_renderer_arc::<ButtonMarker, dyn ButtonRenderer>(…)`
+    /// and consumes ALL of its tokens (bg / fg / padding /
+    /// border / shadow / min_height / disabled_opacity /
+    /// hover_bg / active_bg) to build the `Stateful<Div>`.
+    ///
+    /// The renderer doesn't need to know about headless — it
+    /// just provides the data. The headless owns the
+    /// consumption.
+    pub fn render(self, cx: &App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::button::{ButtonRenderState, ButtonRenderer};
+        use crate::renderer::markers::Button as ButtonMarker;
+        use crate::theme::ActiveTheme;
+
+        let r: &Arc<dyn ButtonRenderer> = cx
+            .renderer_arc::<ButtonMarker, dyn ButtonRenderer>()
+            .expect("ButtonRenderer registered");
+        let theme = cx.theme();
+        let state = ButtonRenderState {
+            variant: self.variant,
+            disabled: self.disabled,
+            is_rtl: false,
+            has_custom_bg: false,
+            has_custom_hover_bg: false,
+            custom_style: None,
+        };
+
+        let bg = r.bg(&state, theme);
+        let fg = r.fg(&state, theme);
+        let padding = r.padding(&state, theme);
+        let radius = r.border_radius(&state, theme);
+        let min_h = r.min_height(&state, theme);
+        let opacity = if self.disabled {
+            r.disabled_opacity(&state, theme)
+        } else {
+            1.0
+        };
+        let hover_bg = r.hover_bg(&state, theme);
+        let active_bg = r.active_bg(&state, theme);
+        let border = r.border(&state, theme);
+        let shadow = r.shadow(&state, theme);
+
+        let mut el = div()
+            .bg(bg)
+            .text_color(fg)
+            .px(padding.left)
+            .py(padding.top)
+            .rounded(radius)
+            .min_h(min_h)
+            .flex()
+            .items_center()
+            .justify_center()
+            .opacity(opacity);
+
+        if let Some(b) = border {
+            // gpui-ce 0.3.3 only ships `border_1()..border_10()`
+            // helpers (no arbitrary-width API on `Styled`).
+            // `Pixels / Pixels -> f32` lets us recover the
+            // width as f32, round it, clamp to 0..=10, then
+            // dispatch to the matching `border_N` helper.
+            // (Brutalism returns 3px → `.border_3()`; the
+            // default renderer returns `None` → no border.)
+            let w = ((b.width / px(1.0)).round() as i32).clamp(0, 10);
+            match w {
+                0 => {}
+                1 => {
+                    el = el.border_1().border_color(b.color);
+                }
+                2 => {
+                    el = el.border_2().border_color(b.color);
+                }
+                3 => {
+                    el = el.border_3().border_color(b.color);
+                }
+                4 => {
+                    el = el.border_4().border_color(b.color);
+                }
+                5 => {
+                    el = el.border_5().border_color(b.color);
+                }
+                6 => {
+                    el = el.border_6().border_color(b.color);
+                }
+                7 => {
+                    el = el.border_7().border_color(b.color);
+                }
+                8 => {
+                    el = el.border_8().border_color(b.color);
+                }
+                9 => {
+                    el = el.border_9().border_color(b.color);
+                }
+                _ => {
+                    el = el.border_10().border_color(b.color);
+                }
+            }
+        }
+        if let Some(s) = shadow {
+            el = el.shadow(vec![gpui::BoxShadow {
+                color: s.color,
+                offset: gpui::point(px(0.0), s.offset_y),
+                blur_radius: s.blur,
+                spread_radius: px(0.0),
+            }]);
+        }
+
+        self.apply(el)
+            .hover(|s| s.bg(hover_bg))
+            .active(|s| s.bg(active_bg))
     }
 }

@@ -7,29 +7,7 @@ use gpui::{Hsla, Pixels};
 
 use yororen_ui_core::theme::Theme;
 
-#[derive(Clone, Copy, Debug, Default)]
-pub struct CheckboxRenderState {
-    pub checked: bool,
-    pub disabled: bool,
-    /// `true` if the caller supplied `.custom_tone(...)`.
-    pub has_custom_tone: bool,
-    /// Caller-supplied override for the checked-state fill /
-    /// border color. When `None`, the renderer falls back to
-    /// `action.primary.bg`.
-    pub custom_tone: Option<Hsla>,
-}
-
-pub trait CheckboxRenderer: Any + Send + Sync {
-    fn box_size(&self, state: &CheckboxRenderState, theme: &Theme) -> Pixels;
-    fn check_size(&self, state: &CheckboxRenderState, theme: &Theme) -> Pixels;
-    fn box_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
-    fn box_border(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
-    fn box_hover_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
-    fn box_active_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
-    fn check_fg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
-    fn focus_color(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
-    fn disabled_opacity(&self, state: &CheckboxRenderState, theme: &Theme) -> f32;
-}
+pub use yororen_ui_core::renderer::checkbox::{CheckboxRenderState, CheckboxRenderer};
 
 pub struct TokenCheckboxRenderer;
 
@@ -117,11 +95,11 @@ use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
 pub trait DefaultCheckbox: Sized {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div>;
+    fn render(self, cx: &App) -> Stateful<gpui::Div>;
 }
 
 impl DefaultCheckbox for CheckboxProps {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div> {
+    fn render(self, cx: &App) -> Stateful<gpui::Div> {
         let theme = cx.theme();
         let r: &Arc<dyn CheckboxRenderer> = cx
             .renderer_arc::<markers::Checkbox, dyn CheckboxRenderer>()

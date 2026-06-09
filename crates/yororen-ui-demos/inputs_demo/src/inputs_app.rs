@@ -79,7 +79,7 @@ impl Render for InputsApp {
                             entity.update(cx, |s, _cx| s.text_value = new.to_string());
                         }
                     })
-                    .default_render(cx, window),
+                    .render(cx, window),
                 cx,
             ))
             .child(status_line(&format!("text_input value: {:?}", self.text_value)))
@@ -96,7 +96,7 @@ impl Render for InputsApp {
                             entity.update(cx, |s, _cx| s.password_value = new.to_string());
                         }
                     })
-                    .default_render(cx, window),
+                    .render(cx, window),
                 cx,
             ))
             .child(status_line(&format!("password_input value: {:?}", self.password_value)))
@@ -127,7 +127,7 @@ impl Render for InputsApp {
                             entity.update(cx, |s, _cx| s.number_value = next);
                         }
                     })
-                    .default_render(cx, window),
+                    .render(cx, window),
                 cx,
             ))
             .child(status_line(&format!("number_input value: {}", self.number_value)))
@@ -148,7 +148,7 @@ impl Render for InputsApp {
                         // already clears the value; this hook
                         // is for the caller to do extra work.
                     })
-                    .default_render(cx, window),
+                    .render(cx, window),
                 cx,
             ))
             .child(status_line(&format!("search_input value: {:?}", self.search_value)))
@@ -172,7 +172,7 @@ impl Render for InputsApp {
                         // (e.g. log, validate, store).
                         eprintln!("file_path_input picked: {picked:?}");
                     })
-                    .default_render(cx, window),
+                    .render(cx, window),
                 cx,
             ))
             .child(status_line(&format!(
@@ -204,7 +204,7 @@ impl Render for InputsApp {
                                 s.keybinding_mode = KeybindingInputMode::Idle;
                             });
                         })
-                        .default_render(cx, window),
+                        .render(cx, window),
                     cx,
                 );
                 let mut s = panel_el;
@@ -234,7 +234,7 @@ impl Render for InputsApp {
                             entity.update(cx, |s, _cx| s.text_area_value = new.to_string());
                         }
                     })
-                    .default_render(cx, window),
+                    .render(cx, window),
                 cx,
             ))
             .child(status_line(&format!(
@@ -261,10 +261,10 @@ fn panel_with_label(
         .flex()
         .flex_col()
         .gap_2()
-        .child(label("title", title, cx).strong(true).default_render(cx))
+        .child(label("title", title, cx).strong(true).render(cx))
         .child(
             label("blurb", blurb, cx)
-                .default_render(cx)
+                .render(cx)
                 .text_color(hsla(0.0, 0.0, 0.4, 1.0))
                 .text_size(px(13.)),
         )

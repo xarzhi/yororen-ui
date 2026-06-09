@@ -8,16 +8,7 @@ use gpui::{FontWeight, Hsla, Pixels};
 use yororen_ui_core::headless::heading::HeadingLevel;
 use yororen_ui_core::theme::Theme;
 
-#[derive(Clone, Copy, Debug)]
-pub struct HeadingRenderState {
-    pub level: HeadingLevel,
-}
-
-pub trait HeadingRenderer: Any + Send + Sync {
-    fn size(&self, state: &HeadingRenderState, theme: &Theme) -> Pixels;
-    fn weight(&self, state: &HeadingRenderState, theme: &Theme) -> FontWeight;
-    fn color(&self, state: &HeadingRenderState, theme: &Theme) -> Hsla;
-}
+pub use yororen_ui_core::renderer::heading::{HeadingRenderState, HeadingRenderer};
 
 pub struct TokenHeadingRenderer;
 

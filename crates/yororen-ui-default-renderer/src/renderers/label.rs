@@ -7,26 +7,7 @@ use gpui::{FontWeight, Hsla, SharedString};
 
 use yororen_ui_core::theme::Theme;
 
-#[derive(Clone, Copy, Debug, Default)]
-pub struct LabelRenderState {
-    pub muted: bool,
-    pub strong: bool,
-    pub mono: bool,
-    pub inherit_color: bool,
-    /// Single-line text gets an ellipsis when it overflows.
-    pub ellipsis: bool,
-    /// Allow text to wrap at the parent's width boundary.
-    pub wrap: bool,
-    /// Cap the visible line count to `Some(n)`. `None` means
-    /// unlimited (the default).
-    pub max_lines: Option<usize>,
-}
-
-pub trait LabelRenderer: Any + Send + Sync {
-    fn color(&self, state: &LabelRenderState, theme: &Theme) -> Hsla;
-    fn strong_weight(&self, state: &LabelRenderState, theme: &Theme) -> FontWeight;
-    fn family_mono(&self, state: &LabelRenderState, theme: &Theme) -> SharedString;
-}
+pub use yororen_ui_core::renderer::label::{LabelRenderState, LabelRenderer};
 
 pub struct TokenLabelRenderer;
 
@@ -74,11 +55,11 @@ use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
 pub trait DefaultLabel: Sized {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div>;
+    fn render(self, cx: &App) -> Stateful<gpui::Div>;
 }
 
 impl DefaultLabel for LabelProps {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div> {
+    fn render(self, cx: &App) -> Stateful<gpui::Div> {
         let theme = cx.theme();
         let r: &Arc<dyn LabelRenderer> = cx
             .renderer_arc::<markers::Label, dyn LabelRenderer>()

@@ -4,8 +4,8 @@
 
 use gpui::{FontWeight, Hsla, Pixels, SharedString, px};
 use yororen_ui_core::headless::badge::BadgeVariant;
+use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
-use yororen_ui_default_renderer::renderers::spec::Edges;
 
 use crate::style::{
     BRUTAL_BORDER, BRUTAL_BORDER_WIDTH, BRUTAL_FONT_FAMILY, BRUTAL_RADIUS, brutal_border_color,
@@ -15,7 +15,7 @@ use crate::style::{
 // Label
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::label::{LabelRenderState, LabelRenderer};
+pub use yororen_ui_core::renderer::label::{LabelRenderState, LabelRenderer};
 
 pub struct BrutalLabelRenderer;
 
@@ -54,7 +54,7 @@ impl LabelRenderer for BrutalLabelRenderer {
 // Heading
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::heading::{HeadingRenderState, HeadingRenderer};
+pub use yororen_ui_core::renderer::heading::{HeadingRenderState, HeadingRenderer};
 
 pub struct BrutalHeadingRenderer;
 
@@ -94,7 +94,7 @@ impl HeadingRenderer for BrutalHeadingRenderer {
 // Divider
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::divider::{DividerRenderState, DividerRenderer};
+pub use yororen_ui_core::renderer::divider::{DividerRenderState, DividerRenderer};
 
 pub struct BrutalDividerRenderer;
 
@@ -114,9 +114,7 @@ impl DividerRenderer for BrutalDividerRenderer {
 // FocusRing
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::focus_ring::{
-    FocusRingRenderState, FocusRingRenderer,
-};
+pub use yororen_ui_core::renderer::focus_ring::{FocusRingRenderState, FocusRingRenderer};
 
 pub struct BrutalFocusRingRenderer;
 
@@ -136,7 +134,7 @@ impl FocusRingRenderer for BrutalFocusRingRenderer {
 // Badge
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::badge::{BadgeRenderState, BadgeRenderer};
+pub use yororen_ui_core::renderer::badge::{BadgeRenderState, BadgeRenderer};
 
 pub struct BrutalBadgeRenderer;
 
@@ -203,7 +201,7 @@ impl BadgeRenderer for BrutalBadgeRenderer {
 // Tag
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::tag::{TagRenderState, TagRenderer};
+pub use yororen_ui_core::renderer::tag::{TagRenderState, TagRenderer};
 
 pub struct BrutalTagRenderer;
 
@@ -285,7 +283,7 @@ impl TagRenderer for BrutalTagRenderer {
 // Skeleton
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::skeleton::{SkeletonRenderState, SkeletonRenderer};
+pub use yororen_ui_core::renderer::skeleton::{SkeletonRenderState, SkeletonRenderer};
 
 pub struct BrutalSkeletonRenderer;
 
@@ -315,9 +313,7 @@ impl SkeletonRenderer for BrutalSkeletonRenderer {
 // ProgressBar
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::progress::{
-    ProgressBarRenderState, ProgressBarRenderer,
-};
+pub use yororen_ui_core::renderer::progress::{ProgressBarRenderState, ProgressBarRenderer};
 
 pub struct BrutalProgressBarRenderer;
 
@@ -351,9 +347,7 @@ impl ProgressBarRenderer for BrutalProgressBarRenderer {
 // EmptyState
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::empty_state::{
-    EmptyStateRenderState, EmptyStateRenderer,
-};
+pub use yororen_ui_core::renderer::empty_state::{EmptyStateRenderState, EmptyStateRenderer};
 
 pub struct BrutalEmptyStateRenderer;
 

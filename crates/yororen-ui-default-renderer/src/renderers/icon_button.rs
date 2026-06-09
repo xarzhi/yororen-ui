@@ -5,30 +5,12 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
-use crate::renderers::button::ActionVariantKind;
+use yororen_ui_core::renderer::variant::ActionVariantKind;
 use yororen_ui_core::theme::Theme;
 
-use super::variant::{VariantState, VariantStyle};
+use yororen_ui_core::renderer::variant::{VariantState, VariantStyle};
 
-#[derive(Clone, Debug, Default)]
-pub struct IconButtonRenderState {
-    pub variant: ActionVariantKind,
-    pub disabled: bool,
-    pub has_custom_bg: bool,
-    pub has_custom_hover_bg: bool,
-    /// Pre-resolved custom variant from the global `VariantRegistry`.
-    /// When `Some`, the renderer delegates color decisions to it.
-    pub custom_style: Option<Arc<dyn VariantStyle>>,
-}
-
-pub trait IconButtonRenderer: Any + Send + Sync {
-    fn bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla;
-    fn hover_bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla;
-    fn active_bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla;
-    fn size(&self, state: &IconButtonRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &IconButtonRenderState, theme: &Theme) -> Pixels;
-    fn disabled_opacity(&self, state: &IconButtonRenderState, theme: &Theme) -> f32;
-}
+pub use yororen_ui_core::renderer::icon_button::{IconButtonRenderState, IconButtonRenderer};
 
 pub struct TokenIconButtonRenderer;
 
@@ -111,11 +93,11 @@ use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
 pub trait DefaultIconButton: Sized {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div>;
+    fn render(self, cx: &App) -> Stateful<gpui::Div>;
 }
 
 impl DefaultIconButton for IconButtonProps {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div> {
+    fn render(self, cx: &App) -> Stateful<gpui::Div> {
         let theme = cx.theme();
         let r: &Arc<dyn IconButtonRenderer> = cx
             .renderer_arc::<markers::IconButton, dyn IconButtonRenderer>()

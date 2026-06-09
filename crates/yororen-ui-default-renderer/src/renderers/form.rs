@@ -5,17 +5,8 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
+pub use yororen_ui_core::renderer::form::{FormRenderState, FormRenderer};
 use yororen_ui_core::theme::Theme;
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct FormRenderState {}
-
-pub trait FormRenderer: Any + Send + Sync {
-    fn gap(&self, state: &FormRenderState, theme: &Theme) -> Pixels;
-    fn label_color(&self, state: &FormRenderState, theme: &Theme) -> Hsla;
-    fn error_color(&self, state: &FormRenderState, theme: &Theme) -> Hsla;
-    fn helper_color(&self, state: &FormRenderState, theme: &Theme) -> Hsla;
-}
 
 pub struct TokenFormRenderer;
 

@@ -2,8 +2,8 @@
 //! `Card`.
 
 use gpui::{Hsla, Pixels, px};
+use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
-use yororen_ui_default_renderer::renderers::spec::Edges;
 
 use crate::style::{BRUTAL_BORDER, BRUTAL_RADIUS, BRUTAL_SMALL_BORDER_WIDTH, brutal_border_color};
 
@@ -11,7 +11,7 @@ use crate::style::{BRUTAL_BORDER, BRUTAL_RADIUS, BRUTAL_SMALL_BORDER_WIDTH, brut
 // Tooltip
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::tooltip::{TooltipRenderState, TooltipRenderer};
+pub use yororen_ui_core::renderer::tooltip::{TooltipRenderState, TooltipRenderer};
 
 pub struct BrutalTooltipRenderer;
 
@@ -53,7 +53,7 @@ impl TooltipRenderer for BrutalTooltipRenderer {
 // Avatar
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::avatar::{AvatarRenderState, AvatarRenderer};
+pub use yororen_ui_core::renderer::avatar::{AvatarRenderState, AvatarRenderer};
 
 pub struct BrutalAvatarRenderer;
 
@@ -94,7 +94,7 @@ impl AvatarRenderer for BrutalAvatarRenderer {
 // Panel
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::panel::{PanelRenderState, PanelRenderer};
+pub use yororen_ui_core::renderer::panel::{PanelRenderState, PanelRenderer};
 
 pub struct BrutalPanelRenderer;
 
@@ -130,7 +130,7 @@ impl PanelRenderer for BrutalPanelRenderer {
 // Card
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::card::{CardRenderState, CardRenderer};
+pub use yororen_ui_core::renderer::card::{CardRenderState, CardRenderer};
 
 pub struct BrutalCardRenderer;
 

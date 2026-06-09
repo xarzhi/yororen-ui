@@ -7,8 +7,8 @@
 //! visual contract via the `XxxRenderer` traits.
 
 use gpui::{Hsla, Pixels, hsla, px};
+use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
-use yororen_ui_default_renderer::renderers::spec::Edges;
 
 use crate::style::{BRUTAL_BORDER, BRUTAL_RADIUS, brutal_border_color};
 
@@ -70,9 +70,7 @@ fn brutal_input_padding(theme: &Theme) -> Edges<Pixels> {
 // TextInput
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::text_input::{
-    TextInputRenderState, TextInputRenderer,
-};
+pub use yororen_ui_core::renderer::text_input::{TextInputRenderState, TextInputRenderer};
 
 pub struct BrutalTextInputRenderer;
 
@@ -125,9 +123,7 @@ impl TextInputRenderer for BrutalTextInputRenderer {
 // directly from the theme); brutalism maps them the same way.
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::text_area::{
-    TextAreaRenderState, TextAreaRenderer,
-};
+pub use yororen_ui_core::renderer::text_area::{TextAreaRenderState, TextAreaRenderer};
 
 pub struct BrutalTextAreaRenderer;
 
@@ -170,7 +166,7 @@ impl TextAreaRenderer for BrutalTextAreaRenderer {
 // PasswordInput
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::password_input::{
+pub use yororen_ui_core::renderer::password_input::{
     PasswordInputRenderState, PasswordInputRenderer,
 };
 
@@ -210,9 +206,7 @@ impl PasswordInputRenderer for BrutalPasswordInputRenderer {
 // NumberInput
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::number_input::{
-    NumberInputRenderState, NumberInputRenderer,
-};
+pub use yororen_ui_core::renderer::number_input::{NumberInputRenderState, NumberInputRenderer};
 
 pub struct BrutalNumberInputRenderer;
 
@@ -260,7 +254,7 @@ impl NumberInputRenderer for BrutalNumberInputRenderer {
 // FilePathInput
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::file_path_input::{
+pub use yororen_ui_core::renderer::file_path_input::{
     FilePathInputRenderState, FilePathInputRenderer,
 };
 
@@ -330,9 +324,7 @@ impl FilePathInputRenderer for BrutalFilePathInputRenderer {
 // SearchInput
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::search_input::{
-    SearchInputRenderState, SearchInputRenderer,
-};
+pub use yororen_ui_core::renderer::search_input::{SearchInputRenderState, SearchInputRenderer};
 
 pub struct BrutalSearchInputRenderer;
 
@@ -391,7 +383,7 @@ impl SearchInputRenderer for BrutalSearchInputRenderer {
 // Select
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::select::{SelectRenderState, SelectRenderer};
+pub use yororen_ui_core::renderer::select::{SelectRenderState, SelectRenderer};
 
 pub struct BrutalSelectRenderer;
 
@@ -441,9 +433,7 @@ impl SelectRenderer for BrutalSelectRenderer {
 // ComboBox
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::combo_box::{
-    ComboBoxRenderState, ComboBoxRenderer,
-};
+pub use yororen_ui_core::renderer::combo_box::{ComboBoxRenderState, ComboBoxRenderer};
 
 pub struct BrutalComboBoxRenderer;
 
@@ -490,7 +480,7 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
 // KeybindingInput
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::keybinding_input::{
+pub use yororen_ui_core::renderer::keybinding_input::{
     KeybindingInputRenderState, KeybindingInputRenderer,
 };
 

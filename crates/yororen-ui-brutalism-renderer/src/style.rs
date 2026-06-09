@@ -6,8 +6,8 @@
 //! stylistic lockstep.
 
 use gpui::{Hsla, px};
+use yororen_ui_core::renderer::spec::ShadowSpec;
 use yororen_ui_core::theme::Theme;
-use yororen_ui_default_renderer::renderers::spec::ShadowSpec;
 
 pub const BRUTAL_BORDER: Hsla = Hsla {
     h: 0.0,

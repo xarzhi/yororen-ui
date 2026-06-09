@@ -5,26 +5,8 @@ use std::sync::Arc;
 
 use gpui::{FontWeight, Hsla, Pixels};
 
+pub use yororen_ui_core::renderer::badge::{BadgeRenderState, BadgeRenderer};
 use yororen_ui_core::theme::Theme;
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct BadgeRenderState {
-    /// The variant selected by the user. The renderer reads
-    /// `status.<variant>.{bg,fg}` from the theme.
-    pub variant: yororen_ui_core::headless::badge::BadgeVariant,
-    /// `true` if the user supplied `.tone(...)`.
-    pub has_custom_tone: bool,
-}
-
-pub trait BadgeRenderer: Any + Send + Sync {
-    fn bg(&self, state: &BadgeRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &BadgeRenderState, theme: &Theme) -> Hsla;
-    fn padding_x(&self, state: &BadgeRenderState, theme: &Theme) -> Pixels;
-    fn height(&self, state: &BadgeRenderState, theme: &Theme) -> Pixels;
-    fn font_size(&self, state: &BadgeRenderState, theme: &Theme) -> Pixels;
-    fn font_weight(&self, state: &BadgeRenderState, theme: &Theme) -> FontWeight;
-    fn border_radius(&self, state: &BadgeRenderState, theme: &Theme) -> Pixels;
-}
 
 pub struct TokenBadgeRenderer;
 

@@ -30,41 +30,13 @@ use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 pub(crate) type SubmitCallback = Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>;
 
-use crate::renderers::spec::Edges;
+use yororen_ui_core::renderer::spec::Edges;
+pub use yororen_ui_core::renderer::text_input::{TextInputRenderState, TextInputRenderer};
 
 // =====================================================================
 // `TextInputRenderer` trait — visual contract (bg / border / colors /
 // spacing). Unchanged from the v0.3 simplified version.
 // =====================================================================
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct TextInputRenderState {
-    pub disabled: bool,
-    pub focused: bool,
-    pub has_custom_bg: bool,
-    pub has_custom_border: bool,
-    pub has_custom_focus_border: bool,
-    pub custom_bg: Option<Hsla>,
-    pub custom_border: Option<Hsla>,
-    pub custom_focus_border: Option<Hsla>,
-    pub custom_text_color: Option<Hsla>,
-}
-
-pub trait TextInputRenderer: Any + Send + Sync {
-    fn bg(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn hover_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn active_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn text_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn hint_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn cursor_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn selection_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &TextInputRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &TextInputRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &TextInputRenderState, theme: &Theme) -> Pixels;
-    fn disabled_opacity(&self, state: &TextInputRenderState, theme: &Theme) -> f32;
-}
 
 pub struct TokenTextInputRenderer;
 
@@ -561,11 +533,11 @@ pub fn start_cursor_blink(state: gpui::Entity<TextInputState>, window: &mut Wind
 // =====================================================================
 
 pub trait DefaultTextInput: Sized {
-    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement;
+    fn render(self, cx: &mut App, window: &mut Window) -> AnyElement;
 }
 
 impl DefaultTextInput for TextInputProps {
-    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
+    fn render(self, cx: &mut App, window: &mut Window) -> AnyElement {
         let theme_arc = cx.theme().clone();
         let r: Arc<dyn TextInputRenderer> = cx
             .renderer_arc::<markers::TextInput, dyn TextInputRenderer>()

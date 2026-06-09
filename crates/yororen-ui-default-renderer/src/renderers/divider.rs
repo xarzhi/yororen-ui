@@ -7,15 +7,7 @@ use gpui::{Hsla, Pixels};
 
 use yororen_ui_core::theme::Theme;
 
-#[derive(Clone, Copy, Debug, Default)]
-pub struct DividerRenderState {
-    pub vertical: bool,
-}
-
-pub trait DividerRenderer: Any + Send + Sync {
-    fn color(&self, state: &DividerRenderState, theme: &Theme) -> Hsla;
-    fn thickness(&self, state: &DividerRenderState, theme: &Theme) -> Pixels;
-}
+pub use yororen_ui_core::renderer::divider::{DividerRenderState, DividerRenderer};
 
 pub struct TokenDividerRenderer;
 

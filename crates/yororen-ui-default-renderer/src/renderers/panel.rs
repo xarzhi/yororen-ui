@@ -11,30 +11,13 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
-use crate::renderers::spec::Edges;
+pub use yororen_ui_core::renderer::panel::{PanelRenderState, PanelRenderer};
+use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
 
 /// State passed to a `PanelRenderer`. The flags indicate whether
 /// the caller supplied explicit overrides for each visual property;
 /// the renderer can choose to honour or ignore them.
-#[derive(Clone, Copy, Debug, Default)]
-pub struct PanelRenderState {
-    /// `true` if the user supplied `.bg(...)` on the builder.
-    pub has_custom_bg: bool,
-    /// `true` if the user supplied `.border(...)` on the builder.
-    pub has_custom_border: bool,
-    /// `true` if the user supplied `.padding(...)` on the builder.
-    pub has_custom_padding: bool,
-}
-
-pub trait PanelRenderer: Any + Send + Sync {
-    fn bg(&self, state: &PanelRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &PanelRenderState, theme: &Theme) -> Hsla;
-    fn padding(&self, state: &PanelRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &PanelRenderState, theme: &Theme) -> Pixels;
-    fn shadow_alpha(&self, state: &PanelRenderState, theme: &Theme) -> f32;
-}
-
 pub struct TokenPanelRenderer;
 
 impl PanelRenderer for TokenPanelRenderer {

@@ -9,10 +9,14 @@ use std::sync::Arc;
 
 use gpui::{
     App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Window,
+    StatefulInteractiveElement, Styled, Window, div,
 };
 
 use super::switch::ToggleCallback;
+use crate::renderer::RendererContext;
+use crate::renderer::markers::ToggleButton as ToggleButtonMarker;
+use crate::renderer::toggle_button::{ToggleButtonRenderState, ToggleButtonRenderer};
+use crate::theme::ActiveTheme;
 
 #[derive(Clone)]
 pub struct ToggleButtonProps {
@@ -77,14 +81,50 @@ impl ToggleButtonProps {
         if !self.disabled
             && let Some(f) = self.on_toggle.clone()
         {
-            // Pass the *current* selected state — the callback
-            // receives `!self.selected` so the caller can flip
-            // its own state in response.
             let current = self.selected;
             s = s.on_click(move |ev, window, cx| {
                 f(!current, Some(ev), window, cx);
             });
         }
         s
+    }
+
+    /// Render the toggle button using the registered `ToggleButtonRenderer`.
+    pub fn render(self, cx: &App) -> Stateful<Div> {
+        let theme = cx.theme();
+        let r: &Arc<dyn ToggleButtonRenderer> = cx
+            .renderer_arc::<ToggleButtonMarker, dyn ToggleButtonRenderer>()
+            .expect("ToggleButtonRenderer registered");
+        let state = ToggleButtonRenderState {
+            variant: self.variant,
+            selected: self.selected,
+            disabled: self.disabled,
+            custom_style: None,
+        };
+        let bg = r.bg(&state, theme);
+        let fg = r.fg(&state, theme);
+        let min_h = r.min_height(&state, theme);
+        let radius = r.border_radius(&state, theme);
+        let opacity = if self.disabled {
+            r.disabled_opacity(&state, theme)
+        } else {
+            1.0
+        };
+        let el = div()
+            .bg(bg)
+            .text_color(fg)
+            .min_h(min_h)
+            .rounded(radius)
+            .px(gpui::px(12.))
+            .py(gpui::px(6.))
+            .opacity(opacity)
+            .flex()
+            .items_center()
+            .justify_center();
+        let hover_bg = r.hover_bg(&state, theme);
+        let active_bg = r.active_bg(&state, theme);
+        self.apply(el)
+            .hover(|s| s.bg(hover_bg))
+            .active(|s| s.bg(active_bg))
     }
 }

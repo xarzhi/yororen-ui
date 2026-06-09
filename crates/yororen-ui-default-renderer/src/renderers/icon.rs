@@ -44,11 +44,11 @@ fn resolve_icon_path(source: &IconSource) -> gpui::SharedString {
 }
 
 pub trait DefaultIcon: Sized {
-    fn default_render(self, _cx: &mut App, _window: &mut Window) -> AnyElement;
+    fn render(self, _cx: &mut App, _window: &mut Window) -> AnyElement;
 }
 
 impl DefaultIcon for IconProps {
-    fn default_render(self, _cx: &mut App, _window: &mut Window) -> AnyElement {
+    fn render(self, _cx: &mut App, _window: &mut Window) -> AnyElement {
         let path = resolve_icon_path(&self.source);
         let size = self.size.unwrap_or(gpui::px(14.0));
         let color = self.color.unwrap_or_else(|| gpui::rgb(0x0A0A0A).into());

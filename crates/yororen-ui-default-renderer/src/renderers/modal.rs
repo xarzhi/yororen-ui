@@ -5,20 +5,9 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
-use crate::renderers::spec::Edges;
+pub use yororen_ui_core::renderer::modal::{ModalRenderState, ModalRenderer};
+use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct ModalRenderState {}
-
-pub trait ModalRenderer: Any + Send + Sync {
-    fn scrim(&self, state: &ModalRenderState, theme: &Theme) -> Hsla;
-    fn panel_bg(&self, state: &ModalRenderState, theme: &Theme) -> Hsla;
-    fn panel_border(&self, state: &ModalRenderState, theme: &Theme) -> Hsla;
-    fn panel_padding(&self, state: &ModalRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn panel_border_radius(&self, state: &ModalRenderState, theme: &Theme) -> Pixels;
-    fn panel_shadow_alpha(&self, state: &ModalRenderState, theme: &Theme) -> f32;
-}
 
 pub struct TokenModalRenderer;
 

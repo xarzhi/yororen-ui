@@ -22,34 +22,11 @@ use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 use crate::renderers::icon::DefaultIcon;
-use crate::renderers::spec::Edges;
 use crate::renderers::text_input::{TextInputElement, start_cursor_blink, wire_input_keyboard};
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct FilePathInputRenderState {
-    pub disabled: bool,
-    pub focused: bool,
-    pub custom_bg: Option<Hsla>,
-    pub custom_border: Option<Hsla>,
-    pub custom_focus_border: Option<Hsla>,
-    pub custom_fg: Option<Hsla>,
-}
-
-pub trait FilePathInputRenderer: Any + Send + Sync {
-    fn bg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn hover_border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn active_border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn button_bg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn button_hover_bg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn button_fg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &FilePathInputRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &FilePathInputRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn action_gap(&self, state: &FilePathInputRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &FilePathInputRenderState, theme: &Theme) -> Pixels;
-    fn icon_size(&self, state: &FilePathInputRenderState, theme: &Theme) -> Pixels;
-}
+pub use yororen_ui_core::renderer::file_path_input::{
+    FilePathInputRenderState, FilePathInputRenderer,
+};
+use yororen_ui_core::renderer::spec::Edges;
 
 pub struct TokenFilePathInputRenderer;
 
@@ -122,11 +99,11 @@ pub fn arc_file_path_input<T: FilePathInputRenderer + 'static>(
 }
 
 pub trait DefaultFilePathInput: Sized {
-    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement;
+    fn render(self, cx: &mut App, window: &mut Window) -> AnyElement;
 }
 
 impl DefaultFilePathInput for FilePathInputProps {
-    fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
+    fn render(self, cx: &mut App, window: &mut Window) -> AnyElement {
         // Copy the theme Arc up front so the `cx.theme()` borrow
         // doesn't conflict with later `cx.renderer_arc` /
         // `cx.use_keyed_state` mutable calls.
@@ -241,7 +218,7 @@ impl DefaultFilePathInput for FilePathInputProps {
                 )
                 .size(icon_size)
                 .color(text_color)
-                .default_render(&mut *cx, window),
+                .render(&mut *cx, window),
             )
             .child(div().flex_1().min_w(px(0.)).child(inner))
             .child(
@@ -328,7 +305,7 @@ impl DefaultFilePathInput for FilePathInputProps {
                         )
                         .size(icon_size)
                         .color(button_fg)
-                        .default_render(&mut *cx, window),
+                        .render(&mut *cx, window),
                     ),
             );
 

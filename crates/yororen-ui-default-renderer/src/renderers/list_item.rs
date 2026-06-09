@@ -5,25 +5,9 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
-use crate::renderers::spec::Edges;
+pub use yororen_ui_core::renderer::list_item::{ListItemRenderState, ListItemRenderer};
+use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct ListItemRenderState {
-    pub selected: bool,
-    pub disabled: bool,
-    pub hovered: bool,
-}
-
-pub trait ListItemRenderer: Any + Send + Sync {
-    fn bg(&self, state: &ListItemRenderState, theme: &Theme) -> Hsla;
-    fn hover_bg(&self, state: &ListItemRenderState, theme: &Theme) -> Hsla;
-    fn selected_bg(&self, state: &ListItemRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &ListItemRenderState, theme: &Theme) -> Hsla;
-    fn padding(&self, state: &ListItemRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn min_height(&self, state: &ListItemRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &ListItemRenderState, theme: &Theme) -> Pixels;
-}
 
 pub struct TokenListItemRenderer;
 

@@ -5,24 +5,8 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
+pub use yororen_ui_core::renderer::split_button::{SplitButtonRenderState, SplitButtonRenderer};
 use yororen_ui_core::theme::Theme;
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct SplitButtonRenderState {
-    pub open: bool,
-    pub disabled: bool,
-}
-
-pub trait SplitButtonRenderer: Any + Send + Sync {
-    fn primary_bg(&self, state: &SplitButtonRenderState, theme: &Theme) -> Hsla;
-    fn primary_fg(&self, state: &SplitButtonRenderState, theme: &Theme) -> Hsla;
-    fn chevron_bg(&self, state: &SplitButtonRenderState, theme: &Theme) -> Hsla;
-    fn chevron_fg(&self, state: &SplitButtonRenderState, theme: &Theme) -> Hsla;
-    fn chevron_hover_bg(&self, state: &SplitButtonRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &SplitButtonRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &SplitButtonRenderState, theme: &Theme) -> Pixels;
-    fn gap(&self, state: &SplitButtonRenderState, theme: &Theme) -> Pixels;
-}
 
 pub struct TokenSplitButtonRenderer;
 

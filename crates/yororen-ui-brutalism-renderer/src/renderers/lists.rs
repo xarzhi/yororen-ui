@@ -1,8 +1,8 @@
 //! Brutalist list renderers: `ListItem`, `TreeItem`, `Form`.
 
 use gpui::{Hsla, Pixels, px};
+use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
-use yororen_ui_default_renderer::renderers::spec::Edges;
 
 use crate::style::{BRUTAL_BORDER, BRUTAL_RADIUS};
 
@@ -10,9 +10,7 @@ use crate::style::{BRUTAL_BORDER, BRUTAL_RADIUS};
 // ListItem
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::list_item::{
-    ListItemRenderState, ListItemRenderer,
-};
+pub use yororen_ui_core::renderer::list_item::{ListItemRenderState, ListItemRenderer};
 
 pub struct BrutalListItemRenderer;
 
@@ -59,9 +57,7 @@ impl ListItemRenderer for BrutalListItemRenderer {
 // TreeItem
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::tree_item::{
-    TreeItemRenderState, TreeItemRenderer,
-};
+pub use yororen_ui_core::renderer::tree_item::{TreeItemRenderState, TreeItemRenderer};
 
 pub struct BrutalTreeItemRenderer;
 
@@ -114,7 +110,7 @@ impl TreeItemRenderer for BrutalTreeItemRenderer {
 // Form
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::form::{FormRenderState, FormRenderer};
+pub use yororen_ui_core::renderer::form::{FormRenderState, FormRenderer};
 
 pub struct BrutalFormRenderer;
 

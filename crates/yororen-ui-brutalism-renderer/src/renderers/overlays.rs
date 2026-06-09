@@ -2,8 +2,8 @@
 //! `DropdownMenu`, `Disclosure`.
 
 use gpui::{Hsla, Pixels, px};
+use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
-use yororen_ui_default_renderer::renderers::spec::Edges;
 
 use crate::style::{BRUTAL_BORDER, BRUTAL_RADIUS, brutal_border_color};
 
@@ -11,7 +11,7 @@ use crate::style::{BRUTAL_BORDER, BRUTAL_RADIUS, brutal_border_color};
 // Modal
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::modal::{ModalRenderState, ModalRenderer};
+pub use yororen_ui_core::renderer::modal::{ModalRenderState, ModalRenderer};
 
 pub struct BrutalModalRenderer;
 
@@ -49,7 +49,7 @@ impl ModalRenderer for BrutalModalRenderer {
 // Popover
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::popover::{PopoverRenderState, PopoverRenderer};
+pub use yororen_ui_core::renderer::popover::{PopoverRenderState, PopoverRenderer};
 
 pub struct BrutalPopoverRenderer;
 
@@ -77,9 +77,7 @@ impl PopoverRenderer for BrutalPopoverRenderer {
 // DropdownMenu
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::dropdown_menu::{
-    DropdownMenuRenderState, DropdownMenuRenderer,
-};
+pub use yororen_ui_core::renderer::dropdown_menu::{DropdownMenuRenderState, DropdownMenuRenderer};
 
 pub struct BrutalDropdownMenuRenderer;
 
@@ -116,9 +114,7 @@ impl DropdownMenuRenderer for BrutalDropdownMenuRenderer {
 // Disclosure
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::disclosure::{
-    DisclosureRenderState, DisclosureRenderer,
-};
+pub use yororen_ui_core::renderer::disclosure::{DisclosureRenderState, DisclosureRenderer};
 
 pub struct BrutalDisclosureRenderer;
 

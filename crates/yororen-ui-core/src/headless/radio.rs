@@ -8,11 +8,15 @@
 use std::sync::Arc;
 
 use gpui::{
-    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Window,
+    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, ParentElement, Stateful,
+    StatefulInteractiveElement, Styled, Window, div,
 };
 
 use super::switch::ToggleCallback;
+use crate::renderer::RendererContext;
+use crate::renderer::markers::Radio as RadioMarker;
+use crate::renderer::radio::{RadioRenderState, RadioRenderer};
+use crate::theme::ActiveTheme;
 
 #[derive(Clone)]
 pub struct RadioProps {
@@ -90,5 +94,42 @@ impl RadioProps {
             });
         }
         s
+    }
+
+    /// Render the radio using the registered `RadioRenderer`.
+    pub fn render(self, cx: &App) -> Stateful<Div> {
+        let theme = cx.theme();
+        let r: &Arc<dyn RadioRenderer> = cx
+            .renderer_arc::<RadioMarker, dyn RadioRenderer>()
+            .expect("RadioRenderer registered");
+        let state = RadioRenderState {
+            checked: self.checked,
+            disabled: self.disabled,
+            has_custom_tone: self.has_custom_tone,
+            custom_tone: self.custom_tone,
+        };
+        let bg = r.ring_bg(&state, theme);
+        let border = r.ring_border(&state, theme);
+        let ring_size = r.ring_size(&state, theme);
+        let dot_size = r.dot_size(&state, theme);
+        let dot_fg = r.dot_fg(&state, theme);
+        let pill_radius = gpui::px(theme.get_number("tokens.radii.pill").unwrap_or(0.0) as f32);
+        let mut el = div()
+            .bg(bg)
+            .border_1()
+            .border_color(border)
+            .size(ring_size)
+            .rounded(pill_radius)
+            .flex()
+            .items_center()
+            .justify_center();
+        if self.checked {
+            el = el.child(div().bg(dot_fg).size(dot_size).rounded(pill_radius));
+        }
+        let hover_bg = r.ring_hover_bg(&state, theme);
+        let active_bg = r.ring_active_bg(&state, theme);
+        self.apply(el)
+            .hover(|s| s.bg(hover_bg))
+            .active(|s| s.bg(active_bg))
     }
 }

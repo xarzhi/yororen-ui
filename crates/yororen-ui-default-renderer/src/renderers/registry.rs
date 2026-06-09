@@ -32,83 +32,121 @@ use std::any::{Any, TypeId};
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use super::avatar::{AvatarRenderer, TokenAvatarRenderer};
-use super::badge::{BadgeRenderer, TokenBadgeRenderer};
-use super::button::{ButtonRenderer, TokenButtonRenderer};
-use super::card::{CardRenderer, TokenCardRenderer};
-use super::checkbox::{CheckboxRenderer, TokenCheckboxRenderer};
-use super::combo_box::{ComboBoxRenderer, TokenComboBoxRenderer};
-use super::disclosure::{DisclosureRenderer, TokenDisclosureRenderer};
-use super::divider::{DividerRenderer, TokenDividerRenderer};
-use super::dropdown_menu::{DropdownMenuRenderer, TokenDropdownMenuRenderer};
-use super::empty_state::{EmptyStateRenderer, TokenEmptyStateRenderer};
-use super::file_path_input::{FilePathInputRenderer, TokenFilePathInputRenderer};
-use super::focus_ring::{FocusRingRenderer, TokenFocusRingRenderer};
-use super::form::{FormRenderer, TokenFormRenderer};
-use super::heading::{HeadingRenderer, TokenHeadingRenderer};
-use super::icon_button::{IconButtonRenderer, TokenIconButtonRenderer};
-use super::keybinding_input::{KeybindingInputRenderer, TokenKeybindingInputRenderer};
-use super::label::{LabelRenderer, TokenLabelRenderer};
-use super::list_item::{ListItemRenderer, TokenListItemRenderer};
-use super::modal::{ModalRenderer, TokenModalRenderer};
-use super::notification::{NotificationRenderer, TokenNotificationRenderer};
-use super::number_input::{NumberInputRenderer, TokenNumberInputRenderer};
-use super::panel::{PanelRenderer, TokenPanelRenderer};
-use super::password_input::{PasswordInputRenderer, TokenPasswordInputRenderer};
-use super::popover::{PopoverRenderer, TokenPopoverRenderer};
-use super::progress::{ProgressBarRenderer, TokenProgressBarRenderer};
-use super::radio::{RadioRenderer, TokenRadioRenderer};
-use super::search_input::{SearchInputRenderer, TokenSearchInputRenderer};
-use super::select::{SelectRenderer, TokenSelectRenderer};
-use super::skeleton::{SkeletonRenderer, TokenSkeletonRenderer};
-use super::split_button::{SplitButtonRenderer, TokenSplitButtonRenderer};
-use super::switch::{SwitchRenderer, TokenSwitchRenderer};
-use super::tag::{TagRenderer, TokenTagRenderer};
-use super::text_area::{TextAreaRenderer, TokenTextAreaRenderer};
-use super::text_input::{TextInputRenderer, TokenTextInputRenderer};
-use super::toast::{ToastRenderer, TokenToastRenderer};
-use super::toggle_button::{ToggleButtonRenderer, TokenToggleButtonRenderer};
-use super::tooltip::{TokenTooltipRenderer, TooltipRenderer};
-use super::tree_item::{TokenTreeItemRenderer, TreeItemRenderer};
+use super::avatar::TokenAvatarRenderer;
+use super::badge::TokenBadgeRenderer;
+use super::button::TokenButtonRenderer;
+use super::card::TokenCardRenderer;
+use super::checkbox::TokenCheckboxRenderer;
+use super::combo_box::TokenComboBoxRenderer;
+use super::disclosure::TokenDisclosureRenderer;
+use super::divider::TokenDividerRenderer;
+use super::dropdown_menu::TokenDropdownMenuRenderer;
+use super::empty_state::TokenEmptyStateRenderer;
+use super::file_path_input::TokenFilePathInputRenderer;
+use super::focus_ring::TokenFocusRingRenderer;
+use super::form::TokenFormRenderer;
+use super::heading::TokenHeadingRenderer;
+use super::icon_button::TokenIconButtonRenderer;
+use super::keybinding_input::TokenKeybindingInputRenderer;
+use super::label::TokenLabelRenderer;
+use super::list_item::TokenListItemRenderer;
+use super::modal::TokenModalRenderer;
+use super::notification::TokenNotificationRenderer;
+use super::number_input::TokenNumberInputRenderer;
+use super::panel::TokenPanelRenderer;
+use super::password_input::TokenPasswordInputRenderer;
+use super::popover::TokenPopoverRenderer;
+use super::progress::TokenProgressBarRenderer;
+use super::radio::TokenRadioRenderer;
+use super::search_input::TokenSearchInputRenderer;
+use super::select::TokenSelectRenderer;
+use super::skeleton::TokenSkeletonRenderer;
+use super::split_button::TokenSplitButtonRenderer;
+use super::switch::TokenSwitchRenderer;
+use super::tag::TokenTagRenderer;
+use super::text_area::TokenTextAreaRenderer;
+use super::text_input::TokenTextInputRenderer;
+use super::toast::TokenToastRenderer;
+use super::toggle_button::TokenToggleButtonRenderer;
+use super::tooltip::TokenTooltipRenderer;
+use super::tree_item::TokenTreeItemRenderer;
+use yororen_ui_core::renderer::avatar::AvatarRenderer;
+use yororen_ui_core::renderer::badge::BadgeRenderer;
+use yororen_ui_core::renderer::button::ButtonRenderer;
+use yororen_ui_core::renderer::card::CardRenderer;
+use yororen_ui_core::renderer::checkbox::CheckboxRenderer;
+use yororen_ui_core::renderer::combo_box::ComboBoxRenderer;
+use yororen_ui_core::renderer::disclosure::DisclosureRenderer;
+use yororen_ui_core::renderer::divider::DividerRenderer;
+use yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderer;
+use yororen_ui_core::renderer::empty_state::EmptyStateRenderer;
+use yororen_ui_core::renderer::file_path_input::FilePathInputRenderer;
+use yororen_ui_core::renderer::focus_ring::FocusRingRenderer;
+use yororen_ui_core::renderer::form::FormRenderer;
+use yororen_ui_core::renderer::heading::HeadingRenderer;
+use yororen_ui_core::renderer::icon_button::IconButtonRenderer;
+use yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderer;
+use yororen_ui_core::renderer::label::LabelRenderer;
+use yororen_ui_core::renderer::list_item::ListItemRenderer;
+use yororen_ui_core::renderer::modal::ModalRenderer;
+use yororen_ui_core::renderer::notification::NotificationRenderer;
+use yororen_ui_core::renderer::number_input::NumberInputRenderer;
+use yororen_ui_core::renderer::panel::PanelRenderer;
+use yororen_ui_core::renderer::password_input::PasswordInputRenderer;
+use yororen_ui_core::renderer::popover::PopoverRenderer;
+use yororen_ui_core::renderer::progress::ProgressBarRenderer;
+use yororen_ui_core::renderer::radio::RadioRenderer;
+use yororen_ui_core::renderer::search_input::SearchInputRenderer;
+use yororen_ui_core::renderer::select::SelectRenderer;
+use yororen_ui_core::renderer::skeleton::SkeletonRenderer;
+use yororen_ui_core::renderer::split_button::SplitButtonRenderer;
+use yororen_ui_core::renderer::switch::SwitchRenderer;
+use yororen_ui_core::renderer::tag::TagRenderer;
+use yororen_ui_core::renderer::text_area::TextAreaRenderer;
+use yororen_ui_core::renderer::text_input::TextInputRenderer;
+use yororen_ui_core::renderer::toast::ToastRenderer;
+use yororen_ui_core::renderer::toggle_button::ToggleButtonRenderer;
+use yororen_ui_core::renderer::tooltip::TooltipRenderer;
+use yororen_ui_core::renderer::tree_item::TreeItemRenderer;
 
-use super::avatar::AvatarRenderState;
-use super::badge::BadgeRenderState;
-use super::button::ButtonRenderState;
-use super::card::CardRenderState;
-use super::checkbox::CheckboxRenderState;
-use super::combo_box::ComboBoxRenderState;
-use super::disclosure::DisclosureRenderState;
-use super::divider::DividerRenderState;
-use super::dropdown_menu::DropdownMenuRenderState;
-use super::empty_state::EmptyStateRenderState;
-use super::file_path_input::FilePathInputRenderState;
-use super::focus_ring::FocusRingRenderState;
-use super::form::FormRenderState;
-use super::heading::HeadingRenderState;
-use super::icon_button::IconButtonRenderState;
-use super::keybinding_input::KeybindingInputRenderState;
-use super::label::LabelRenderState;
-use super::list_item::ListItemRenderState;
-use super::modal::ModalRenderState;
-use super::notification::NotificationRenderState;
-use super::number_input::NumberInputRenderState;
-use super::panel::PanelRenderState;
-use super::password_input::PasswordInputRenderState;
-use super::popover::PopoverRenderState;
-use super::progress::ProgressBarRenderState;
-use super::radio::RadioRenderState;
-use super::search_input::SearchInputRenderState;
-use super::select::SelectRenderState;
-use super::skeleton::SkeletonRenderState;
-use super::split_button::SplitButtonRenderState;
-use super::switch::SwitchRenderState;
-use super::tag::TagRenderState;
-use super::text_area::TextAreaRenderState;
-use super::text_input::TextInputRenderState;
-use super::toast::ToastRenderState;
-use super::toggle_button::ToggleButtonRenderState;
-use super::tooltip::TooltipRenderState;
-use super::tree_item::TreeItemRenderState;
+use yororen_ui_core::renderer::avatar::AvatarRenderState;
+use yororen_ui_core::renderer::badge::BadgeRenderState;
+use yororen_ui_core::renderer::button::ButtonRenderState;
+use yororen_ui_core::renderer::card::CardRenderState;
+use yororen_ui_core::renderer::checkbox::CheckboxRenderState;
+use yororen_ui_core::renderer::combo_box::ComboBoxRenderState;
+use yororen_ui_core::renderer::disclosure::DisclosureRenderState;
+use yororen_ui_core::renderer::divider::DividerRenderState;
+use yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderState;
+use yororen_ui_core::renderer::empty_state::EmptyStateRenderState;
+use yororen_ui_core::renderer::file_path_input::FilePathInputRenderState;
+use yororen_ui_core::renderer::focus_ring::FocusRingRenderState;
+use yororen_ui_core::renderer::form::FormRenderState;
+use yororen_ui_core::renderer::heading::HeadingRenderState;
+use yororen_ui_core::renderer::icon_button::IconButtonRenderState;
+use yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState;
+use yororen_ui_core::renderer::label::LabelRenderState;
+use yororen_ui_core::renderer::list_item::ListItemRenderState;
+use yororen_ui_core::renderer::modal::ModalRenderState;
+use yororen_ui_core::renderer::notification::NotificationRenderState;
+use yororen_ui_core::renderer::number_input::NumberInputRenderState;
+use yororen_ui_core::renderer::panel::PanelRenderState;
+use yororen_ui_core::renderer::password_input::PasswordInputRenderState;
+use yororen_ui_core::renderer::popover::PopoverRenderState;
+use yororen_ui_core::renderer::progress::ProgressBarRenderState;
+use yororen_ui_core::renderer::radio::RadioRenderState;
+use yororen_ui_core::renderer::search_input::SearchInputRenderState;
+use yororen_ui_core::renderer::select::SelectRenderState;
+use yororen_ui_core::renderer::skeleton::SkeletonRenderState;
+use yororen_ui_core::renderer::split_button::SplitButtonRenderState;
+use yororen_ui_core::renderer::switch::SwitchRenderState;
+use yororen_ui_core::renderer::tag::TagRenderState;
+use yororen_ui_core::renderer::text_area::TextAreaRenderState;
+use yororen_ui_core::renderer::text_input::TextInputRenderState;
+use yororen_ui_core::renderer::toast::ToastRenderState;
+use yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState;
+use yororen_ui_core::renderer::tooltip::TooltipRenderState;
+use yororen_ui_core::renderer::tree_item::TreeItemRenderState;
 
 /// Collection of component renderers. Looked up at render time by
 /// `XxxRenderState` `TypeId`.
@@ -317,7 +355,9 @@ impl RendererRegistry {
     /// to `Box<dyn Any + Send + Sync>`. So the inner `Any` is
     /// `Arc<dyn XxxRenderer>`. We downcast back to that `Arc<...>`
     /// to recover the original typed renderer.
-    fn get_typed<S: super::spec::RenderState, R: ?Sized + 'static>(&self) -> Option<&Arc<R>> {
+    fn get_typed<S: yororen_ui_core::renderer::spec::RenderState, R: ?Sized + 'static>(
+        &self,
+    ) -> Option<&Arc<R>> {
         self.map
             .get(&TypeId::of::<S>())
             .and_then(|arc| arc.downcast_ref::<Arc<R>>())
@@ -541,7 +581,7 @@ mod tests {
         let mut map: HashMap<TypeId, Arc<dyn Any + Send + Sync>> = HashMap::new();
         let arc: Arc<dyn ButtonRenderer> = Arc::new(super::super::button::TokenButtonRenderer);
         map.insert(
-            TypeId::of::<super::super::button::ButtonRenderState>(),
+            TypeId::of::<yororen_ui_core::renderer::button::ButtonRenderState>(),
             Arc::new(arc),
         );
         RendererRegistry { map }
@@ -651,7 +691,7 @@ mod tests {
         // via a hand-rolled almost-complete registry.
         let mut almost = RendererRegistry::token_based();
         // Drop one entry to simulate "future edit removed this line".
-        let dropped = TypeId::of::<super::super::button::ButtonRenderState>();
+        let dropped = TypeId::of::<yororen_ui_core::renderer::button::ButtonRenderState>();
         almost.map.remove(&dropped);
         // Now `almost` is incomplete; the same `panic_missing_renderers`
         // path used by `token_based()` must fire.

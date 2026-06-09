@@ -9,7 +9,7 @@ use crate::style::{BRUTAL_BORDER, brutal_border_color};
 // Switch
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::switch::{SwitchRenderState, SwitchRenderer};
+pub use yororen_ui_core::renderer::switch::{SwitchRenderState, SwitchRenderer};
 
 pub struct BrutalSwitchRenderer;
 
@@ -102,7 +102,7 @@ impl SwitchRenderer for BrutalSwitchRenderer {
 // Checkbox
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::checkbox::{CheckboxRenderState, CheckboxRenderer};
+pub use yororen_ui_core::renderer::checkbox::{CheckboxRenderState, CheckboxRenderer};
 
 pub struct BrutalCheckboxRenderer;
 
@@ -182,7 +182,7 @@ impl CheckboxRenderer for BrutalCheckboxRenderer {
 // Radio
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::radio::{RadioRenderState, RadioRenderer};
+pub use yororen_ui_core::renderer::radio::{RadioRenderState, RadioRenderer};
 
 pub struct BrutalRadioRenderer;
 

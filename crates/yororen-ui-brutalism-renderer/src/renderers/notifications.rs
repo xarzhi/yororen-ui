@@ -1,8 +1,8 @@
 //! Brutalist notification renderers: `Toast`, `Notification`.
 
 use gpui::{Hsla, Pixels, px};
+use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
-use yororen_ui_default_renderer::renderers::spec::Edges;
 
 use crate::style::{BRUTAL_BORDER, BRUTAL_RADIUS, brutal_border_color};
 
@@ -10,7 +10,7 @@ use crate::style::{BRUTAL_BORDER, BRUTAL_RADIUS, brutal_border_color};
 // Toast
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::toast::{ToastRenderState, ToastRenderer};
+pub use yororen_ui_core::renderer::toast::{ToastRenderState, ToastRenderer};
 
 pub struct BrutalToastRenderer;
 
@@ -42,9 +42,7 @@ impl ToastRenderer for BrutalToastRenderer {
 // Notification
 // =====================================================================
 
-pub use yororen_ui_default_renderer::renderers::notification::{
-    NotificationRenderState, NotificationRenderer,
-};
+pub use yororen_ui_core::renderer::notification::{NotificationRenderState, NotificationRenderer};
 
 pub struct BrutalNotificationRenderer;
 

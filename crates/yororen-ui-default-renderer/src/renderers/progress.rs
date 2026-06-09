@@ -5,22 +5,8 @@ use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
 
+pub use yororen_ui_core::renderer::progress::{ProgressBarRenderState, ProgressBarRenderer};
 use yororen_ui_core::theme::Theme;
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct ProgressBarRenderState {
-    pub indeterminate: bool,
-    /// `true` if user supplied a non-zero `.height(...)`.
-    pub has_custom_height: bool,
-}
-
-pub trait ProgressBarRenderer: Any + Send + Sync {
-    fn track(&self, state: &ProgressBarRenderState, theme: &Theme) -> Hsla;
-    fn fill(&self, state: &ProgressBarRenderState, theme: &Theme) -> Hsla;
-    fn height(&self, state: &ProgressBarRenderState, theme: &Theme) -> Pixels;
-    fn border_color(&self, state: &ProgressBarRenderState, theme: &Theme) -> Hsla;
-    fn border_radius(&self, state: &ProgressBarRenderState, theme: &Theme) -> Pixels;
-}
 
 pub struct TokenProgressBarRenderer;
 

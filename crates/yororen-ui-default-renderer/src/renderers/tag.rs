@@ -5,26 +5,8 @@ use std::sync::Arc;
 
 use gpui::{FontWeight, Hsla, Pixels};
 
+pub use yororen_ui_core::renderer::tag::{TagRenderState, TagRenderer};
 use yororen_ui_core::theme::Theme;
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct TagRenderState {
-    pub selected: bool,
-    pub has_custom_tone: bool,
-    pub closable: bool,
-}
-
-pub trait TagRenderer: Any + Send + Sync {
-    fn bg(&self, state: &TagRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &TagRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &TagRenderState, theme: &Theme) -> Pixels;
-    fn padding_x(&self, state: &TagRenderState, theme: &Theme) -> Pixels;
-    fn font_size(&self, state: &TagRenderState, theme: &Theme) -> Pixels;
-    fn font_weight(&self, state: &TagRenderState, theme: &Theme) -> FontWeight;
-    fn border_radius(&self, state: &TagRenderState, theme: &Theme) -> Pixels;
-    fn close_size(&self, state: &TagRenderState, theme: &Theme) -> Pixels;
-    fn close_hover_bg(&self, state: &TagRenderState, theme: &Theme) -> Hsla;
-}
 
 pub struct TokenTagRenderer;
 
