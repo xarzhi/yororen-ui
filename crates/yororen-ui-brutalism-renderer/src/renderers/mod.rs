@@ -12,4 +12,5 @@
 pub mod actions;
 pub mod controls;
 pub mod display;
+pub mod inputs;
 pub mod surfaces;
