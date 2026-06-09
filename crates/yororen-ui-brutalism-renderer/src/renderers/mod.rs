@@ -10,4 +10,6 @@
 //! renderers stay in stylistic lockstep.
 
 pub mod actions;
+pub mod controls;
 pub mod display;
+pub mod surfaces;
