@@ -4,10 +4,7 @@
 
 use std::sync::Arc;
 
-use gpui::{
-    App, ClickEvent, Div, ElementId, InteractiveElement, Stateful, StatefulInteractiveElement,
-    Window,
-};
+use gpui::{App, ClickEvent, Div, ElementId, InteractiveElement, Stateful, Window};
 
 pub type ClickCallback = Arc<dyn Fn(&ClickEvent, &mut Window, &mut App) + Send + Sync>;
 

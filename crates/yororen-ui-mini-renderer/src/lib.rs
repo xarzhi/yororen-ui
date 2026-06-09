@@ -36,8 +36,8 @@ use std::sync::Arc;
 
 use gpui::App;
 
-use yororen_ui_core::renderer::markers;
 use yororen_ui_core::renderer::RendererContext;
+use yororen_ui_core::renderer::markers;
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 use yororen_ui_default_renderer::{
@@ -70,25 +70,23 @@ pub fn install(cx: &mut App) {
     let base = theme
         .get_color("themeColor")
         .or_else(|| theme.get_color("surface.hover"))
-        .unwrap_or_else(gpui::Hsla::default);
+        .unwrap_or_default();
     let accent = theme
         .get_color("accentColor")
         .or_else(|| theme.get_color("surface.hover"))
         .unwrap_or(base);
     let _ = accent; // currently unused; future button-renderer fields can use it
 
-    cx.register_renderer_arc::<markers::Button, dyn ButtonRenderer>(
-        Arc::new(MiniButtonRenderer { base }),
-    );
-    cx.register_renderer_arc::<markers::IconButton, dyn IconButtonRenderer>(
-        Arc::new(MiniIconButtonRenderer { base }),
-    );
-    cx.register_renderer_arc::<markers::ToggleButton, dyn ToggleButtonRenderer>(
-        Arc::new(MiniToggleButtonRenderer { base }),
-    );
-    cx.register_renderer_arc::<markers::Label, dyn LabelRenderer>(
-        Arc::new(MiniLabelRenderer),
-    );
+    cx.register_renderer_arc::<markers::Button, dyn ButtonRenderer>(Arc::new(MiniButtonRenderer {
+        base,
+    }));
+    cx.register_renderer_arc::<markers::IconButton, dyn IconButtonRenderer>(Arc::new(
+        MiniIconButtonRenderer { base },
+    ));
+    cx.register_renderer_arc::<markers::ToggleButton, dyn ToggleButtonRenderer>(Arc::new(
+        MiniToggleButtonRenderer { base },
+    ));
+    cx.register_renderer_arc::<markers::Label, dyn LabelRenderer>(Arc::new(MiniLabelRenderer));
 }
 
 /// Load the bundled `themes/mini-default.json` and install a

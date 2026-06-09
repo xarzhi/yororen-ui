@@ -77,20 +77,17 @@ pub fn value_to_hsla(v: &Value) -> Option<Hsla> {
         let h = obj.get("h").and_then(Value::as_f64)? as f32;
         let s = obj.get("s").and_then(Value::as_f64)? as f32;
         let l = obj.get("l").and_then(Value::as_f64)? as f32;
-        let a = obj
-            .get("a")
-            .and_then(Value::as_f64)
-            .unwrap_or(1.0) as f32;
+        let a = obj.get("a").and_then(Value::as_f64).unwrap_or(1.0) as f32;
         return Some(Hsla { h, s, l, a });
     }
-    if let Some(arr) = v.as_array() {
-        if arr.len() == 4 {
-            let h = arr[0].as_f64()? as f32;
-            let s = arr[1].as_f64()? as f32;
-            let l = arr[2].as_f64()? as f32;
-            let a = arr[3].as_f64()? as f32;
-            return Some(Hsla { h, s, l, a });
-        }
+    if let Some(arr) = v.as_array()
+        && arr.len() == 4
+    {
+        let h = arr[0].as_f64()? as f32;
+        let s = arr[1].as_f64()? as f32;
+        let l = arr[2].as_f64()? as f32;
+        let a = arr[3].as_f64()? as f32;
+        return Some(Hsla { h, s, l, a });
     }
     None
 }
@@ -180,7 +177,11 @@ mod tests {
         let c = parse_hex_color("#ff0000").unwrap();
         // red: hue 0, sat 1, lightness 0.5, alpha 1
         assert!(c.s > 0.5, "expected high saturation, got {}", c.s);
-        assert!(c.l > 0.4 && c.l < 0.6, "expected mid lightness, got {}", c.l);
+        assert!(
+            c.l > 0.4 && c.l < 0.6,
+            "expected mid lightness, got {}",
+            c.l
+        );
         assert!(c.a > 0.99);
     }
 

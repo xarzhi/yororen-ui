@@ -22,7 +22,7 @@ use serde_json::Value;
 mod global;
 mod path;
 
-pub use global::{install, ActiveTheme, GlobalTheme};
+pub use global::{ActiveTheme, GlobalTheme, install};
 pub use path::value_to_hsla;
 
 /// Open key-value palette.

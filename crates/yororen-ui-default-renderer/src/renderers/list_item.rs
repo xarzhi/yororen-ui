@@ -53,7 +53,11 @@ impl ListItemRenderer for TokenListItemRenderer {
         )
     }
     fn min_height(&self, _state: &ListItemRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.list_item.min_height").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.list_item.min_height")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn border_radius(&self, _state: &ListItemRenderState, theme: &Theme) -> Pixels {
         gpui::px(theme.get_number("tokens.radii.sm").unwrap_or(0.0) as f32)

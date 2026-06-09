@@ -1,8 +1,8 @@
 //! Headless `tag` — closeable inline label.
 
 use gpui::{
-    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Window,
+    App, ClickEvent, Div, ElementId, InteractiveElement, Stateful, StatefulInteractiveElement,
+    Window,
 };
 
 use std::sync::Arc;

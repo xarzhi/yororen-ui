@@ -37,13 +37,13 @@ fn main() {
 
         // Open the main window.
         let options = WindowOptions {
-            window_bounds: Some(WindowBounds::Windowed(
-                gpui::Bounds::centered(None, size(px(400.0), px(300.0)), cx),
-            )),
+            window_bounds: Some(WindowBounds::Windowed(gpui::Bounds::centered(
+                None,
+                size(px(400.0), px(300.0)),
+                cx,
+            ))),
             ..Default::default()
         };
-        let _ = cx.open_window(options, |_, cx| {
-            cx.new(|_cx| counter_app::CounterApp)
-        });
+        let _ = cx.open_window(options, |_, cx| cx.new(|_cx| counter_app::CounterApp));
     });
 }

@@ -55,7 +55,11 @@ impl TagRenderer for TokenTagRenderer {
     }
 
     fn min_height(&self, _state: &TagRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.tag.min_height").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.tag.min_height")
+                .unwrap_or(0.0) as f32,
+        )
     }
 
     fn padding_x(&self, _state: &TagRenderState, theme: &Theme) -> Pixels {
@@ -63,11 +67,19 @@ impl TagRenderer for TokenTagRenderer {
     }
 
     fn font_size(&self, _state: &TagRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.typography.font_size_xs").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.typography.font_size_xs")
+                .unwrap_or(0.0) as f32,
+        )
     }
 
     fn font_weight(&self, _state: &TagRenderState, theme: &Theme) -> FontWeight {
-        FontWeight(theme.get_number("tokens.typography.weight_medium").unwrap_or(500.0) as f32)
+        FontWeight(
+            theme
+                .get_number("tokens.typography.weight_medium")
+                .unwrap_or(500.0) as f32,
+        )
     }
 
     fn border_radius(&self, _state: &TagRenderState, theme: &Theme) -> Pixels {
@@ -79,7 +91,9 @@ impl TagRenderer for TokenTagRenderer {
     }
 
     fn close_hover_bg(&self, _state: &TagRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("action.neutral.hover_bg").unwrap_or_default()
+        theme
+            .get_color("action.neutral.hover_bg")
+            .unwrap_or_default()
     }
 }
 

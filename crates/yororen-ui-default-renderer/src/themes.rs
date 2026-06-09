@@ -18,9 +18,9 @@ use std::sync::Arc;
 
 use gpui::{App, WindowAppearance};
 
-use yororen_ui_core::renderer::markers;
 use yororen_ui_core::renderer::RendererContext;
-use yororen_ui_core::theme::{install as install_theme, Theme};
+use yororen_ui_core::renderer::markers;
+use yororen_ui_core::theme::{Theme, install as install_theme};
 
 use crate::renderers::{
     TokenAvatarRenderer, TokenBadgeRenderer, TokenButtonRenderer, TokenCardRenderer,
@@ -84,54 +84,54 @@ pub fn install_with(cx: &mut App, theme: Theme) {
 /// installed the theme (e.g. for tests) can still wire up the
 /// default look without re-installing the theme.
 pub fn register_default_renderers(cx: &mut App) {
-    cx.register_renderer_arc::<markers::Button, dyn crate::renderers::ButtonRenderer>(
-        Arc::new(TokenButtonRenderer),
-    );
+    cx.register_renderer_arc::<markers::Button, dyn crate::renderers::ButtonRenderer>(Arc::new(
+        TokenButtonRenderer,
+    ));
     cx.register_renderer_arc::<markers::IconButton, dyn crate::renderers::IconButtonRenderer>(
         Arc::new(TokenIconButtonRenderer),
     );
     cx.register_renderer_arc::<markers::ToggleButton, dyn crate::renderers::ToggleButtonRenderer>(
         Arc::new(TokenToggleButtonRenderer),
     );
-    cx.register_renderer_arc::<markers::Label, dyn crate::renderers::LabelRenderer>(
-        Arc::new(TokenLabelRenderer),
-    );
-    cx.register_renderer_arc::<markers::Heading, dyn crate::renderers::HeadingRenderer>(
-        Arc::new(TokenHeadingRenderer),
-    );
-    cx.register_renderer_arc::<markers::Divider, dyn crate::renderers::DividerRenderer>(
-        Arc::new(TokenDividerRenderer),
-    );
+    cx.register_renderer_arc::<markers::Label, dyn crate::renderers::LabelRenderer>(Arc::new(
+        TokenLabelRenderer,
+    ));
+    cx.register_renderer_arc::<markers::Heading, dyn crate::renderers::HeadingRenderer>(Arc::new(
+        TokenHeadingRenderer,
+    ));
+    cx.register_renderer_arc::<markers::Divider, dyn crate::renderers::DividerRenderer>(Arc::new(
+        TokenDividerRenderer,
+    ));
     cx.register_renderer_arc::<markers::FocusRing, dyn crate::renderers::FocusRingRenderer>(
         Arc::new(TokenFocusRingRenderer),
     );
-    cx.register_renderer_arc::<markers::Badge, dyn crate::renderers::BadgeRenderer>(
-        Arc::new(TokenBadgeRenderer),
-    );
-    cx.register_renderer_arc::<markers::Tag, dyn crate::renderers::TagRenderer>(
-        Arc::new(TokenTagRenderer),
-    );
+    cx.register_renderer_arc::<markers::Badge, dyn crate::renderers::BadgeRenderer>(Arc::new(
+        TokenBadgeRenderer,
+    ));
+    cx.register_renderer_arc::<markers::Tag, dyn crate::renderers::TagRenderer>(Arc::new(
+        TokenTagRenderer,
+    ));
     cx.register_renderer_arc::<markers::ProgressBar, dyn crate::renderers::ProgressBarRenderer>(
         Arc::new(TokenProgressBarRenderer),
     );
     cx.register_renderer_arc::<markers::Skeleton, dyn crate::renderers::SkeletonRenderer>(
         Arc::new(TokenSkeletonRenderer),
     );
-    cx.register_renderer_arc::<markers::Tooltip, dyn crate::renderers::TooltipRenderer>(
-        Arc::new(TokenTooltipRenderer),
-    );
-    cx.register_renderer_arc::<markers::Avatar, dyn crate::renderers::AvatarRenderer>(
-        Arc::new(TokenAvatarRenderer),
-    );
-    cx.register_renderer_arc::<markers::Switch, dyn crate::renderers::SwitchRenderer>(
-        Arc::new(TokenSwitchRenderer),
-    );
+    cx.register_renderer_arc::<markers::Tooltip, dyn crate::renderers::TooltipRenderer>(Arc::new(
+        TokenTooltipRenderer,
+    ));
+    cx.register_renderer_arc::<markers::Avatar, dyn crate::renderers::AvatarRenderer>(Arc::new(
+        TokenAvatarRenderer,
+    ));
+    cx.register_renderer_arc::<markers::Switch, dyn crate::renderers::SwitchRenderer>(Arc::new(
+        TokenSwitchRenderer,
+    ));
     cx.register_renderer_arc::<markers::Checkbox, dyn crate::renderers::CheckboxRenderer>(
         Arc::new(TokenCheckboxRenderer),
     );
-    cx.register_renderer_arc::<markers::Radio, dyn crate::renderers::RadioRenderer>(
-        Arc::new(TokenRadioRenderer),
-    );
+    cx.register_renderer_arc::<markers::Radio, dyn crate::renderers::RadioRenderer>(Arc::new(
+        TokenRadioRenderer,
+    ));
     cx.register_renderer_arc::<markers::TextInput, dyn crate::renderers::TextInputRenderer>(
         Arc::new(TokenTextInputRenderer),
     );
@@ -150,39 +150,39 @@ pub fn register_default_renderers(cx: &mut App) {
     cx.register_renderer_arc::<markers::SearchInput, dyn crate::renderers::SearchInputRenderer>(
         Arc::new(TokenSearchInputRenderer),
     );
-    cx.register_renderer_arc::<markers::Select, dyn crate::renderers::SelectRenderer>(
-        Arc::new(TokenSelectRenderer),
-    );
+    cx.register_renderer_arc::<markers::Select, dyn crate::renderers::SelectRenderer>(Arc::new(
+        TokenSelectRenderer,
+    ));
     cx.register_renderer_arc::<markers::ComboBox, dyn crate::renderers::ComboBoxRenderer>(
         Arc::new(TokenComboBoxRenderer),
     );
-    cx.register_renderer_arc::<markers::Modal, dyn crate::renderers::ModalRenderer>(
-        Arc::new(TokenModalRenderer),
-    );
-    cx.register_renderer_arc::<markers::Popover, dyn crate::renderers::PopoverRenderer>(
-        Arc::new(TokenPopoverRenderer),
-    );
+    cx.register_renderer_arc::<markers::Modal, dyn crate::renderers::ModalRenderer>(Arc::new(
+        TokenModalRenderer,
+    ));
+    cx.register_renderer_arc::<markers::Popover, dyn crate::renderers::PopoverRenderer>(Arc::new(
+        TokenPopoverRenderer,
+    ));
     cx.register_renderer_arc::<markers::DropdownMenu, dyn crate::renderers::DropdownMenuRenderer>(
         Arc::new(TokenDropdownMenuRenderer),
     );
     cx.register_renderer_arc::<markers::Disclosure, dyn crate::renderers::DisclosureRenderer>(
         Arc::new(TokenDisclosureRenderer),
     );
-    cx.register_renderer_arc::<markers::Toast, dyn crate::renderers::ToastRenderer>(
-        Arc::new(TokenToastRenderer),
-    );
+    cx.register_renderer_arc::<markers::Toast, dyn crate::renderers::ToastRenderer>(Arc::new(
+        TokenToastRenderer,
+    ));
     cx.register_renderer_arc::<markers::Notification, dyn crate::renderers::NotificationRenderer>(
         Arc::new(TokenNotificationRenderer),
     );
-    cx.register_renderer_arc::<markers::Panel, dyn crate::renderers::PanelRenderer>(
-        Arc::new(TokenPanelRenderer),
-    );
-    cx.register_renderer_arc::<markers::Card, dyn crate::renderers::CardRenderer>(
-        Arc::new(TokenCardRenderer),
-    );
-    cx.register_renderer_arc::<markers::Form, dyn crate::renderers::FormRenderer>(
-        Arc::new(TokenFormRenderer),
-    );
+    cx.register_renderer_arc::<markers::Panel, dyn crate::renderers::PanelRenderer>(Arc::new(
+        TokenPanelRenderer,
+    ));
+    cx.register_renderer_arc::<markers::Card, dyn crate::renderers::CardRenderer>(Arc::new(
+        TokenCardRenderer,
+    ));
+    cx.register_renderer_arc::<markers::Form, dyn crate::renderers::FormRenderer>(Arc::new(
+        TokenFormRenderer,
+    ));
     cx.register_renderer_arc::<markers::ListItem, dyn crate::renderers::ListItemRenderer>(
         Arc::new(TokenListItemRenderer),
     );

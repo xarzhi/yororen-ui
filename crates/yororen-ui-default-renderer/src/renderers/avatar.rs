@@ -39,15 +39,27 @@ impl AvatarRenderer for TokenAvatarRenderer {
     }
 
     fn status_dot_size(&self, _state: &AvatarRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.avatar.status_dot_size").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.avatar.status_dot_size")
+                .unwrap_or(0.0) as f32,
+        )
     }
 
     fn status_inset(&self, _state: &AvatarRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.avatar.status_inset").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.avatar.status_inset")
+                .unwrap_or(0.0) as f32,
+        )
     }
 
     fn status_border_w(&self, _state: &AvatarRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.avatar.border_w").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.avatar.border_w")
+                .unwrap_or(0.0) as f32,
+        )
     }
 
     fn status_border_color(&self, _state: &AvatarRenderState, theme: &Theme) -> Hsla {

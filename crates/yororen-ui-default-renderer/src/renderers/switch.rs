@@ -37,16 +37,32 @@ pub struct TokenSwitchRenderer;
 
 impl SwitchRenderer for TokenSwitchRenderer {
     fn track_w(&self, _state: &SwitchRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.switch.track_w").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.switch.track_w")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn track_h(&self, _state: &SwitchRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.switch.track_h").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.switch.track_h")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn knob_size(&self, _state: &SwitchRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.switch.knob_size").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.switch.knob_size")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn padding(&self, _state: &SwitchRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.switch.padding").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.switch.padding")
+                .unwrap_or(0.0) as f32,
+        )
     }
 
     fn track_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
@@ -71,14 +87,18 @@ impl SwitchRenderer for TokenSwitchRenderer {
     }
     fn track_hover_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
         if state.checked {
-            theme.get_color("action.primary.hover_bg").unwrap_or_default()
+            theme
+                .get_color("action.primary.hover_bg")
+                .unwrap_or_default()
         } else {
             theme.get_color("surface.base").unwrap_or_default()
         }
     }
     fn track_active_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
         if state.checked {
-            theme.get_color("action.primary.active_bg").unwrap_or_default()
+            theme
+                .get_color("action.primary.active_bg")
+                .unwrap_or_default()
         } else {
             theme.get_color("surface.sunken").unwrap_or_default()
         }
@@ -108,9 +128,11 @@ pub fn arc_switch<T: SwitchRenderer + 'static>(r: T) -> Arc<dyn SwitchRenderer> 
 // `DefaultSwitch` — `headless::SwitchProps` sugar.
 // =====================================================================
 
-use gpui::{div, App, InteractiveElement, ParentElement, Stateful, StatefulInteractiveElement, Styled};
+use gpui::{
+    App, InteractiveElement, ParentElement, Stateful, StatefulInteractiveElement, Styled, div,
+};
 use yororen_ui_core::headless::switch::SwitchProps;
-use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
 pub trait DefaultSwitch: Sized {
@@ -174,15 +196,27 @@ mod tests {
         let state = SwitchRenderState::default();
         assert_eq!(
             r.track_w(&state, &theme),
-            gpui::px(theme.get_number("tokens.control.switch.track_w").unwrap_or(0.0) as f32),
+            gpui::px(
+                theme
+                    .get_number("tokens.control.switch.track_w")
+                    .unwrap_or(0.0) as f32
+            ),
         );
         assert_eq!(
             r.track_h(&state, &theme),
-            gpui::px(theme.get_number("tokens.control.switch.track_h").unwrap_or(0.0) as f32),
+            gpui::px(
+                theme
+                    .get_number("tokens.control.switch.track_h")
+                    .unwrap_or(0.0) as f32
+            ),
         );
         assert_eq!(
             r.knob_size(&state, &theme),
-            gpui::px(theme.get_number("tokens.control.switch.knob_size").unwrap_or(0.0) as f32),
+            gpui::px(
+                theme
+                    .get_number("tokens.control.switch.knob_size")
+                    .unwrap_or(0.0) as f32
+            ),
         );
     }
 
@@ -190,7 +224,10 @@ mod tests {
     fn track_bg_uses_action_primary_when_checked() {
         let theme = fixture();
         let r = TokenSwitchRenderer;
-        let state = SwitchRenderState { checked: true, ..Default::default() };
+        let state = SwitchRenderState {
+            checked: true,
+            ..Default::default()
+        };
         assert_eq!(
             r.track_bg(&state, &theme),
             theme.get_color("action.primary.bg").unwrap(),
@@ -201,7 +238,10 @@ mod tests {
     fn track_bg_uses_surface_hover_when_unchecked() {
         let theme = fixture();
         let r = TokenSwitchRenderer;
-        let state = SwitchRenderState { checked: false, ..Default::default() };
+        let state = SwitchRenderState {
+            checked: false,
+            ..Default::default()
+        };
         assert_eq!(
             r.track_bg(&state, &theme),
             theme.get_color("surface.hover").unwrap(),
@@ -212,7 +252,10 @@ mod tests {
     fn disabled_state_doesnt_panic() {
         let theme = fixture();
         let r = TokenSwitchRenderer;
-        let state = SwitchRenderState { disabled: true, ..Default::default() };
+        let state = SwitchRenderState {
+            disabled: true,
+            ..Default::default()
+        };
         // All methods should not panic on a disabled state.
         let _ = r.track_bg(&state, &theme);
         let _ = r.knob_bg(&state, &theme);

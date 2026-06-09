@@ -30,9 +30,17 @@ impl SkeletonRenderer for TokenSkeletonRenderer {
 
     fn min_height(&self, state: &SkeletonRenderState, theme: &Theme) -> Pixels {
         if state.block {
-            gpui::px(theme.get_number("tokens.control.skeleton.block_min_h").unwrap_or(0.0) as f32)
+            gpui::px(
+                theme
+                    .get_number("tokens.control.skeleton.block_min_h")
+                    .unwrap_or(0.0) as f32,
+            )
         } else {
-            gpui::px(theme.get_number("tokens.control.skeleton.line_h").unwrap_or(0.0) as f32)
+            gpui::px(
+                theme
+                    .get_number("tokens.control.skeleton.line_h")
+                    .unwrap_or(0.0) as f32,
+            )
         }
     }
 

@@ -28,8 +28,8 @@ use std::ops::Range;
 use std::sync::{Arc, OnceLock};
 
 use gpui::{
-    actions, point, App, Bounds, Context, EntityInputHandler, FocusHandle, Focusable, Hsla,
-    KeyBinding, Pixels, ShapedLine, SharedString, UTF16Selection, Window,
+    App, Bounds, Context, EntityInputHandler, FocusHandle, Focusable, Hsla, KeyBinding, Pixels,
+    ShapedLine, SharedString, UTF16Selection, Window, actions, point,
 };
 
 pub type TextChangeCallback = Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>;
@@ -85,7 +85,11 @@ pub fn init(cx: &mut App) {
         KeyBinding::new("secondary-x", Cut, Some("UITextInput")),
         KeyBinding::new("home", Home, Some("UITextInput")),
         KeyBinding::new("end", End, Some("UITextInput")),
-        KeyBinding::new("ctrl-secondary-space", ShowCharacterPalette, Some("UITextInput")),
+        KeyBinding::new(
+            "ctrl-secondary-space",
+            ShowCharacterPalette,
+            Some("UITextInput"),
+        ),
     ]);
 }
 
@@ -251,8 +255,7 @@ impl TextInputState {
     /// Currently selected byte range. Empty when there's no
     /// selection (just a caret).
     pub fn selected_range(&self) -> Range<usize> {
-        self.selection_start.min(self.selection_end)
-            ..self.selection_start.max(self.selection_end)
+        self.selection_start.min(self.selection_end)..self.selection_start.max(self.selection_end)
     }
 
     /// `true` if a non-empty selection is active.
@@ -414,15 +417,13 @@ impl TextInputState {
         // range wins over the selection because the caret sits
         // at the end of the marked text — falling back to the
         // selection would insert *after* the pinyin.
-        let resolved = range
-            .or_else(|| self.marked_range.clone())
-            .or_else(|| {
-                if !self.selected_range().is_empty() {
-                    Some(self.selected_range())
-                } else {
-                    None
-                }
-            });
+        let resolved = range.or_else(|| self.marked_range.clone()).or_else(|| {
+            if !self.selected_range().is_empty() {
+                Some(self.selected_range())
+            } else {
+                None
+            }
+        });
         // Decide the effective new text up front (honouring
         // `max_length`). This avoids the "apply, then truncate"
         // path which would leave the caret past the end.
@@ -486,8 +487,7 @@ impl TextInputState {
         // Apply the replacement. The just-inserted text
         // occupies `[range_start, range_start + new_text.len())`
         // in byte space — that's the new marked range.
-        self.value
-            .replace_range(range_start..range_end, new_text);
+        self.value.replace_range(range_start..range_end, new_text);
         let marked_start = range_start;
         let marked_end = range_start + new_text.len();
         self.caret = marked_end;
@@ -505,8 +505,12 @@ impl TextInputState {
         // didn't provide one, the caret sits at the end of
         // the marked text.
         if let Some(sel_utf16) = new_selected_range {
-            let start_in_marked = self.utf16_to_offset(sel_utf16.start).saturating_sub(marked_start);
-            let end_in_marked = self.utf16_to_offset(sel_utf16.end).saturating_sub(marked_start);
+            let start_in_marked = self
+                .utf16_to_offset(sel_utf16.start)
+                .saturating_sub(marked_start);
+            let end_in_marked = self
+                .utf16_to_offset(sel_utf16.end)
+                .saturating_sub(marked_start);
             let sel_start = (marked_start + start_in_marked).min(marked_end);
             let sel_end = (marked_start + end_in_marked).min(marked_end);
             self.selection_start = sel_start;
@@ -520,10 +524,7 @@ impl TextInputState {
     // -- `EntityInputHandler` body methods (not the trait impl) -----
 
     /// UTF-8 version of `EntityInputHandler::text_for_range`.
-    pub fn text_for_range_inner(
-        &self,
-        range_utf16: Range<usize>,
-    ) -> (String, Range<usize>) {
+    pub fn text_for_range_inner(&self, range_utf16: Range<usize>) -> (String, Range<usize>) {
         self.text_for_range_utf16(range_utf16)
     }
 
@@ -536,7 +537,10 @@ impl TextInputState {
         // is the caret when the selection is non-empty). We treat
         // `selection_end` as the caret head, which matches the
         // rendering direction in `caret` above.
-        UTF16Selection { range: start..end, reversed: false }
+        UTF16Selection {
+            range: start..end,
+            reversed: false,
+        }
     }
 
     /// UTF-8 version of `EntityInputHandler::bounds_for_range`.
@@ -618,10 +622,7 @@ impl TextInputState {
     }
 
     /// UTF-8 version of `EntityInputHandler::character_index_for_point`.
-    pub fn character_index_for_point_inner(
-        &self,
-        point: gpui::Point<Pixels>,
-    ) -> Option<usize> {
+    pub fn character_index_for_point_inner(&self, point: gpui::Point<Pixels>) -> Option<usize> {
         if self.value.is_empty() {
             return Some(0);
         }
@@ -702,9 +703,7 @@ impl EntityInputHandler for TextInputState {
         // Return the UTF-16 of the active IME marked range.
         // The platform uses this to know where the composition
         // is when committing (or to query / replace it).
-        self.marked_range
-            .as_ref()
-            .map(|r| self.range_to_utf16(r))
+        self.marked_range.as_ref().map(|r| self.range_to_utf16(r))
     }
 
     fn unmark_text(&mut self, _window: &mut Window, _cx: &mut Context<Self>) {
@@ -744,7 +743,7 @@ impl EntityInputHandler for TextInputState {
         if self.value != before
             && let Some(cb) = self.on_change.as_ref()
         {
-            cb(&self.value, window, &mut **cx);
+            cb(&self.value, window, cx);
         }
         cx.notify();
     }
@@ -764,7 +763,7 @@ impl EntityInputHandler for TextInputState {
         if self.value != before
             && let Some(cb) = self.on_change.as_ref()
         {
-            cb(&self.value, window, &mut **cx);
+            cb(&self.value, window, cx);
         }
         cx.notify();
     }
@@ -885,7 +884,7 @@ impl TextInputState {
         if self.value != before
             && let Some(cb) = self.on_change.as_ref()
         {
-            cb(&self.value, window, &mut **cx);
+            cb(&self.value, window, cx);
         }
         cx.notify();
     }
@@ -903,7 +902,7 @@ impl TextInputState {
         if self.value != before
             && let Some(cb) = self.on_change.as_ref()
         {
-            cb(&self.value, window, &mut **cx);
+            cb(&self.value, window, cx);
         }
         cx.notify();
     }
@@ -927,7 +926,7 @@ impl TextInputState {
             if self.value != before
                 && let Some(cb) = self.on_change.as_ref()
             {
-                cb(&self.value, window, &mut **cx);
+                cb(&self.value, window, cx);
             }
         }
         cx.notify();
@@ -951,7 +950,7 @@ impl TextInputState {
             if self.value != before
                 && let Some(cb) = self.on_change.as_ref()
             {
-                cb(&self.value, window, &mut **cx);
+                cb(&self.value, window, cx);
             }
         }
         cx.notify();
@@ -1184,7 +1183,7 @@ mod tests {
 
     #[test]
     fn replace_text_collapses_selection() {
-        let mut s = test_state("hello");
+        let s = &mut *test_state("hello");
         s.caret = 5;
         s.selection_start = 1;
         s.selection_end = 4;
@@ -1197,7 +1196,7 @@ mod tests {
 
     #[test]
     fn backspace_at_zero_is_noop() {
-        let mut s = test_state("hi");
+        let s = &mut *test_state("hi");
         s.move_to(0);
         // No selection, caret=0 → replace_text(0,0,"") is a no-op
         s.replace_text(0, 0, "");
@@ -1207,14 +1206,14 @@ mod tests {
 
     #[test]
     fn move_to_clamps() {
-        let mut s = test_state("hi");
+        let s = &mut *test_state("hi");
         s.move_to(100);
         assert_eq!(s.caret, 2);
     }
 
     #[test]
     fn selected_range_is_normalised() {
-        let mut s = test_state("hello");
+        let s = &mut *test_state("hello");
         s.selection_start = 4;
         s.selection_end = 1;
         assert_eq!(s.selected_range(), 1..4);

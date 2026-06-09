@@ -158,11 +158,15 @@ mod tests {
     }
     struct A;
     impl MyTrait for A {
-        fn name(&self) -> &str { "A" }
+        fn name(&self) -> &str {
+            "A"
+        }
     }
     struct B;
     impl MyTrait for B {
-        fn name(&self) -> &str { "B" }
+        fn name(&self) -> &str {
+            "B"
+        }
     }
 
     #[test]
@@ -204,8 +208,14 @@ mod tests {
         r.register_arc::<TestMarkerA, dyn MyTrait>(Arc::new(A) as Arc<dyn MyTrait>);
         r.register_arc::<TestMarkerB, dyn MyTrait>(Arc::new(B) as Arc<dyn MyTrait>);
         assert_eq!(r.len(), 2);
-        assert_eq!(r.renderer_arc::<TestMarkerA, dyn MyTrait>().unwrap().name(), "A");
-        assert_eq!(r.renderer_arc::<TestMarkerB, dyn MyTrait>().unwrap().name(), "B");
+        assert_eq!(
+            r.renderer_arc::<TestMarkerA, dyn MyTrait>().unwrap().name(),
+            "A"
+        );
+        assert_eq!(
+            r.renderer_arc::<TestMarkerB, dyn MyTrait>().unwrap().name(),
+            "B"
+        );
     }
 
     #[test]

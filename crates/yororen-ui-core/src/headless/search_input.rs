@@ -6,8 +6,8 @@ use std::sync::Arc;
 
 use gpui::{App, Hsla, Window};
 
-pub type SearchChangeCallback =
-    Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>;
+pub type SearchChangeCallback = Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>;
+pub type SearchClearCallback = Arc<dyn Fn(&mut Window, &mut App) + Send + Sync>;
 
 #[derive(Clone)]
 pub struct SearchInputProps {
@@ -17,7 +17,7 @@ pub struct SearchInputProps {
     pub value: String,
     pub on_change: Option<SearchChangeCallback>,
     pub on_submit: Option<SearchChangeCallback>,
-    pub on_clear: Option<Arc<dyn Fn(&mut gpui::Window, &mut App) + Send + Sync>>,
+    pub on_clear: Option<SearchClearCallback>,
     pub has_custom_bg: bool,
     pub has_custom_border: bool,
     pub has_custom_focus_border: bool,

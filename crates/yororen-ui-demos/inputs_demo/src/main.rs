@@ -107,9 +107,11 @@ fn main() {
         default_renderer::install_with(cx, theme);
 
         let options = WindowOptions {
-            window_bounds: Some(WindowBounds::Windowed(
-                gpui::Bounds::centered(None, size(px(900.0), px(900.0)), cx),
-            )),
+            window_bounds: Some(WindowBounds::Windowed(gpui::Bounds::centered(
+                None,
+                size(px(900.0), px(900.0)),
+                cx,
+            ))),
             ..Default::default()
         };
         let _ = cx.open_window(options, |_, cx| cx.new(|_cx| inputs_app::InputsApp::new()));

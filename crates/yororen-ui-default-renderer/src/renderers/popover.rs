@@ -34,7 +34,11 @@ impl PopoverRenderer for TokenPopoverRenderer {
         gpui::px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
     }
     fn offset(&self, _state: &PopoverRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.popover.offset").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.popover.offset")
+                .unwrap_or(0.0) as f32,
+        )
     }
 }
 

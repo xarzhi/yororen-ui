@@ -11,10 +11,10 @@ pub mod markers;
 mod registry;
 mod variant;
 
-pub use context::{init_renderer_registry, RendererContext};
+pub use context::{RendererContext, init_renderer_registry};
 pub use markers::*;
 pub use registry::{RendererMarker, RendererRegistry};
 pub use variant::{
-    variant_compose, ActionVariantKind, ButtonVariant, BuiltinVariantKey, GlobalVariantRegistry,
-    TokenVariantStyle, VariantKey, VariantRegistry, VariantState, VariantStyle,
+    ActionVariantKind, BuiltinVariantKey, ButtonVariant, GlobalVariantRegistry, TokenVariantStyle,
+    VariantKey, VariantRegistry, VariantState, VariantStyle, variant_compose,
 };

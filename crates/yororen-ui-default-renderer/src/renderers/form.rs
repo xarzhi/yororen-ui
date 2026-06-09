@@ -21,7 +21,11 @@ pub struct TokenFormRenderer;
 
 impl FormRenderer for TokenFormRenderer {
     fn gap(&self, _state: &FormRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.form.field_gap").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.form.field_gap")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn label_color(&self, _state: &FormRenderState, theme: &Theme) -> Hsla {
         theme.get_color("content.secondary").unwrap_or_default()

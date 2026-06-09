@@ -25,7 +25,11 @@ impl DividerRenderer for TokenDividerRenderer {
     }
 
     fn thickness(&self, _state: &DividerRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.divider.thickness").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.divider.thickness")
+                .unwrap_or(0.0) as f32,
+        )
     }
 }
 

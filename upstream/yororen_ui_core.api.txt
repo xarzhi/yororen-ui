@@ -1316,8 +1316,8 @@ pub yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_b
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_border: bool
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custom_focus_border: bool
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::id: gpui::window::ElementId
-pub yororen_ui_core::headless::file_path_input::FilePathInputProps::on_browse: core::option::Option<alloc::sync::Arc<(dyn core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>>
-pub yororen_ui_core::headless::file_path_input::FilePathInputProps::on_change: core::option::Option<alloc::sync::Arc<(dyn core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>>
+pub yororen_ui_core::headless::file_path_input::FilePathInputProps::on_browse: core::option::Option<yororen_ui_core::headless::file_path_input::TextBrowseCallback>
+pub yororen_ui_core::headless::file_path_input::FilePathInputProps::on_change: core::option::Option<yororen_ui_core::headless::file_path_input::TextChangeCallback>
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::placeholder: alloc::string::String
 pub yororen_ui_core::headless::file_path_input::FilePathInputProps::value: alloc::string::String
 impl yororen_ui_core::headless::file_path_input::FilePathInputProps
@@ -1343,6 +1343,8 @@ impl core::marker::UnsafeUnpin for yororen_ui_core::headless::file_path_input::F
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::file_path_input::FilePathInputProps
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::file_path_input::FilePathInputProps
 pub fn yororen_ui_core::headless::file_path_input::file_path_input(impl core::convert::Into<gpui::window::ElementId>) -> yororen_ui_core::headless::file_path_input::FilePathInputProps
+pub type yororen_ui_core::headless::file_path_input::TextBrowseCallback = yororen_ui_core::headless::file_path_input::TextChangeCallback
+pub type yororen_ui_core::headless::file_path_input::TextChangeCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
 pub mod yororen_ui_core::headless::focus_ring
 pub struct yororen_ui_core::headless::focus_ring::FocusRingProps
 pub yororen_ui_core::headless::focus_ring::FocusRingProps::focus_handle: gpui::window::FocusHandle
@@ -1599,9 +1601,9 @@ pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::has_custo
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::has_custom_focus_border: bool
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::mode: yororen_ui_core::headless::keybinding_input::KeybindingInputMode
-pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_cancel_capture: core::option::Option<alloc::sync::Arc<(dyn core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>>
+pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_cancel_capture: core::option::Option<yororen_ui_core::headless::keybinding_input::KeybindingCaptureCallback>
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_change: core::option::Option<yororen_ui_core::headless::keybinding_input::KeybindingChangeCallback>
-pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_start_capture: core::option::Option<alloc::sync::Arc<(dyn core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>>
+pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_start_capture: core::option::Option<yororen_ui_core::headless::keybinding_input::KeybindingCaptureCallback>
 pub yororen_ui_core::headless::keybinding_input::KeybindingInputProps::placeholder: alloc::string::String
 impl yororen_ui_core::headless::keybinding_input::KeybindingInputProps
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::custom_bg(self, gpui::color::Hsla) -> Self
@@ -1627,6 +1629,7 @@ impl core::marker::UnsafeUnpin for yororen_ui_core::headless::keybinding_input::
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::keybinding_input::KeybindingInputProps
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::keybinding_input::KeybindingInputProps
 pub fn yororen_ui_core::headless::keybinding_input::keybinding_input(impl core::convert::Into<gpui::window::ElementId>) -> yororen_ui_core::headless::keybinding_input::KeybindingInputProps
+pub type yororen_ui_core::headless::keybinding_input::KeybindingCaptureCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
 pub type yororen_ui_core::headless::keybinding_input::KeybindingChangeCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
 pub mod yororen_ui_core::headless::label
 pub struct yororen_ui_core::headless::label::LabelProps
@@ -2927,7 +2930,7 @@ pub yororen_ui_core::headless::search_input::SearchInputProps::has_custom_border
 pub yororen_ui_core::headless::search_input::SearchInputProps::has_custom_focus_border: bool
 pub yororen_ui_core::headless::search_input::SearchInputProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::search_input::SearchInputProps::on_change: core::option::Option<yororen_ui_core::headless::search_input::SearchChangeCallback>
-pub yororen_ui_core::headless::search_input::SearchInputProps::on_clear: core::option::Option<alloc::sync::Arc<(dyn core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>>
+pub yororen_ui_core::headless::search_input::SearchInputProps::on_clear: core::option::Option<yororen_ui_core::headless::search_input::SearchClearCallback>
 pub yororen_ui_core::headless::search_input::SearchInputProps::on_submit: core::option::Option<yororen_ui_core::headless::search_input::SearchChangeCallback>
 pub yororen_ui_core::headless::search_input::SearchInputProps::placeholder: alloc::string::String
 pub yororen_ui_core::headless::search_input::SearchInputProps::value: alloc::string::String
@@ -2956,6 +2959,7 @@ impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::sea
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::search_input::SearchInputProps
 pub fn yororen_ui_core::headless::search_input::search_input(impl core::convert::Into<gpui::window::ElementId>) -> yororen_ui_core::headless::search_input::SearchInputProps
 pub type yororen_ui_core::headless::search_input::SearchChangeCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
+pub type yororen_ui_core::headless::search_input::SearchClearCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
 pub mod yororen_ui_core::headless::select
 pub struct yororen_ui_core::headless::select::SelectOption
 pub yororen_ui_core::headless::select::SelectOption::disabled: bool
@@ -3904,6 +3908,7 @@ impl core::marker::UnsafeUnpin for yororen_ui_core::headless::tooltip::TooltipSt
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::tooltip::TooltipState
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::tooltip::TooltipState
 pub fn yororen_ui_core::headless::tooltip::tooltip(impl core::convert::Into<gpui::window::ElementId>, impl core::convert::Into<alloc::string::String>, gpui::app::entity_map::Entity<yororen_ui_core::headless::tooltip::TooltipState>) -> yororen_ui_core::headless::tooltip::TooltipProps
+pub type yororen_ui_core::headless::tooltip::TooltipCloseCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
 pub mod yororen_ui_core::headless::tree
 pub struct yororen_ui_core::headless::tree::TreeData
 pub yororen_ui_core::headless::tree::TreeData::children: alloc::collections::btree::map::BTreeMap<yororen_ui_core::headless::tree_item::TreeNodeId, alloc::vec::Vec<yororen_ui_core::headless::tree_item::TreeNodeId>>

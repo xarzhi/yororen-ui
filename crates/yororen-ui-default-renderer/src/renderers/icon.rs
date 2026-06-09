@@ -24,9 +24,7 @@
 //! via `Window::text_style_stack`. We must call `text_color(c)`
 //! on the SVG explicitly.
 
-use gpui::{
-    svg, AnyElement, App, InteractiveElement, IntoElement, Styled, Window,
-};
+use gpui::{AnyElement, App, InteractiveElement, IntoElement, Styled, Window, svg};
 
 use yororen_ui_core::headless::icon::{IconProps, IconSource};
 
@@ -92,10 +90,7 @@ mod tests {
     fn resource_path_passes_through() {
         // `IconSource::Resource` is an explicit asset path the
         // caller owns; the resolver must not add any prefix.
-        let p = resolve_icon_path(&IconSource::Resource(
-            "icons/custom-thing.svg".into(),
-        ));
+        let p = resolve_icon_path(&IconSource::Resource("icons/custom-thing.svg".into()));
         assert_eq!(p.as_ref(), "icons/custom-thing.svg");
     }
 }
-

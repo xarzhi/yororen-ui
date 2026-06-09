@@ -72,7 +72,11 @@ impl SelectRenderer for TokenSelectRenderer {
         theme.get_color("content.tertiary").unwrap_or_default()
     }
     fn min_height(&self, _state: &SelectRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.button.min_height").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.button.min_height")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn padding(&self, _state: &SelectRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(

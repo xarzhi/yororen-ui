@@ -44,7 +44,11 @@ impl LabelRenderer for TokenLabelRenderer {
     }
 
     fn strong_weight(&self, _state: &LabelRenderState, theme: &Theme) -> FontWeight {
-        FontWeight(theme.get_number("tokens.typography.weight_semibold").unwrap_or(600.0) as f32)
+        FontWeight(
+            theme
+                .get_number("tokens.typography.weight_semibold")
+                .unwrap_or(600.0) as f32,
+        )
     }
 
     fn family_mono(&self, _state: &LabelRenderState, theme: &Theme) -> SharedString {
@@ -64,9 +68,9 @@ pub fn arc_label<T: LabelRenderer + 'static>(r: T) -> Arc<dyn LabelRenderer> {
 // `DefaultLabel` — `headless::LabelProps` sugar.
 // =====================================================================
 
-use gpui::{div, App, ParentElement, Stateful, Styled};
+use gpui::{App, ParentElement, Stateful, Styled, div};
 use yororen_ui_core::headless::label::LabelProps;
-use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
 pub trait DefaultLabel: Sized {
@@ -142,7 +146,10 @@ mod tests {
     fn color_picks_secondary_when_muted() {
         let theme = fixture();
         let r = TokenLabelRenderer;
-        let state = LabelRenderState { muted: true, ..Default::default() };
+        let state = LabelRenderState {
+            muted: true,
+            ..Default::default()
+        };
         assert_eq!(
             r.color(&state, &theme),
             theme.get_color("content.secondary").unwrap(),
@@ -153,7 +160,10 @@ mod tests {
     fn color_returns_primary_when_inherit() {
         let theme = fixture();
         let r = TokenLabelRenderer;
-        let state = LabelRenderState { inherit_color: true, ..Default::default() };
+        let state = LabelRenderState {
+            inherit_color: true,
+            ..Default::default()
+        };
         assert_eq!(
             r.color(&state, &theme),
             theme.get_color("content.primary").unwrap(),
@@ -178,7 +188,9 @@ mod tests {
         let state = LabelRenderState::default();
         assert_eq!(
             r.family_mono(&state, &theme).to_string(),
-            theme.get_string("tokens.typography.family_mono").unwrap_or("ui-monospace"),
+            theme
+                .get_string("tokens.typography.family_mono")
+                .unwrap_or("ui-monospace"),
         );
     }
 }

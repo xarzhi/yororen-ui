@@ -8,23 +8,20 @@
 use std::any::Any;
 use std::sync::Arc;
 
-use gpui::{
-    div, px, AnyElement, App, Div, Hsla, InteractiveElement, IntoElement, MouseButton,
-    ParentElement, Pixels, Stateful, StatefulInteractiveElement, Styled, Window,
-};
 use gpui::prelude::FluentBuilder;
-use yororen_ui_core::headless::icon::{icon, IconSource};
+use gpui::{
+    AnyElement, App, Div, Hsla, InteractiveElement, IntoElement, MouseButton, ParentElement,
+    Pixels, Stateful, StatefulInteractiveElement, Styled, Window, div, px,
+};
+use yororen_ui_core::headless::icon::{IconSource, icon};
 use yororen_ui_core::headless::search_input::SearchInputProps;
 use yororen_ui_core::headless::text_input::{Escape, TextInputState};
-use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 use crate::renderers::icon::DefaultIcon;
 use crate::renderers::spec::Edges;
-use crate::renderers::text_input::{
-    start_cursor_blink, wire_input_keyboard, TextInputElement, TextInputRenderState,
-    TextInputRenderer,
-};
+use crate::renderers::text_input::{TextInputElement, start_cursor_blink, wire_input_keyboard};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct SearchInputRenderState {
@@ -76,22 +73,32 @@ impl SearchInputRenderer for TokenSearchInputRenderer {
         theme.get_color("content.primary").unwrap_or_default()
     }
     fn min_height(&self, _state: &SearchInputRenderState, theme: &Theme) -> Pixels {
-        px(theme.get_number("tokens.control.search_input.min_height").unwrap_or(0.0) as f32)
+        px(theme
+            .get_number("tokens.control.search_input.min_height")
+            .unwrap_or(0.0) as f32)
     }
     fn padding(&self, _state: &SearchInputRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(
-            px(theme.get_number("tokens.control.search_input.horizontal_padding").unwrap_or(0.0) as f32),
-            px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
+            px(theme
+                .get_number("tokens.control.search_input.horizontal_padding")
+                .unwrap_or(0.0) as f32),
+            px(theme
+                .get_number("tokens.control.input.vertical_padding")
+                .unwrap_or(0.0) as f32),
         )
     }
     fn border_radius(&self, _state: &SearchInputRenderState, theme: &Theme) -> Pixels {
         px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
     }
     fn input_gap(&self, _state: &SearchInputRenderState, theme: &Theme) -> Pixels {
-        px(theme.get_number("tokens.control.search_input.input_gap").unwrap_or(0.0) as f32)
+        px(theme
+            .get_number("tokens.control.search_input.input_gap")
+            .unwrap_or(0.0) as f32)
     }
     fn icon_size(&self, _state: &SearchInputRenderState, theme: &Theme) -> Pixels {
-        px(theme.get_number("tokens.control.search_input.icon_size").unwrap_or(0.0) as f32)
+        px(theme
+            .get_number("tokens.control.search_input.icon_size")
+            .unwrap_or(0.0) as f32)
     }
 }
 
@@ -106,9 +113,10 @@ pub trait DefaultSearchInput: Sized {
 impl DefaultSearchInput for SearchInputProps {
     fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
         let theme_arc = cx.theme().clone();
-                let r: Arc<dyn SearchInputRenderer> = cx
+        let r: Arc<dyn SearchInputRenderer> = cx
             .renderer_arc::<markers::SearchInput, dyn SearchInputRenderer>()
-            .expect("SearchInputRenderer registered").clone();
+            .expect("SearchInputRenderer registered")
+            .clone();
         let theme = &*theme_arc;
 
         let id = self.id.clone();
@@ -195,26 +203,32 @@ impl DefaultSearchInput for SearchInputProps {
         // Search-specific: Escape clears the value.
         let state_for_escape = state.clone();
         let on_change_for_escape = on_change.clone();
-        let keyed = wire_input_keyboard(focused_div, state.clone(), focus_handle.clone(), disabled, on_submit)
-            .on_action(move |_: &Escape, _window, cx| {
-                if disabled {
-                    return;
-                }
-                let before = state_for_escape.read(cx).value.clone();
-                state_for_escape.update(cx, |s, cx| {
-                    s.value.clear();
-                    s.caret = 0;
-                    s.selection_start = 0;
-                    s.selection_end = 0;
-                    cx.notify();
-                });
-                if let Some(cb) = on_change_for_escape.as_ref() {
-                    let after = state_for_escape.read(cx).value.clone();
-                    if before != after {
-                        cb(&after, _window, cx);
-                    }
-                }
+        let keyed = wire_input_keyboard(
+            focused_div,
+            state.clone(),
+            focus_handle.clone(),
+            disabled,
+            on_submit,
+        )
+        .on_action(move |_: &Escape, _window, cx| {
+            if disabled {
+                return;
+            }
+            let before = state_for_escape.read(cx).value.clone();
+            state_for_escape.update(cx, |s, cx| {
+                s.value.clear();
+                s.caret = 0;
+                s.selection_start = 0;
+                s.selection_end = 0;
+                cx.notify();
             });
+            if let Some(cb) = on_change_for_escape.as_ref() {
+                let after = state_for_escape.read(cx).value.clone();
+                if before != after {
+                    cb(&after, _window, cx);
+                }
+            }
+        });
 
         let hover_border = r.hover_border(&render_state, theme);
         let active_border = r.active_border(&render_state, theme);

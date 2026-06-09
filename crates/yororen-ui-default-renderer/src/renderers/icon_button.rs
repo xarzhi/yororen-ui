@@ -49,7 +49,9 @@ impl IconButtonRenderer for TokenIconButtonRenderer {
         }
         let key = action_variant_key(state.variant);
         let field = if state.disabled { "disabled_bg" } else { "bg" };
-        theme.get_color(&format!("action.{}.{}", key, field)).unwrap_or_default()
+        theme
+            .get_color(&format!("action.{}.{}", key, field))
+            .unwrap_or_default()
     }
     fn hover_bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla {
         if let Some(s) = &state.custom_style {
@@ -62,17 +64,27 @@ impl IconButtonRenderer for TokenIconButtonRenderer {
             });
         }
         let key = action_variant_key(state.variant);
-        theme.get_color(&format!("action.{}.hover_bg", key)).unwrap_or_default()
+        theme
+            .get_color(&format!("action.{}.hover_bg", key))
+            .unwrap_or_default()
     }
     fn active_bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla {
         if let Some(s) = &state.custom_style {
-            return s.bg(&VariantState { disabled: state.disabled });
+            return s.bg(&VariantState {
+                disabled: state.disabled,
+            });
         }
         let key = action_variant_key(state.variant);
-        theme.get_color(&format!("action.{}.active_bg", key)).unwrap_or_default()
+        theme
+            .get_color(&format!("action.{}.active_bg", key))
+            .unwrap_or_default()
     }
     fn size(&self, _state: &IconButtonRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.button.icon_button_min_size").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.button.icon_button_min_size")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn border_radius(&self, _state: &IconButtonRenderState, theme: &Theme) -> Pixels {
         gpui::px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
@@ -93,9 +105,9 @@ pub fn arc_icon_button<T: IconButtonRenderer + 'static>(r: T) -> Arc<dyn IconBut
 // `DefaultIconButton` — `headless::IconButtonProps` sugar.
 // =====================================================================
 
-use gpui::{div, App, InteractiveElement, Stateful, StatefulInteractiveElement, Styled};
+use gpui::{App, InteractiveElement, Stateful, StatefulInteractiveElement, Styled, div};
 use yororen_ui_core::headless::icon_button::IconButtonProps;
-use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
 pub trait DefaultIconButton: Sized {

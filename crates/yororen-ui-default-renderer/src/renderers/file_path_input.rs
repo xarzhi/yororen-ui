@@ -12,20 +12,18 @@ use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{
-    div, px, AnyElement, App, AppContext, Div, Hsla, InteractiveElement, IntoElement, MouseButton,
-    ParentElement, Pixels, Stateful, StatefulInteractiveElement, Styled, Window,
+    AnyElement, App, AppContext, Div, Hsla, InteractiveElement, IntoElement, MouseButton,
+    ParentElement, Pixels, Stateful, StatefulInteractiveElement, Styled, Window, div, px,
 };
 use yororen_ui_core::headless::file_path_input::FilePathInputProps;
-use yororen_ui_core::headless::icon::{icon, IconSource};
+use yororen_ui_core::headless::icon::{IconSource, icon};
 use yororen_ui_core::headless::text_input::TextInputState;
-use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 use crate::renderers::icon::DefaultIcon;
 use crate::renderers::spec::Edges;
-use crate::renderers::text_input::{
-    start_cursor_blink, wire_input_keyboard, TextInputElement,
-};
+use crate::renderers::text_input::{TextInputElement, start_cursor_blink, wire_input_keyboard};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct FilePathInputRenderState {
@@ -88,26 +86,38 @@ impl FilePathInputRenderer for TokenFilePathInputRenderer {
         theme.get_color("surface.hover").unwrap_or_default()
     }
     fn min_height(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Pixels {
-        px(theme.get_number("tokens.control.file_path_input.min_height").unwrap_or(0.0) as f32)
+        px(theme
+            .get_number("tokens.control.file_path_input.min_height")
+            .unwrap_or(0.0) as f32)
     }
     fn padding(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(
-            px(theme.get_number("tokens.control.file_path_input.horizontal_padding").unwrap_or(0.0) as f32),
-            px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
+            px(theme
+                .get_number("tokens.control.file_path_input.horizontal_padding")
+                .unwrap_or(0.0) as f32),
+            px(theme
+                .get_number("tokens.control.input.vertical_padding")
+                .unwrap_or(0.0) as f32),
         )
     }
     fn action_gap(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Pixels {
-        px(theme.get_number("tokens.control.file_path_input.action_gap").unwrap_or(0.0) as f32)
+        px(theme
+            .get_number("tokens.control.file_path_input.action_gap")
+            .unwrap_or(0.0) as f32)
     }
     fn border_radius(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Pixels {
         px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
     }
     fn icon_size(&self, _state: &FilePathInputRenderState, theme: &Theme) -> Pixels {
-        px(theme.get_number("tokens.control.file_path_input.icon_size").unwrap_or(0.0) as f32)
+        px(theme
+            .get_number("tokens.control.file_path_input.icon_size")
+            .unwrap_or(0.0) as f32)
     }
 }
 
-pub fn arc_file_path_input<T: FilePathInputRenderer + 'static>(r: T) -> Arc<dyn FilePathInputRenderer> {
+pub fn arc_file_path_input<T: FilePathInputRenderer + 'static>(
+    r: T,
+) -> Arc<dyn FilePathInputRenderer> {
     Arc::new(r)
 }
 
@@ -123,7 +133,8 @@ impl DefaultFilePathInput for FilePathInputProps {
         let theme_arc = cx.theme().clone();
         let r: Arc<dyn FilePathInputRenderer> = cx
             .renderer_arc::<markers::FilePathInput, dyn FilePathInputRenderer>()
-            .expect("FilePathInputRenderer registered").clone();
+            .expect("FilePathInputRenderer registered")
+            .clone();
         let theme = &*theme_arc;
 
         let id = self.id.clone();
@@ -218,7 +229,6 @@ impl DefaultFilePathInput for FilePathInputProps {
         let active_border = r.active_border(&render_state, theme);
 
         let on_browse_clone = on_browse.clone();
-        let state_for_browse = state.clone();
         let window_handle = window.window_handle();
         let final_div = keyed
             .hover(|s| s.border_color(hover_border))
@@ -283,8 +293,8 @@ impl DefaultFilePathInput for FilePathInputProps {
                                 let path_str = path.to_string_lossy().to_string();
                                 let state_for_change = state_for_browse.clone();
                                 let on_browse_for_async = on_browse_cb.clone();
-                                let _ = async_cx
-                                    .update_window(window_handle, move |_, window, cx| {
+                                let _ =
+                                    async_cx.update_window(window_handle, move |_, window, cx| {
                                         state_for_change.update(cx, |s, cx| {
                                             s.value = path_str.clone();
                                             let end = s.value.len();

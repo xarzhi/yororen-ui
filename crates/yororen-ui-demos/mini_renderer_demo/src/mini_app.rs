@@ -27,8 +27,8 @@ impl Render for MiniApp {
         // `MiniButtonRenderer` because it was installed last
         // (overwrites the default registration in the core
         // `RendererRegistry`).
-        let _inc = button("inc", &mut **cx).default_render(cx);
-        let _reset = button("reset", &mut **cx).default_render(cx);
+        let _inc = button("inc", cx).default_render(cx);
+        let _reset = button("reset", cx).default_render(cx);
 
         div()
             .size_full()
@@ -36,12 +36,12 @@ impl Render for MiniApp {
             .flex()
             .flex_col()
             .gap_3()
-            .child(label("title", "Mini renderer demo", &mut **cx).default_render(cx))
+            .child(label("title", "Mini renderer demo", cx).default_render(cx))
             .child(
                 label(
                     "blurb",
                     "Install order: default-renderer first, then mini. Last registration wins. The mini only overrides Button / IconButton / ToggleButton / Label.",
-                    &mut **cx,
+                    cx,
                 )
                 .default_render(cx),
             )
@@ -49,9 +49,9 @@ impl Render for MiniApp {
                 div()
                     .flex()
                     .gap_2()
-                    .child(label("c", format!("Counter: {}", self.counter), &mut **cx).default_render(cx))
-                    .child(button("inc-btn", &mut **cx).default_render(cx))
-                    .child(button("reset-btn", &mut **cx).default_render(cx)),
+                    .child(label("c", format!("Counter: {}", self.counter), cx).default_render(cx))
+                    .child(button("inc-btn", cx).default_render(cx))
+                    .child(button("reset-btn", cx).default_render(cx)),
             )
     }
 }

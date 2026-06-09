@@ -15,12 +15,15 @@
 //!    while the surrounding label / div still come from
 //!    default-renderer.
 
-use gpui::{Context, InteractiveElement, IntoElement, ParentElement, Render, StatefulInteractiveElement, Styled, Window, div, px};
+use gpui::{
+    Context, InteractiveElement, IntoElement, ParentElement, Render, StatefulInteractiveElement,
+    Styled, Window, div, px,
+};
+use yororen_ui::ActionVariantKind;
 use yororen_ui::headless::button::button;
 use yororen_ui::headless::label::label;
 use yororen_ui::renderer::DefaultButton;
 use yororen_ui::renderer::DefaultLabel;
-use yororen_ui::ActionVariantKind;
 
 pub struct LayersApp;
 
@@ -39,24 +42,22 @@ impl Render for LayersApp {
         // PointingHand explicitly so it's visible). To get
         // hover feedback, the caller must add their own
         // `.hover(...).active(...)` — see panel 3.
-        let headless_btn = button("headless-only", &mut **cx)
-            .on_click(|_, _, _| {})
-            .apply(
-                div()
-                    .bg(gpui::hsla(0.0, 0.0, 0.05, 1.0))
-                    .text_color(gpui::hsla(0.0, 0.0, 1.0, 1.0))
-                    .p_2()
-                    .rounded(px(4.))
-                    .cursor(gpui::CursorStyle::PointingHand)
-                    .child("click me"),
-            );
+        let headless_btn = button("headless-only", cx).on_click(|_, _, _| {}).apply(
+            div()
+                .bg(gpui::hsla(0.0, 0.0, 0.05, 1.0))
+                .text_color(gpui::hsla(0.0, 0.0, 1.0, 1.0))
+                .p_2()
+                .rounded(px(4.))
+                .cursor(gpui::CursorStyle::PointingHand)
+                .child("click me"),
+        );
 
         // Column 2: headless + default-renderer sugar. Uses
         // the demo theme's `Neutral` action palette — pure
         // black `#0A0A0A`, hover `#2A2A2A`, active `#1A1A1A`
         // (modern monochrome, ~8% lightness delta on
         // hover).
-        let default_btn = button("default-render", &mut **cx)
+        let default_btn = button("default-render", cx)
             .variant(ActionVariantKind::Neutral)
             .default_render(cx)
             .child("Click me");
@@ -67,7 +68,7 @@ impl Render for LayersApp {
         // (panel 1 has none; this panel wires both). The
         // caller's hover/active overrides go *after* the
         // `apply(el)` call so they take precedence.
-        let custom_btn = button("custom", &mut **cx)
+        let custom_btn = button("custom", cx)
             .variant(ActionVariantKind::Danger)
             .apply(
                 div()
@@ -107,7 +108,7 @@ impl Render for LayersApp {
                     .flex_col()
                     .gap_2()
                     .child(headless_btn)
-                    .child(label("caption", "headless caption", &mut **cx).default_render(cx)),
+                    .child(label("caption", "headless caption", cx).default_render(cx)),
                 cx,
             ))
             .child(panel_body(
@@ -118,7 +119,7 @@ impl Render for LayersApp {
                     .flex_col()
                     .gap_2()
                     .child(default_btn)
-                    .child(label("caption", "default caption", &mut **cx).default_render(cx)),
+                    .child(label("caption", "default caption", cx).default_render(cx)),
                 cx,
             ))
             .child(panel_body(
@@ -129,7 +130,7 @@ impl Render for LayersApp {
                     .flex_col()
                     .gap_2()
                     .child(custom_btn)
-                    .child(label("caption", "custom caption", &mut **cx).default_render(cx)),
+                    .child(label("caption", "custom caption", cx).default_render(cx)),
                 cx,
             ))
             .child({
@@ -151,16 +152,11 @@ impl Render for LayersApp {
 fn text_input_strip(window: &mut Window, cx: &mut Context<LayersApp>) -> impl IntoElement + use<> {
     use yororen_ui::headless::text_input::text_input;
     use yororen_ui::renderer::DefaultTextInput;
-    div()
-        .flex()
-        .flex_col()
-        .gap_2()
-        .w_full()
-        .child(
-            text_input("demo-text-input")
-                .placeholder("Type here…")
-                .default_render(cx, window),
-        )
+    div().flex().flex_col().gap_2().w_full().child(
+        text_input("demo-text-input")
+            .placeholder("Type here…")
+            .default_render(cx, window),
+    )
 }
 
 fn panel_body(
@@ -177,13 +173,9 @@ fn panel_body(
         .flex()
         .flex_col()
         .gap_2()
+        .child(label("title", title, cx).strong(true).default_render(cx))
         .child(
-            label("title", title, &mut **cx)
-                .strong(true)
-                .default_render(cx),
-        )
-        .child(
-            label("blurb", blurb, &mut **cx)
+            label("blurb", blurb, cx)
                 .wrap()
                 .default_render(cx)
                 .text_size(gpui::px(13.))

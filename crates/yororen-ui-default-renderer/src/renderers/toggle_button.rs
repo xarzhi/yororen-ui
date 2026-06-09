@@ -55,7 +55,9 @@ impl ToggleButtonRenderer for TokenToggleButtonRenderer {
             });
         }
         if state.disabled {
-            theme.get_color("action.neutral.disabled_bg").unwrap_or_default()
+            theme
+                .get_color("action.neutral.disabled_bg")
+                .unwrap_or_default()
         } else if state.selected {
             theme.get_color("action.primary.bg").unwrap_or_default()
         } else {
@@ -81,24 +83,40 @@ impl ToggleButtonRenderer for TokenToggleButtonRenderer {
         // Selected: hover the selected look's hover_bg.
         // Unselected: hover the unselected (neutral) hover_bg.
         if state.disabled {
-            return theme.get_color("action.neutral.disabled_bg").unwrap_or_default();
+            return theme
+                .get_color("action.neutral.disabled_bg")
+                .unwrap_or_default();
         }
         if state.selected {
-            return theme.get_color("action.primary.hover_bg").unwrap_or_default();
+            return theme
+                .get_color("action.primary.hover_bg")
+                .unwrap_or_default();
         }
-        theme.get_color("action.neutral.hover_bg").unwrap_or_default()
+        theme
+            .get_color("action.neutral.hover_bg")
+            .unwrap_or_default()
     }
     fn active_bg(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
-            return theme.get_color("action.neutral.disabled_bg").unwrap_or_default();
+            return theme
+                .get_color("action.neutral.disabled_bg")
+                .unwrap_or_default();
         }
         if state.selected {
-            return theme.get_color("action.primary.active_bg").unwrap_or_default();
+            return theme
+                .get_color("action.primary.active_bg")
+                .unwrap_or_default();
         }
-        theme.get_color("action.neutral.active_bg").unwrap_or_default()
+        theme
+            .get_color("action.neutral.active_bg")
+            .unwrap_or_default()
     }
     fn min_height(&self, _state: &ToggleButtonRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.toggle_button.min_height").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.toggle_button.min_height")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn border_radius(&self, _state: &ToggleButtonRenderState, theme: &Theme) -> Pixels {
         gpui::px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
@@ -119,9 +137,9 @@ pub fn arc_toggle_button<T: ToggleButtonRenderer + 'static>(r: T) -> Arc<dyn Tog
 // `DefaultToggleButton` — `headless::ToggleButtonProps` sugar.
 // =====================================================================
 
-use gpui::{div, App, InteractiveElement, Stateful, StatefulInteractiveElement, Styled};
+use gpui::{App, InteractiveElement, Stateful, StatefulInteractiveElement, Styled, div};
 use yororen_ui_core::headless::toggle_button::ToggleButtonProps;
-use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
 pub trait DefaultToggleButton: Sized {

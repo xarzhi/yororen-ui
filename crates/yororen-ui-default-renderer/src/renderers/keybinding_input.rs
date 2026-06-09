@@ -13,20 +13,16 @@ use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{
-    div, fill, point, px, AnyElement, App, Bounds, CursorStyle, Div, Element, ElementId,
-    ElementInputHandler, FocusHandle, GlobalElementId, Hsla, InteractiveElement, IntoElement,
-    KeyDownEvent, LayoutId, MouseButton, ParentElement, Pixels, ShapedLine, SharedString, Stateful,
-    StatefulInteractiveElement, Style, Styled, TextRun, Window,
+    AnyElement, App, CursorStyle, Div, Hsla, InteractiveElement, IntoElement, KeyDownEvent,
+    MouseButton, ParentElement, Pixels, Stateful, StatefulInteractiveElement, Styled, Window, div,
+    px,
 };
 use yororen_ui_core::headless::keybinding_input::{KeybindingInputMode, KeybindingInputProps};
 use yororen_ui_core::headless::text_input::TextInputState;
-use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
-use crate::renderers::spec::Edges;
-use crate::renderers::text_input::{
-    start_cursor_blink, wire_input_keyboard, TextInputElement,
-};
+use crate::renderers::text_input::{TextInputElement, start_cursor_blink, wire_input_keyboard};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct KeybindingInputRenderState {
@@ -75,14 +71,18 @@ impl KeybindingInputRenderer for TokenKeybindingInputRenderer {
         theme.get_color("content.primary").unwrap_or_default()
     }
     fn min_height(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Pixels {
-        px(theme.get_number("tokens.control.input.min_height").unwrap_or(0.0) as f32)
+        px(theme
+            .get_number("tokens.control.input.min_height")
+            .unwrap_or(0.0) as f32)
     }
     fn border_radius(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Pixels {
         px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
     }
 }
 
-pub fn arc_keybinding_input<T: KeybindingInputRenderer + 'static>(r: T) -> Arc<dyn KeybindingInputRenderer> {
+pub fn arc_keybinding_input<T: KeybindingInputRenderer + 'static>(
+    r: T,
+) -> Arc<dyn KeybindingInputRenderer> {
     Arc::new(r)
 }
 
@@ -93,9 +93,10 @@ pub trait DefaultKeybindingInput: Sized {
 impl DefaultKeybindingInput for KeybindingInputProps {
     fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
         let theme_arc = cx.theme().clone();
-                let r: Arc<dyn KeybindingInputRenderer> = cx
+        let r: Arc<dyn KeybindingInputRenderer> = cx
             .renderer_arc::<markers::KeybindingInput, dyn KeybindingInputRenderer>()
-            .expect("KeybindingInputRenderer registered").clone();
+            .expect("KeybindingInputRenderer registered")
+            .clone();
         let theme = &*theme_arc;
 
         let id = self.id.clone();
@@ -136,6 +137,7 @@ impl DefaultKeybindingInput for KeybindingInputProps {
         let kbd_fg = r.kbd_fg(&render_state, theme);
         let min_h = r.min_height(&render_state, theme);
         let radius = r.border_radius(&render_state, theme);
+        let _ = text_color;
 
         if focused {
             start_cursor_blink(state.clone(), window, cx);
@@ -216,10 +218,18 @@ impl DefaultKeybindingInput for KeybindingInputProps {
                     return;
                 }
                 let mut parts: Vec<String> = Vec::new();
-                if ks.modifiers.control { parts.push("ctrl".into()); }
-                if ks.modifiers.alt { parts.push("alt".into()); }
-                if ks.modifiers.shift { parts.push("shift".into()); }
-                if ks.modifiers.platform { parts.push("cmd".into()); }
+                if ks.modifiers.control {
+                    parts.push("ctrl".into());
+                }
+                if ks.modifiers.alt {
+                    parts.push("alt".into());
+                }
+                if ks.modifiers.shift {
+                    parts.push("shift".into());
+                }
+                if ks.modifiers.platform {
+                    parts.push("cmd".into());
+                }
                 if ks.key.is_empty() {
                     return;
                 }

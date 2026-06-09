@@ -62,10 +62,7 @@ impl ToggleButtonProps {
         self.selected = v;
         self
     }
-    pub fn variant(
-        mut self,
-        v: crate::renderer::ActionVariantKind,
-    ) -> Self {
+    pub fn variant(mut self, v: crate::renderer::ActionVariantKind) -> Self {
         self.variant = v;
         self
     }

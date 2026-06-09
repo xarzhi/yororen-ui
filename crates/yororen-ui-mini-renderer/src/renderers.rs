@@ -14,13 +14,14 @@ use gpui::{Hsla, Pixels};
 use yororen_ui_core::theme::Theme;
 use yororen_ui_default_renderer::renderers::spec::{BorderSpec, Edges, ShadowSpec};
 use yororen_ui_default_renderer::renderers::{
-    ButtonRenderState, ButtonRenderer, IconButtonRenderState, IconButtonRenderer,
-    LabelRenderState, LabelRenderer, ToggleButtonRenderState, ToggleButtonRenderer,
+    ButtonRenderState, ButtonRenderer, IconButtonRenderState, IconButtonRenderer, LabelRenderState,
+    LabelRenderer, ToggleButtonRenderState, ToggleButtonRenderer,
 };
 
 /// The mini palette: just one `Hsla` reused everywhere.
 #[derive(Copy, Clone, Debug)]
 pub struct MiniPalette {
+    #[allow(dead_code)]
     pub base: Hsla,
 }
 
@@ -130,15 +131,25 @@ pub struct MiniIconButtonRenderer {
 }
 
 impl IconButtonRenderer for MiniIconButtonRenderer {
-    fn bg(&self, _state: &IconButtonRenderState, _theme: &Theme) -> Hsla { self.base }
+    fn bg(&self, _state: &IconButtonRenderState, _theme: &Theme) -> Hsla {
+        self.base
+    }
     fn hover_bg(&self, _state: &IconButtonRenderState, _theme: &Theme) -> Hsla {
         // No hover differentiation in the mini.
         self.base
     }
-    fn active_bg(&self, _state: &IconButtonRenderState, _theme: &Theme) -> Hsla { self.base }
-    fn size(&self, _state: &IconButtonRenderState, _theme: &Theme) -> Pixels { min_h() }
-    fn border_radius(&self, _state: &IconButtonRenderState, _theme: &Theme) -> Pixels { radius() }
-    fn disabled_opacity(&self, _state: &IconButtonRenderState, _theme: &Theme) -> f32 { 1.0 }
+    fn active_bg(&self, _state: &IconButtonRenderState, _theme: &Theme) -> Hsla {
+        self.base
+    }
+    fn size(&self, _state: &IconButtonRenderState, _theme: &Theme) -> Pixels {
+        min_h()
+    }
+    fn border_radius(&self, _state: &IconButtonRenderState, _theme: &Theme) -> Pixels {
+        radius()
+    }
+    fn disabled_opacity(&self, _state: &IconButtonRenderState, _theme: &Theme) -> f32 {
+        1.0
+    }
 }
 
 // =====================================================================
@@ -152,21 +163,43 @@ pub struct MiniToggleButtonRenderer {
 
 impl ToggleButtonRenderer for MiniToggleButtonRenderer {
     fn bg(&self, state: &ToggleButtonRenderState, _theme: &Theme) -> Hsla {
-        if state.selected { self.base } else { gpui::hsla(0.0, 0.0, 0.95, 1.0) }
+        if state.selected {
+            self.base
+        } else {
+            gpui::hsla(0.0, 0.0, 0.95, 1.0)
+        }
     }
     fn hover_bg(&self, state: &ToggleButtonRenderState, _theme: &Theme) -> Hsla {
         // Mini: hover mirrors base. (Future: differentiate.)
-        if state.selected { self.base } else { gpui::hsla(0.0, 0.0, 0.95, 1.0) }
+        if state.selected {
+            self.base
+        } else {
+            gpui::hsla(0.0, 0.0, 0.95, 1.0)
+        }
     }
     fn active_bg(&self, state: &ToggleButtonRenderState, _theme: &Theme) -> Hsla {
-        if state.selected { self.base } else { gpui::hsla(0.0, 0.0, 0.9, 1.0) }
+        if state.selected {
+            self.base
+        } else {
+            gpui::hsla(0.0, 0.0, 0.9, 1.0)
+        }
     }
     fn fg(&self, state: &ToggleButtonRenderState, _theme: &Theme) -> Hsla {
-        if state.selected { gpui::hsla(0.0, 0.0, 1.0, 1.0) } else { gpui::hsla(0.0, 0.0, 0.1, 1.0) }
+        if state.selected {
+            gpui::hsla(0.0, 0.0, 1.0, 1.0)
+        } else {
+            gpui::hsla(0.0, 0.0, 0.1, 1.0)
+        }
     }
-    fn min_height(&self, _state: &ToggleButtonRenderState, _theme: &Theme) -> Pixels { min_h() }
-    fn border_radius(&self, _state: &ToggleButtonRenderState, _theme: &Theme) -> Pixels { radius() }
-    fn disabled_opacity(&self, _state: &ToggleButtonRenderState, _theme: &Theme) -> f32 { 1.0 }
+    fn min_height(&self, _state: &ToggleButtonRenderState, _theme: &Theme) -> Pixels {
+        min_h()
+    }
+    fn border_radius(&self, _state: &ToggleButtonRenderState, _theme: &Theme) -> Pixels {
+        radius()
+    }
+    fn disabled_opacity(&self, _state: &ToggleButtonRenderState, _theme: &Theme) -> f32 {
+        1.0
+    }
 }
 
 // =====================================================================
@@ -221,8 +254,7 @@ mod tests {
 
     #[test]
     fn mini_palette_yields_zero_when_no_relevant_key() {
-        let theme =
-            yororen_ui_core::theme::Theme::from_value(serde_json::json!({}));
+        let theme = yororen_ui_core::theme::Theme::from_value(serde_json::json!({}));
         let p = MiniPalette::from_theme(&theme);
         assert_eq!(p.base.a, 0.0);
     }

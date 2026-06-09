@@ -28,13 +28,19 @@ impl DropdownMenuRenderer for TokenDropdownMenuRenderer {
         theme.get_color("action.neutral.bg").unwrap_or_default()
     }
     fn trigger_hover_bg(&self, _state: &DropdownMenuRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("action.neutral.hover_bg").unwrap_or_default()
+        theme
+            .get_color("action.neutral.hover_bg")
+            .unwrap_or_default()
     }
     fn trigger_fg(&self, _state: &DropdownMenuRenderState, theme: &Theme) -> Hsla {
         theme.get_color("action.neutral.fg").unwrap_or_default()
     }
     fn min_height(&self, _state: &DropdownMenuRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.button.min_height").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.button.min_height")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn border_radius(&self, _state: &DropdownMenuRenderState, theme: &Theme) -> Pixels {
         gpui::px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)

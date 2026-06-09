@@ -10,18 +10,16 @@ use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{
-    div, px, AnyElement, App, Div, Hsla, InteractiveElement, IntoElement, MouseButton,
-    ParentElement, Pixels, Stateful, StatefulInteractiveElement, Styled, Window,
+    AnyElement, App, Div, Hsla, InteractiveElement, IntoElement, MouseButton, ParentElement,
+    Pixels, Stateful, StatefulInteractiveElement, Styled, Window, div, px,
 };
 use yororen_ui_core::headless::number_input::NumberInputProps;
 use yororen_ui_core::headless::text_input::TextInputState;
-use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 use crate::renderers::spec::Edges;
-use crate::renderers::text_input::{
-    start_cursor_blink, wire_input_keyboard, TextInputElement,
-};
+use crate::renderers::text_input::{TextInputElement, start_cursor_blink, wire_input_keyboard};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct NumberInputRenderState {
@@ -64,16 +62,24 @@ impl NumberInputRenderer for TokenNumberInputRenderer {
         theme.get_color("border.default").unwrap_or_default()
     }
     fn min_height(&self, _state: &NumberInputRenderState, theme: &Theme) -> Pixels {
-        px(theme.get_number("tokens.control.number_input.min_height").unwrap_or(0.0) as f32)
+        px(theme
+            .get_number("tokens.control.number_input.min_height")
+            .unwrap_or(0.0) as f32)
     }
     fn padding(&self, _state: &NumberInputRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(
-            px(theme.get_number("tokens.control.number_input.horizontal_padding").unwrap_or(0.0) as f32),
-            px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
+            px(theme
+                .get_number("tokens.control.number_input.horizontal_padding")
+                .unwrap_or(0.0) as f32),
+            px(theme
+                .get_number("tokens.control.input.vertical_padding")
+                .unwrap_or(0.0) as f32),
         )
     }
     fn stepper_button_size(&self, _state: &NumberInputRenderState, theme: &Theme) -> Pixels {
-        px(theme.get_number("tokens.control.number_input.stepper_button_size").unwrap_or(0.0) as f32)
+        px(theme
+            .get_number("tokens.control.number_input.stepper_button_size")
+            .unwrap_or(0.0) as f32)
     }
     fn border_radius(&self, _state: &NumberInputRenderState, theme: &Theme) -> Pixels {
         px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
@@ -91,9 +97,10 @@ pub trait DefaultNumberInput: Sized {
 impl DefaultNumberInput for NumberInputProps {
     fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
         let theme_arc = cx.theme().clone();
-                let r: Arc<dyn NumberInputRenderer> = cx
+        let r: Arc<dyn NumberInputRenderer> = cx
             .renderer_arc::<markers::NumberInput, dyn NumberInputRenderer>()
-            .expect("NumberInputRenderer registered").clone();
+            .expect("NumberInputRenderer registered")
+            .clone();
         let theme = &*theme_arc;
 
         let id = self.id.clone();
@@ -123,12 +130,14 @@ impl DefaultNumberInput for NumberInputProps {
         }
         state.update(cx, |s, _cx| {
             s.placeholder = gpui::SharedString::from(placeholder_str);
-            s.on_change = Some(Arc::new(move |new_value: &str, window: &mut gpui::Window, cx: &mut gpui::App| {
-                if let Some(cb) = on_change_for_state.as_ref() {
-                    let parsed = new_value.parse::<f64>().unwrap_or(value);
-                    cb(parsed, window, cx);
-                }
-            }));
+            s.on_change = Some(Arc::new(
+                move |new_value: &str, window: &mut gpui::Window, cx: &mut gpui::App| {
+                    if let Some(cb) = on_change_for_state.as_ref() {
+                        let parsed = new_value.parse::<f64>().unwrap_or(value);
+                        cb(parsed, window, cx);
+                    }
+                },
+            ));
         });
 
         let focus_handle = state.read(cx).focus_handle();

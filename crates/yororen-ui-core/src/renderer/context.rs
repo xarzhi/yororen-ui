@@ -52,9 +52,8 @@ pub trait RendererContext {
     /// Borrow the renderer for marker `T` downcast to `Arc<R>`.
     /// Returns `None` if no renderer is registered for `T` (or
     /// no registry has been installed).
-    fn renderer_arc<T: RendererMarker, R: ?Sized + Send + Sync + 'static>(
-        &self,
-    ) -> Option<&Arc<R>>;
+    fn renderer_arc<T: RendererMarker, R: ?Sized + Send + Sync + 'static>(&self)
+    -> Option<&Arc<R>>;
 
     /// True iff a renderer is registered for marker `T`.
     fn has_renderer<T: RendererMarker>(&self) -> bool;
@@ -70,7 +69,8 @@ impl RendererContext for App {
         if self.try_global::<RendererRegistry>().is_none() {
             self.set_global(RendererRegistry::new());
         }
-        self.global_mut::<RendererRegistry>().register_arc::<T, R>(r);
+        self.global_mut::<RendererRegistry>()
+            .register_arc::<T, R>(r);
     }
 
     fn renderer_arc<T: RendererMarker, R: ?Sized + Send + Sync + 'static>(

@@ -71,7 +71,11 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
         theme.get_color("surface.base").unwrap_or_default()
     }
     fn min_height(&self, _state: &ComboBoxRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.button.min_height").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.button.min_height")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn padding(&self, _state: &ComboBoxRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(

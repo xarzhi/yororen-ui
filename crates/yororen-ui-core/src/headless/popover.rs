@@ -5,8 +5,7 @@
 use std::sync::Arc;
 
 use gpui::{
-    App, AppContext, Bounds, Div, ElementId, Entity, InteractiveElement, Pixels, Point, Size,
-    Stateful,
+    App, AppContext, Bounds, Div, ElementId, Entity, InteractiveElement, Pixels, Size, Stateful,
 };
 
 /// Preferred placement of a popover relative to its trigger.

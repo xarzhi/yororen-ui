@@ -34,7 +34,11 @@ impl ProgressBarRenderer for TokenProgressBarRenderer {
     }
 
     fn height(&self, _state: &ProgressBarRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.progress.bar_default_h").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.progress.bar_default_h")
+                .unwrap_or(0.0) as f32,
+        )
     }
 
     fn border_color(&self, _state: &ProgressBarRenderState, theme: &Theme) -> Hsla {

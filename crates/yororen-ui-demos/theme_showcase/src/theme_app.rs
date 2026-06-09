@@ -9,9 +9,9 @@
 //! makes the "themes are just JSON" point obvious.
 
 use gpui::{Context, IntoElement, ParentElement, Render, Styled, Window, div, px};
+use yororen_ui::Theme;
 use yororen_ui::headless::button::button;
 use yororen_ui::headless::label::label;
-use yororen_ui::Theme;
 use yororen_ui::theme as theme_mod;
 use yororen_ui_default_renderer::DefaultButton;
 use yororen_ui_default_renderer::DefaultLabel;
@@ -69,8 +69,8 @@ impl Render for ThemeApp {
         let current = self.current;
         let total = self.themes.len();
 
-        let next_btn = button("next-theme", &mut **cx)
-            .on_click(move |_, _, cx| {
+        let next_btn = button("next-theme", cx)
+            .on_click(move |_, _, _cx| {
                 // No-op for the demo — the user clicks the
                 // button but the theme doesn't actually
                 // cycle (would need a state entity). The
@@ -89,17 +89,12 @@ impl Render for ThemeApp {
                 label(
                     "title",
                     format!("Theme showcase ({}/{})", current + 1, total),
-                    &mut **cx,
+                    cx,
                 )
                 .default_render(cx),
             )
             .child(
-                label(
-                    "blurb",
-                    format!("Currently: {} — {}", name, blurb),
-                    &mut **cx,
-                )
-                .default_render(cx),
+                label("blurb", format!("Currently: {} — {}", name, blurb), cx).default_render(cx),
             )
             .child(next_btn)
     }

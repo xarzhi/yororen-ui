@@ -7,8 +7,7 @@ use std::sync::Arc;
 
 use gpui::{App, Hsla};
 
-pub type NumberChangeCallback =
-    Arc<dyn Fn(f64, &mut gpui::Window, &mut App) + Send + Sync>;
+pub type NumberChangeCallback = Arc<dyn Fn(f64, &mut gpui::Window, &mut App) + Send + Sync>;
 
 #[derive(Clone)]
 pub struct NumberInputProps {

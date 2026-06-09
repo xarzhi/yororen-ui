@@ -125,14 +125,15 @@ fn main() {
         // shared `system-light.json` ships a darker default
         // (action.primary 2.6% delta) that the demo
         // overrides here.
-        let theme = Theme::from_json(DEMO_THEME_JSON)
-            .expect("DEMO_THEME_JSON is valid");
+        let theme = Theme::from_json(DEMO_THEME_JSON).expect("DEMO_THEME_JSON is valid");
         default_renderer::install_with(cx, theme);
 
         let options = WindowOptions {
-            window_bounds: Some(WindowBounds::Windowed(
-                gpui::Bounds::centered(None, size(px(1500.0), px(500.0)), cx),
-            )),
+            window_bounds: Some(WindowBounds::Windowed(gpui::Bounds::centered(
+                None,
+                size(px(1500.0), px(500.0)),
+                cx,
+            ))),
             ..Default::default()
         };
         let _ = cx.open_window(options, |_, cx| cx.new(|_cx| layers_app::LayersApp::new()));

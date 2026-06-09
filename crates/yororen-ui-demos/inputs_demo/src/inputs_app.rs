@@ -1,11 +1,11 @@
 //! `InputsApp` — the demo's root view.
 
 use gpui::{
-    div, hsla, px, Context, Div, InteractiveElement, IntoElement, ParentElement, Render, Stateful,
-    StatefulInteractiveElement, Styled, Window,
+    Context, Div, InteractiveElement, IntoElement, ParentElement, Render, Stateful,
+    StatefulInteractiveElement, Styled, Window, div, hsla, px,
 };
 use yororen_ui::headless::file_path_input::file_path_input;
-use yororen_ui::headless::keybinding_input::{keybinding_input, KeybindingInputMode};
+use yororen_ui::headless::keybinding_input::{KeybindingInputMode, keybinding_input};
 use yororen_ui::headless::label::label;
 use yororen_ui::headless::number_input::number_input;
 use yororen_ui::headless::password_input::password_input;
@@ -261,13 +261,9 @@ fn panel_with_label(
         .flex()
         .flex_col()
         .gap_2()
+        .child(label("title", title, cx).strong(true).default_render(cx))
         .child(
-            label("title", title, &mut **cx)
-                .strong(true)
-                .default_render(cx),
-        )
-        .child(
-            label("blurb", blurb, &mut **cx)
+            label("blurb", blurb, cx)
                 .default_render(cx)
                 .text_color(hsla(0.0, 0.0, 0.4, 1.0))
                 .text_size(px(13.)),

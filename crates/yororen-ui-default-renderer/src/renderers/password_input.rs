@@ -10,19 +10,16 @@ use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{
-    div, px, AnyElement, App, Div, Hsla, InteractiveElement, IntoElement, ParentElement, Pixels,
-    Stateful, StatefulInteractiveElement, Styled, Window,
+    AnyElement, App, Div, Hsla, InteractiveElement, IntoElement, ParentElement, Pixels, Stateful,
+    StatefulInteractiveElement, Styled, Window, div, px,
 };
 use yororen_ui_core::headless::password_input::PasswordInputProps;
 use yororen_ui_core::headless::text_input::TextInputState;
-use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 use crate::renderers::spec::Edges;
-use crate::renderers::text_input::{
-    start_cursor_blink, wire_input_keyboard, TextInputElement, TextInputRenderState,
-    TextInputRenderer,
-};
+use crate::renderers::text_input::{TextInputElement, start_cursor_blink, wire_input_keyboard};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct PasswordInputRenderState {
@@ -99,12 +96,18 @@ impl PasswordInputRenderer for TokenPasswordInputRenderer {
         }
     }
     fn min_height(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Pixels {
-        px(theme.get_number("tokens.control.input.min_height").unwrap_or(0.0) as f32)
+        px(theme
+            .get_number("tokens.control.input.min_height")
+            .unwrap_or(0.0) as f32)
     }
     fn padding(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(
-            px(theme.get_number("tokens.control.input.horizontal_padding").unwrap_or(0.0) as f32),
-            px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
+            px(theme
+                .get_number("tokens.control.input.horizontal_padding")
+                .unwrap_or(0.0) as f32),
+            px(theme
+                .get_number("tokens.control.input.vertical_padding")
+                .unwrap_or(0.0) as f32),
         )
     }
     fn border_radius(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Pixels {
@@ -112,7 +115,9 @@ impl PasswordInputRenderer for TokenPasswordInputRenderer {
     }
 }
 
-pub fn arc_password_input<T: PasswordInputRenderer + 'static>(r: T) -> Arc<dyn PasswordInputRenderer> {
+pub fn arc_password_input<T: PasswordInputRenderer + 'static>(
+    r: T,
+) -> Arc<dyn PasswordInputRenderer> {
     Arc::new(r)
 }
 
@@ -123,9 +128,10 @@ pub trait DefaultPasswordInput: Sized {
 impl DefaultPasswordInput for PasswordInputProps {
     fn default_render(self, cx: &mut App, window: &mut Window) -> AnyElement {
         let theme_arc = cx.theme().clone();
-                let r: Arc<dyn PasswordInputRenderer> = cx
+        let r: Arc<dyn PasswordInputRenderer> = cx
             .renderer_arc::<markers::PasswordInput, dyn PasswordInputRenderer>()
-            .expect("PasswordInputRenderer registered").clone();
+            .expect("PasswordInputRenderer registered")
+            .clone();
         let theme = &*theme_arc;
 
         let id = self.id.clone();
@@ -181,7 +187,7 @@ impl DefaultPasswordInput for PasswordInputProps {
         // `value` holds the *real* password; the `TextInputElement`
         // uses `value_override` to display the mask instead.
         let value_len = state.read(cx).value.chars().count();
-        let masked: String = std::iter::repeat(mask_char).take(value_len).collect();
+        let masked: String = std::iter::repeat_n(mask_char, value_len).collect();
 
         let inner = TextInputElement {
             state: state.clone(),

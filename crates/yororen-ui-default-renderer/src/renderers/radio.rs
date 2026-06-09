@@ -35,10 +35,18 @@ pub struct TokenRadioRenderer;
 
 impl RadioRenderer for TokenRadioRenderer {
     fn ring_size(&self, _state: &RadioRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.radio.ring_size").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.radio.ring_size")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn dot_size(&self, _state: &RadioRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.radio.dot_size").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.radio.dot_size")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn ring_bg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
@@ -87,9 +95,11 @@ pub fn arc_radio<T: RadioRenderer + 'static>(r: T) -> Arc<dyn RadioRenderer> {
 // `DefaultRadio` — `headless::RadioProps` sugar.
 // =====================================================================
 
-use gpui::{div, App, InteractiveElement, ParentElement, Stateful, StatefulInteractiveElement, Styled};
+use gpui::{
+    App, InteractiveElement, ParentElement, Stateful, StatefulInteractiveElement, Styled, div,
+};
 use yororen_ui_core::headless::radio::RadioProps;
-use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
 pub trait DefaultRadio: Sized {

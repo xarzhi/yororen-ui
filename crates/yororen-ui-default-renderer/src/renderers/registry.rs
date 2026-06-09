@@ -452,7 +452,10 @@ impl RendererRegistry {
         (TypeId::of::<FormRenderState>(), "form"),
         (TypeId::of::<ListItemRenderState>(), "list_item"),
         (TypeId::of::<TreeItemRenderState>(), "tree_item"),
-        (TypeId::of::<KeybindingInputRenderState>(), "keybinding_input"),
+        (
+            TypeId::of::<KeybindingInputRenderState>(),
+            "keybinding_input",
+        ),
         (TypeId::of::<SplitButtonRenderState>(), "split_button"),
         (TypeId::of::<EmptyStateRenderState>(), "empty_state"),
     ];
@@ -537,7 +540,10 @@ mod tests {
     fn only_button() -> RendererRegistry {
         let mut map: HashMap<TypeId, Arc<dyn Any + Send + Sync>> = HashMap::new();
         let arc: Arc<dyn ButtonRenderer> = Arc::new(super::super::button::TokenButtonRenderer);
-        map.insert(TypeId::of::<super::super::button::ButtonRenderState>(), Arc::new(arc));
+        map.insert(
+            TypeId::of::<super::super::button::ButtonRenderState>(),
+            Arc::new(arc),
+        );
         RendererRegistry { map }
     }
 
@@ -547,7 +553,13 @@ mod tests {
             map: HashMap::new(),
         };
         let err = r.validate().unwrap_err();
-        assert_eq!(err.len(), 38, "expected 38 missing entries, got {}: {:?}", err.len(), err);
+        assert_eq!(
+            err.len(),
+            38,
+            "expected 38 missing entries, got {}: {:?}",
+            err.len(),
+            err
+        );
         // Spot-check a few well-known component names.
         assert!(err.contains(&"button"));
         assert!(err.contains(&"text_input"));
@@ -560,8 +572,17 @@ mod tests {
     fn only_button_reports_37_missing() {
         let r = only_button();
         let err = r.validate().unwrap_err();
-        assert_eq!(err.len(), 37, "expected 37 missing entries, got {}: {:?}", err.len(), err);
-        assert!(!err.contains(&"button"), "button was registered, must not appear in missing");
+        assert_eq!(
+            err.len(),
+            37,
+            "expected 37 missing entries, got {}: {:?}",
+            err.len(),
+            err
+        );
+        assert!(
+            !err.contains(&"button"),
+            "button was registered, must not appear in missing"
+        );
         assert!(err.contains(&"text_input"));
     }
 
@@ -579,7 +600,8 @@ mod tests {
         // must also pass — this guards the (infinite-recursion)
         // implementation comment in `token_based()` from drifting.
         let r = RendererRegistry::default();
-        r.validate().expect("Default::default() must always validate");
+        r.validate()
+            .expect("Default::default() must always validate");
     }
 
     #[test]
@@ -589,7 +611,8 @@ mod tests {
         // accidentally drop the other 37.
         let r = RendererRegistry::token_based()
             .with_button(Arc::new(super::super::button::TokenButtonRenderer));
-        r.validate().expect("override-after-token_based must validate");
+        r.validate()
+            .expect("override-after-token_based must validate");
     }
 
     #[test]

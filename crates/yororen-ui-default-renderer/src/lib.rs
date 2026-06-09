@@ -49,8 +49,10 @@ pub use renderers::text_area::DefaultTextArea;
 pub use renderers::text_input::DefaultTextInput;
 pub use renderers::toggle_button::DefaultToggleButton;
 pub use renderers::{
-    ButtonRenderState, ButtonRenderer, IconButtonRenderState, IconButtonRenderer,
-    LabelRenderState, LabelRenderer, ToggleButtonRenderState, ToggleButtonRenderer,
+    ButtonRenderState, ButtonRenderer, IconButtonRenderState, IconButtonRenderer, LabelRenderState,
+    LabelRenderer, ToggleButtonRenderState, ToggleButtonRenderer,
+};
+pub use themes::{
+    install, install_with, register_default_renderers, system_dark, system_for, system_light,
 };
 pub use yororen_ui_core::theme::Theme;
-pub use themes::{install, install_with, register_default_renderers, system_dark, system_for, system_light};

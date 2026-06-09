@@ -295,6 +295,7 @@ impl NotificationCenter {
         state.queue.iter().cloned().collect()
     }
 
+    #[allow(dead_code)]
     pub(crate) fn click(
         &self,
         id: NotificationId,
@@ -314,6 +315,7 @@ impl NotificationCenter {
         }
     }
 
+    #[allow(dead_code)]
     pub(crate) fn dismiss_from_ui(
         &self,
         id: NotificationId,
@@ -346,6 +348,7 @@ impl NotificationCenter {
         self.refresh_host(cx);
     }
 
+    #[allow(dead_code)]
     pub(crate) fn bind_persisted_state(
         &self,
         entity: gpui::Entity<PersistedState>,
@@ -377,6 +380,7 @@ impl NotificationCenter {
         }
     }
 
+    #[allow(dead_code)]
     pub(crate) fn unbind_persisted_state(&self) {
         let mut state = self.state.lock().unwrap();
         state.persisted_state = None;

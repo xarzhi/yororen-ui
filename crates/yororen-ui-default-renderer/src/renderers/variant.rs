@@ -11,8 +11,8 @@
 //! wrappers for backward-compat with v0.2 import paths.
 
 pub use yororen_ui_core::renderer::{
-    variant_compose, ButtonVariant, BuiltinVariantKey, GlobalVariantRegistry, TokenVariantStyle,
-    VariantKey, VariantRegistry, VariantState, VariantStyle,
+    BuiltinVariantKey, ButtonVariant, GlobalVariantRegistry, TokenVariantStyle, VariantKey,
+    VariantRegistry, VariantState, VariantStyle, variant_compose,
 };
 
 use std::sync::Arc;

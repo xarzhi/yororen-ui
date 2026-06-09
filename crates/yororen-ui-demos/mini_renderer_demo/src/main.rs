@@ -30,9 +30,11 @@ fn main() {
         mini::install(cx);
 
         let options = WindowOptions {
-            window_bounds: Some(WindowBounds::Windowed(
-                gpui::Bounds::centered(None, size(px(560.0), px(360.0)), cx),
-            )),
+            window_bounds: Some(WindowBounds::Windowed(gpui::Bounds::centered(
+                None,
+                size(px(560.0), px(360.0)),
+                cx,
+            ))),
             ..Default::default()
         };
         let _ = cx.open_window(options, |_, cx| cx.new(|_cx| mini_app::MiniApp::new()));

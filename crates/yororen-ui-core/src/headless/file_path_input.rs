@@ -5,14 +5,17 @@ use std::sync::Arc;
 
 use gpui::{App, Hsla};
 
+pub type TextChangeCallback = Arc<dyn Fn(&str, &mut gpui::Window, &mut App) + Send + Sync>;
+pub type TextBrowseCallback = TextChangeCallback;
+
 #[derive(Clone)]
 pub struct FilePathInputProps {
     pub id: gpui::ElementId,
     pub placeholder: String,
     pub disabled: bool,
     pub value: String,
-    pub on_change: Option<Arc<dyn Fn(&str, &mut gpui::Window, &mut App) + Send + Sync>>,
-    pub on_browse: Option<Arc<dyn Fn(&str, &mut gpui::Window, &mut App) + Send + Sync>>,
+    pub on_change: Option<TextChangeCallback>,
+    pub on_browse: Option<TextBrowseCallback>,
     pub has_custom_bg: bool,
     pub has_custom_border: bool,
     pub has_custom_focus_border: bool,

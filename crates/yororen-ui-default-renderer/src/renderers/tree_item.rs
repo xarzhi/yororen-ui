@@ -58,10 +58,18 @@ impl TreeItemRenderer for TokenTreeItemRenderer {
         )
     }
     fn min_height(&self, _state: &TreeItemRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.tree_item.min_height").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.tree_item.min_height")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn chevron_size(&self, _state: &TreeItemRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.list_item.chevron_size").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.list_item.chevron_size")
+                .unwrap_or(0.0) as f32,
+        )
     }
 }
 

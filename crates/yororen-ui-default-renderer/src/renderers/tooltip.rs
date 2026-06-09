@@ -41,7 +41,11 @@ impl TooltipRenderer for TokenTooltipRenderer {
     }
 
     fn font_size(&self, _state: &TooltipRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.typography.font_size_sm").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.typography.font_size_sm")
+                .unwrap_or(0.0) as f32,
+        )
     }
 
     fn border_radius(&self, _state: &TooltipRenderState, theme: &Theme) -> Pixels {

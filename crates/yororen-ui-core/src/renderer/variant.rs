@@ -175,7 +175,8 @@ impl VariantStyle for TokenVariantStyle {
 /// resolve in parallel.
 pub struct VariantRegistry {
     builtins: std::collections::HashMap<BuiltinVariantKey, std::sync::Arc<dyn VariantStyle>>,
-    customs: std::sync::RwLock<std::collections::HashMap<VariantKey, std::sync::Arc<dyn VariantStyle>>>,
+    customs:
+        std::sync::RwLock<std::collections::HashMap<VariantKey, std::sync::Arc<dyn VariantStyle>>>,
 }
 
 impl Default for VariantRegistry {
@@ -388,7 +389,11 @@ mod tests {
         let s = TokenVariantStyle::from_action(ActionVariantKind::Primary, &theme);
         // Red's HSL: hue=0. Verify against the theme.
         let bg = s.bg(&VariantState::default());
-        assert!(bg.s > 0.5, "primary bg should be saturated red, got {:?}", bg);
+        assert!(
+            bg.s > 0.5,
+            "primary bg should be saturated red, got {:?}",
+            bg
+        );
     }
 
     #[test]
@@ -418,10 +423,18 @@ mod tests {
         #[derive(Debug)]
         struct Ghost;
         impl VariantStyle for Ghost {
-            fn bg(&self, _: &VariantState) -> Hsla { rgb(0x000000).into() }
-            fn fg(&self, _: &VariantState) -> Hsla { rgb(0xFFFFFF).into() }
-            fn border(&self, _: &VariantState) -> Option<Hsla> { None }
-            fn disabled_opacity(&self) -> f32 { 1.0 }
+            fn bg(&self, _: &VariantState) -> Hsla {
+                rgb(0x000000).into()
+            }
+            fn fg(&self, _: &VariantState) -> Hsla {
+                rgb(0xFFFFFF).into()
+            }
+            fn border(&self, _: &VariantState) -> Option<Hsla> {
+                None
+            }
+            fn disabled_opacity(&self) -> f32 {
+                1.0
+            }
         }
         let key = VariantKey::borrowed("ghost");
         r.register(key.clone(), std::sync::Arc::new(Ghost));

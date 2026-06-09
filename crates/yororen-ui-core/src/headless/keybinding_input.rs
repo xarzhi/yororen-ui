@@ -5,8 +5,8 @@ use std::sync::Arc;
 
 use gpui::{App, Hsla};
 
-pub type KeybindingChangeCallback =
-    Arc<dyn Fn(&str, &mut gpui::Window, &mut App) + Send + Sync>;
+pub type KeybindingChangeCallback = Arc<dyn Fn(&str, &mut gpui::Window, &mut App) + Send + Sync>;
+pub type KeybindingCaptureCallback = Arc<dyn Fn(&mut gpui::Window, &mut App) + Send + Sync>;
 
 /// `KeybindingInput` is in one of two states: idle (user is
 /// typing) or capturing (next keystroke is recorded as a
@@ -25,8 +25,8 @@ pub struct KeybindingInputProps {
     pub disabled: bool,
     pub placeholder: String,
     pub on_change: Option<KeybindingChangeCallback>,
-    pub on_start_capture: Option<Arc<dyn Fn(&mut gpui::Window, &mut App) + Send + Sync>>,
-    pub on_cancel_capture: Option<Arc<dyn Fn(&mut gpui::Window, &mut App) + Send + Sync>>,
+    pub on_start_capture: Option<KeybindingCaptureCallback>,
+    pub on_cancel_capture: Option<KeybindingCaptureCallback>,
     pub has_custom_bg: bool,
     pub has_custom_border: bool,
     pub has_custom_focus_border: bool,

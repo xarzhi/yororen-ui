@@ -20,11 +20,11 @@ use std::ops::Range;
 use std::sync::Arc;
 
 use gpui::{
-    div, fill, point, px, relative, size, AnyElement, App, Bounds, CursorStyle, Div, Element,
-    ElementId, ElementInputHandler, FocusHandle, GlobalElementId, Hsla, InteractiveElement,
-    IntoElement, LayoutId, MouseButton, MouseDownEvent, MouseMoveEvent, PaintQuad, ParentElement,
-    Pixels, ShapedLine, SharedString, Stateful, StatefulInteractiveElement, Style, Styled, TextRun,
-    Window,
+    AnyElement, App, Bounds, CursorStyle, Div, Element, ElementId, ElementInputHandler,
+    FocusHandle, GlobalElementId, Hsla, InteractiveElement, IntoElement, LayoutId, MouseButton,
+    MouseDownEvent, MouseMoveEvent, PaintQuad, ParentElement, Pixels, ShapedLine, SharedString,
+    Stateful, StatefulInteractiveElement, Style, Styled, TextRun, Window, div, fill, point, px,
+    relative, size,
 };
 use yororen_ui_core::action_handler;
 use yororen_ui_core::headless::text_area::TextAreaProps;
@@ -32,7 +32,7 @@ use yororen_ui_core::headless::text_input::{
     Backspace, Copy, Cut, Delete, End, Enter, Home, Left, Paste, Right, SelectAll, SelectLeft,
     SelectRight, ShowCharacterPalette, TextInputState,
 };
-use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
 use crate::renderers::spec::Edges;
@@ -104,12 +104,14 @@ impl TextAreaRenderer for TokenTextAreaRenderer {
         }
     }
     fn min_height(&self, _state: &TextAreaRenderState, theme: &Theme) -> Pixels {
-        px(theme.get_number("tokens.control.input.text_area_min_h").unwrap_or(0.0) as f32)
+        px(theme
+            .get_number("tokens.control.input.text_area_min_h")
+            .unwrap_or(0.0) as f32)
     }
     fn padding(&self, _state: &TextAreaRenderState, theme: &Theme) -> Edges<Pixels> {
-        Edges::all(px(
-            theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32,
-        ))
+        Edges::all(px(theme
+            .get_number("tokens.control.input.vertical_padding")
+            .unwrap_or(0.0) as f32))
     }
     fn border_radius(&self, _state: &TextAreaRenderState, theme: &Theme) -> Pixels {
         px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
@@ -268,9 +270,10 @@ impl Element for TextAreaElement {
                 underline: None,
                 strikethrough: None,
             };
-            let shaped_line = window
-                .text_system()
-                .shape_line(line_str.clone().into(), font_size, &[run], None);
+            let shaped_line =
+                window
+                    .text_system()
+                    .shape_line(line_str.clone().into(), font_size, &[run], None);
             shaped.push(shaped_line);
         }
 
@@ -354,14 +357,8 @@ impl Element for TextAreaElement {
                     let y_bottom = y_top + line_height_px;
                     let quad = fill(
                         Bounds::from_corners(
-                            point(
-                                bounds.left() + start_x.min(end_x) - scroll_x,
-                                y_top,
-                            ),
-                            point(
-                                bounds.left() + start_x.max(end_x) - scroll_x,
-                                y_bottom,
-                            ),
+                            point(bounds.left() + start_x.min(end_x) - scroll_x, y_top),
+                            point(bounds.left() + start_x.max(end_x) - scroll_x, y_bottom),
                         ),
                         self.selection_color,
                     );
@@ -446,7 +443,8 @@ impl Element for TextAreaElement {
 
         // 3. The caret.
         let is_focused = self.focus_handle.is_focused(window);
-        if is_focused && prepaint.cursor_visible
+        if is_focused
+            && prepaint.cursor_visible
             && let Some(cur) = prepaint.cursor.take()
         {
             window.paint_quad(cur);
@@ -595,13 +593,33 @@ impl DefaultTextArea for TextAreaProps {
         // which `text_area` doesn't have anyway).
         let mut keyed: Stateful<Div> = focused_div
             .key_context("UITextInput")
-            .on_action(action_handler!(state.clone(), disabled, Backspace, backspace))
+            .on_action(action_handler!(
+                state.clone(),
+                disabled,
+                Backspace,
+                backspace
+            ))
             .on_action(action_handler!(state.clone(), disabled, Delete, delete))
             .on_action(action_handler!(state.clone(), disabled, Left, left))
             .on_action(action_handler!(state.clone(), disabled, Right, right))
-            .on_action(action_handler!(state.clone(), disabled, SelectLeft, select_left))
-            .on_action(action_handler!(state.clone(), disabled, SelectRight, select_right))
-            .on_action(action_handler!(state.clone(), disabled, SelectAll, select_all))
+            .on_action(action_handler!(
+                state.clone(),
+                disabled,
+                SelectLeft,
+                select_left
+            ))
+            .on_action(action_handler!(
+                state.clone(),
+                disabled,
+                SelectRight,
+                select_right
+            ))
+            .on_action(action_handler!(
+                state.clone(),
+                disabled,
+                SelectAll,
+                select_all
+            ))
             .on_action(action_handler!(state.clone(), disabled, Home, home))
             .on_action(action_handler!(state.clone(), disabled, End, end))
             .on_action(action_handler!(

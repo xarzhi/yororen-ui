@@ -35,10 +35,18 @@ pub struct TokenCheckboxRenderer;
 
 impl CheckboxRenderer for TokenCheckboxRenderer {
     fn box_size(&self, _state: &CheckboxRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.checkbox.box_size").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.checkbox.box_size")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn check_size(&self, _state: &CheckboxRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.checkbox.check_size").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.checkbox.check_size")
+                .unwrap_or(0.0) as f32,
+        )
     }
     fn box_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
@@ -66,14 +74,18 @@ impl CheckboxRenderer for TokenCheckboxRenderer {
     }
     fn box_hover_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         if state.checked {
-            theme.get_color("action.primary.hover_bg").unwrap_or_default()
+            theme
+                .get_color("action.primary.hover_bg")
+                .unwrap_or_default()
         } else {
             theme.get_color("surface.hover").unwrap_or_default()
         }
     }
     fn box_active_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         if state.checked {
-            theme.get_color("action.primary.active_bg").unwrap_or_default()
+            theme
+                .get_color("action.primary.active_bg")
+                .unwrap_or_default()
         } else {
             theme.get_color("surface.sunken").unwrap_or_default()
         }
@@ -97,9 +109,11 @@ pub fn arc_checkbox<T: CheckboxRenderer + 'static>(r: T) -> Arc<dyn CheckboxRend
 // `DefaultCheckbox` — `headless::CheckboxProps` sugar.
 // =====================================================================
 
-use gpui::{div, App, InteractiveElement, ParentElement, Stateful, StatefulInteractiveElement, Styled, px};
+use gpui::{
+    App, InteractiveElement, ParentElement, Stateful, StatefulInteractiveElement, Styled, div, px,
+};
 use yororen_ui_core::headless::checkbox::CheckboxProps;
-use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
 pub trait DefaultCheckbox: Sized {

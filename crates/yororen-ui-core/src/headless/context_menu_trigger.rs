@@ -3,10 +3,7 @@
 
 use std::sync::Arc;
 
-use gpui::{
-    App, Div, ElementId, InteractiveElement, MouseButton, Stateful, StatefulInteractiveElement,
-    Window,
-};
+use gpui::{App, Div, ElementId, InteractiveElement, MouseButton, Stateful};
 
 pub type ContextMenuCallback = Arc<dyn Fn(&gpui::Point<gpui::Pixels>, &mut gpui::Window, &mut App)>;
 

@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, InteractiveElement, Stateful, StatefulInteractiveElement, Window};
+use gpui::{App, Div, ElementId, InteractiveElement, Stateful, Window};
 
 pub type SliderCallback = Arc<dyn Fn(f32, &mut Window, &mut App)>;
 

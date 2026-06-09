@@ -7,6 +7,8 @@ use gpui::{
     Window,
 };
 
+pub type TooltipCloseCallback = Arc<dyn Fn(&mut Window, &mut App) + Send + Sync>;
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum TooltipPlacement {
     Top,
@@ -23,7 +25,7 @@ pub struct TooltipState {
     /// Anchor bounds — written by the renderer during prepaint.
     pub anchor_bounds: Option<Bounds<Pixels>>,
     pub content_size: Option<Size<Pixels>>,
-    on_close: Option<Arc<dyn Fn(&mut Window, &mut App) + Send + Sync>>,
+    on_close: Option<TooltipCloseCallback>,
 }
 
 impl TooltipState {

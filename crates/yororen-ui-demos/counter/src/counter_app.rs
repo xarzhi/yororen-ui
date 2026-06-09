@@ -60,14 +60,14 @@ impl Render for CounterApp {
             .gap_3()
             .p_4()
             .child(
-                label("subtitle", "Counter Demo", &mut **cx)
+                label("subtitle", "Counter Demo", cx)
                     .strong(true)
                     .default_render(cx)
                     .text_size(gpui::px(28.))
                     .into_any_element(),
             )
             .child(
-                label("count", count.to_string(), &mut **cx)
+                label("count", count.to_string(), cx)
                     .default_render(cx)
                     .text_size(gpui::px(20.))
                     .into_any_element(),
@@ -77,7 +77,7 @@ impl Render for CounterApp {
                     .flex()
                     .gap_2()
                     .child(
-                        button("decrease", &mut **cx)
+                        button("decrease", cx)
                             .on_click(move |_, _, cx| {
                                 dec_entity.update(cx, |c, cx| {
                                     c.value -= 1;
@@ -88,7 +88,7 @@ impl Render for CounterApp {
                             .child("-"),
                     )
                     .child(
-                        button("reset", &mut **cx)
+                        button("reset", cx)
                             .on_click(move |_, _, cx| {
                                 reset_entity.update(cx, |c, cx| {
                                     c.value = 0;
@@ -99,7 +99,7 @@ impl Render for CounterApp {
                             .child("Reset"),
                     )
                     .child(
-                        button("increase", &mut **cx)
+                        button("increase", cx)
                             .on_click(move |_, _, cx| {
                                 inc_entity.update(cx, |c, cx| {
                                     c.value += 1;

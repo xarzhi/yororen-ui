@@ -79,7 +79,7 @@ mod tests {
         // Smoke: every marker is distinct and 'static.
         let mut r = RendererRegistry::new();
         r.register_arc::<Button, dyn std::any::Any + Send + Sync>(
-            std::sync::Arc::new(()) as std::sync::Arc<dyn std::any::Any + Send + Sync>,
+            std::sync::Arc::new(()) as std::sync::Arc<dyn std::any::Any + Send + Sync>
         );
         // We can't check much more without a real trait, but the
         // registration must not panic.

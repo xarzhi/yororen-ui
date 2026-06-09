@@ -14,19 +14,21 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use gpui::{
-    div, fill, hsla, point, px, relative, size, AnyElement, App, Bounds, CursorStyle, Div, Element,
-    ElementId, ElementInputHandler, FocusHandle, GlobalElementId, Hsla, InteractiveElement,
-    IntoElement, LayoutId, MouseButton, MouseDownEvent, MouseMoveEvent, MouseUpEvent, ParentElement,
-    Pixels, PaintQuad, ShapedLine, SharedString, Stateful, StatefulInteractiveElement, Style,
-    Styled, TextRun, Window,
+    AnyElement, App, Bounds, CursorStyle, Div, Element, ElementId, ElementInputHandler,
+    FocusHandle, GlobalElementId, Hsla, InteractiveElement, IntoElement, LayoutId, MouseButton,
+    MouseDownEvent, MouseMoveEvent, MouseUpEvent, PaintQuad, ParentElement, Pixels, ShapedLine,
+    SharedString, Stateful, StatefulInteractiveElement, Style, Styled, TextRun, Window, div, fill,
+    hsla, point, px, relative, size,
 };
 use yororen_ui_core::action_handler;
 use yororen_ui_core::headless::text_input::{
     Backspace, Copy, Cut, Delete, End, Enter, Home, Left, Paste, Right, SelectAll, SelectLeft,
     SelectRight, ShowCharacterPalette, TextInputProps, TextInputState,
 };
-use yororen_ui_core::renderer::{markers, RendererContext};
+use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::{ActiveTheme, Theme};
+
+pub(crate) type SubmitCallback = Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>;
 
 use crate::renderers::spec::Edges;
 
@@ -130,12 +132,18 @@ impl TextInputRenderer for TokenTextInputRenderer {
         hsla(c.h, c.s, c.l, 0.25)
     }
     fn min_height(&self, _state: &TextInputRenderState, theme: &Theme) -> Pixels {
-        px(theme.get_number("tokens.control.input.min_height").unwrap_or(0.0) as f32)
+        px(theme
+            .get_number("tokens.control.input.min_height")
+            .unwrap_or(0.0) as f32)
     }
     fn padding(&self, _state: &TextInputRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(
-            px(theme.get_number("tokens.control.input.horizontal_padding").unwrap_or(0.0) as f32),
-            px(theme.get_number("tokens.control.input.vertical_padding").unwrap_or(0.0) as f32),
+            px(theme
+                .get_number("tokens.control.input.horizontal_padding")
+                .unwrap_or(0.0) as f32),
+            px(theme
+                .get_number("tokens.control.input.vertical_padding")
+                .unwrap_or(0.0) as f32),
         )
     }
     fn border_radius(&self, _state: &TextInputRenderState, theme: &Theme) -> Pixels {
@@ -310,10 +318,7 @@ impl Element for TextInputElement {
             let end_x = line.x_for_index(selection_disp.end);
             let quad = fill(
                 Bounds::from_corners(
-                    point(
-                        bounds.left() + start_x.min(end_x) - scroll_x,
-                        bounds.top(),
-                    ),
+                    point(bounds.left() + start_x.min(end_x) - scroll_x, bounds.top()),
                     point(
                         bounds.left() + start_x.max(end_x) - scroll_x,
                         bounds.bottom(),
@@ -371,10 +376,16 @@ impl Element for TextInputElement {
             .take()
             .expect("prepaint always produces a line");
         let origin_x = bounds.left() - prepaint.scroll_x;
-        let _ = line.paint(point(origin_x, bounds.top()), window.line_height(), window, cx);
+        let _ = line.paint(
+            point(origin_x, bounds.top()),
+            window.line_height(),
+            window,
+            cx,
+        );
 
         let is_focused = self.focus_handle.is_focused(window);
-        if is_focused && prepaint.cursor_visible
+        if is_focused
+            && prepaint.cursor_visible
             && let Some(cur) = prepaint.cursor.take()
         {
             window.paint_quad(cur);
@@ -405,20 +416,45 @@ pub fn wire_input_keyboard(
     state: gpui::Entity<TextInputState>,
     focus_handle: FocusHandle,
     disabled: bool,
-    on_submit: Option<Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>>,
+    on_submit: Option<SubmitCallback>,
 ) -> Stateful<Div> {
     wrapper = wrapper
         .key_context("UITextInput")
-        .on_action(action_handler!(state.clone(), disabled, Backspace, backspace))
+        .on_action(action_handler!(
+            state.clone(),
+            disabled,
+            Backspace,
+            backspace
+        ))
         .on_action(action_handler!(state.clone(), disabled, Delete, delete))
         .on_action(action_handler!(state.clone(), disabled, Left, left))
         .on_action(action_handler!(state.clone(), disabled, Right, right))
-        .on_action(action_handler!(state.clone(), disabled, SelectLeft, select_left))
-        .on_action(action_handler!(state.clone(), disabled, SelectRight, select_right))
-        .on_action(action_handler!(state.clone(), disabled, SelectAll, select_all))
+        .on_action(action_handler!(
+            state.clone(),
+            disabled,
+            SelectLeft,
+            select_left
+        ))
+        .on_action(action_handler!(
+            state.clone(),
+            disabled,
+            SelectRight,
+            select_right
+        ))
+        .on_action(action_handler!(
+            state.clone(),
+            disabled,
+            SelectAll,
+            select_all
+        ))
         .on_action(action_handler!(state.clone(), disabled, Home, home))
         .on_action(action_handler!(state.clone(), disabled, End, end))
-        .on_action(action_handler!(state.clone(), disabled, ShowCharacterPalette, show_character_palette))
+        .on_action(action_handler!(
+            state.clone(),
+            disabled,
+            ShowCharacterPalette,
+            show_character_palette
+        ))
         .on_action(action_handler!(state.clone(), disabled, Paste, paste))
         .on_action(action_handler!(state.clone(), disabled, Cut, cut))
         .on_action(action_handler!(state.clone(), disabled, Copy, copy));
@@ -444,17 +480,26 @@ pub fn wire_input_keyboard(
     let state_for_up_out = state.clone();
     let state_for_move = state.clone();
     wrapper = wrapper
-        .on_mouse_down(MouseButton::Left, move |event: &MouseDownEvent, window, cx| {
-            state_for_mouse.update(cx, |s, cx| {
-                s.on_mouse_down(event.position, window, cx);
-            });
-        })
-        .on_mouse_up(MouseButton::Left, move |event: &MouseUpEvent, window, cx| {
-            state_for_up.update(cx, |s, cx| s.on_mouse_up(event, window, cx));
-        })
-        .on_mouse_up_out(MouseButton::Left, move |event: &MouseUpEvent, window, cx| {
-            state_for_up_out.update(cx, |s, cx| s.on_mouse_up(event, window, cx));
-        })
+        .on_mouse_down(
+            MouseButton::Left,
+            move |event: &MouseDownEvent, window, cx| {
+                state_for_mouse.update(cx, |s, cx| {
+                    s.on_mouse_down(event.position, window, cx);
+                });
+            },
+        )
+        .on_mouse_up(
+            MouseButton::Left,
+            move |event: &MouseUpEvent, window, cx| {
+                state_for_up.update(cx, |s, cx| s.on_mouse_up(event, window, cx));
+            },
+        )
+        .on_mouse_up_out(
+            MouseButton::Left,
+            move |event: &MouseUpEvent, window, cx| {
+                state_for_up_out.update(cx, |s, cx| s.on_mouse_up(event, window, cx));
+            },
+        )
         .on_mouse_move(move |event: &MouseMoveEvent, window, cx| {
             state_for_move.update(cx, |s, cx| s.on_mouse_move(event, window, cx));
         });
@@ -468,11 +513,7 @@ pub fn wire_input_keyboard(
 /// `cursor_blink_epoch` counter; the running task checks it on
 /// each tick and exits if it changed (i.e. focus moved
 /// elsewhere).
-pub fn start_cursor_blink(
-    state: gpui::Entity<TextInputState>,
-    window: &mut Window,
-    cx: &mut App,
-) {
+pub fn start_cursor_blink(state: gpui::Entity<TextInputState>, window: &mut Window, cx: &mut App) {
     state.update(cx, |s, _cx| {
         s.cursor_blink_epoch = s.cursor_blink_epoch.wrapping_add(1);
     });
@@ -528,7 +569,8 @@ impl DefaultTextInput for TextInputProps {
         let theme_arc = cx.theme().clone();
         let r: Arc<dyn TextInputRenderer> = cx
             .renderer_arc::<markers::TextInput, dyn TextInputRenderer>()
-            .expect("TextInputRenderer registered").clone();
+            .expect("TextInputRenderer registered")
+            .clone();
         let theme = &*theme_arc;
 
         // Mint the state.

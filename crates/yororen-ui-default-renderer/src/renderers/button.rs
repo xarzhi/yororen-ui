@@ -21,6 +21,7 @@
 //! `cx.renderer_arc::<headless::Button, dyn ButtonRenderer>()`
 //! to fetch the registered renderer from the core registry.
 
+use std::any::Any;
 use std::sync::Arc;
 
 use gpui::{Hsla, Pixels};
@@ -77,8 +78,6 @@ pub trait ButtonRenderer: Any + Send + Sync {
     /// pressed. Used by `default_render`'s `.active(|s| …)`.
     fn active_bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla;
 }
-
-use std::any::Any;
 
 /// Default implementation. Reads color from
 /// `action.<variant>.<bg|fg|disabled_bg|disabled_fg>` and
@@ -167,7 +166,11 @@ impl ButtonRenderer for TokenButtonRenderer {
                 disabled: state.disabled,
             });
         }
-        let field = if state.disabled { "disabled_bg" } else { "hover_bg" };
+        let field = if state.disabled {
+            "disabled_bg"
+        } else {
+            "hover_bg"
+        };
         let key = format!("action.{}.{}", state.variant.as_str(), field);
         theme.get_color(&key).unwrap_or_default()
     }
@@ -178,7 +181,11 @@ impl ButtonRenderer for TokenButtonRenderer {
                 disabled: state.disabled,
             });
         }
-        let field = if state.disabled { "disabled_bg" } else { "active_bg" };
+        let field = if state.disabled {
+            "disabled_bg"
+        } else {
+            "active_bg"
+        };
         let key = format!("action.{}.{}", state.variant.as_str(), field);
         theme.get_color(&key).unwrap_or_default()
     }
@@ -188,6 +195,73 @@ impl ButtonRenderer for TokenButtonRenderer {
 /// renderer in an Arc.
 pub fn arc<T: ButtonRenderer + 'static>(r: T) -> Arc<dyn ButtonRenderer> {
     Arc::new(r)
+}
+
+// =====================================================================
+// `DefaultButton` — render a `headless::ButtonProps` with the
+// registered `ButtonRenderer`. Lives in this same file because
+// it is the `headless`-shaped entry point for *this* renderer.
+// =====================================================================
+
+use gpui::{App, InteractiveElement, Stateful, StatefulInteractiveElement, Styled, div};
+use yororen_ui_core::headless::button::ButtonProps;
+use yororen_ui_core::renderer::RendererContext;
+use yororen_ui_core::theme::ActiveTheme;
+
+/// Sugar trait. Add `use yororen_ui_renderer::renderers::button::DefaultButton;`
+/// to a file to unlock `.default_render(cx)` on every `ButtonProps`.
+pub trait DefaultButton: Sized {
+    fn default_render(self, cx: &App) -> Stateful<gpui::Div>;
+}
+
+impl DefaultButton for ButtonProps {
+    fn default_render(self, cx: &App) -> Stateful<gpui::Div> {
+        let theme = cx.theme();
+        let r: &Arc<dyn ButtonRenderer> = cx
+            .renderer_arc::<ButtonMarker, dyn ButtonRenderer>()
+            .expect("ButtonRenderer registered");
+        let state = ButtonRenderState {
+            variant: self.variant,
+            disabled: self.disabled,
+            is_rtl: false,
+            has_custom_bg: false,
+            has_custom_hover_bg: false,
+            custom_style: None,
+        };
+        let bg = r.bg(&state, theme);
+        let fg = r.fg(&state, theme);
+        let padding = r.padding(&state, theme);
+        let radius = r.border_radius(&state, theme);
+        let min_h = r.min_height(&state, theme);
+        let opacity = if self.disabled {
+            r.disabled_opacity(&state, theme)
+        } else {
+            1.0
+        };
+        let hover_bg = r.hover_bg(&state, theme);
+        let active_bg = r.active_bg(&state, theme);
+        let el = div()
+            .bg(bg)
+            .text_color(fg)
+            .px(padding.left)
+            .py(padding.top)
+            .rounded(radius)
+            .min_h(min_h)
+            .flex()
+            .items_center()
+            .justify_center()
+            .opacity(opacity);
+        // `self.apply(el)` is purely a11y (focus + click) and
+        // returns a `Stateful<Div>` that implements
+        // `StatefulInteractiveElement`, so we chain `.hover(...)`
+        // / `.active(...)` for the theme-driven visual
+        // feedback. The closures read the renderer's
+        // `hover_bg` / `active_bg` and apply them as style
+        // overrides.
+        self.apply(el)
+            .hover(|s| s.bg(hover_bg))
+            .active(|s| s.bg(active_bg))
+    }
 }
 
 #[cfg(test)]
@@ -272,12 +346,11 @@ mod tests {
         let theme = fixture();
         let r = TokenButtonRenderer;
         let state = ButtonRenderState::default();
-        let expected = theme.get_number("tokens.control.button.min_height").unwrap() as f32;
+        let expected = theme
+            .get_number("tokens.control.button.min_height")
+            .unwrap() as f32;
         // Pixels equality is f32-based; compare values.
-        assert_eq!(
-            r.min_height(&state, &theme),
-            gpui::px(expected),
-        );
+        assert_eq!(r.min_height(&state, &theme), gpui::px(expected),);
     }
 
     #[test]
@@ -343,72 +416,5 @@ mod tests {
             r.fg(&state, &theme),
             theme.get_color("action.primary.fg").unwrap(),
         );
-    }
-}
-
-// =====================================================================
-// `DefaultButton` — render a `headless::ButtonProps` with the
-// registered `ButtonRenderer`. Lives in this same file because
-// it is the `headless`-shaped entry point for *this* renderer.
-// =====================================================================
-
-use gpui::{div, App, InteractiveElement, Stateful, StatefulInteractiveElement, Styled};
-use yororen_ui_core::headless::button::ButtonProps;
-use yororen_ui_core::renderer::RendererContext;
-use yororen_ui_core::theme::ActiveTheme;
-
-/// Sugar trait. Add `use yororen_ui_renderer::renderers::button::DefaultButton;`
-/// to a file to unlock `.default_render(cx)` on every `ButtonProps`.
-pub trait DefaultButton: Sized {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div>;
-}
-
-impl DefaultButton for ButtonProps {
-    fn default_render(self, cx: &App) -> Stateful<gpui::Div> {
-        let theme = cx.theme();
-        let r: &Arc<dyn ButtonRenderer> = cx
-            .renderer_arc::<ButtonMarker, dyn ButtonRenderer>()
-            .expect("ButtonRenderer registered");
-        let state = ButtonRenderState {
-            variant: self.variant,
-            disabled: self.disabled,
-            is_rtl: false,
-            has_custom_bg: false,
-            has_custom_hover_bg: false,
-            custom_style: None,
-        };
-        let bg = r.bg(&state, theme);
-        let fg = r.fg(&state, theme);
-        let padding = r.padding(&state, theme);
-        let radius = r.border_radius(&state, theme);
-        let min_h = r.min_height(&state, theme);
-        let opacity = if self.disabled {
-            r.disabled_opacity(&state, theme)
-        } else {
-            1.0
-        };
-        let hover_bg = r.hover_bg(&state, theme);
-        let active_bg = r.active_bg(&state, theme);
-        let el = div()
-            .bg(bg)
-            .text_color(fg)
-            .px(padding.left)
-            .py(padding.top)
-            .rounded(radius)
-            .min_h(min_h)
-            .flex()
-            .items_center()
-            .justify_center()
-            .opacity(opacity);
-        // `self.apply(el)` is purely a11y (focus + click) and
-        // returns a `Stateful<Div>` that implements
-        // `StatefulInteractiveElement`, so we chain `.hover(...)`
-        // / `.active(...)` for the theme-driven visual
-        // feedback. The closures read the renderer's
-        // `hover_bg` / `active_bg` and apply them as style
-        // overrides.
-        self.apply(el)
-            .hover(|s| s.bg(hover_bg))
-            .active(|s| s.bg(active_bg))
     }
 }

@@ -17,8 +17,6 @@
 use gpui::{App, AppContext, Application, WindowBounds, WindowOptions, px, size};
 
 use yororen_ui::assets::UiAsset;
-use yororen_ui::headless::button::button;
-use yororen_ui::headless::label::label;
 use yororen_ui::renderer;
 
 mod variant_app;
@@ -30,11 +28,15 @@ fn main() {
         renderer::install(cx, cx.window_appearance());
 
         let options = WindowOptions {
-            window_bounds: Some(WindowBounds::Windowed(
-                gpui::Bounds::centered(None, size(px(700.0), px(420.0)), cx),
-            )),
+            window_bounds: Some(WindowBounds::Windowed(gpui::Bounds::centered(
+                None,
+                size(px(700.0), px(420.0)),
+                cx,
+            ))),
             ..Default::default()
         };
-        let _ = cx.open_window(options, |_, cx| cx.new(|_cx| variant_app::VariantApp::new()));
+        let _ = cx.open_window(options, |_, cx| {
+            cx.new(|_cx| variant_app::VariantApp::new())
+        });
     });
 }

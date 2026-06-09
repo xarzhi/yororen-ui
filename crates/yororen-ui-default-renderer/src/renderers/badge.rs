@@ -64,15 +64,27 @@ impl BadgeRenderer for TokenBadgeRenderer {
     }
 
     fn height(&self, _state: &BadgeRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.control.badge.min_height").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.control.badge.min_height")
+                .unwrap_or(0.0) as f32,
+        )
     }
 
     fn font_size(&self, _state: &BadgeRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.typography.font_size_xs").unwrap_or(0.0) as f32)
+        gpui::px(
+            theme
+                .get_number("tokens.typography.font_size_xs")
+                .unwrap_or(0.0) as f32,
+        )
     }
 
     fn font_weight(&self, _state: &BadgeRenderState, theme: &Theme) -> FontWeight {
-        FontWeight(theme.get_number("tokens.typography.weight_medium").unwrap_or(500.0) as f32)
+        FontWeight(
+            theme
+                .get_number("tokens.typography.weight_medium")
+                .unwrap_or(500.0) as f32,
+        )
     }
 
     fn border_radius(&self, _state: &BadgeRenderState, theme: &Theme) -> Pixels {
