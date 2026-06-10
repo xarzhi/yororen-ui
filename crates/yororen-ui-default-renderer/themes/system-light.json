@@ -31,8 +31,8 @@
     },
     "primary": {
       "bg": "#121214",
-      "hover_bg": "#0C0C0D",
-      "active_bg": "#000000",
+      "hover_bg": "#2A2A2E",
+      "active_bg": "#404045",
       "fg": "#FFFFFF",
       "disabled_bg": "#2A2A2E",
       "disabled_fg": "#D0D0D6"
