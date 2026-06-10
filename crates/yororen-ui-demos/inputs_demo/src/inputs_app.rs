@@ -12,10 +12,6 @@ use yororen_ui::headless::password_input::password_input;
 use yororen_ui::headless::search_input::search_input;
 use yororen_ui::headless::text_area::text_area;
 use yororen_ui::headless::text_input::text_input;
-use yororen_ui::renderer::{
-    DefaultFilePathInput, DefaultKeybindingInput, DefaultLabel, DefaultNumberInput,
-    DefaultPasswordInput, DefaultSearchInput, DefaultTextArea, DefaultTextInput,
-};
 
 pub struct InputsApp {
     pub text_value: String,

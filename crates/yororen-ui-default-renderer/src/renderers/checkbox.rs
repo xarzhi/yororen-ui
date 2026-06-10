@@ -94,46 +94,6 @@ use yororen_ui_core::headless::checkbox::CheckboxProps;
 use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
-pub trait DefaultCheckbox: Sized {
-    fn render(self, cx: &App) -> Stateful<gpui::Div>;
-}
-
-impl DefaultCheckbox for CheckboxProps {
-    fn render(self, cx: &App) -> Stateful<gpui::Div> {
-        let theme = cx.theme();
-        let r: &Arc<dyn CheckboxRenderer> = cx
-            .renderer_arc::<markers::Checkbox, dyn CheckboxRenderer>()
-            .expect("CheckboxRenderer registered");
-        let state = CheckboxRenderState {
-            checked: self.checked,
-            disabled: self.disabled,
-            has_custom_tone: self.has_custom_tone,
-            custom_tone: self.custom_tone,
-        };
-        let bg = r.box_bg(&state, theme);
-        let border = r.box_border(&state, theme);
-        let size = r.box_size(&state, theme);
-        let check_size = r.check_size(&state, theme);
-        let mut el = div()
-            .bg(bg)
-            .border_1()
-            .border_color(border)
-            .size(size)
-            .rounded(px(4.))
-            .flex()
-            .items_center()
-            .justify_center();
-        if self.checked {
-            el = el.child(div().bg(border).size(check_size).rounded(px(2.)));
-        }
-        let hover_bg = r.box_hover_bg(&state, theme);
-        let active_bg = r.box_active_bg(&state, theme);
-        self.apply(el)
-            .hover(|s| s.bg(hover_bg))
-            .active(|s| s.bg(active_bg))
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

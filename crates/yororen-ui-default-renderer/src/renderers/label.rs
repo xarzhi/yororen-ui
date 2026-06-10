@@ -54,55 +54,6 @@ use yororen_ui_core::headless::label::LabelProps;
 use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
-pub trait DefaultLabel: Sized {
-    fn render(self, cx: &App) -> Stateful<gpui::Div>;
-}
-
-impl DefaultLabel for LabelProps {
-    fn render(self, cx: &App) -> Stateful<gpui::Div> {
-        let theme = cx.theme();
-        let r: &Arc<dyn LabelRenderer> = cx
-            .renderer_arc::<markers::Label, dyn LabelRenderer>()
-            .expect("LabelRenderer registered");
-        let state = LabelRenderState {
-            muted: self.muted,
-            strong: self.strong,
-            mono: self.mono,
-            inherit_color: self.inherit_color,
-            ellipsis: self.ellipsis,
-            wrap: self.wrap,
-            max_lines: self.max_lines,
-        };
-        let color = r.color(&state, theme);
-        let weight = r.strong_weight(&state, theme);
-        let family = r.family_mono(&state, theme);
-        let mut el = div();
-        if !self.inherit_color {
-            el = el.text_color(color);
-        }
-        if self.strong {
-            el = el.font_weight(weight);
-        }
-        if self.mono {
-            el = el.font_family(family);
-        }
-        if self.ellipsis {
-            el = el.overflow_hidden().text_ellipsis().whitespace_nowrap();
-        }
-        if self.wrap {
-            el = el.whitespace_normal();
-        }
-        if let Some(n) = self.max_lines {
-            // gpui exposes `line_clamp` on `Styled`; it both
-            // truncates and disables wrapping. Pair with
-            // `overflow_hidden` for safety.
-            el = el.line_clamp(n).overflow_hidden();
-        }
-        el = el.child(self.text.clone());
-        self.apply(el)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

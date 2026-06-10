@@ -1334,6 +1334,7 @@ pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::has_custo
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::on_browse<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::on_change<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
+pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::render(self, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::value(self, impl core::convert::Into<alloc::string::String>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::file_path_input::FilePathInputProps
 pub fn yororen_ui_core::headless::file_path_input::FilePathInputProps::clone(&self) -> yororen_ui_core::headless::file_path_input::FilePathInputProps
@@ -1480,6 +1481,7 @@ pub yororen_ui_core::headless::icon::IconProps::source: yororen_ui_core::headles
 impl yororen_ui_core::headless::icon::IconProps
 pub fn yororen_ui_core::headless::icon::IconProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::icon::IconProps::color(self, impl core::convert::Into<gpui::color::Hsla>) -> Self
+pub fn yororen_ui_core::headless::icon::IconProps::render(self, &mut gpui::app::App) -> gpui::element::AnyElement
 pub fn yororen_ui_core::headless::icon::IconProps::size(self, impl core::convert::Into<gpui::geometry::Pixels>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::icon::IconProps
 pub fn yororen_ui_core::headless::icon::IconProps::clone(&self) -> yororen_ui_core::headless::icon::IconProps
@@ -1622,6 +1624,7 @@ pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_can
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_change<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::on_start_capture<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
+pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::render(self, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 impl core::clone::Clone for yororen_ui_core::headless::keybinding_input::KeybindingInputProps
 pub fn yororen_ui_core::headless::keybinding_input::KeybindingInputProps::clone(&self) -> yororen_ui_core::headless::keybinding_input::KeybindingInputProps
 impl core::marker::Freeze for yororen_ui_core::headless::keybinding_input::KeybindingInputProps
@@ -2644,6 +2647,7 @@ pub fn yororen_ui_core::headless::number_input::NumberInputProps::on_change<F>(s
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::on_decrement<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(f64, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::on_increment<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(f64, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
+pub fn yororen_ui_core::headless::number_input::NumberInputProps::render(self, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::step(self, f64) -> Self
 pub fn yororen_ui_core::headless::number_input::NumberInputProps::value(self, f64) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::number_input::NumberInputProps
@@ -2760,6 +2764,7 @@ pub fn yororen_ui_core::headless::password_input::PasswordInputProps::max_length
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::on_change<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::on_submit<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
+pub fn yororen_ui_core::headless::password_input::PasswordInputProps::render(self, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 impl core::clone::Clone for yororen_ui_core::headless::password_input::PasswordInputProps
 pub fn yororen_ui_core::headless::password_input::PasswordInputProps::clone(&self) -> yororen_ui_core::headless::password_input::PasswordInputProps
 impl core::marker::Freeze for yororen_ui_core::headless::password_input::PasswordInputProps
@@ -2952,6 +2957,7 @@ pub fn yororen_ui_core::headless::search_input::SearchInputProps::on_change<F>(s
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::on_clear<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::on_submit<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
+pub fn yororen_ui_core::headless::search_input::SearchInputProps::render(self, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::value(self, impl core::convert::Into<alloc::string::String>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::search_input::SearchInputProps
 pub fn yororen_ui_core::headless::search_input::SearchInputProps::clone(&self) -> yororen_ui_core::headless::search_input::SearchInputProps
@@ -3287,6 +3293,7 @@ pub fn yororen_ui_core::headless::text_area::TextAreaProps::has_custom_focus_bor
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::max_length(self, usize) -> Self
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::on_change<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
+pub fn yororen_ui_core::headless::text_area::TextAreaProps::render(self, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 impl core::clone::Clone for yororen_ui_core::headless::text_area::TextAreaProps
 pub fn yororen_ui_core::headless::text_area::TextAreaProps::clone(&self) -> yororen_ui_core::headless::text_area::TextAreaProps
 impl core::marker::Freeze for yororen_ui_core::headless::text_area::TextAreaProps
@@ -3297,6 +3304,49 @@ impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_area::TextAre
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_area::TextAreaProps
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_area::TextAreaProps
 pub fn yororen_ui_core::headless::text_area::text_area(impl core::convert::Into<gpui::window::ElementId>) -> yororen_ui_core::headless::text_area::TextAreaProps
+pub mod yororen_ui_core::headless::text_area_element
+pub struct yororen_ui_core::headless::text_area_element::TextAreaElement
+pub yororen_ui_core::headless::text_area_element::TextAreaElement::cursor_color: gpui::color::Hsla
+pub yororen_ui_core::headless::text_area_element::TextAreaElement::disabled: bool
+pub yororen_ui_core::headless::text_area_element::TextAreaElement::focus_handle: gpui::window::FocusHandle
+pub yororen_ui_core::headless::text_area_element::TextAreaElement::hint_color: gpui::color::Hsla
+pub yororen_ui_core::headless::text_area_element::TextAreaElement::min_h: gpui::geometry::Pixels
+pub yororen_ui_core::headless::text_area_element::TextAreaElement::placeholder: gpui::shared_string::SharedString
+pub yororen_ui_core::headless::text_area_element::TextAreaElement::selection_color: gpui::color::Hsla
+pub yororen_ui_core::headless::text_area_element::TextAreaElement::state: gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
+pub yororen_ui_core::headless::text_area_element::TextAreaElement::text_color: gpui::color::Hsla
+impl gpui::element::Element for yororen_ui_core::headless::text_area_element::TextAreaElement
+pub type yororen_ui_core::headless::text_area_element::TextAreaElement::PrepaintState = yororen_ui_core::headless::text_area_element::TextAreaPrepaintState
+pub type yororen_ui_core::headless::text_area_element::TextAreaElement::RequestLayoutState = ()
+pub fn yororen_ui_core::headless::text_area_element::TextAreaElement::id(&self) -> core::option::Option<gpui::window::ElementId>
+pub fn yororen_ui_core::headless::text_area_element::TextAreaElement::paint(&mut self, core::option::Option<&gpui::element::GlobalElementId>, core::option::Option<&gpui::inspector::InspectorElementId>, gpui::geometry::Bounds<gpui::geometry::Pixels>, &mut Self::RequestLayoutState, &mut Self::PrepaintState, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::text_area_element::TextAreaElement::prepaint(&mut self, core::option::Option<&gpui::element::GlobalElementId>, core::option::Option<&gpui::inspector::InspectorElementId>, gpui::geometry::Bounds<gpui::geometry::Pixels>, &mut Self::RequestLayoutState, &mut gpui::window::Window, &mut gpui::app::App) -> Self::PrepaintState
+pub fn yororen_ui_core::headless::text_area_element::TextAreaElement::request_layout(&mut self, core::option::Option<&gpui::element::GlobalElementId>, core::option::Option<&gpui::inspector::InspectorElementId>, &mut gpui::window::Window, &mut gpui::app::App) -> (gpui::taffy::LayoutId, Self::RequestLayoutState)
+pub fn yororen_ui_core::headless::text_area_element::TextAreaElement::source_location(&self) -> core::option::Option<&'static core::panic::location::Location<'static>>
+impl gpui::element::IntoElement for yororen_ui_core::headless::text_area_element::TextAreaElement
+pub type yororen_ui_core::headless::text_area_element::TextAreaElement::Element = yororen_ui_core::headless::text_area_element::TextAreaElement
+pub fn yororen_ui_core::headless::text_area_element::TextAreaElement::into_element(self) -> Self::Element
+impl core::marker::Freeze for yororen_ui_core::headless::text_area_element::TextAreaElement
+impl core::marker::Send for yororen_ui_core::headless::text_area_element::TextAreaElement
+impl core::marker::Sync for yororen_ui_core::headless::text_area_element::TextAreaElement
+impl core::marker::Unpin for yororen_ui_core::headless::text_area_element::TextAreaElement
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_area_element::TextAreaElement
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_area_element::TextAreaElement
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_area_element::TextAreaElement
+pub struct yororen_ui_core::headless::text_area_element::TextAreaPrepaintState
+pub yororen_ui_core::headless::text_area_element::TextAreaPrepaintState::cursor: core::option::Option<gpui::window::PaintQuad>
+pub yororen_ui_core::headless::text_area_element::TextAreaPrepaintState::cursor_visible: bool
+pub yororen_ui_core::headless::text_area_element::TextAreaPrepaintState::line_byte_ranges: alloc::vec::Vec<core::ops::range::Range<usize>>
+pub yororen_ui_core::headless::text_area_element::TextAreaPrepaintState::lines: alloc::vec::Vec<gpui::text_system::line::ShapedLine>
+pub yororen_ui_core::headless::text_area_element::TextAreaPrepaintState::scroll_x: gpui::geometry::Pixels
+pub yororen_ui_core::headless::text_area_element::TextAreaPrepaintState::selection_quads: alloc::vec::Vec<gpui::window::PaintQuad>
+impl core::marker::Freeze for yororen_ui_core::headless::text_area_element::TextAreaPrepaintState
+impl core::marker::Send for yororen_ui_core::headless::text_area_element::TextAreaPrepaintState
+impl core::marker::Sync for yororen_ui_core::headless::text_area_element::TextAreaPrepaintState
+impl core::marker::Unpin for yororen_ui_core::headless::text_area_element::TextAreaPrepaintState
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_area_element::TextAreaPrepaintState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_area_element::TextAreaPrepaintState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_area_element::TextAreaPrepaintState
 pub mod yororen_ui_core::headless::text_input
 pub struct yororen_ui_core::headless::text_input::Backspace
 impl core::clone::Clone for yororen_ui_core::headless::text_input::Backspace
@@ -3730,6 +3780,7 @@ pub fn yororen_ui_core::headless::text_input::TextInputProps::max_length(self, u
 pub fn yororen_ui_core::headless::text_input::TextInputProps::on_change<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::text_input::TextInputProps::on_submit<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::text_input::TextInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
+pub fn yororen_ui_core::headless::text_input::TextInputProps::render(self, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 impl core::clone::Clone for yororen_ui_core::headless::text_input::TextInputProps
 pub fn yororen_ui_core::headless::text_input::TextInputProps::clone(&self) -> yororen_ui_core::headless::text_input::TextInputProps
 impl core::marker::Freeze for yororen_ui_core::headless::text_input::TextInputProps
@@ -3822,6 +3873,53 @@ impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_i
 pub fn yororen_ui_core::headless::text_input::init(&mut gpui::app::App)
 pub fn yororen_ui_core::headless::text_input::text_input(impl core::convert::Into<gpui::window::ElementId>) -> yororen_ui_core::headless::text_input::TextInputProps
 pub type yororen_ui_core::headless::text_input::TextChangeCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
+pub mod yororen_ui_core::headless::text_input_element
+pub struct yororen_ui_core::headless::text_input_element::PrepaintState
+pub yororen_ui_core::headless::text_input_element::PrepaintState::cursor: core::option::Option<gpui::window::PaintQuad>
+pub yororen_ui_core::headless::text_input_element::PrepaintState::cursor_visible: bool
+pub yororen_ui_core::headless::text_input_element::PrepaintState::display_text: gpui::shared_string::SharedString
+pub yororen_ui_core::headless::text_input_element::PrepaintState::line: core::option::Option<gpui::text_system::line::ShapedLine>
+pub yororen_ui_core::headless::text_input_element::PrepaintState::scroll_x: gpui::geometry::Pixels
+pub yororen_ui_core::headless::text_input_element::PrepaintState::selection: core::option::Option<gpui::window::PaintQuad>
+impl core::marker::Freeze for yororen_ui_core::headless::text_input_element::PrepaintState
+impl core::marker::Send for yororen_ui_core::headless::text_input_element::PrepaintState
+impl core::marker::Sync for yororen_ui_core::headless::text_input_element::PrepaintState
+impl core::marker::Unpin for yororen_ui_core::headless::text_input_element::PrepaintState
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input_element::PrepaintState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input_element::PrepaintState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input_element::PrepaintState
+pub struct yororen_ui_core::headless::text_input_element::TextInputElement
+pub yororen_ui_core::headless::text_input_element::TextInputElement::cursor_color: gpui::color::Hsla
+pub yororen_ui_core::headless::text_input_element::TextInputElement::disabled: bool
+pub yororen_ui_core::headless::text_input_element::TextInputElement::focus_handle: gpui::window::FocusHandle
+pub yororen_ui_core::headless::text_input_element::TextInputElement::hint_color: gpui::color::Hsla
+pub yororen_ui_core::headless::text_input_element::TextInputElement::placeholder: gpui::shared_string::SharedString
+pub yororen_ui_core::headless::text_input_element::TextInputElement::selection_color: gpui::color::Hsla
+pub yororen_ui_core::headless::text_input_element::TextInputElement::state: gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>
+pub yororen_ui_core::headless::text_input_element::TextInputElement::text_color: gpui::color::Hsla
+pub yororen_ui_core::headless::text_input_element::TextInputElement::value_override: core::option::Option<alloc::string::String>
+impl gpui::element::Element for yororen_ui_core::headless::text_input_element::TextInputElement
+pub type yororen_ui_core::headless::text_input_element::TextInputElement::PrepaintState = yororen_ui_core::headless::text_input_element::PrepaintState
+pub type yororen_ui_core::headless::text_input_element::TextInputElement::RequestLayoutState = ()
+pub fn yororen_ui_core::headless::text_input_element::TextInputElement::id(&self) -> core::option::Option<gpui::window::ElementId>
+pub fn yororen_ui_core::headless::text_input_element::TextInputElement::paint(&mut self, core::option::Option<&gpui::element::GlobalElementId>, core::option::Option<&gpui::inspector::InspectorElementId>, gpui::geometry::Bounds<gpui::geometry::Pixels>, &mut Self::RequestLayoutState, &mut Self::PrepaintState, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::text_input_element::TextInputElement::prepaint(&mut self, core::option::Option<&gpui::element::GlobalElementId>, core::option::Option<&gpui::inspector::InspectorElementId>, gpui::geometry::Bounds<gpui::geometry::Pixels>, &mut Self::RequestLayoutState, &mut gpui::window::Window, &mut gpui::app::App) -> Self::PrepaintState
+pub fn yororen_ui_core::headless::text_input_element::TextInputElement::request_layout(&mut self, core::option::Option<&gpui::element::GlobalElementId>, core::option::Option<&gpui::inspector::InspectorElementId>, &mut gpui::window::Window, &mut gpui::app::App) -> (gpui::taffy::LayoutId, Self::RequestLayoutState)
+pub fn yororen_ui_core::headless::text_input_element::TextInputElement::source_location(&self) -> core::option::Option<&'static core::panic::location::Location<'static>>
+impl gpui::element::IntoElement for yororen_ui_core::headless::text_input_element::TextInputElement
+pub type yororen_ui_core::headless::text_input_element::TextInputElement::Element = yororen_ui_core::headless::text_input_element::TextInputElement
+pub fn yororen_ui_core::headless::text_input_element::TextInputElement::into_element(self) -> Self::Element
+impl core::marker::Freeze for yororen_ui_core::headless::text_input_element::TextInputElement
+impl core::marker::Send for yororen_ui_core::headless::text_input_element::TextInputElement
+impl core::marker::Sync for yororen_ui_core::headless::text_input_element::TextInputElement
+impl core::marker::Unpin for yororen_ui_core::headless::text_input_element::TextInputElement
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::text_input_element::TextInputElement
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::text_input_element::TextInputElement
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::text_input_element::TextInputElement
+pub const yororen_ui_core::headless::text_input_element::CURSOR_BLINK_INTERVAL: core::time::Duration
+pub fn yororen_ui_core::headless::text_input_element::start_cursor_blink(gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::text_input_element::wire_input_keyboard(gpui::elements::div::Stateful<gpui::elements::div::Div>, gpui::app::entity_map::Entity<yororen_ui_core::headless::text_input::TextInputState>, gpui::window::FocusHandle, bool, core::option::Option<yororen_ui_core::headless::text_input_element::SubmitCallback>) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub type yororen_ui_core::headless::text_input_element::SubmitCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
 pub mod yororen_ui_core::headless::toggle_button
 pub struct yororen_ui_core::headless::toggle_button::ToggleButtonProps
 pub yororen_ui_core::headless::toggle_button::ToggleButtonProps::disabled: bool

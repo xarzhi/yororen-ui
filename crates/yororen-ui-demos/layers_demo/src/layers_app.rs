@@ -140,7 +140,6 @@ impl Render for LayersApp {
 }
 
 fn text_input_strip(window: &mut Window, cx: &mut Context<LayersApp>) -> impl IntoElement + use<> {
-    use yororen_ui::DefaultTextInput;
     use yororen_ui::headless::text_input::text_input;
     div().flex().flex_col().gap_2().w_full().child(
         text_input("demo-text-input")

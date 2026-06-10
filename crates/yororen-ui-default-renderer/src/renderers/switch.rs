@@ -111,51 +111,6 @@ use yororen_ui_core::headless::switch::SwitchProps;
 use yororen_ui_core::renderer::{RendererContext, markers};
 use yororen_ui_core::theme::ActiveTheme;
 
-pub trait DefaultSwitch: Sized {
-    fn render(self, cx: &App) -> Stateful<gpui::Div>;
-}
-
-impl DefaultSwitch for SwitchProps {
-    fn render(self, cx: &App) -> Stateful<gpui::Div> {
-        let theme = cx.theme();
-        let r: &Arc<dyn SwitchRenderer> = cx
-            .renderer_arc::<markers::Switch, dyn SwitchRenderer>()
-            .expect("SwitchRenderer registered");
-        let state = SwitchRenderState {
-            checked: self.checked,
-            disabled: self.disabled,
-            has_custom_tone: self.has_custom_tone,
-            custom_tone: self.custom_tone,
-        };
-        let track = r.track_bg(&state, theme);
-        let knob = r.knob_bg(&state, theme);
-        let w = r.track_w(&state, theme);
-        let h = r.track_h(&state, theme);
-        let knob_size = r.knob_size(&state, theme);
-        let pad = r.padding(&state, theme);
-        let pill_radius = gpui::px(theme.get_number("tokens.radii.pill").unwrap_or(0.0) as f32);
-        let mut el = div()
-            .bg(track)
-            .w(w)
-            .h(h)
-            .rounded(pill_radius)
-            .p(pad)
-            .flex()
-            .items_center();
-        if self.checked {
-            el = el.justify_end();
-        } else {
-            el = el.justify_start();
-        }
-        el = el.child(div().bg(knob).size(knob_size).rounded(pill_radius));
-        let track_hover = r.track_hover_bg(&state, theme);
-        let track_active = r.track_active_bg(&state, theme);
-        self.apply(el)
-            .hover(|s| s.bg(track_hover))
-            .active(|s| s.bg(track_active))
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

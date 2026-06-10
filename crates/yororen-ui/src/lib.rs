@@ -29,11 +29,6 @@ pub use yororen_ui_default_renderer as renderer;
 /// (the canonical home in v0.3). Also reachable via
 /// `yororen_ui::renderer::ActionVariantKind`.
 pub use yororen_ui_default_renderer::renderers::button::ActionVariantKind;
-pub use yororen_ui_default_renderer::renderers::{
-    DefaultCheckbox, DefaultFilePathInput, DefaultIcon, DefaultIconButton, DefaultKeybindingInput,
-    DefaultNumberInput, DefaultPasswordInput, DefaultRadio, DefaultSearchInput, DefaultSwitch,
-    DefaultTextArea, DefaultTextInput, DefaultToggleButton,
-};
 
 #[cfg(feature = "brutalism")]
 pub use yororen_ui_brutalism_renderer as brutalism_renderer;

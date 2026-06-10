@@ -1,149 +1,38 @@
-//! `TextInputRenderer` — visual side of `TextInput`.
+//! `TextInputElement` — the inner painter for any single-line
+//! text-input headless component.
 //!
-//! v0.3 implementation follows the v0.2 pattern: the renderer
-//! mints a `TextInputState` via `window.use_keyed_state`, the
-//! wrapper `div` carries `track_focus` + `key_context` + 14
-//! `.on_action(...)` handlers, and the inner `TextInputElement`
-//! is a custom `gpui::Element` that shapes the text, paints the
-//! selection quad, paints the line, and calls
-//! `window.handle_input(&focus_handle, ElementInputHandler::new(bounds, state.clone()), cx)`
-//! in `paint` to register the IME / clipboard pipeline.
+//! Lives in headless (not the renderer) because it carries no
+//! theme knowledge: it shapes the line, paints the selection quad
+//! and caret, and registers the IME pipeline against the
+//! `TextInputState`. The colours are passed in by the caller
+//! (`headless::XxxProps::render`), which reads them from the
+//! registered `XxxRenderer`.
 
-use std::any::Any;
-use std::sync::Arc;
 use std::time::Duration;
 
 use gpui::{
-    AnyElement, App, Bounds, CursorStyle, Div, Element, ElementId, ElementInputHandler,
-    FocusHandle, GlobalElementId, Hsla, InteractiveElement, IntoElement, LayoutId, MouseButton,
-    MouseDownEvent, MouseMoveEvent, MouseUpEvent, PaintQuad, ParentElement, Pixels, ShapedLine,
-    SharedString, Stateful, StatefulInteractiveElement, Style, Styled, TextRun, Window, div, fill,
-    hsla, point, px, relative, size,
+    App, Bounds, CursorStyle, Div, Element, ElementId, ElementInputHandler, FocusHandle,
+    GlobalElementId, Hsla, InteractiveElement, IntoElement, LayoutId, MouseButton, MouseDownEvent,
+    MouseMoveEvent, MouseUpEvent, PaintQuad, ParentElement, Pixels, ShapedLine, SharedString,
+    Stateful, StatefulInteractiveElement, Style, Styled, TextRun, Window, fill, hsla, point, px,
+    relative, size,
 };
-use yororen_ui_core::action_handler;
-use yororen_ui_core::headless::text_input::{
-    Backspace, Copy, Cut, Delete, End, Enter, Home, Left, Paste, Right, SelectAll, SelectLeft,
-    SelectRight, ShowCharacterPalette, TextInputProps, TextInputState,
+
+use crate::action_handler;
+use crate::headless::text_input::{
+    Backspace, Copy, Cut, Delete, End, Enter, Escape, Home, Left, Paste, Right, SelectAll,
+    SelectLeft, SelectRight, ShowCharacterPalette, TextInputState,
 };
-use yororen_ui_core::renderer::{RendererContext, markers};
-use yororen_ui_core::theme::{ActiveTheme, Theme};
-
-pub(crate) type SubmitCallback = Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>;
-
-use yororen_ui_core::renderer::spec::Edges;
-pub use yororen_ui_core::renderer::text_input::{TextInputRenderState, TextInputRenderer};
-
-// =====================================================================
-// `TextInputRenderer` trait — visual contract (bg / border / colors /
-// spacing). Unchanged from the v0.3 simplified version.
-// =====================================================================
-
-pub struct TokenTextInputRenderer;
-
-impl TextInputRenderer for TokenTextInputRenderer {
-    fn bg(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
-        if state.disabled {
-            theme.get_color("surface.sunken").unwrap_or_default()
-        } else if state.has_custom_bg {
-            state
-                .custom_bg
-                .unwrap_or_else(|| theme.get_color("surface.base").unwrap_or_default())
-        } else {
-            theme.get_color("surface.base").unwrap_or_default()
-        }
-    }
-    fn border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
-        if state.disabled {
-            theme.get_color("border.muted").unwrap_or_default()
-        } else if state.has_custom_border {
-            state
-                .custom_border
-                .unwrap_or_else(|| theme.get_color("border.default").unwrap_or_default())
-        } else {
-            theme.get_color("border.default").unwrap_or_default()
-        }
-    }
-    fn focus_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
-        if state.has_custom_focus_border {
-            state
-                .custom_focus_border
-                .unwrap_or_else(|| theme.get_color("border.focus").unwrap_or_default())
-        } else {
-            theme.get_color("border.focus").unwrap_or_default()
-        }
-    }
-    fn hover_border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("border.muted").unwrap_or_default()
-    }
-    fn active_border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("border.default").unwrap_or_default()
-    }
-    fn text_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
-        if state.disabled {
-            theme.get_color("content.disabled").unwrap_or_default()
-        } else if state.custom_text_color.is_some() {
-            state.custom_text_color.unwrap()
-        } else {
-            theme.get_color("content.primary").unwrap_or_default()
-        }
-    }
-    fn hint_color(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("content.tertiary").unwrap_or_default()
-    }
-    fn cursor_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
-        if state.has_custom_focus_border {
-            state
-                .custom_focus_border
-                .unwrap_or_else(|| theme.get_color("border.focus").unwrap_or_default())
-        } else {
-            theme.get_color("border.focus").unwrap_or_default()
-        }
-    }
-    fn selection_color(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
-        let c = theme.get_color("border.focus").unwrap_or_default();
-        hsla(c.h, c.s, c.l, 0.25)
-    }
-    fn min_height(&self, _state: &TextInputRenderState, theme: &Theme) -> Pixels {
-        px(theme
-            .get_number("tokens.control.input.min_height")
-            .unwrap_or(0.0) as f32)
-    }
-    fn padding(&self, _state: &TextInputRenderState, theme: &Theme) -> Edges<Pixels> {
-        Edges::symmetric(
-            px(theme
-                .get_number("tokens.control.input.horizontal_padding")
-                .unwrap_or(0.0) as f32),
-            px(theme
-                .get_number("tokens.control.input.vertical_padding")
-                .unwrap_or(0.0) as f32),
-        )
-    }
-    fn border_radius(&self, _state: &TextInputRenderState, theme: &Theme) -> Pixels {
-        px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
-    }
-    fn disabled_opacity(&self, state: &TextInputRenderState, _theme: &Theme) -> f32 {
-        if state.disabled { 0.6 } else { 1.0 }
-    }
-}
-
-pub fn arc_text_input<T: TextInputRenderer + 'static>(r: T) -> Arc<dyn TextInputRenderer> {
-    Arc::new(r)
-}
-
-// =====================================================================
-// `TextInputElement` — the inner `gpui::Element` that shapes the
-// text, paints selection / line / cursor, and registers the IME
-// handler. Mirrors v0.2's `TextLineElement`. **Public** so the
-// derived input renderers (search / password / number / file_path
-// / keybinding) can embed it inside their own wrapper divs.
-// =====================================================================
 
 /// How often the caret blinks while focused. 500ms matches the
 /// gpui / WebKit convention.
 pub const CURSOR_BLINK_INTERVAL: Duration = Duration::from_millis(500);
 
 /// The inner element for any single-line text-input component.
-/// Public so the derived renderers can embed it.
+///
+/// Embedded by `headless::XxxProps::render` (for `text_input`,
+/// `password_input`, `search_input`, etc.) inside the wrapper
+/// `div` that supplies focus / keymap / border / padding.
 pub struct TextInputElement {
     pub state: gpui::Entity<TextInputState>,
     pub focus_handle: FocusHandle,
@@ -219,10 +108,6 @@ impl Element for TextInputElement {
         let scroll_x_input = input.scroll_x;
         let cursor_visible = input.cursor_visible;
 
-        // Pick the display text. If `value_override` is set
-        // (e.g. `password_input`'s mask), use it instead of
-        // `value` for the visual line — the state's real value
-        // still drives the caret / selection / IME / on_change.
         let is_empty = value.is_empty();
         let (display_text, run_color) = if is_empty {
             (placeholder, self.hint_color)
@@ -232,14 +117,6 @@ impl Element for TextInputElement {
             (SharedString::from(value.clone()), self.text_color)
         };
 
-        // Map the real-value caret (in UTF-8 bytes) to the
-        // display-text byte position. For `value_override`
-        // (the password mask), the display is `mask_char`
-        // repeated N times where N = `value.chars().count()`.
-        // **Important**: the mask char itself may be multi-byte
-        // (e.g. `•` is 3 bytes, `●` is 3 bytes) — so the
-        // display byte index for real-value char `n` is
-        // `n * mask_char.len_utf8()`, NOT just `n`.
         let mask_char_bytes = self
             .value_override
             .as_ref()
@@ -371,14 +248,13 @@ impl Element for TextInputElement {
     }
 }
 
-// =====================================================================
-// `wire_input_keyboard` — shared helper. The 14 on_action handlers
-// are identical for all 7 input components; this function applies
-// them to a wrapper div. Plus `track_focus` and `key_context`.
-// =====================================================================
+/// The submit callback (Enter / on_submit) shared by every input
+/// component. Lives in headless because the action handler chain
+/// references it directly.
+pub type SubmitCallback = std::sync::Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>;
 
-/// Apply the text-input keymap (track_focus + key_context +
-/// 14 on_action handlers + 3 mouse handlers) to `wrapper`.
+/// Apply the text-input keymap (`track_focus` + `key_context` +
+/// 14 `on_action` handlers + 3 mouse handlers) to `wrapper`.
 ///
 /// The wrapper's `.id(...)` is NOT applied here — the caller is
 /// expected to set it before calling, and the `key_context`
@@ -386,7 +262,7 @@ impl Element for TextInputElement {
 pub fn wire_input_keyboard(
     mut wrapper: Stateful<Div>,
     state: gpui::Entity<TextInputState>,
-    focus_handle: FocusHandle,
+    _focus_handle: FocusHandle,
     disabled: bool,
     on_submit: Option<SubmitCallback>,
 ) -> Stateful<Div> {
@@ -431,9 +307,6 @@ pub fn wire_input_keyboard(
         .on_action(action_handler!(state.clone(), disabled, Cut, cut))
         .on_action(action_handler!(state.clone(), disabled, Copy, copy));
 
-    // Enter: fire on_submit. This isn't an action_handler! because
-    // we also need the on_submit callback (which is owned by the
-    // renderer's `props`, not the state).
     let state_for_enter = state.clone();
     let on_submit_for_enter = on_submit.clone();
     wrapper = wrapper.on_action(move |_: &Enter, window, cx| {
@@ -446,7 +319,6 @@ pub fn wire_input_keyboard(
         }
     });
 
-    // Mouse handlers — focus on click, drag-select while held.
     let state_for_mouse = state.clone();
     let state_for_up = state.clone();
     let state_for_up_out = state.clone();
@@ -476,8 +348,6 @@ pub fn wire_input_keyboard(
             state_for_move.update(cx, |s, cx| s.on_mouse_move(event, window, cx));
         });
 
-    // Blur on click-outside.
-    let _ = focus_handle; // reserved for future focus_handle-aware wiring
     wrapper
 }
 
@@ -527,7 +397,10 @@ pub fn start_cursor_blink(state: gpui::Entity<TextInputState>, window: &mut Wind
         .detach();
 }
 
-// =====================================================================
-// `DefaultTextInput` — `headless::TextInputProps` sugar. Returns
-// `AnyElement` (the v0.2 pattern).
-// =====================================================================
+// `hsla` re-export so callers don't have to import gpui::hsla
+// just to build a `HintColor` or `CursorColor`. Kept here so the
+// headless text-input element stays renderer-agnostic.
+#[allow(dead_code)]
+pub(crate) fn hsla_default() -> Hsla {
+    hsla(0.0, 0.0, 0.0, 1.0)
+}

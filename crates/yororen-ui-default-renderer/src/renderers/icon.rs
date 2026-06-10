@@ -43,29 +43,6 @@ fn resolve_icon_path(source: &IconSource) -> gpui::SharedString {
     }
 }
 
-pub trait DefaultIcon: Sized {
-    fn render(self, _cx: &mut App, _window: &mut Window) -> AnyElement;
-}
-
-impl DefaultIcon for IconProps {
-    fn render(self, _cx: &mut App, _window: &mut Window) -> AnyElement {
-        let path = resolve_icon_path(&self.source);
-        let size = self.size.unwrap_or(gpui::px(14.0));
-        let color = self.color.unwrap_or_else(|| gpui::rgb(0x0A0A0A).into());
-        // v0.2 pattern: chain `.path().size()` first (which stay
-        // on `Svg`), then call `.id()` last (which produces
-        // `Stateful<Svg>`) and finally `.text_color()` on
-        // `Stateful<Svg>`. `Stateful<E>: Styled` so the
-        // `text_color` setter is in scope.
-        svg()
-            .path(path)
-            .size(size)
-            .id(self.id)
-            .text_color(color)
-            .into_any_element()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

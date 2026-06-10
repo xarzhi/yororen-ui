@@ -111,4 +111,200 @@ impl SearchInputProps {
         self.custom_text_color = Some(c);
         self
     }
+
+    /// Render the search input using the registered `SearchInputRenderer`.
+    pub fn render(self, cx: &mut gpui::App, window: &mut gpui::Window) -> gpui::AnyElement {
+        use crate::headless::icon::{IconSource, icon};
+        use crate::headless::text_input::{Escape, TextInputState};
+        use crate::headless::text_input_element::{
+            TextInputElement, start_cursor_blink, wire_input_keyboard,
+        };
+        use crate::renderer::RendererContext;
+        use crate::renderer::markers::SearchInput as SearchInputMarker;
+        use crate::renderer::search_input::{SearchInputRenderState, SearchInputRenderer};
+        use crate::renderer::spec::Edges;
+        use crate::theme::ActiveTheme;
+        use gpui::prelude::FluentBuilder;
+        use gpui::{
+            CursorStyle, InteractiveElement, IntoElement, MouseButton, ParentElement, Stateful,
+            StatefulInteractiveElement, Styled, div, px,
+        };
+        use std::sync::Arc;
+
+        let theme_arc = cx.theme().clone();
+        let r: Arc<dyn SearchInputRenderer> = cx
+            .renderer_arc::<SearchInputMarker, dyn SearchInputRenderer>()
+            .expect("SearchInputRenderer registered")
+            .clone();
+        let theme = &*theme_arc;
+
+        let id = self.id.clone();
+        let placeholder_str = self.placeholder.clone();
+        let disabled = self.disabled;
+        let on_change = self.on_change.clone();
+        let on_submit = self.on_submit.clone();
+        let on_clear = self.on_clear.clone();
+
+        let state = window.use_keyed_state(self.id.clone(), cx, |_window, cx| {
+            TextInputState::new(&mut *cx)
+        });
+        state.update(cx, |s, _cx| {
+            s.placeholder = gpui::SharedString::from(placeholder_str);
+            s.on_change = on_change.clone();
+            s.on_submit = on_submit.clone();
+        });
+
+        let focus_handle = state.read(cx).focus_handle();
+        let focused = focus_handle.is_focused(window);
+
+        let render_state = SearchInputRenderState {
+            disabled,
+            focused,
+            custom_bg: self.custom_bg,
+            custom_border: self.custom_border,
+            custom_focus_border: self.custom_focus_border,
+            custom_fg: self.custom_text_color,
+        };
+        let bg = r.bg(&render_state, theme);
+        let border_color = if focused {
+            r.focus_border(&render_state, theme)
+        } else {
+            r.border(&render_state, theme)
+        };
+        let text_color = r.fg(&render_state, theme);
+        let icon_color = r.icon_color(&render_state, theme);
+        let min_h = r.min_height(&render_state, theme);
+        let padding: Edges<gpui::Pixels> = r.padding(&render_state, theme);
+        let radius = r.border_radius(&render_state, theme);
+        let input_gap = r.input_gap(&render_state, theme);
+        let icon_size = r.icon_size(&render_state, theme);
+
+        if focused {
+            start_cursor_blink(state.clone(), window, cx);
+        } else {
+            state.update(cx, |s, _cx| s.cursor_visible = true);
+        }
+
+        let inner = TextInputElement {
+            state: state.clone(),
+            focus_handle: focus_handle.clone(),
+            disabled,
+            text_color,
+            hint_color: theme.get_color("content.tertiary").unwrap_or_default(),
+            cursor_color: text_color,
+            selection_color: text_color,
+            placeholder: state.read(cx).placeholder.clone(),
+            value_override: None,
+        };
+
+        let base: Stateful<gpui::Div> = div()
+            .id(id.clone())
+            .bg(bg)
+            .border_1()
+            .border_color(border_color)
+            .min_h(min_h)
+            .rounded(radius)
+            .px(padding.left)
+            .py(padding.top)
+            .flex()
+            .items_center()
+            .gap(input_gap)
+            .text_color(text_color)
+            .overflow_hidden()
+            .cursor(if disabled {
+                CursorStyle::Arrow
+            } else {
+                CursorStyle::IBeam
+            });
+
+        let focused_div: Stateful<gpui::Div> = base.track_focus(&focus_handle);
+
+        let state_for_escape = state.clone();
+        let on_change_for_escape = on_change.clone();
+        let keyed = wire_input_keyboard(
+            focused_div,
+            state.clone(),
+            focus_handle.clone(),
+            disabled,
+            on_submit,
+        )
+        .on_action(move |_: &Escape, _window, cx| {
+            if disabled {
+                return;
+            }
+            let before = state_for_escape.read(cx).value.clone();
+            state_for_escape.update(cx, |s, cx| {
+                s.value.clear();
+                s.caret = 0;
+                s.selection_start = 0;
+                s.selection_end = 0;
+                cx.notify();
+            });
+            if let Some(cb) = on_change_for_escape.as_ref() {
+                let after = state_for_escape.read(cx).value.clone();
+                if before != after {
+                    cb(&after, _window, cx);
+                }
+            }
+        });
+
+        let hover_border = r.hover_border(&render_state, theme);
+        let active_border = r.active_border(&render_state, theme);
+
+        let state_for_clear = state.clone();
+        let on_change_for_clear = on_change.clone();
+        let on_clear_clone = on_clear.clone();
+
+        keyed
+            .hover(|s| s.border_color(hover_border))
+            .active(|s| s.border_color(active_border))
+            .child(
+                icon(
+                    "search-input-leading-icon",
+                    IconSource::Builtin("search".into()),
+                    cx,
+                )
+                .size(icon_size)
+                .color(text_color)
+                .render(cx),
+            )
+            .child(div().flex_1().min_w(px(0.)).child(inner))
+            .when(!state_for_clear.read(cx).value.is_empty(), |d| {
+                d.child(
+                    div()
+                        .id("search-input-clear")
+                        .size(icon_size)
+                        .flex()
+                        .items_center()
+                        .justify_center()
+                        .text_color(icon_color)
+                        .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
+                            state_for_clear.update(cx, |s, cx| {
+                                s.value.clear();
+                                s.caret = 0;
+                                s.selection_start = 0;
+                                s.selection_end = 0;
+                                cx.notify();
+                            });
+                            if let Some(cb) = on_change_for_clear.as_ref() {
+                                cb("", window, cx);
+                            }
+                            if let Some(cb) = on_clear_clone.as_ref() {
+                                cb(window, cx);
+                            }
+                        })
+                        .child(
+                            icon(
+                                "search-input-clear-icon",
+                                IconSource::Builtin("close".into()),
+                                cx,
+                            )
+                            .size(icon_size)
+                            .color(icon_color)
+                            .render(cx),
+                        ),
+                )
+            })
+            .into_any_element()
+    }
 }
