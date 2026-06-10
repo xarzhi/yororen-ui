@@ -35,6 +35,7 @@ use std::sync::Arc;
 use super::avatar::TokenAvatarRenderer;
 use super::badge::TokenBadgeRenderer;
 use super::button::TokenButtonRenderer;
+use super::button_group::TokenButtonGroupRenderer;
 use super::card::TokenCardRenderer;
 use super::checkbox::TokenCheckboxRenderer;
 use super::combo_box::TokenComboBoxRenderer;
@@ -73,6 +74,7 @@ use super::tree_item::TokenTreeItemRenderer;
 use yororen_ui_core::renderer::avatar::AvatarRenderer;
 use yororen_ui_core::renderer::badge::BadgeRenderer;
 use yororen_ui_core::renderer::button::ButtonRenderer;
+use yororen_ui_core::renderer::button_group::ButtonGroupRenderer;
 use yororen_ui_core::renderer::card::CardRenderer;
 use yororen_ui_core::renderer::checkbox::CheckboxRenderer;
 use yororen_ui_core::renderer::combo_box::ComboBoxRenderer;
@@ -112,6 +114,7 @@ use yororen_ui_core::renderer::tree_item::TreeItemRenderer;
 use yororen_ui_core::renderer::avatar::AvatarRenderState;
 use yororen_ui_core::renderer::badge::BadgeRenderState;
 use yororen_ui_core::renderer::button::ButtonRenderState;
+use yororen_ui_core::renderer::button_group::ButtonGroupRenderState;
 use yororen_ui_core::renderer::card::CardRenderState;
 use yororen_ui_core::renderer::checkbox::CheckboxRenderState;
 use yororen_ui_core::renderer::combo_box::ComboBoxRenderState;
@@ -219,6 +222,7 @@ impl RendererRegistry {
             map: HashMap::new(),
         }
         .with_button(Arc::new(TokenButtonRenderer))
+        .with_button_group(Arc::new(TokenButtonGroupRenderer))
         .with_icon_button(Arc::new(TokenIconButtonRenderer))
         .with_toggle_button(Arc::new(TokenToggleButtonRenderer))
         .with_label(Arc::new(TokenLabelRenderer))
@@ -270,6 +274,11 @@ impl RendererRegistry {
     // `TypeId::of::<XxxRenderState>()`.
 
     renderer_setter!(with_button, ButtonRenderState, ButtonRenderer);
+    renderer_setter!(
+        with_button_group,
+        ButtonGroupRenderState,
+        ButtonGroupRenderer
+    );
     renderer_setter!(with_label, LabelRenderState, LabelRenderer);
     renderer_setter!(with_heading, HeadingRenderState, HeadingRenderer);
     renderer_setter!(with_divider, DividerRenderState, DividerRenderer);
@@ -370,6 +379,11 @@ impl RendererRegistry {
     // install a custom renderer).
 
     renderer_getter!(get_button, ButtonRenderState, ButtonRenderer);
+    renderer_getter!(
+        get_button_group,
+        ButtonGroupRenderState,
+        ButtonGroupRenderer
+    );
     renderer_getter!(get_label, LabelRenderState, LabelRenderer);
     renderer_getter!(get_heading, HeadingRenderState, HeadingRenderer);
     renderer_getter!(get_divider, DividerRenderState, DividerRenderer);
@@ -458,6 +472,7 @@ impl RendererRegistry {
     /// exactly which `with_<x>(...)` calls they forgot.
     const REQUIRED: &[(TypeId, &str)] = &[
         (TypeId::of::<ButtonRenderState>(), "button"),
+        (TypeId::of::<ButtonGroupRenderState>(), "button_group"),
         (TypeId::of::<IconButtonRenderState>(), "icon_button"),
         (TypeId::of::<ToggleButtonRenderState>(), "toggle_button"),
         (TypeId::of::<LabelRenderState>(), "label"),
@@ -575,7 +590,7 @@ mod tests {
     use std::any::TypeId;
 
     /// Build a registry that has *only* `ButtonRenderState`
-    /// registered. Used to assert validate() reports the other 37
+    /// registered. Used to assert validate() reports the other 38
     /// as missing.
     fn only_button() -> RendererRegistry {
         let mut map: HashMap<TypeId, Arc<dyn Any + Send + Sync>> = HashMap::new();
@@ -588,15 +603,15 @@ mod tests {
     }
 
     #[test]
-    fn empty_registry_reports_all_38_missing() {
+    fn empty_registry_reports_all_39_missing() {
         let r = RendererRegistry {
             map: HashMap::new(),
         };
         let err = r.validate().unwrap_err();
         assert_eq!(
             err.len(),
-            38,
-            "expected 38 missing entries, got {}: {:?}",
+            39,
+            "expected 39 missing entries, got {}: {:?}",
             err.len(),
             err
         );
@@ -609,13 +624,13 @@ mod tests {
     }
 
     #[test]
-    fn only_button_reports_37_missing() {
+    fn only_button_reports_38_missing() {
         let r = only_button();
         let err = r.validate().unwrap_err();
         assert_eq!(
             err.len(),
-            37,
-            "expected 37 missing entries, got {}: {:?}",
+            38,
+            "expected 38 missing entries, got {}: {:?}",
             err.len(),
             err
         );
@@ -648,7 +663,7 @@ mod tests {
     fn override_after_token_based_still_passes() {
         // The realistic theme-package pattern: take `token_based()`
         // and override one renderer. The override path must not
-        // accidentally drop the other 37.
+        // accidentally drop the other 38.
         let r = RendererRegistry::token_based()
             .with_button(Arc::new(super::super::button::TokenButtonRenderer));
         r.validate()
@@ -684,7 +699,7 @@ mod tests {
         //
         // The realistic mirror is: rebuild the registry from a
         // `token_based()` snapshot but skip one setter. We do that
-        // by constructing an almost-complete registry (37 of 38) and
+        // by constructing an almost-complete registry (38 of 39) and
         // asking the same code path to validate. Since we can't
         // reuse the production self-check without code duplication,
         // we rely on the `panic_missing_renderers` helper directly

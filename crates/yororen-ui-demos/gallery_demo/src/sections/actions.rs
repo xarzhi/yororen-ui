@@ -96,17 +96,22 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
             cx,
         ));
 
-    // --- button_group ---
+    // --- button_group: set props, add children, end with
+    //     .render(cx) — the same shape as every other
+    //     component. Each child button is independently styled
+    //     by `ButtonRenderer` (bg / fg / rounded / hover /
+    //     active); the group renderer only owns the container's
+    //     layout (flex direction + gap).
     let row_group = div()
         .flex()
         .flex_row()
         .items_center()
         .gap(px(12.))
         .child(cell("button_group (3 buttons)", button_group("btn-group-1", cx)
-            .apply(div().flex().flex_row().rounded(px(6.)).overflow_hidden().border_1())
-            .child(button("bg-left", cx).variant(ActionVariantKind::Neutral).on_click(|_, _, _| {}).apply(div().px(px(12.)).py(px(6.))).child("Left"))
-            .child(button("bg-mid", cx).variant(ActionVariantKind::Neutral).on_click(|_, _, _| {}).apply(div().px(px(12.)).py(px(6.)).border_l_1().border_r_1()).child("Mid"))
-            .child(button("bg-right", cx).variant(ActionVariantKind::Neutral).on_click(|_, _, _| {}).apply(div().px(px(12.)).py(px(6.))).child("Right")), cx));
+            .child(button("bg-left", cx).variant(ActionVariantKind::Neutral).caption("Left").on_click(|_, _, _| {}).render(cx))
+            .child(button("bg-mid", cx).variant(ActionVariantKind::Neutral).caption("Mid").on_click(|_, _, _| {}).render(cx))
+            .child(button("bg-right", cx).variant(ActionVariantKind::Neutral).caption("Right").on_click(|_, _, _| {}).render(cx))
+            .render(cx), cx));
 
     div()
         .flex()

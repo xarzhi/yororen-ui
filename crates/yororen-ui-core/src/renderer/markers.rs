@@ -30,6 +30,7 @@ macro_rules! marker {
 
 marker!(
     Button,
+    ButtonGroup,
     IconButton,
     ToggleButton,
     Label,

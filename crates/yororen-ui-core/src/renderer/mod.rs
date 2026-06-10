@@ -24,6 +24,7 @@ pub use variant::{
 pub mod avatar;
 pub mod badge;
 pub mod button;
+pub mod button_group;
 pub mod card;
 pub mod checkbox;
 pub mod combo_box;

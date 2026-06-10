@@ -89,6 +89,7 @@
     },
     "control": {
       "button":          { "min_height": 36, "icon_button_min_size": 32, "horizontal_padding": 16, "vertical_padding": 6,  "icon_gap": 8, "radius": 6 },
+      "button_group":    { "gap": 2 },
       "input":           { "min_height": 32, "horizontal_padding": 12, "vertical_padding": 8,  "cursor_thickness": 1, "focus_ring_thickness": 2, "icon_gap": 8, "spinner_size": 14, "text_area_min_h": 120, "radius": 4 },
       "switch":          { "track_w": 34, "track_h": 18, "knob_size": 14, "padding": 2, "border_w": 1, "focus_border_w": 2, "duration": 100, "disabled_opacity": 0.5 },
       "checkbox":        { "size": 16, "box_size": 16, "check_size": 12, "border_w": 1, "focus_border_w": 2, "radius": 4, "border_radius": 4 },

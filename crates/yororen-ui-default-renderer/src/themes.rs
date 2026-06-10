@@ -23,16 +23,17 @@ use yororen_ui_core::renderer::markers;
 use yororen_ui_core::theme::{Theme, install as install_theme};
 
 use crate::renderers::{
-    TokenAvatarRenderer, TokenBadgeRenderer, TokenButtonRenderer, TokenCardRenderer,
-    TokenCheckboxRenderer, TokenComboBoxRenderer, TokenDisclosureRenderer, TokenDividerRenderer,
-    TokenDropdownMenuRenderer, TokenEmptyStateRenderer, TokenFilePathInputRenderer,
-    TokenFocusRingRenderer, TokenFormRenderer, TokenHeadingRenderer, TokenIconButtonRenderer,
-    TokenKeybindingInputRenderer, TokenLabelRenderer, TokenListItemRenderer, TokenModalRenderer,
-    TokenNotificationRenderer, TokenNumberInputRenderer, TokenPanelRenderer,
-    TokenPasswordInputRenderer, TokenPopoverRenderer, TokenProgressBarRenderer, TokenRadioRenderer,
-    TokenSearchInputRenderer, TokenSelectRenderer, TokenSkeletonRenderer, TokenSplitButtonRenderer,
-    TokenSwitchRenderer, TokenTagRenderer, TokenTextAreaRenderer, TokenTextInputRenderer,
-    TokenToastRenderer, TokenToggleButtonRenderer, TokenTooltipRenderer, TokenTreeItemRenderer,
+    TokenAvatarRenderer, TokenBadgeRenderer, TokenButtonGroupRenderer, TokenButtonRenderer,
+    TokenCardRenderer, TokenCheckboxRenderer, TokenComboBoxRenderer, TokenDisclosureRenderer,
+    TokenDividerRenderer, TokenDropdownMenuRenderer, TokenEmptyStateRenderer,
+    TokenFilePathInputRenderer, TokenFocusRingRenderer, TokenFormRenderer, TokenHeadingRenderer,
+    TokenIconButtonRenderer, TokenKeybindingInputRenderer, TokenLabelRenderer,
+    TokenListItemRenderer, TokenModalRenderer, TokenNotificationRenderer, TokenNumberInputRenderer,
+    TokenPanelRenderer, TokenPasswordInputRenderer, TokenPopoverRenderer, TokenProgressBarRenderer,
+    TokenRadioRenderer, TokenSearchInputRenderer, TokenSelectRenderer, TokenSkeletonRenderer,
+    TokenSplitButtonRenderer, TokenSwitchRenderer, TokenTagRenderer, TokenTextAreaRenderer,
+    TokenTextInputRenderer, TokenToastRenderer, TokenToggleButtonRenderer, TokenTooltipRenderer,
+    TokenTreeItemRenderer,
 };
 
 /// Load `themes/system-light.json` as a `Theme`.
@@ -87,6 +88,9 @@ pub fn register_default_renderers(cx: &mut App) {
     cx.register_renderer_arc::<markers::Button, dyn crate::renderers::ButtonRenderer>(Arc::new(
         TokenButtonRenderer,
     ));
+    cx.register_renderer_arc::<markers::ButtonGroup, dyn crate::renderers::ButtonGroupRenderer>(
+        Arc::new(TokenButtonGroupRenderer),
+    );
     cx.register_renderer_arc::<markers::IconButton, dyn crate::renderers::IconButtonRenderer>(
         Arc::new(TokenIconButtonRenderer),
     );

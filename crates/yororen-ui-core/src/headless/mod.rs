@@ -96,6 +96,7 @@ pub mod virtual_list;
 pub use avatar::avatar;
 pub use badge::badge;
 pub use button::button;
+pub use button_group::button_group;
 pub use checkbox::checkbox;
 pub use combo_box::combo_box;
 pub use divider::divider;

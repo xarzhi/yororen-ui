@@ -967,23 +967,23 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::butt
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::button_group::ButtonGroupOrientation
 pub struct yororen_ui_core::headless::button_group::ButtonGroupProps
 pub yororen_ui_core::headless::button_group::ButtonGroupProps::attached: bool
+pub yororen_ui_core::headless::button_group::ButtonGroupProps::children: alloc::vec::Vec<gpui::elements::div::Stateful<gpui::elements::div::Div>>
 pub yororen_ui_core::headless::button_group::ButtonGroupProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::button_group::ButtonGroupProps::orientation: yororen_ui_core::headless::button_group::ButtonGroupOrientation
 impl yororen_ui_core::headless::button_group::ButtonGroupProps
-pub fn yororen_ui_core::headless::button_group::ButtonGroupProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::button_group::ButtonGroupProps::attached(self, bool) -> Self
+pub fn yororen_ui_core::headless::button_group::ButtonGroupProps::child(self, gpui::elements::div::Stateful<gpui::elements::div::Div>) -> Self
+pub fn yororen_ui_core::headless::button_group::ButtonGroupProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::button_group::ButtonGroupProps::vertical(self) -> Self
-impl core::clone::Clone for yororen_ui_core::headless::button_group::ButtonGroupProps
-pub fn yororen_ui_core::headless::button_group::ButtonGroupProps::clone(&self) -> yororen_ui_core::headless::button_group::ButtonGroupProps
 impl core::fmt::Debug for yororen_ui_core::headless::button_group::ButtonGroupProps
 pub fn yororen_ui_core::headless::button_group::ButtonGroupProps::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
 impl core::marker::Freeze for yororen_ui_core::headless::button_group::ButtonGroupProps
-impl core::marker::Send for yororen_ui_core::headless::button_group::ButtonGroupProps
-impl core::marker::Sync for yororen_ui_core::headless::button_group::ButtonGroupProps
+impl !core::marker::Send for yororen_ui_core::headless::button_group::ButtonGroupProps
+impl !core::marker::Sync for yororen_ui_core::headless::button_group::ButtonGroupProps
 impl core::marker::Unpin for yororen_ui_core::headless::button_group::ButtonGroupProps
 impl core::marker::UnsafeUnpin for yororen_ui_core::headless::button_group::ButtonGroupProps
-impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::button_group::ButtonGroupProps
-impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::button_group::ButtonGroupProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::button_group::ButtonGroupProps
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::button_group::ButtonGroupProps
 pub fn yororen_ui_core::headless::button_group::button_group(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::button_group::ButtonGroupProps
 pub mod yororen_ui_core::headless::card
 pub struct yororen_ui_core::headless::card::CardProps
@@ -1840,6 +1840,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Button
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Button
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Button
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Button
+pub struct yororen_ui_core::headless::markers::ButtonGroup
+impl core::clone::Clone for yororen_ui_core::renderer::ButtonGroup
+pub fn yororen_ui_core::renderer::ButtonGroup::clone(&self) -> yororen_ui_core::renderer::ButtonGroup
+impl core::cmp::Eq for yororen_ui_core::renderer::ButtonGroup
+impl core::cmp::PartialEq for yororen_ui_core::renderer::ButtonGroup
+pub fn yororen_ui_core::renderer::ButtonGroup::eq(&self, &yororen_ui_core::renderer::ButtonGroup) -> bool
+impl core::default::Default for yororen_ui_core::renderer::ButtonGroup
+pub fn yororen_ui_core::renderer::ButtonGroup::default() -> yororen_ui_core::renderer::ButtonGroup
+impl core::fmt::Debug for yororen_ui_core::renderer::ButtonGroup
+pub fn yororen_ui_core::renderer::ButtonGroup::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::ButtonGroup
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::Freeze for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::Send for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::Sync for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::Unpin for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::ButtonGroup
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::ButtonGroup
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::ButtonGroup
 pub struct yororen_ui_core::headless::markers::Card
 impl core::clone::Clone for yororen_ui_core::renderer::Card
 pub fn yororen_ui_core::renderer::Card::clone(&self) -> yororen_ui_core::renderer::Card
@@ -4224,6 +4244,7 @@ pub fn yororen_ui_core::headless::virtual_list::virtual_list(impl core::convert:
 pub fn yororen_ui_core::headless::avatar(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::avatar::AvatarProps
 pub fn yororen_ui_core::headless::badge(impl core::convert::Into<gpui::window::ElementId>, impl core::convert::Into<alloc::string::String>, &mut gpui::app::App) -> yororen_ui_core::headless::badge::BadgeProps
 pub fn yororen_ui_core::headless::button(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::button::ButtonProps
+pub fn yororen_ui_core::headless::button_group(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::button_group::ButtonGroupProps
 pub fn yororen_ui_core::headless::checkbox(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::checkbox::CheckboxProps
 pub fn yororen_ui_core::headless::combo_box(impl core::convert::Into<gpui::window::ElementId>, gpui::app::entity_map::Entity<yororen_ui_core::headless::combo_box::ComboBoxState>) -> yororen_ui_core::headless::combo_box::ComboBoxProps
 pub fn yororen_ui_core::headless::divider(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::divider::DividerProps
@@ -5571,6 +5592,26 @@ impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::but
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::button::ButtonRenderState
 pub trait yororen_ui_core::renderer::button::ButtonRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_core::renderer::button::ButtonRenderer::compose(&self, &yororen_ui_core::headless::button::ButtonProps, &gpui::window::FocusHandle, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub mod yororen_ui_core::renderer::button_group
+pub struct yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+pub yororen_ui_core::renderer::button_group::ButtonGroupRenderState::attached: bool
+pub yororen_ui_core::renderer::button_group::ButtonGroupRenderState::orientation: yororen_ui_core::headless::button_group::ButtonGroupOrientation
+impl core::clone::Clone for yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+pub fn yororen_ui_core::renderer::button_group::ButtonGroupRenderState::clone(&self) -> yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+impl core::default::Default for yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+pub fn yororen_ui_core::renderer::button_group::ButtonGroupRenderState::default() -> yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+pub fn yororen_ui_core::renderer::button_group::ButtonGroupRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+impl core::marker::Send for yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::button_group::ButtonGroupRenderState
+pub trait yororen_ui_core::renderer::button_group::ButtonGroupRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::button_group::ButtonGroupRenderer::compose(&self, yororen_ui_core::headless::button_group::ButtonGroupProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub mod yororen_ui_core::renderer::card
 pub struct yororen_ui_core::renderer::card::CardRenderState
 pub yororen_ui_core::renderer::card::CardRenderState::has_custom_bg: bool
@@ -5943,6 +5984,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Button
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Button
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Button
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Button
+pub struct yororen_ui_core::renderer::markers::ButtonGroup
+impl core::clone::Clone for yororen_ui_core::renderer::ButtonGroup
+pub fn yororen_ui_core::renderer::ButtonGroup::clone(&self) -> yororen_ui_core::renderer::ButtonGroup
+impl core::cmp::Eq for yororen_ui_core::renderer::ButtonGroup
+impl core::cmp::PartialEq for yororen_ui_core::renderer::ButtonGroup
+pub fn yororen_ui_core::renderer::ButtonGroup::eq(&self, &yororen_ui_core::renderer::ButtonGroup) -> bool
+impl core::default::Default for yororen_ui_core::renderer::ButtonGroup
+pub fn yororen_ui_core::renderer::ButtonGroup::default() -> yororen_ui_core::renderer::ButtonGroup
+impl core::fmt::Debug for yororen_ui_core::renderer::ButtonGroup
+pub fn yororen_ui_core::renderer::ButtonGroup::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::ButtonGroup
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::Freeze for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::Send for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::Sync for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::Unpin for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::ButtonGroup
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::ButtonGroup
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::ButtonGroup
 pub struct yororen_ui_core::renderer::markers::Card
 impl core::clone::Clone for yororen_ui_core::renderer::Card
 pub fn yororen_ui_core::renderer::Card::clone(&self) -> yororen_ui_core::renderer::Card
@@ -7531,6 +7592,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Button
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Button
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Button
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Button
+pub struct yororen_ui_core::renderer::ButtonGroup
+impl core::clone::Clone for yororen_ui_core::renderer::ButtonGroup
+pub fn yororen_ui_core::renderer::ButtonGroup::clone(&self) -> yororen_ui_core::renderer::ButtonGroup
+impl core::cmp::Eq for yororen_ui_core::renderer::ButtonGroup
+impl core::cmp::PartialEq for yororen_ui_core::renderer::ButtonGroup
+pub fn yororen_ui_core::renderer::ButtonGroup::eq(&self, &yororen_ui_core::renderer::ButtonGroup) -> bool
+impl core::default::Default for yororen_ui_core::renderer::ButtonGroup
+pub fn yororen_ui_core::renderer::ButtonGroup::default() -> yororen_ui_core::renderer::ButtonGroup
+impl core::fmt::Debug for yororen_ui_core::renderer::ButtonGroup
+pub fn yororen_ui_core::renderer::ButtonGroup::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::ButtonGroup
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::Freeze for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::Send for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::Sync for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::Unpin for yororen_ui_core::renderer::ButtonGroup
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::ButtonGroup
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::ButtonGroup
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::ButtonGroup
 pub struct yororen_ui_core::renderer::Card
 impl core::clone::Clone for yororen_ui_core::renderer::Card
 pub fn yororen_ui_core::renderer::Card::clone(&self) -> yororen_ui_core::renderer::Card
@@ -8397,6 +8478,7 @@ pub trait yororen_ui_core::renderer::RendererMarker: 'static
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Avatar
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Badge
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Button
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ButtonGroup
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Card
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Checkbox
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ComboBox

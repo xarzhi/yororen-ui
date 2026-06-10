@@ -15,6 +15,8 @@ pub use yororen_ui_default_renderer::renderers::AvatarRenderer
 pub use yororen_ui_default_renderer::renderers::BadgeRenderState
 pub use yororen_ui_default_renderer::renderers::BadgeRenderer
 pub use yororen_ui_default_renderer::renderers::BuiltinVariantKey
+pub use yororen_ui_default_renderer::renderers::ButtonGroupRenderState
+pub use yororen_ui_default_renderer::renderers::ButtonGroupRenderer
 pub use yororen_ui_default_renderer::renderers::ButtonRenderState
 pub use yororen_ui_default_renderer::renderers::ButtonRenderer
 pub use yororen_ui_default_renderer::renderers::ButtonVariant
@@ -164,6 +166,24 @@ impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::butto
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::button::TokenButtonRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::button::TokenButtonRenderer
 pub fn yororen_ui_default_renderer::renderers::button::arc<T: yororen_ui_core::renderer::button::ButtonRenderer + 'static>(T) -> alloc::sync::Arc<dyn yororen_ui_core::renderer::button::ButtonRenderer>
+pub mod yororen_ui_default_renderer::renderers::button_group
+pub use yororen_ui_default_renderer::renderers::button_group::ButtonGroupRenderState
+pub use yororen_ui_default_renderer::renderers::button_group::ButtonGroupRenderer
+pub struct yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+impl yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+pub fn yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer::border_color(&self, &yororen_ui_core::renderer::button_group::ButtonGroupRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer::gap(&self, &yororen_ui_core::renderer::button_group::ButtonGroupRenderState, &yororen_ui_core::theme::Theme) -> f32
+pub fn yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer::radius(&self, &yororen_ui_core::renderer::button_group::ButtonGroupRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::button_group::ButtonGroupRenderer for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+pub fn yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer::compose(&self, yororen_ui_core::headless::button_group::ButtonGroupProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl core::marker::Freeze for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+impl core::marker::Send for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+impl core::marker::Sync for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+impl core::marker::Unpin for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+pub fn yororen_ui_default_renderer::renderers::button_group::arc_button_group<T: yororen_ui_core::renderer::button_group::ButtonGroupRenderer + 'static>(T) -> alloc::sync::Arc<dyn yororen_ui_core::renderer::button_group::ButtonGroupRenderer>
 pub mod yororen_ui_default_renderer::renderers::card
 pub use yororen_ui_default_renderer::renderers::card::CardRenderState
 pub use yororen_ui_default_renderer::renderers::card::CardRenderer
@@ -649,6 +669,7 @@ impl yororen_ui_default_renderer::renderers::registry::RendererRegistry
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_avatar(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::avatar::AvatarRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_badge(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::badge::BadgeRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_button(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::button::ButtonRenderer>>
+pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_button_group(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::button_group::ButtonGroupRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_card(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::card::CardRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_checkbox(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::checkbox::CheckboxRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_combo_box(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::combo_box::ComboBoxRenderer>>
@@ -689,6 +710,7 @@ pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::valid
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_avatar(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::avatar::AvatarRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_badge(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::badge::BadgeRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_button(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::button::ButtonRenderer>) -> Self
+pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_button_group(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::button_group::ButtonGroupRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_card(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::card::CardRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_checkbox(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::checkbox::CheckboxRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_combo_box(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::combo_box::ComboBoxRenderer>) -> Self
@@ -1027,6 +1049,7 @@ impl yororen_ui_default_renderer::renderers::registry::RendererRegistry
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_avatar(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::avatar::AvatarRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_badge(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::badge::BadgeRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_button(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::button::ButtonRenderer>>
+pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_button_group(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::button_group::ButtonGroupRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_card(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::card::CardRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_checkbox(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::checkbox::CheckboxRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_combo_box(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::combo_box::ComboBoxRenderer>>
@@ -1067,6 +1090,7 @@ pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::valid
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_avatar(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::avatar::AvatarRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_badge(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::badge::BadgeRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_button(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::button::ButtonRenderer>) -> Self
+pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_button_group(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::button_group::ButtonGroupRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_card(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::card::CardRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_checkbox(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::checkbox::CheckboxRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_combo_box(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::combo_box::ComboBoxRenderer>) -> Self
@@ -1150,6 +1174,20 @@ impl core::marker::Unpin for yororen_ui_default_renderer::renderers::badge::Toke
 impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::badge::TokenBadgeRenderer
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::badge::TokenBadgeRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::badge::TokenBadgeRenderer
+pub struct yororen_ui_default_renderer::renderers::TokenButtonGroupRenderer
+impl yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+pub fn yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer::border_color(&self, &yororen_ui_core::renderer::button_group::ButtonGroupRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer::gap(&self, &yororen_ui_core::renderer::button_group::ButtonGroupRenderState, &yororen_ui_core::theme::Theme) -> f32
+pub fn yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer::radius(&self, &yororen_ui_core::renderer::button_group::ButtonGroupRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::button_group::ButtonGroupRenderer for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+pub fn yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer::compose(&self, yororen_ui_core::headless::button_group::ButtonGroupProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl core::marker::Freeze for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+impl core::marker::Send for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+impl core::marker::Sync for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+impl core::marker::Unpin for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::button_group::TokenButtonGroupRenderer
 pub struct yororen_ui_default_renderer::renderers::TokenButtonRenderer
 impl yororen_ui_default_renderer::renderers::button::TokenButtonRenderer
 pub fn yororen_ui_default_renderer::renderers::button::TokenButtonRenderer::active_bg(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
