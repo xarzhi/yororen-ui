@@ -28,12 +28,9 @@ use std::ops::Range;
 use std::sync::{Arc, OnceLock};
 
 use gpui::{
-    App, Bounds, Context, EntityInputHandler, FocusHandle, Focusable, Hsla, IntoElement,
-    KeyBinding, ParentElement, Pixels, ShapedLine, SharedString, StatefulInteractiveElement,
-    Styled, UTF16Selection, Window, actions, point,
+    App, Bounds, Context, EntityInputHandler, FocusHandle, Focusable, Hsla, KeyBinding, Pixels,
+    ShapedLine, SharedString, UTF16Selection, Window, actions, point,
 };
-
-use crate::renderer::text_input::{TextInputRenderState, TextInputRenderer};
 
 pub type TextChangeCallback = Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>;
 

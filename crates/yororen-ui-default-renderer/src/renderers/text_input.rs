@@ -10,7 +10,7 @@
 use std::sync::Arc;
 
 use gpui::{
-    AnyElement, App, CursorStyle, Div, FocusHandle, Hsla, InteractiveElement, IntoElement,
+    AnyElement, App, CursorStyle, Div, Hsla, InteractiveElement, IntoElement,
     ParentElement, Pixels, SharedString, Stateful, StatefulInteractiveElement, Styled, Window, div,
     hsla, px,
 };

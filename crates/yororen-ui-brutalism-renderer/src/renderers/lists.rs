@@ -1,8 +1,8 @@
 //! Brutalist list renderers: `ListItem`, `TreeItem`, `Form`.
 
-use gpui::{App, Div, Hsla, ParentElement, Pixels, Styled, div, px};
+use gpui::{App, Div, Hsla, ParentElement, Pixels, Styled, px};
 use yororen_ui_core::renderer::spec::Edges;
-use yororen_ui_core::theme::{ActiveTheme, Theme};
+use yororen_ui_core::theme::Theme;
 
 use crate::style::{BRUTAL_BORDER, BRUTAL_RADIUS};
 

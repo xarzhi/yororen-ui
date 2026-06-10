@@ -2,7 +2,7 @@
 //! `FocusRing`, `Badge`, `Tag`, `Skeleton`, `ProgressBar`,
 //! `EmptyState`.
 
-use gpui::{App, BoxShadow, Div, FontWeight, Hsla, InteractiveElement, ParentElement, Pixels, SharedString, Stateful, Styled, hsla, point, px};
+use gpui::{App, BoxShadow, Div, FontWeight, Hsla, InteractiveElement, ParentElement, Pixels, SharedString, Stateful, Styled, point, px};
 use yororen_ui_core::headless::badge::BadgeVariant;
 use yororen_ui_core::headless::label::LabelProps;
 use yororen_ui_core::renderer::spec::Edges;

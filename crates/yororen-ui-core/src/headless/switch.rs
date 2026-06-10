@@ -9,10 +9,8 @@ use std::sync::Arc;
 
 use gpui::{
     App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Window, div,
+    StatefulInteractiveElement, Window,
 };
-
-use crate::renderer::switch::SwitchRenderer;
 
 /// Callback for toggle-style hooks (switch / checkbox / radio / toggle_button).
 ///

@@ -21,7 +21,7 @@ use yororen_ui::ActiveTheme;
 use yororen_ui::Theme;
 use yororen_ui::headless::button::button;
 use yororen_ui::headless::label::label;
-use yororen_ui::renderer::{ButtonRenderState, ButtonRenderer};
+use yororen_ui::renderer::ButtonRenderState;
 
 /// Inherent helper renderer for the variant_showcase demo.
 /// Reads the same `action.<variant>.{bg,fg,hover_bg,active_bg}`

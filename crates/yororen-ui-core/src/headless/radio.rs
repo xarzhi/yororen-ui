@@ -9,11 +9,10 @@ use std::sync::Arc;
 
 use gpui::{
     App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Window, div,
+    StatefulInteractiveElement, Window,
 };
 
 use super::switch::ToggleCallback;
-use crate::renderer::radio::RadioRenderer;
 
 #[derive(Clone)]
 pub struct RadioProps {
