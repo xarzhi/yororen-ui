@@ -138,6 +138,20 @@ impl SplitButtonRenderer for TokenSplitButtonRenderer {
             .child(primary)
             .child(chevron);
 
+        // `on_mouse_down_out` on the outer wrapper closes the menu
+        // when the user clicks anywhere outside the trigger + menu
+        // (the absolute menu body is still a layout child of this
+        // div, so clicks on items are absorbed by the items and
+        // don't fire `_out`). Clicks on the trigger are likewise
+        // absorbed by the primary / chevron buttons. Honoured only
+        // when the caller opted in via `dismiss_on_outside_click`.
+        let state_for_close = props.state.clone();
+        let dismiss_outside = props
+            .state
+            .as_ref()
+            .map(|s| s.read(cx).dismiss_on_outside_click)
+            .unwrap_or(true);
+
         // ---- Dropdown body (only when open) ----
         // Wrapped in `gpui::deferred(...)` so the popover paints
         // *after* every other sibling in the tree. Without this,
@@ -145,7 +159,14 @@ impl SplitButtonRenderer for TokenSplitButtonRenderer {
         // — paint order remains DOM order, so any later sibling
         // (e.g. the next row in the section) would draw on top of
         // the menu and you'd see "through" it.
-        let root = div().relative().child(trigger_row);
+        let mut root = div().relative().child(trigger_row);
+        if dismiss_outside {
+            root = root.on_mouse_down_out(move |_ev, _w, cx| {
+                if let Some(st) = state_for_close.as_ref() {
+                    st.update(cx, |s, _cx| s.close());
+                }
+            });
+        }
         if open {
             // Dropdown bg prefers `surface.popover` (a dedicated
             // contrast colour the JSON theme can override) and

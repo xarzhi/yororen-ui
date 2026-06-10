@@ -58,6 +58,10 @@ pub struct DropdownMenuState {
     pub open: bool,
     pub highlighted_index: Option<usize>,
     pub dismiss_on_escape: bool,
+    /// When `true` (the default), clicking anywhere outside the
+    /// trigger + menu area closes the menu. Renderers wire this
+    /// up via `gpui::on_mouse_down_out` on the owning element.
+    pub dismiss_on_outside_click: bool,
     pub items: Vec<DropdownItem>,
     on_select: Option<DropdownSelectCallback>,
 }
@@ -68,6 +72,7 @@ impl DropdownMenuState {
             open: false,
             highlighted_index: None,
             dismiss_on_escape: true,
+            dismiss_on_outside_click: true,
             items: Vec::new(),
             on_select: None,
         })
@@ -87,6 +92,9 @@ impl DropdownMenuState {
     }
     pub fn set_items(&mut self, items: Vec<DropdownItem>) {
         self.items = items;
+    }
+    pub fn set_dismiss_on_outside_click(&mut self, v: bool) {
+        self.dismiss_on_outside_click = v;
     }
     pub fn highlight_next(&mut self) {
         // Skip separators.

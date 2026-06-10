@@ -1273,6 +1273,7 @@ impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::dro
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::dropdown_menu::DropdownMenuProps
 pub struct yororen_ui_core::headless::dropdown_menu::DropdownMenuState
 pub yororen_ui_core::headless::dropdown_menu::DropdownMenuState::dismiss_on_escape: bool
+pub yororen_ui_core::headless::dropdown_menu::DropdownMenuState::dismiss_on_outside_click: bool
 pub yororen_ui_core::headless::dropdown_menu::DropdownMenuState::highlighted_index: core::option::Option<usize>
 pub yororen_ui_core::headless::dropdown_menu::DropdownMenuState::items: alloc::vec::Vec<yororen_ui_core::headless::dropdown_menu::DropdownItem>
 pub yororen_ui_core::headless::dropdown_menu::DropdownMenuState::open: bool
@@ -1284,6 +1285,7 @@ pub fn yororen_ui_core::headless::dropdown_menu::DropdownMenuState::is_open(&sel
 pub fn yororen_ui_core::headless::dropdown_menu::DropdownMenuState::new(&mut gpui::app::App) -> gpui::app::entity_map::Entity<Self>
 pub fn yororen_ui_core::headless::dropdown_menu::DropdownMenuState::open(&mut self)
 pub fn yororen_ui_core::headless::dropdown_menu::DropdownMenuState::select_highlighted(&mut self, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::dropdown_menu::DropdownMenuState::set_dismiss_on_outside_click(&mut self, bool)
 pub fn yororen_ui_core::headless::dropdown_menu::DropdownMenuState::set_items(&mut self, alloc::vec::Vec<yororen_ui_core::headless::dropdown_menu::DropdownItem>)
 pub fn yororen_ui_core::headless::dropdown_menu::DropdownMenuState::set_on_select<F>(&mut self, F) where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::dropdown_menu::DropdownMenuState::toggle(&mut self)
