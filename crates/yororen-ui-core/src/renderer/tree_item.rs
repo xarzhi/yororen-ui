@@ -1,11 +1,15 @@
-//! `TreeItemRenderer` — visual side of `TreeItem`.
+//! `TreeItemRenderer` — visual contract for `TreeItem`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (bg / hover_bg / selected_bg / fg / indent / padding /
+//! min_height / chevron_size) stay on the concrete
+//! renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::renderer::spec::Edges;
-use crate::theme::Theme;
+use crate::headless::tree_item::TreeItemProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct TreeItemRenderState {
@@ -16,12 +20,5 @@ pub struct TreeItemRenderState {
 }
 
 pub trait TreeItemRenderer: Any + Send + Sync {
-    fn bg(&self, state: &TreeItemRenderState, theme: &Theme) -> Hsla;
-    fn hover_bg(&self, state: &TreeItemRenderState, theme: &Theme) -> Hsla;
-    fn selected_bg(&self, state: &TreeItemRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &TreeItemRenderState, theme: &Theme) -> Hsla;
-    fn indent(&self, state: &TreeItemRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &TreeItemRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn min_height(&self, state: &TreeItemRenderState, theme: &Theme) -> Pixels;
-    fn chevron_size(&self, state: &TreeItemRenderState, theme: &Theme) -> Pixels;
+    fn compose(&self, props: &TreeItemProps, cx: &App) -> Div;
 }

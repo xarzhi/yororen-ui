@@ -1,5 +1,7 @@
 //! Headless `card` — generic content surface. No state.
 
+use std::sync::Arc;
+
 use gpui::{Div, ElementId, InteractiveElement, Stateful};
 
 #[derive(Clone, Debug)]
@@ -30,5 +32,21 @@ impl CardProps {
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the card using the registered `CardRenderer`. Returns
+    /// a `Stateful<Div>` with the element id and the renderer-built
+    /// bg / border / padding / radius. The caller still chains
+    /// `.child(...)` to add content.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::card::CardRenderer;
+        use crate::renderer::markers::Card as CardMarker;
+
+        let r: &Arc<dyn CardRenderer> = cx
+            .renderer_arc::<CardMarker, dyn CardRenderer>()
+            .expect("CardRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
     }
 }

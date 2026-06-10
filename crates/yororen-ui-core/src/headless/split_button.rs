@@ -44,4 +44,20 @@ impl SplitButtonProps {
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
     }
+
+    /// Render the split button using the registered
+    /// `SplitButtonRenderer`. Returns a `Stateful<Div>` with the
+    /// element id. The caller adds the children (primary + chevron
+    /// triggers).
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::split_button::SplitButtonRenderer;
+        use crate::renderer::markers::SplitButton as SplitButtonMarker;
+
+        let r: &Arc<dyn SplitButtonRenderer> = cx
+            .renderer_arc::<SplitButtonMarker, dyn SplitButtonRenderer>()
+            .expect("SplitButtonRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
+    }
 }

@@ -1,11 +1,12 @@
-//! `FilePathInputRenderer` — visual side of `FilePathInput`.
+//! `FilePathInputRenderer` — visual contract for `FilePathInput`.
+//!
+//! Trait surface is just `compose`.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{AnyElement, App, Hsla, Window};
 
-use crate::renderer::spec::Edges;
-use crate::theme::Theme;
+use crate::headless::file_path_input::FilePathInputProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct FilePathInputRenderState {
@@ -18,17 +19,10 @@ pub struct FilePathInputRenderState {
 }
 
 pub trait FilePathInputRenderer: Any + Send + Sync {
-    fn bg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn hover_border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn active_border(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn button_bg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn button_hover_bg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn button_fg(&self, state: &FilePathInputRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &FilePathInputRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &FilePathInputRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn action_gap(&self, state: &FilePathInputRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &FilePathInputRenderState, theme: &Theme) -> Pixels;
-    fn icon_size(&self, state: &FilePathInputRenderState, theme: &Theme) -> Pixels;
+    fn compose(
+        &self,
+        props: &FilePathInputProps,
+        cx: &mut App,
+        window: &mut Window,
+    ) -> AnyElement;
 }

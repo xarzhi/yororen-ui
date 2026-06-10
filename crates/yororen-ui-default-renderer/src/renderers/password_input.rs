@@ -1,26 +1,27 @@
-//! `PasswordInputRenderer` — visual side of `PasswordInput`.
-//!
-//! The text input / keymap / IME pipeline lives in
-//! `yororen-ui-core/src/headless/text_input_element.rs`. This
-//! module only provides the `TokenPasswordInputRenderer` default
-//! impl. The headless `PasswordInputProps::render` masks the
-//! displayed value with `mask_char` while the underlying
-//! `TextInputState.value` keeps the real text.
+//! `TokenPasswordInputRenderer` — default `PasswordInputRenderer` impl.
 
 use std::sync::Arc;
 
-use gpui::{Hsla, Pixels, px};
-
-use yororen_ui_core::renderer::password_input::{
-    PasswordInputRenderState, PasswordInputRenderer,
+use gpui::{
+    AnyElement, App, CursorStyle, Div, Hsla, InteractiveElement, IntoElement, ParentElement,
+    Pixels, SharedString, Stateful, StatefulInteractiveElement, Styled, Window, div, px,
 };
+
+use yororen_ui_core::headless::password_input::PasswordInputProps;
+use yororen_ui_core::headless::text_input::TextInputState;
+use yororen_ui_core::headless::text_input_element::{
+    TextInputElement, start_cursor_blink, wire_input_keyboard,
+};
+use yororen_ui_core::renderer::password_input::{PasswordInputRenderState, PasswordInputRenderer};
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
 
 pub struct TokenPasswordInputRenderer;
 
-impl PasswordInputRenderer for TokenPasswordInputRenderer {
-    fn bg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
+// Inherent helpers — *not* part of the `PasswordInputRenderer`
+// trait surface.
+impl TokenPasswordInputRenderer {
+    pub fn bg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.get_color("surface.sunken").unwrap_or_default()
         } else if state.has_custom_bg {
@@ -31,7 +32,7 @@ impl PasswordInputRenderer for TokenPasswordInputRenderer {
             theme.get_color("surface.base").unwrap_or_default()
         }
     }
-    fn border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
+    pub fn border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.get_color("border.muted").unwrap_or_default()
         } else if state.has_custom_border {
@@ -42,7 +43,7 @@ impl PasswordInputRenderer for TokenPasswordInputRenderer {
             theme.get_color("border.default").unwrap_or_default()
         }
     }
-    fn focus_border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
+    pub fn focus_border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
         if state.has_custom_focus_border {
             state
                 .custom_focus_border
@@ -51,13 +52,13 @@ impl PasswordInputRenderer for TokenPasswordInputRenderer {
             theme.get_color("border.focus").unwrap_or_default()
         }
     }
-    fn hover_border(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
+    pub fn hover_border(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.muted").unwrap_or_default()
     }
-    fn active_border(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
+    pub fn active_border(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.default").unwrap_or_default()
     }
-    fn fg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
+    pub fn fg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.get_color("content.disabled").unwrap_or_default()
         } else {
@@ -66,12 +67,12 @@ impl PasswordInputRenderer for TokenPasswordInputRenderer {
                 .unwrap_or_else(|| theme.get_color("content.primary").unwrap_or_default())
         }
     }
-    fn min_height(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Pixels {
+    pub fn min_height(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Pixels {
         px(theme
             .get_number("tokens.control.input.min_height")
             .unwrap_or(0.0) as f32)
     }
-    fn padding(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Edges<Pixels> {
+    pub fn padding(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(
             px(theme
                 .get_number("tokens.control.input.horizontal_padding")
@@ -81,8 +82,121 @@ impl PasswordInputRenderer for TokenPasswordInputRenderer {
                 .unwrap_or(0.0) as f32),
         )
     }
-    fn border_radius(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Pixels {
+    pub fn border_radius(&self, _state: &PasswordInputRenderState, theme: &Theme) -> Pixels {
         px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
+    }
+}
+
+impl PasswordInputRenderer for TokenPasswordInputRenderer {
+    fn compose(
+        &self,
+        props: &PasswordInputProps,
+        cx: &mut App,
+        window: &mut Window,
+    ) -> AnyElement {
+        use yororen_ui_core::theme::ActiveTheme;
+
+        let placeholder_str = props.placeholder.clone();
+        let disabled = props.disabled;
+        let max_length = props.max_length;
+        let on_change = props.on_change.clone();
+        let on_submit = props.on_submit.clone();
+        let mask_char = props.mask_char;
+
+        let state = window.use_keyed_state(props.id.clone(), cx, |_window, cx| {
+            TextInputState::new(&mut *cx)
+        });
+        state.update(cx, |s, _cx| {
+            s.placeholder = SharedString::from(placeholder_str);
+            s.max_length = max_length;
+            s.on_change = on_change.clone();
+            s.on_submit = on_submit.clone();
+        });
+
+        let focus_handle = state.read(cx).focus_handle();
+        let focused = focus_handle.is_focused(window);
+
+        if focused {
+            start_cursor_blink(state.clone(), window, cx);
+        } else {
+            state.update(cx, |s, _cx| s.cursor_visible = true);
+        }
+
+        let theme = cx.theme().clone();
+        let render_state = PasswordInputRenderState {
+            disabled,
+            focused,
+            has_custom_bg: props.has_custom_bg,
+            has_custom_border: props.has_custom_border,
+            has_custom_focus_border: props.has_custom_focus_border,
+            custom_bg: props.custom_bg,
+            custom_border: props.custom_border,
+            custom_focus_border: props.custom_focus_border,
+            custom_fg: props.custom_text_color,
+        };
+        let bg = self.bg(&render_state, &theme);
+        let border_color = if focused {
+            self.focus_border(&render_state, &theme)
+        } else {
+            self.border(&render_state, &theme)
+        };
+        let text_color = self.fg(&render_state, &theme);
+        let min_h = self.min_height(&render_state, &theme);
+        let padding = self.padding(&render_state, &theme);
+        let radius = self.border_radius(&render_state, &theme);
+        let hover_border = self.hover_border(&render_state, &theme);
+        let active_border = self.active_border(&render_state, &theme);
+        let hint_color = theme.get_color("content.tertiary").unwrap_or_default();
+        drop(theme);
+
+        let value_len = state.read(cx).value.chars().count();
+        let masked: String = std::iter::repeat_n(mask_char, value_len).collect();
+
+        let inner = TextInputElement {
+            state: state.clone(),
+            focus_handle: focus_handle.clone(),
+            disabled,
+            text_color,
+            hint_color,
+            cursor_color: text_color,
+            selection_color: text_color,
+            placeholder: state.read(cx).placeholder.clone(),
+            value_override: Some(masked),
+        };
+
+        let base: Stateful<Div> = div()
+            .id(props.id.clone())
+            .bg(bg)
+            .border_1()
+            .border_color(border_color)
+            .min_h(min_h)
+            .rounded(radius)
+            .px(padding.left)
+            .py(padding.top)
+            .flex()
+            .items_center()
+            .text_color(text_color)
+            .overflow_hidden()
+            .cursor(if disabled {
+                CursorStyle::Arrow
+            } else {
+                CursorStyle::IBeam
+            })
+            .child(inner)
+            .track_focus(&focus_handle);
+
+        let keyed = wire_input_keyboard(
+            base,
+            state.clone(),
+            focus_handle.clone(),
+            disabled,
+            on_submit,
+        );
+
+        keyed
+            .hover(|s| s.border_color(hover_border))
+            .active(|s| s.border_color(active_border))
+            .into_any_element()
     }
 }
 

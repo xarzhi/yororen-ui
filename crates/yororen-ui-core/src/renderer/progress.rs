@@ -1,10 +1,14 @@
-//! `ProgressBarRenderer` — the visual side of `ProgressBar`.
+//! `ProgressBarRenderer` — visual contract for `ProgressBar`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (track / fill / height / border_color / border_radius)
+//! stay on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::theme::Theme;
+use crate::headless::progress::ProgressBarProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct ProgressBarRenderState {
@@ -13,9 +17,5 @@ pub struct ProgressBarRenderState {
 }
 
 pub trait ProgressBarRenderer: Any + Send + Sync {
-    fn track(&self, state: &ProgressBarRenderState, theme: &Theme) -> Hsla;
-    fn fill(&self, state: &ProgressBarRenderState, theme: &Theme) -> Hsla;
-    fn height(&self, state: &ProgressBarRenderState, theme: &Theme) -> Pixels;
-    fn border_color(&self, state: &ProgressBarRenderState, theme: &Theme) -> Hsla;
-    fn border_radius(&self, state: &ProgressBarRenderState, theme: &Theme) -> Pixels;
+    fn compose(&self, props: &ProgressBarProps, cx: &App) -> Div;
 }

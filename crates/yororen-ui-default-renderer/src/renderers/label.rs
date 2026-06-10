@@ -2,19 +2,20 @@
 
 use std::sync::Arc;
 
-use gpui::{FontWeight, Hsla, SharedString};
+use gpui::{App, Div, FontWeight, Hsla, ParentElement, SharedString, Styled};
 
+use yororen_ui_core::headless::label::LabelProps;
 use yororen_ui_core::theme::Theme;
 
 pub use yororen_ui_core::renderer::label::{LabelRenderState, LabelRenderer};
 
 pub struct TokenLabelRenderer;
 
-impl LabelRenderer for TokenLabelRenderer {
-    fn color(&self, state: &LabelRenderState, theme: &Theme) -> Hsla {
+// Inherent helpers — *not* part of the `LabelRenderer` trait
+// surface.
+impl TokenLabelRenderer {
+    pub fn color(&self, state: &LabelRenderState, theme: &Theme) -> Hsla {
         if state.inherit_color {
-            // Inherit means "use whatever parent div set".
-            // For simplicity, return the base content color.
             theme.get_color("content.primary").unwrap_or_default()
         } else if state.muted {
             theme.get_color("content.secondary").unwrap_or_default()
@@ -22,21 +23,59 @@ impl LabelRenderer for TokenLabelRenderer {
             theme.get_color("content.primary").unwrap_or_default()
         }
     }
-
-    fn strong_weight(&self, _state: &LabelRenderState, theme: &Theme) -> FontWeight {
+    pub fn strong_weight(&self, _state: &LabelRenderState, theme: &Theme) -> FontWeight {
         FontWeight(
             theme
                 .get_number("tokens.typography.weight_semibold")
                 .unwrap_or(600.0) as f32,
         )
     }
-
-    fn family_mono(&self, _state: &LabelRenderState, theme: &Theme) -> SharedString {
+    pub fn family_mono(&self, _state: &LabelRenderState, theme: &Theme) -> SharedString {
         theme
             .get_string("tokens.typography.family_mono")
             .unwrap_or("ui-monospace")
             .to_string()
             .into()
+    }
+}
+
+impl LabelRenderer for TokenLabelRenderer {
+    fn compose(&self, props: &LabelProps, cx: &App) -> Div {
+        use yororen_ui_core::theme::ActiveTheme;
+        let theme = cx.theme();
+        let state = LabelRenderState {
+            muted: props.muted,
+            strong: props.strong,
+            mono: props.mono,
+            inherit_color: props.inherit_color,
+            ellipsis: props.ellipsis,
+            wrap: props.wrap,
+            max_lines: props.max_lines,
+        };
+        let color = self.color(&state, theme);
+        let weight = self.strong_weight(&state, theme);
+        let family = self.family_mono(&state, theme);
+        let mut el: Div = gpui::div();
+        if !props.inherit_color {
+            el = el.text_color(color);
+        }
+        if props.strong {
+            el = el.font_weight(weight);
+        }
+        if props.mono {
+            el = el.font_family(family);
+        }
+        if props.ellipsis {
+            el = el.overflow_hidden().text_ellipsis().whitespace_nowrap();
+        }
+        if props.wrap {
+            el = el.whitespace_normal();
+        }
+        if let Some(n) = props.max_lines {
+            el = el.line_clamp(n).overflow_hidden();
+        }
+        el = el.child(props.text.clone());
+        el
     }
 }
 

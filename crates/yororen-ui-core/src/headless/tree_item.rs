@@ -113,4 +113,20 @@ impl TreeItemProps {
         }
         s
     }
+
+    /// Render the tree item using the registered
+    /// `TreeItemRenderer`. Returns a `Stateful<Div>` with the
+    /// element id and on_click wired by `apply`. The renderer
+    /// decides bg / padding / indent / chevron.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::tree_item::TreeItemRenderer;
+        use crate::renderer::markers::TreeItem as TreeItemMarker;
+
+        let r: &Arc<dyn TreeItemRenderer> = cx
+            .renderer_arc::<TreeItemMarker, dyn TreeItemRenderer>()
+            .expect("TreeItemRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
+    }
 }

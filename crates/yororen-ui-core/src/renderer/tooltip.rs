@@ -1,11 +1,14 @@
-//! `TooltipRenderer` — the visual side of `Tooltip`.
+//! `TooltipRenderer` — visual contract for `Tooltip`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (bg / fg / padding / font_size / border_radius) stay
+//! on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::renderer::spec::Edges;
-use crate::theme::Theme;
+use crate::headless::tooltip::TooltipProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct TooltipRenderState {
@@ -14,9 +17,5 @@ pub struct TooltipRenderState {
 }
 
 pub trait TooltipRenderer: Any + Send + Sync {
-    fn bg(&self, state: &TooltipRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &TooltipRenderState, theme: &Theme) -> Hsla;
-    fn padding(&self, state: &TooltipRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn font_size(&self, state: &TooltipRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &TooltipRenderState, theme: &Theme) -> Pixels;
+    fn compose(&self, props: &TooltipProps, cx: &App) -> Div;
 }

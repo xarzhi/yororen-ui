@@ -68,4 +68,20 @@ impl TagProps {
         }
         s
     }
+
+    /// Render the tag using the registered `TagRenderer`. Returns a
+    /// `Stateful<Div>` with id + on_click wired by `apply`. The
+    /// renderer chooses the bg / fg / padding / height / close
+    /// button / hover bg.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::tag::TagRenderer;
+        use crate::renderer::markers::Tag as TagMarker;
+
+        let r: &Arc<dyn TagRenderer> = cx
+            .renderer_arc::<TagMarker, dyn TagRenderer>()
+            .expect("TagRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
+    }
 }

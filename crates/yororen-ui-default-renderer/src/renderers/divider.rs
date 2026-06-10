@@ -1,26 +1,47 @@
-//! `DividerRenderer` — the visual side of `Divider`.
+//! `TokenDividerRenderer` — default `DividerRenderer` impl.
 
 use std::sync::Arc;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div, Hsla, Pixels, Styled, div};
 
+use yororen_ui_core::headless::divider::DividerProps;
 use yororen_ui_core::theme::Theme;
 
 pub use yororen_ui_core::renderer::divider::{DividerRenderState, DividerRenderer};
 
 pub struct TokenDividerRenderer;
 
-impl DividerRenderer for TokenDividerRenderer {
-    fn color(&self, _state: &DividerRenderState, theme: &Theme) -> Hsla {
+// Inherent helpers — *not* part of the trait surface.
+impl TokenDividerRenderer {
+    pub fn color(&self, _state: &DividerRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.divider").unwrap_or_default()
     }
 
-    fn thickness(&self, _state: &DividerRenderState, theme: &Theme) -> Pixels {
+    pub fn thickness(&self, _state: &DividerRenderState, theme: &Theme) -> Pixels {
         gpui::px(
             theme
                 .get_number("tokens.control.divider.thickness")
-                .unwrap_or(0.0) as f32,
+                .unwrap_or(1.0) as f32,
         )
+    }
+}
+
+impl DividerRenderer for TokenDividerRenderer {
+    fn compose(&self, props: &DividerProps, cx: &App) -> Div {
+        use yororen_ui_core::theme::ActiveTheme;
+        let theme = cx.theme();
+        let state = DividerRenderState {
+            horizontal: props.horizontal,
+        };
+        let color = self.color(&state, theme);
+        let thickness = self.thickness(&state, theme);
+        let mut el = div().bg(color);
+        if props.horizontal {
+            el = el.w_full().h(thickness);
+        } else {
+            el = el.h_full().w(thickness);
+        }
+        el
     }
 }
 
@@ -42,8 +63,6 @@ mod tests {
         let theme = fixture();
         let r = TokenDividerRenderer;
         let state = DividerRenderState::default();
-        // The renderer's `color` should equal
-        // `theme.get_color("border.divider")` — same path.
         assert_eq!(
             r.color(&state, &theme),
             theme.get_color("border.divider").unwrap_or_default(),
@@ -57,18 +76,15 @@ mod tests {
         let state = DividerRenderState::default();
         let expected = theme
             .get_number("tokens.control.divider.thickness")
-            .unwrap_or(0.0) as f32;
+            .unwrap_or(1.0) as f32;
         assert_eq!(r.thickness(&state, &theme), gpui::px(expected));
     }
 
     #[test]
     fn missing_paths_yield_zero_color() {
-        // Theme with only one path — everything else returns None.
         let theme = Theme::from_value(serde_json::json!({}));
         let r = TokenDividerRenderer;
         let state = DividerRenderState::default();
-        // Both should fall back to defaults; the call must
-        // not panic.
         let _ = r.color(&state, &theme);
         let _ = r.thickness(&state, &theme);
     }

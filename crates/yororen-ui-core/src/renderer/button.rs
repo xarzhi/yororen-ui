@@ -3,25 +3,30 @@
 //! describe a `Button`'s visual.
 //!
 //! Lives in core (not the default-renderer) so headless
-//! `ButtonProps::render` can call these methods. The actual
-//! rendering logic that builds the `Stateful<Div>` lives in
-//! headless's `ButtonProps::render`; the renderer's job is
-//! only to provide the *values* the headless consumes.
+//! `ButtonProps::render` can call `compose`. The trait surface
+//! is intentionally minimal: a single `compose` method that
+//! takes the full `ButtonProps` and returns a fully-built
+//! `Stateful<Div>` (visuals + children + hover / active + id +
+//! focus). All token reads, palette lookups and styling
+//! choices live inside the renderer — core does not know
+//! about `bg` / `fg` / `border` / etc.
 //!
-//! One trait, one component. The other 37 component renderer
-//! traits follow the same shape.
+//! `ButtonRenderState` is provided as a convenience projection
+//! of `ButtonProps` for renderers that want to share helpers
+//! across the suite (e.g. token-based vs. brutalist), but it
+//! is not part of the trait surface.
 
 use std::any::Any;
+use std::sync::Arc;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div, FocusHandle, Stateful};
 
-use crate::renderer::spec::{BorderSpec, Edges, ShadowSpec};
+use crate::headless::button::ButtonProps;
 use crate::renderer::variant::VariantStyle;
-use crate::theme::Theme;
 
-/// State passed to a `ButtonRenderer`. Fields are deliberately
-/// minimal — a renderer can read more from the `Theme` if it
-/// needs to.
+/// Projection of `ButtonProps` used by built-in renderers when
+/// they want to factor out helpers (bg / fg / border / etc.).
+/// Not part of the `ButtonRenderer` trait surface.
 #[derive(Clone, Debug, Default)]
 pub struct ButtonRenderState {
     pub variant: ActionVariantKind,
@@ -34,15 +39,12 @@ pub struct ButtonRenderState {
     pub has_custom_hover_bg: bool,
     /// Pre-resolved custom variant from the global
     /// `VariantRegistry`. When `Some`, the renderer should
-    /// delegate color decisions (bg/fg/border/disabled_opacity)
-    /// to the contained `VariantStyle` instead of reading
-    /// `theme.get_color("action.<v>.<field>")`. When `None`,
-    /// the renderer falls back to the built-in token path.
+    /// delegate color decisions to the contained
+    /// `VariantStyle` instead of reading from theme paths.
     pub custom_style: Option<Arc<dyn VariantStyle>>,
 }
 
 pub use crate::renderer::variant::ActionVariantKind;
-use std::sync::Arc;
 
 /// Renderer for the `Button` component. Implementations decide
 /// what the button looks like in every state.
@@ -52,18 +54,11 @@ use std::sync::Arc;
 /// registering their own `ButtonRenderer` impl via
 /// `cx.register_renderer_arc::<ButtonMarker, dyn ButtonRenderer>(…)`.
 pub trait ButtonRenderer: Any + Send + Sync {
-    fn bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla;
-    fn padding(&self, state: &ButtonRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &ButtonRenderState, theme: &Theme) -> Pixels;
-    fn border(&self, state: &ButtonRenderState, theme: &Theme) -> Option<BorderSpec>;
-    fn shadow(&self, state: &ButtonRenderState, theme: &Theme) -> Option<ShadowSpec>;
-    fn min_height(&self, state: &ButtonRenderState, theme: &Theme) -> Pixels;
-    fn disabled_opacity(&self, state: &ButtonRenderState, theme: &Theme) -> f32;
-    /// Background colour while the mouse is hovering. Used by
-    /// the headless `render()` for `.hover(|s| s.bg(…))`.
-    fn hover_bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla;
-    /// Background colour while the button is being pressed.
-    /// Used for `.active(|s| …)`.
-    fn active_bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla;
+    /// Build the full `Stateful<Div>` for a button.
+    fn compose(
+        &self,
+        props: &ButtonProps,
+        focus_handle: &FocusHandle,
+        cx: &App,
+    ) -> Stateful<Div>;
 }

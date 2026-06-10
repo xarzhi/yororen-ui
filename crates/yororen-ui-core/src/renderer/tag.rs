@@ -1,10 +1,15 @@
-//! `TagRenderer` — the visual side of `Tag`.
+//! `TagRenderer` — visual contract for `Tag`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (bg / fg / min_height / padding_x / font_size /
+//! font_weight / border_radius / close_size / close_hover_bg)
+//! stay on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{FontWeight, Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::theme::Theme;
+use crate::headless::tag::TagProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct TagRenderState {
@@ -14,13 +19,5 @@ pub struct TagRenderState {
 }
 
 pub trait TagRenderer: Any + Send + Sync {
-    fn bg(&self, state: &TagRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &TagRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &TagRenderState, theme: &Theme) -> Pixels;
-    fn padding_x(&self, state: &TagRenderState, theme: &Theme) -> Pixels;
-    fn font_size(&self, state: &TagRenderState, theme: &Theme) -> Pixels;
-    fn font_weight(&self, state: &TagRenderState, theme: &Theme) -> FontWeight;
-    fn border_radius(&self, state: &TagRenderState, theme: &Theme) -> Pixels;
-    fn close_size(&self, state: &TagRenderState, theme: &Theme) -> Pixels;
-    fn close_hover_bg(&self, state: &TagRenderState, theme: &Theme) -> Hsla;
+    fn compose(&self, props: &TagProps, cx: &App) -> Div;
 }

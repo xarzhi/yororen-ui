@@ -2,12 +2,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, ElementId, InteractiveElement, ParentElement, Stateful, Styled};
-
-use crate::renderer::RendererContext;
-use crate::renderer::label::{LabelRenderState, LabelRenderer};
-use crate::renderer::markers::Label as LabelMarker;
-use crate::theme::ActiveTheme;
+use gpui::{App, Div, ElementId, InteractiveElement, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct LabelProps {
@@ -75,47 +70,20 @@ impl LabelProps {
 
     /// Render the label using the registered `LabelRenderer`.
     ///
-    /// Looks up the renderer via
-    /// `cx.renderer_arc::<LabelMarker, dyn LabelRenderer>()` and
-    /// consumes all of its tokens (color / strong_weight /
-    /// family_mono) to build the `Stateful<Div>`.
+    /// Data flow is one-way: the renderer takes the full
+    /// `LabelProps` and returns a fully-built `Div` with the
+    /// text content and all style tokens applied. Headless
+    /// only attaches the element id. Headless does **not** pull
+    /// token values from the renderer.
     pub fn render(self, cx: &App) -> Stateful<Div> {
-        let theme = cx.theme();
+        use crate::renderer::RendererContext;
+        use crate::renderer::label::LabelRenderer;
+        use crate::renderer::markers::Label as LabelMarker;
+
         let r: &Arc<dyn LabelRenderer> = cx
             .renderer_arc::<LabelMarker, dyn LabelRenderer>()
             .expect("LabelRenderer registered");
-        let state = LabelRenderState {
-            muted: self.muted,
-            strong: self.strong,
-            mono: self.mono,
-            inherit_color: self.inherit_color,
-            ellipsis: self.ellipsis,
-            wrap: self.wrap,
-            max_lines: self.max_lines,
-        };
-        let color = r.color(&state, theme);
-        let weight = r.strong_weight(&state, theme);
-        let family = r.family_mono(&state, theme);
-        let mut el = gpui::div();
-        if !self.inherit_color {
-            el = el.text_color(color);
-        }
-        if self.strong {
-            el = el.font_weight(weight);
-        }
-        if self.mono {
-            el = el.font_family(family);
-        }
-        if self.ellipsis {
-            el = el.overflow_hidden().text_ellipsis().whitespace_nowrap();
-        }
-        if self.wrap {
-            el = el.whitespace_normal();
-        }
-        if let Some(n) = self.max_lines {
-            el = el.line_clamp(n).overflow_hidden();
-        }
-        el = el.child(self.text.clone());
-        self.apply(el)
+        let div = r.compose(&self, cx);
+        self.apply(div)
     }
 }

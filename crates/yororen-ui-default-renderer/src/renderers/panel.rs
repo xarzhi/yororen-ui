@@ -1,4 +1,4 @@
-//! `PanelRenderer` — the visual side of `Panel`.
+//! `TokenPanelRenderer` — default `PanelRenderer` impl.
 //!
 //! The `Panel` component (defined in
 //! `yororen_ui_core::headless::panel`) is the visual "card"
@@ -8,37 +8,51 @@
 
 use std::sync::Arc;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div, Hsla, Pixels, Styled, div};
 
-pub use yororen_ui_core::renderer::panel::{PanelRenderState, PanelRenderer};
+use yororen_ui_core::headless::panel::PanelProps;
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
 
-/// State passed to a `PanelRenderer`. The flags indicate whether
-/// the caller supplied explicit overrides for each visual property;
-/// the renderer can choose to honour or ignore them.
+pub use yororen_ui_core::renderer::panel::{PanelRenderState, PanelRenderer};
+
 pub struct TokenPanelRenderer;
 
-impl PanelRenderer for TokenPanelRenderer {
-    fn bg(&self, _state: &PanelRenderState, theme: &Theme) -> Hsla {
-        // The has_custom_bg flag is honoured by the Panel builder
-        // which sets the explicit `.bg(...)`; here we always read
-        // the default from the theme.
+// Inherent helpers — *not* part of the trait surface.
+impl TokenPanelRenderer {
+    pub fn bg(&self, _state: &PanelRenderState, theme: &Theme) -> Hsla {
         theme.get_color("surface.raised").unwrap_or_default()
     }
-    fn border(&self, _state: &PanelRenderState, theme: &Theme) -> Hsla {
+    pub fn border(&self, _state: &PanelRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.default").unwrap_or_default()
     }
-    fn padding(&self, _state: &PanelRenderState, theme: &Theme) -> Edges<Pixels> {
+    pub fn padding(&self, _state: &PanelRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::all(gpui::px(
             theme.get_number("tokens.spacing.inset_md").unwrap_or(0.0) as f32,
         ))
     }
-    fn border_radius(&self, _state: &PanelRenderState, theme: &Theme) -> Pixels {
+    pub fn border_radius(&self, _state: &PanelRenderState, theme: &Theme) -> Pixels {
         gpui::px(theme.get_number("tokens.radii.lg").unwrap_or(0.0) as f32)
     }
-    fn shadow_alpha(&self, _state: &PanelRenderState, theme: &Theme) -> f32 {
+    pub fn shadow_alpha(&self, _state: &PanelRenderState, theme: &Theme) -> f32 {
         theme.get_color("shadow.elevation_2").unwrap_or_default().a
+    }
+}
+
+impl PanelRenderer for TokenPanelRenderer {
+    fn compose(&self, props: &PanelProps, cx: &App) -> Div {
+        use yororen_ui_core::theme::ActiveTheme;
+        let theme = cx.theme();
+        let state = PanelRenderState {
+            has_custom_bg: props.has_custom_bg,
+            has_custom_border: props.has_custom_border,
+            has_custom_padding: props.has_custom_padding,
+        };
+        let bg = self.bg(&state, theme);
+        let border = self.border(&state, theme);
+        let pad = self.padding(&state, theme);
+        let r = self.border_radius(&state, theme);
+        div().bg(bg).border_color(border).p(pad.top).rounded(r)
     }
 }
 

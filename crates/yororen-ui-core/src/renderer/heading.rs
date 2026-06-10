@@ -1,19 +1,19 @@
-//! `HeadingRenderer` — the visual side of `Heading`.
+//! `HeadingRenderer` — visual contract for `Heading`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (size / weight / color) stay on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{FontWeight, Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::headless::heading::HeadingLevel;
-use crate::theme::Theme;
+use crate::headless::heading::HeadingProps;
 
 #[derive(Clone, Copy, Debug)]
 pub struct HeadingRenderState {
-    pub level: HeadingLevel,
+    pub level: crate::headless::heading::HeadingLevel,
 }
 
 pub trait HeadingRenderer: Any + Send + Sync {
-    fn size(&self, state: &HeadingRenderState, theme: &Theme) -> Pixels;
-    fn weight(&self, state: &HeadingRenderState, theme: &Theme) -> FontWeight;
-    fn color(&self, state: &HeadingRenderState, theme: &Theme) -> Hsla;
+    fn compose(&self, props: &HeadingProps, cx: &App) -> Div;
 }

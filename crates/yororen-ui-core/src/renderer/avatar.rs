@@ -1,10 +1,15 @@
-//! `AvatarRenderer` — the visual side of `Avatar`.
+//! `AvatarRenderer` — visual contract for `Avatar`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (default_bg / border_radius / status_dot_size /
+//! status_inset / status_border_w / status_border_color)
+//! stay on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::theme::Theme;
+use crate::headless::avatar::AvatarProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct AvatarRenderState {
@@ -14,10 +19,5 @@ pub struct AvatarRenderState {
 }
 
 pub trait AvatarRenderer: Any + Send + Sync {
-    fn default_bg(&self, state: &AvatarRenderState, theme: &Theme) -> Hsla;
-    fn border_radius(&self, state: &AvatarRenderState, theme: &Theme) -> Pixels;
-    fn status_dot_size(&self, state: &AvatarRenderState, theme: &Theme) -> Pixels;
-    fn status_inset(&self, state: &AvatarRenderState, theme: &Theme) -> Pixels;
-    fn status_border_w(&self, state: &AvatarRenderState, theme: &Theme) -> Pixels;
-    fn status_border_color(&self, state: &AvatarRenderState, theme: &Theme) -> Hsla;
+    fn compose(&self, props: &AvatarProps, cx: &App) -> Div;
 }

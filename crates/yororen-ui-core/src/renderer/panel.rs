@@ -1,11 +1,14 @@
-//! `PanelRenderer` — the visual side of `Panel`.
+//! `PanelRenderer` — visual contract for `Panel`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (bg / border / padding / border_radius / shadow_alpha)
+//! stay on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::renderer::spec::Edges;
-use crate::theme::Theme;
+use crate::headless::panel::PanelProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct PanelRenderState {
@@ -15,9 +18,5 @@ pub struct PanelRenderState {
 }
 
 pub trait PanelRenderer: Any + Send + Sync {
-    fn bg(&self, state: &PanelRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &PanelRenderState, theme: &Theme) -> Hsla;
-    fn padding(&self, state: &PanelRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &PanelRenderState, theme: &Theme) -> Pixels;
-    fn shadow_alpha(&self, state: &PanelRenderState, theme: &Theme) -> f32;
+    fn compose(&self, props: &PanelProps, cx: &App) -> Div;
 }

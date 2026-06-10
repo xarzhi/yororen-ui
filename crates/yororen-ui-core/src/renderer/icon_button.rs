@@ -1,13 +1,20 @@
-//! `IconButtonRenderer` — visual side of `IconButton`.
+//! `IconButtonRenderer` — visual contract for `IconButton`.
+//!
+//! Trait surface is **just** `compose`. The renderer takes the
+//! full `IconButtonProps` and returns a fully-built
+//! `Stateful<Div>`. Headless layers `on_click` on top.
 
 use std::any::Any;
 use std::sync::Arc;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div, FocusHandle, Stateful};
 
+use crate::headless::icon_button::IconButtonProps;
 use crate::renderer::variant::{ActionVariantKind, VariantStyle};
-use crate::theme::Theme;
 
+/// Projection of `IconButtonProps` used by built-in renderers
+/// when they want to factor out helpers. Not part of the
+/// `IconButtonRenderer` trait surface.
 #[derive(Clone, Debug, Default)]
 pub struct IconButtonRenderState {
     pub variant: ActionVariantKind,
@@ -18,10 +25,11 @@ pub struct IconButtonRenderState {
 }
 
 pub trait IconButtonRenderer: Any + Send + Sync {
-    fn bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla;
-    fn hover_bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla;
-    fn active_bg(&self, state: &IconButtonRenderState, theme: &Theme) -> Hsla;
-    fn size(&self, state: &IconButtonRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &IconButtonRenderState, theme: &Theme) -> Pixels;
-    fn disabled_opacity(&self, state: &IconButtonRenderState, theme: &Theme) -> f32;
+    /// Build the full `Stateful<Div>` for an icon button.
+    fn compose(
+        &self,
+        props: &IconButtonProps,
+        focus_handle: &FocusHandle,
+        cx: &App,
+    ) -> Stateful<Div>;
 }

@@ -1,5 +1,7 @@
 //! Headless `badge` — small inline label with a variant flag set.
 
+use std::sync::Arc;
+
 use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
@@ -40,5 +42,21 @@ impl BadgeProps {
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the badge using the registered `BadgeRenderer`.
+    /// Returns a `Stateful<Div>` with the element id and the
+    /// renderer-applied variant styling (bg / fg / padding /
+    /// height / font / radius).
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::badge::BadgeRenderer;
+        use crate::renderer::markers::Badge as BadgeMarker;
+
+        let r: &Arc<dyn BadgeRenderer> = cx
+            .renderer_arc::<BadgeMarker, dyn BadgeRenderer>()
+            .expect("BadgeRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
     }
 }

@@ -4,19 +4,21 @@
 //! `apply` is purely a11y: focus + click. The caller (or the
 //! renderer via `default_render`) owns every visual concern,
 //! including hover / active feedback.
+//!
+//! For the common case, set `caption` / `icon` and call
+//! `.render(cx)` — the headless wraps the content with the
+//! renderer's tokens.
 
 use std::sync::Arc;
 
 use gpui::{
-    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Styled, Window, div,
+    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Pixels, SharedString,
+    Stateful, StatefulInteractiveElement, Window, px,
 };
 
+use super::icon::IconSource;
 use super::switch::ToggleCallback;
-use crate::renderer::RendererContext;
-use crate::renderer::markers::ToggleButton as ToggleButtonMarker;
-use crate::renderer::toggle_button::{ToggleButtonRenderState, ToggleButtonRenderer};
-use crate::theme::ActiveTheme;
+use crate::renderer::toggle_button::ToggleButtonRenderer;
 
 #[derive(Clone)]
 pub struct ToggleButtonProps {
@@ -31,6 +33,12 @@ pub struct ToggleButtonProps {
     /// Action variant — `Neutral` / `Primary` / `Danger`. The
     /// renderer dispatches to `action.<variant>.{bg,fg}`.
     pub variant: crate::renderer::ActionVariantKind,
+    /// Optional text caption. Used by `render`.
+    pub caption: Option<SharedString>,
+    /// Optional icon source. Used by `render`.
+    pub icon: Option<IconSource>,
+    /// Pixel size of the icon, when `icon` is set.
+    pub icon_size: Pixels,
 }
 
 pub fn toggle_button(id: impl Into<ElementId>, cx: &mut App) -> ToggleButtonProps {
@@ -41,6 +49,9 @@ pub fn toggle_button(id: impl Into<ElementId>, cx: &mut App) -> ToggleButtonProp
         disabled: false,
         selected: false,
         variant: crate::renderer::ActionVariantKind::default(),
+        caption: None,
+        icon: None,
+        icon_size: px(16.),
     }
 }
 
@@ -71,6 +82,35 @@ impl ToggleButtonProps {
         self
     }
 
+    /// Set the toggle button's text caption. Consumed by `render`.
+    pub fn caption(mut self, text: impl Into<SharedString>) -> Self {
+        self.caption = Some(text.into());
+        self
+    }
+
+    /// Set the toggle button's icon source. Consumed by `render`.
+    pub fn icon(mut self, source: IconSource) -> Self {
+        self.icon = Some(source);
+        self
+    }
+
+    /// Override the icon's pixel size. Default: 16.
+    pub fn icon_size(mut self, size: Pixels) -> Self {
+        self.icon_size = size;
+        self
+    }
+
+    /// Convenience: set both caption and icon in one call.
+    pub fn caption_icon(
+        mut self,
+        caption: impl Into<SharedString>,
+        icon: IconSource,
+    ) -> Self {
+        self.caption = Some(caption.into());
+        self.icon = Some(icon);
+        self
+    }
+
     /// Wire the headless contract onto the caller's `el`.
     ///
     /// Purely a11y: id, focus, click (which fires
@@ -90,41 +130,29 @@ impl ToggleButtonProps {
     }
 
     /// Render the toggle button using the registered `ToggleButtonRenderer`.
+    ///
+    /// Data flow is one-way: the renderer takes the full
+    /// `ToggleButtonProps` and returns a fully-built
+    /// `Stateful<Div>` (visuals + caption/icon children + hover /
+    /// active + id + focus). This method only wires the
+    /// `on_toggle` callback as `on_click` on top.
     pub fn render(self, cx: &App) -> Stateful<Div> {
-        let theme = cx.theme();
+        use crate::renderer::RendererContext;
+        use crate::renderer::markers::ToggleButton as ToggleButtonMarker;
+
         let r: &Arc<dyn ToggleButtonRenderer> = cx
             .renderer_arc::<ToggleButtonMarker, dyn ToggleButtonRenderer>()
             .expect("ToggleButtonRenderer registered");
-        let state = ToggleButtonRenderState {
-            variant: self.variant,
-            selected: self.selected,
-            disabled: self.disabled,
-            custom_style: None,
-        };
-        let bg = r.bg(&state, theme);
-        let fg = r.fg(&state, theme);
-        let min_h = r.min_height(&state, theme);
-        let radius = r.border_radius(&state, theme);
-        let opacity = if self.disabled {
-            r.disabled_opacity(&state, theme)
-        } else {
-            1.0
-        };
-        let el = div()
-            .bg(bg)
-            .text_color(fg)
-            .min_h(min_h)
-            .rounded(radius)
-            .px(gpui::px(12.))
-            .py(gpui::px(6.))
-            .opacity(opacity)
-            .flex()
-            .items_center()
-            .justify_center();
-        let hover_bg = r.hover_bg(&state, theme);
-        let active_bg = r.active_bg(&state, theme);
-        self.apply(el)
-            .hover(|s| s.bg(hover_bg))
-            .active(|s| s.bg(active_bg))
+
+        let mut styled = r.compose(&self, &self.focus_handle, cx);
+        if !self.disabled
+            && let Some(f) = self.on_toggle.clone()
+        {
+            let current = self.selected;
+            styled = styled.on_click(move |ev, window, cx| {
+                f(!current, Some(ev), window, cx);
+            });
+        }
+        styled
     }
 }

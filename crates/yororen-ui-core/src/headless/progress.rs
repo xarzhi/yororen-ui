@@ -1,5 +1,7 @@
 //! Headless `progress` — a value in [0, max] with optional label.
 
+use std::sync::Arc;
+
 use gpui::{App, Div, ElementId, InteractiveElement, Stateful};
 
 pub type ProgressCallback = std::sync::Arc<dyn Fn(f32, &mut gpui::Window, &mut gpui::App)>;
@@ -52,5 +54,20 @@ impl ProgressBarProps {
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the progress bar using the registered
+    /// `ProgressBarRenderer`. Returns a `Stateful<Div>` with the
+    /// element id and the renderer-built track + fill.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::progress::ProgressBarRenderer;
+        use crate::renderer::markers::ProgressBar as ProgressBarMarker;
+
+        let r: &Arc<dyn ProgressBarRenderer> = cx
+            .renderer_arc::<ProgressBarMarker, dyn ProgressBarRenderer>()
+            .expect("ProgressBarRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
     }
 }

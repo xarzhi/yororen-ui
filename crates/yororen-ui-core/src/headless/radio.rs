@@ -8,15 +8,12 @@
 use std::sync::Arc;
 
 use gpui::{
-    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, ParentElement, Stateful,
-    StatefulInteractiveElement, Styled, Window, div,
+    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
+    StatefulInteractiveElement, Window, div,
 };
 
 use super::switch::ToggleCallback;
-use crate::renderer::RendererContext;
-use crate::renderer::markers::Radio as RadioMarker;
-use crate::renderer::radio::{RadioRenderState, RadioRenderer};
-use crate::theme::ActiveTheme;
+use crate::renderer::radio::RadioRenderer;
 
 #[derive(Clone)]
 pub struct RadioProps {
@@ -97,39 +94,29 @@ impl RadioProps {
     }
 
     /// Render the radio using the registered `RadioRenderer`.
+    ///
+    /// Data flow is one-way: the renderer takes the full
+    /// `RadioProps` and returns a fully-built `Stateful<Div>`
+    /// (visuals + dot + hover / active + id + focus). Headless
+    /// only layers the toggle callback on top.
     pub fn render(self, cx: &App) -> Stateful<Div> {
-        let theme = cx.theme();
+        use crate::renderer::RendererContext;
+        use crate::renderer::radio::RadioRenderer;
+        use crate::renderer::markers::Radio as RadioMarker;
+
         let r: &Arc<dyn RadioRenderer> = cx
             .renderer_arc::<RadioMarker, dyn RadioRenderer>()
             .expect("RadioRenderer registered");
-        let state = RadioRenderState {
-            checked: self.checked,
-            disabled: self.disabled,
-            has_custom_tone: self.has_custom_tone,
-            custom_tone: self.custom_tone,
-        };
-        let bg = r.ring_bg(&state, theme);
-        let border = r.ring_border(&state, theme);
-        let ring_size = r.ring_size(&state, theme);
-        let dot_size = r.dot_size(&state, theme);
-        let dot_fg = r.dot_fg(&state, theme);
-        let pill_radius = gpui::px(theme.get_number("tokens.radii.pill").unwrap_or(0.0) as f32);
-        let mut el = div()
-            .bg(bg)
-            .border_1()
-            .border_color(border)
-            .size(ring_size)
-            .rounded(pill_radius)
-            .flex()
-            .items_center()
-            .justify_center();
-        if self.checked {
-            el = el.child(div().bg(dot_fg).size(dot_size).rounded(pill_radius));
+
+        let mut styled = r.compose(&self, &self.focus_handle, cx);
+        if !self.disabled
+            && let Some(f) = self.on_toggle.clone()
+        {
+            let new_value = !self.checked;
+            styled = styled.on_click(move |ev, window, cx| {
+                f(new_value, Some(ev), window, cx);
+            });
         }
-        let hover_bg = r.ring_hover_bg(&state, theme);
-        let active_bg = r.ring_active_bg(&state, theme);
-        self.apply(el)
-            .hover(|s| s.bg(hover_bg))
-            .active(|s| s.bg(active_bg))
+        styled
     }
 }

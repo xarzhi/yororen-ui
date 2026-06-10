@@ -13,12 +13,17 @@
 //! feedback. The caller's `el` decides colors, padding,
 //! radius, hover, active — every visual concern stays
 //! with the caller (or the renderer, via `default_render`).
+//!
+//! For the common case where the caller just wants a styled
+//! button with text (and/or an icon) inside, use `caption` /
+//! `icon` builder methods and then `.render(cx)` — the headless
+//! wraps the content with the renderer's tokens.
 
 use std::sync::Arc;
 
 use gpui::{
-    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Styled, Window, div, px,
+    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Pixels, SharedString,
+    Stateful, StatefulInteractiveElement, Window, px,
 };
 
 // The headless `Button` marker is the same type the
@@ -28,6 +33,8 @@ use gpui::{
 // import path working in renderer code that wants the
 // renderer-marker.
 pub use crate::renderer::markers::Button;
+
+use super::icon::IconSource;
 
 /// Click handler shared by every interactive headless primitive.
 pub type ClickCallback = Arc<dyn Fn(&ClickEvent, &mut Window, &mut App) + Send + Sync>;
@@ -44,6 +51,9 @@ pub fn button(id: impl Into<ElementId>, cx: &mut App) -> ButtonProps {
         disabled: false,
         clickable: true,
         variant: crate::renderer::ActionVariantKind::default(),
+        caption: None,
+        icon: None,
+        icon_size: px(16.),
     }
 }
 
@@ -57,6 +67,17 @@ pub struct ButtonProps {
     /// Action variant — `Neutral` (default) / `Primary` / `Danger`.
     /// The renderer dispatches to `action.<variant>.{bg,fg}`.
     pub variant: crate::renderer::ActionVariantKind,
+    /// Optional text caption. Used by `render` to render the
+    /// button's content. `apply` is unaffected — the caller is
+    /// still expected to chain `.child(...)` for the a11y path.
+    pub caption: Option<SharedString>,
+    /// Optional icon source. Used by `render` to render an
+    /// inline icon. When both `caption` and `icon` are set,
+    /// the icon is laid out before the caption with the
+    /// renderer's `icon_gap` token.
+    pub icon: Option<IconSource>,
+    /// Pixel size of the icon, when `icon` is set.
+    pub icon_size: Pixels,
 }
 
 impl ButtonProps {
@@ -91,6 +112,38 @@ impl ButtonProps {
         self
     }
 
+    /// Set the button's text caption. Consumed by `render`.
+    /// `apply` is unaffected.
+    pub fn caption(mut self, text: impl Into<SharedString>) -> Self {
+        self.caption = Some(text.into());
+        self
+    }
+
+    /// Set the button's icon source. Consumed by `render` —
+    /// the icon is rendered inline with the caption (if any),
+    /// using the renderer's `icon_size` / `icon_gap` tokens.
+    pub fn icon(mut self, source: IconSource) -> Self {
+        self.icon = Some(source);
+        self
+    }
+
+    /// Override the icon's pixel size. Default: 16.
+    pub fn icon_size(mut self, size: Pixels) -> Self {
+        self.icon_size = size;
+        self
+    }
+
+    /// Convenience: set both caption and icon in one call.
+    pub fn caption_icon(
+        mut self,
+        caption: impl Into<SharedString>,
+        icon: IconSource,
+    ) -> Self {
+        self.caption = Some(caption.into());
+        self.icon = Some(icon);
+        self
+    }
+
     /// Wire the headless contract onto the caller's `el`.
     ///
     /// `apply` is purely a11y: it sets the element id,
@@ -122,115 +175,38 @@ impl ButtonProps {
 
     /// Render the button using the registered `ButtonRenderer`.
     ///
-    /// Looks up the `XxxRenderer` registered via
-    /// `cx.register_renderer_arc::<ButtonMarker, dyn ButtonRenderer>(…)`
-    /// and consumes ALL of its tokens (bg / fg / padding /
-    /// border / shadow / min_height / disabled_opacity /
-    /// hover_bg / active_bg) to build the `Stateful<Div>`.
-    ///
-    /// The renderer doesn't need to know about headless — it
-    /// just provides the data. The headless owns the
-    /// consumption.
+    /// Data flow is one-way: the renderer takes the full
+    /// `ButtonProps` and returns a fully-built `Stateful<Div>`
+    /// (visuals + children + hover / active + id + focus). This
+    /// method only layers `on_click` on top of the renderer's
+    /// output. **No** token values are pulled from the renderer
+    /// in headless — all visual decisions live in the renderer's
+    /// `compose`.
     pub fn render(self, cx: &App) -> Stateful<Div> {
         use crate::renderer::RendererContext;
-        use crate::renderer::button::{ButtonRenderState, ButtonRenderer};
+        use crate::renderer::button::ButtonRenderer;
         use crate::renderer::markers::Button as ButtonMarker;
-        use crate::theme::ActiveTheme;
 
         let r: &Arc<dyn ButtonRenderer> = cx
             .renderer_arc::<ButtonMarker, dyn ButtonRenderer>()
             .expect("ButtonRenderer registered");
-        let theme = cx.theme();
-        let state = ButtonRenderState {
-            variant: self.variant,
-            disabled: self.disabled,
-            is_rtl: false,
-            has_custom_bg: false,
-            has_custom_hover_bg: false,
-            custom_style: None,
-        };
 
-        let bg = r.bg(&state, theme);
-        let fg = r.fg(&state, theme);
-        let padding = r.padding(&state, theme);
-        let radius = r.border_radius(&state, theme);
-        let min_h = r.min_height(&state, theme);
-        let opacity = if self.disabled {
-            r.disabled_opacity(&state, theme)
-        } else {
-            1.0
-        };
-        let hover_bg = r.hover_bg(&state, theme);
-        let active_bg = r.active_bg(&state, theme);
-        let border = r.border(&state, theme);
-        let shadow = r.shadow(&state, theme);
-
-        let mut el = div()
-            .bg(bg)
-            .text_color(fg)
-            .px(padding.left)
-            .py(padding.top)
-            .rounded(radius)
-            .min_h(min_h)
-            .flex()
-            .items_center()
-            .justify_center()
-            .opacity(opacity);
-
-        if let Some(b) = border {
-            // gpui-ce 0.3.3 only ships `border_1()..border_10()`
-            // helpers (no arbitrary-width API on `Styled`).
-            // `Pixels / Pixels -> f32` lets us recover the
-            // width as f32, round it, clamp to 0..=10, then
-            // dispatch to the matching `border_N` helper.
-            // (Brutalism returns 3px → `.border_3()`; the
-            // default renderer returns `None` → no border.)
-            let w = ((b.width / px(1.0)).round() as i32).clamp(0, 10);
-            match w {
-                0 => {}
-                1 => {
-                    el = el.border_1().border_color(b.color);
+        let mut styled = r.compose(&self, &self.focus_handle, cx);
+        // Wire a11y (click). The renderer has already set
+        // the element id, visuals, children, hover / active,
+        // and track_focus.
+        if !self.disabled
+            && self.clickable
+            && let Some(f) = self.on_click.clone()
+        {
+            let disabled = self.disabled;
+            styled = styled.on_click(move |ev, window, cx| {
+                if disabled {
+                    return;
                 }
-                2 => {
-                    el = el.border_2().border_color(b.color);
-                }
-                3 => {
-                    el = el.border_3().border_color(b.color);
-                }
-                4 => {
-                    el = el.border_4().border_color(b.color);
-                }
-                5 => {
-                    el = el.border_5().border_color(b.color);
-                }
-                6 => {
-                    el = el.border_6().border_color(b.color);
-                }
-                7 => {
-                    el = el.border_7().border_color(b.color);
-                }
-                8 => {
-                    el = el.border_8().border_color(b.color);
-                }
-                9 => {
-                    el = el.border_9().border_color(b.color);
-                }
-                _ => {
-                    el = el.border_10().border_color(b.color);
-                }
-            }
+                f(ev, window, cx);
+            });
         }
-        if let Some(s) = shadow {
-            el = el.shadow(vec![gpui::BoxShadow {
-                color: s.color,
-                offset: gpui::point(px(0.0), s.offset_y),
-                blur_radius: s.blur,
-                spread_radius: px(0.0),
-            }]);
-        }
-
-        self.apply(el)
-            .hover(|s| s.bg(hover_bg))
-            .active(|s| s.bg(active_bg))
+        styled
     }
 }

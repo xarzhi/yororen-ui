@@ -1,6 +1,8 @@
 //! Headless `panel` — generic container with optional title. No
 //! state of its own; the caller composes the content.
 
+use std::sync::Arc;
+
 use gpui::{Div, ElementId, InteractiveElement, Stateful};
 
 #[derive(Clone, Debug)]
@@ -53,5 +55,20 @@ impl PanelProps {
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the panel using the registered `PanelRenderer`.
+    /// Returns a `Stateful<Div>` with the element id and the
+    /// renderer-built bg / border / padding / radius.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::panel::PanelRenderer;
+        use crate::renderer::markers::Panel as PanelMarker;
+
+        let r: &Arc<dyn PanelRenderer> = cx
+            .renderer_arc::<PanelMarker, dyn PanelRenderer>()
+            .expect("PanelRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
     }
 }

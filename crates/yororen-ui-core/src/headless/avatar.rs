@@ -1,5 +1,7 @@
 //! Headless `avatar` — image or initials in a circle.
 
+use std::sync::Arc;
+
 use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
@@ -62,5 +64,20 @@ impl AvatarProps {
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the avatar using the registered `AvatarRenderer`.
+    /// Returns a `Stateful<Div>` with the element id and the
+    /// renderer-built avatar (image / initials) and status dot.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::avatar::AvatarRenderer;
+        use crate::renderer::markers::Avatar as AvatarMarker;
+
+        let r: &Arc<dyn AvatarRenderer> = cx
+            .renderer_arc::<AvatarMarker, dyn AvatarRenderer>()
+            .expect("AvatarRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
     }
 }

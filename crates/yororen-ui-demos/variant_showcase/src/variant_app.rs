@@ -13,18 +13,57 @@
 //! then wire it back to the headless button via `apply(...)`.
 
 use gpui::{
-    Context, InteractiveElement, IntoElement, ParentElement, Render, StatefulInteractiveElement,
+    Context, Hsla, InteractiveElement, IntoElement, ParentElement, Render, StatefulInteractiveElement,
     Styled, Window, div, px,
 };
-use std::sync::Arc;
 use yororen_ui::ActionVariantKind;
 use yororen_ui::ActiveTheme;
-use yororen_ui::RendererContext;
 use yororen_ui::Theme;
 use yororen_ui::headless::button::button;
 use yororen_ui::headless::label::label;
-use yororen_ui::markers::Button as ButtonMarker;
 use yororen_ui::renderer::{ButtonRenderState, ButtonRenderer};
+
+/// Inherent helper renderer for the variant_showcase demo.
+/// Reads the same `action.<variant>.{bg,fg,hover_bg,active_bg}`
+/// tokens as the default renderer. Lives outside the trait so
+/// the demo can pull the colour palette without going through
+/// the trait's `compose` method.
+struct DemoButtonRenderer;
+
+impl DemoButtonRenderer {
+    fn bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
+        let field = if state.disabled { "disabled_bg" } else { "bg" };
+        theme
+            .get_color(&format!("action.{}.{}", state.variant.as_str(), field))
+            .unwrap_or_default()
+    }
+    fn fg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
+        let field = if state.disabled { "disabled_fg" } else { "fg" };
+        theme
+            .get_color(&format!("action.{}.{}", state.variant.as_str(), field))
+            .unwrap_or_default()
+    }
+    fn hover_bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
+        let field = if state.disabled {
+            "disabled_bg"
+        } else {
+            "hover_bg"
+        };
+        theme
+            .get_color(&format!("action.{}.{}", state.variant.as_str(), field))
+            .unwrap_or_default()
+    }
+    fn active_bg(&self, state: &ButtonRenderState, theme: &Theme) -> Hsla {
+        let field = if state.disabled {
+            "disabled_bg"
+        } else {
+            "active_bg"
+        };
+        theme
+            .get_color(&format!("action.{}.{}", state.variant.as_str(), field))
+            .unwrap_or_default()
+    }
+}
 
 pub struct VariantApp;
 
@@ -41,10 +80,8 @@ impl Render for VariantApp {
         // `cx` is released before we call the headless factories
         // (which need `&mut App`).
         let (primary_bg, primary_fg, primary_hover_bg, primary_active_bg) = {
-            let r: &Arc<dyn ButtonRenderer> = cx
-                .renderer_arc::<ButtonMarker, dyn ButtonRenderer>()
-                .expect("ButtonRenderer registered");
             let theme: &Theme = cx.theme();
+            let r = DemoButtonRenderer;
             let state = ButtonRenderState {
                 variant: ActionVariantKind::Primary,
                 ..Default::default()

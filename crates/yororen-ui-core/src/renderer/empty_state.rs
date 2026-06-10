@@ -1,20 +1,18 @@
-//! `EmptyStateRenderer` — visual side of `EmptyState`.
+//! `EmptyStateRenderer` — visual contract for `EmptyState`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (icon_color / title_color / body_color / padding / icon_size /
+//! gap) stay on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::renderer::spec::Edges;
-use crate::theme::Theme;
+use crate::headless::empty_state::EmptyStateProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct EmptyStateRenderState {}
 
 pub trait EmptyStateRenderer: Any + Send + Sync {
-    fn icon_color(&self, state: &EmptyStateRenderState, theme: &Theme) -> Hsla;
-    fn title_color(&self, state: &EmptyStateRenderState, theme: &Theme) -> Hsla;
-    fn body_color(&self, state: &EmptyStateRenderState, theme: &Theme) -> Hsla;
-    fn padding(&self, state: &EmptyStateRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn icon_size(&self, state: &EmptyStateRenderState, theme: &Theme) -> Pixels;
-    fn gap(&self, state: &EmptyStateRenderState, theme: &Theme) -> Pixels;
+    fn compose(&self, props: &EmptyStateProps, cx: &App) -> Div;
 }

@@ -8,14 +8,11 @@
 use std::sync::Arc;
 
 use gpui::{
-    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, ParentElement, Stateful,
-    StatefulInteractiveElement, Styled, Window, div,
+    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
+    StatefulInteractiveElement, Window, div,
 };
 
-use crate::renderer::RendererContext;
-use crate::renderer::markers::Switch as SwitchMarker;
-use crate::renderer::switch::{SwitchRenderState, SwitchRenderer};
-use crate::theme::ActiveTheme;
+use crate::renderer::switch::SwitchRenderer;
 
 /// Callback for toggle-style hooks (switch / checkbox / radio / toggle_button).
 ///
@@ -102,42 +99,29 @@ impl SwitchProps {
     }
 
     /// Render the switch using the registered `SwitchRenderer`.
+    ///
+    /// Data flow is one-way: the renderer takes the full
+    /// `SwitchProps` and returns a fully-built `Stateful<Div>`
+    /// (visuals + knob + hover / active + id + focus). Headless
+    /// only layers the toggle callback on top.
     pub fn render(self, cx: &App) -> Stateful<Div> {
-        let theme = cx.theme();
+        use crate::renderer::RendererContext;
+        use crate::renderer::switch::SwitchRenderer;
+        use crate::renderer::markers::Switch as SwitchMarker;
+
         let r: &Arc<dyn SwitchRenderer> = cx
             .renderer_arc::<SwitchMarker, dyn SwitchRenderer>()
             .expect("SwitchRenderer registered");
-        let state = SwitchRenderState {
-            checked: self.checked,
-            disabled: self.disabled,
-            has_custom_tone: self.has_custom_tone,
-            custom_tone: self.custom_tone,
-        };
-        let track = r.track_bg(&state, theme);
-        let knob = r.knob_bg(&state, theme);
-        let w = r.track_w(&state, theme);
-        let h = r.track_h(&state, theme);
-        let knob_size = r.knob_size(&state, theme);
-        let pad = r.padding(&state, theme);
-        let pill_radius = gpui::px(theme.get_number("tokens.radii.pill").unwrap_or(0.0) as f32);
-        let mut el = div()
-            .bg(track)
-            .w(w)
-            .h(h)
-            .rounded(pill_radius)
-            .p(pad)
-            .flex()
-            .items_center();
-        if self.checked {
-            el = el.justify_end();
-        } else {
-            el = el.justify_start();
+
+        let mut styled = r.compose(&self, &self.focus_handle, cx);
+        if !self.disabled
+            && let Some(f) = self.on_toggle.clone()
+        {
+            let new_value = !self.checked;
+            styled = styled.on_click(move |ev, window, cx| {
+                f(new_value, Some(ev), window, cx);
+            });
         }
-        el = el.child(div().bg(knob).size(knob_size).rounded(pill_radius));
-        let track_hover = r.track_hover_bg(&state, theme);
-        let track_active = r.track_active_bg(&state, theme);
-        self.apply(el)
-            .hover(|s| s.bg(track_hover))
-            .active(|s| s.bg(track_active))
+        styled
     }
 }

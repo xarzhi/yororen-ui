@@ -1,10 +1,12 @@
-//! `KeybindingInputRenderer` — visual side of `KeybindingInput`.
+//! `KeybindingInputRenderer` — visual contract for `KeybindingInput`.
+//!
+//! Trait surface is just `compose`.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{AnyElement, App, Hsla, Window};
 
-use crate::theme::Theme;
+use crate::headless::keybinding_input::KeybindingInputProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct KeybindingInputRenderState {
@@ -17,13 +19,10 @@ pub struct KeybindingInputRenderState {
 }
 
 pub trait KeybindingInputRenderer: Any + Send + Sync {
-    fn bg(&self, state: &KeybindingInputRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &KeybindingInputRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &KeybindingInputRenderState, theme: &Theme) -> Hsla;
-    fn hover_border(&self, state: &KeybindingInputRenderState, theme: &Theme) -> Hsla;
-    fn active_border(&self, state: &KeybindingInputRenderState, theme: &Theme) -> Hsla;
-    fn kbd_bg(&self, state: &KeybindingInputRenderState, theme: &Theme) -> Hsla;
-    fn kbd_fg(&self, state: &KeybindingInputRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &KeybindingInputRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &KeybindingInputRenderState, theme: &Theme) -> Pixels;
+    fn compose(
+        &self,
+        props: &KeybindingInputProps,
+        cx: &mut App,
+        window: &mut Window,
+    ) -> AnyElement;
 }

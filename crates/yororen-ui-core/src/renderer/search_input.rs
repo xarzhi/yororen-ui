@@ -1,11 +1,12 @@
-//! `SearchInputRenderer` — visual side of `SearchInput`.
+//! `SearchInputRenderer` — visual contract for `SearchInput`.
+//!
+//! Trait surface is just `compose`.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{AnyElement, App, Hsla, Window};
 
-use crate::renderer::spec::Edges;
-use crate::theme::Theme;
+use crate::headless::search_input::SearchInputProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct SearchInputRenderState {
@@ -18,16 +19,10 @@ pub struct SearchInputRenderState {
 }
 
 pub trait SearchInputRenderer: Any + Send + Sync {
-    fn bg(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn hover_border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn active_border(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn icon_color(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &SearchInputRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &SearchInputRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &SearchInputRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &SearchInputRenderState, theme: &Theme) -> Pixels;
-    fn input_gap(&self, state: &SearchInputRenderState, theme: &Theme) -> Pixels;
-    fn icon_size(&self, state: &SearchInputRenderState, theme: &Theme) -> Pixels;
+    fn compose(
+        &self,
+        props: &SearchInputProps,
+        cx: &mut App,
+        window: &mut Window,
+    ) -> AnyElement;
 }

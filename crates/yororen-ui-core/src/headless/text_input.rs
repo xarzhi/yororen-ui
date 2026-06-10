@@ -28,9 +28,12 @@ use std::ops::Range;
 use std::sync::{Arc, OnceLock};
 
 use gpui::{
-    App, Bounds, Context, EntityInputHandler, FocusHandle, Focusable, Hsla, KeyBinding, Pixels,
-    ShapedLine, SharedString, UTF16Selection, Window, actions, point,
+    App, Bounds, Context, EntityInputHandler, FocusHandle, Focusable, Hsla, IntoElement,
+    KeyBinding, ParentElement, Pixels, ShapedLine, SharedString, StatefulInteractiveElement,
+    Styled, UTF16Selection, Window, actions, point,
 };
+
+use crate::renderer::text_input::{TextInputRenderState, TextInputRenderer};
 
 pub type TextChangeCallback = Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>;
 
@@ -1119,140 +1122,24 @@ impl TextInputProps {
 
     /// Render the text input using the registered `TextInputRenderer`.
     ///
-    /// Looks up the renderer via
-    /// `cx.renderer_arc::<TextInputMarker, dyn TextInputRenderer>()`
-    /// and consumes all of its tokens (bg / border / focus_border /
-    /// hover_border / active_border / text_color / hint_color /
-    /// cursor_color / selection_color / min_height / padding /
-    /// border_radius / disabled_opacity) to build the
-    /// `AnyElement` that wires the inner `TextInputElement`,
-    /// focus tracking, the 14-action keymap, and mouse handlers.
+    /// Data flow is one-way: hand the full `TextInputProps` to
+    /// the registered renderer's `compose` and return the
+    /// resulting `AnyElement`. No token values are pulled from
+    /// the renderer here — every visual decision (bg, border,
+    /// padding, radius, hover/active, text colour, the inner
+    /// `TextInputElement` placement, the keymap wiring, focus
+    /// tracking) lives in the renderer's `compose`.
     pub fn render(self, cx: &mut App, window: &mut Window) -> gpui::AnyElement {
         use crate::renderer::RendererContext;
         use crate::renderer::markers::TextInput as TextInputMarker;
-        use crate::renderer::spec::Edges;
-        use crate::renderer::text_input::{TextInputRenderState, TextInputRenderer};
-        use crate::theme::ActiveTheme;
-        use gpui::{
-            CursorStyle, InteractiveElement, IntoElement, ParentElement, Stateful,
-            StatefulInteractiveElement, Styled, div,
-        };
-        use std::sync::Arc;
+        use crate::renderer::text_input::TextInputRenderer;
 
-        use super::text_input_element::{
-            TextInputElement, start_cursor_blink, wire_input_keyboard,
-        };
-
-        let theme_arc = cx.theme().clone();
         let r: Arc<dyn TextInputRenderer> = cx
             .renderer_arc::<TextInputMarker, dyn TextInputRenderer>()
             .expect("TextInputRenderer registered")
             .clone();
-        let theme = &*theme_arc;
 
-        let id = self.id.clone();
-        let placeholder_str = self.placeholder.clone();
-        let max_length = self.max_length;
-        let disabled = self.disabled;
-        let on_change = self.on_change.clone();
-        let on_submit = self.on_submit.clone();
-
-        let state = window.use_keyed_state(self.id.clone(), cx, |_window, cx| {
-            TextInputState::new(&mut *cx)
-        });
-        state.update(cx, |s, _cx| {
-            s.placeholder = SharedString::from(placeholder_str);
-            s.max_length = max_length;
-            s.on_change = on_change;
-            s.on_submit = on_submit.clone();
-        });
-
-        let focus_handle = state.read(cx).focus_handle();
-        let focused = focus_handle.is_focused(window);
-
-        let render_state = TextInputRenderState {
-            disabled,
-            focused,
-            has_custom_bg: self.has_custom_bg,
-            has_custom_border: self.has_custom_border,
-            has_custom_focus_border: self.has_custom_focus_border,
-            custom_bg: self.custom_bg,
-            custom_border: self.custom_border,
-            custom_focus_border: self.custom_focus_border,
-            custom_text_color: self.custom_text_color,
-        };
-        let bg = r.bg(&render_state, theme);
-        let border_color = if focused {
-            r.focus_border(&render_state, theme)
-        } else {
-            r.border(&render_state, theme)
-        };
-        let text_color = r.text_color(&render_state, theme);
-        let hint_color = r.hint_color(&render_state, theme);
-        let cursor_color = r.cursor_color(&render_state, theme);
-        let selection_color = r.selection_color(&render_state, theme);
-        let min_h = r.min_height(&render_state, theme);
-        let padding: Edges<gpui::Pixels> = r.padding(&render_state, theme);
-        let radius = r.border_radius(&render_state, theme);
-        let opacity = r.disabled_opacity(&render_state, theme);
-
-        let placeholder_for_element = state.read(cx).placeholder.clone();
-
-        if focused {
-            start_cursor_blink(state.clone(), window, cx);
-        } else {
-            state.update(cx, |s, _cx| s.cursor_visible = true);
-        }
-
-        let inner = TextInputElement {
-            state: state.clone(),
-            focus_handle: focus_handle.clone(),
-            disabled,
-            text_color,
-            hint_color,
-            cursor_color,
-            selection_color,
-            placeholder: placeholder_for_element,
-            value_override: None,
-        };
-
-        let base: Stateful<gpui::Div> = div()
-            .id(id.clone())
-            .bg(bg)
-            .border_1()
-            .border_color(border_color)
-            .min_h(min_h)
-            .rounded(radius)
-            .opacity(opacity)
-            .px(padding.left)
-            .py(padding.top)
-            .flex()
-            .items_center()
-            .text_color(text_color)
-            .overflow_hidden()
-            .cursor(if disabled {
-                CursorStyle::Arrow
-            } else {
-                CursorStyle::IBeam
-            })
-            .child(inner);
-
-        let focused_div: Stateful<gpui::Div> = base.track_focus(&focus_handle);
-        let keyed: Stateful<gpui::Div> = wire_input_keyboard(
-            focused_div,
-            state.clone(),
-            focus_handle.clone(),
-            disabled,
-            on_submit,
-        );
-
-        let hover_border = r.hover_border(&render_state, theme);
-        let active_border = r.active_border(&render_state, theme);
-        let final_div: Stateful<gpui::Div> = keyed
-            .hover(|s| s.border_color(hover_border))
-            .active(|s| s.border_color(active_border));
-
-        final_div.into_any_element()
+        r.compose(&self, cx, window)
     }
 }
 

@@ -1,19 +1,22 @@
-//! `SkeletonRenderer` — visual side of `SkeletonLine` / `SkeletonBlock`.
+//! `SkeletonRenderer` — visual contract for `Skeleton`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (bg / min_height / border_radius) stay on the concrete
+//! renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::theme::Theme;
+use crate::headless::skeleton::SkeletonProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct SkeletonRenderState {
     pub block: bool,
     pub block_sharp: bool,
+    pub rounded: bool,
 }
 
 pub trait SkeletonRenderer: Any + Send + Sync {
-    fn bg(&self, state: &SkeletonRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &SkeletonRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &SkeletonRenderState, theme: &Theme) -> Pixels;
+    fn compose(&self, props: &SkeletonProps, cx: &App) -> Div;
 }

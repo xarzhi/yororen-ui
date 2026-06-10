@@ -118,6 +118,21 @@ impl PopoverProps {
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
     }
+
+    /// Render the popover using the registered `PopoverRenderer`.
+    /// Returns a `Stateful<Div>` with the element id. The renderer
+    /// decides bg / border / shadow based on the `state` entity.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::popover::PopoverRenderer;
+        use crate::renderer::markers::Popover as PopoverMarker;
+
+        let r: &Arc<dyn PopoverRenderer> = cx
+            .renderer_arc::<PopoverMarker, dyn PopoverRenderer>()
+            .expect("PopoverRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
+    }
 }
 
 /// Re-export `Point` so callers can use it from the headless

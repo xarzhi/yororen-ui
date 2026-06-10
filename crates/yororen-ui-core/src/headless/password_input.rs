@@ -110,127 +110,19 @@ impl PasswordInputProps {
     }
 
     /// Render the password input using the registered `PasswordInputRenderer`.
+    ///
+    /// One-way data flow: the renderer's `compose` owns
+    /// everything (state minting, masking, wrapper, keymap,
+    /// hover / active). Headless just forwards the call.
     pub fn render(self, cx: &mut gpui::App, window: &mut gpui::Window) -> gpui::AnyElement {
-        use crate::headless::text_input::TextInputState;
-        use crate::headless::text_input_element::{
-            TextInputElement, start_cursor_blink, wire_input_keyboard,
-        };
         use crate::renderer::RendererContext;
         use crate::renderer::markers::PasswordInput as PasswordInputMarker;
-        use crate::renderer::password_input::{PasswordInputRenderState, PasswordInputRenderer};
-        use crate::renderer::spec::Edges;
-        use crate::theme::ActiveTheme;
-        use gpui::{
-            CursorStyle, InteractiveElement, IntoElement, ParentElement, Stateful,
-            StatefulInteractiveElement, Styled, div,
-        };
-        use std::sync::Arc;
+        use crate::renderer::password_input::PasswordInputRenderer;
 
-        let theme_arc = cx.theme().clone();
         let r: Arc<dyn PasswordInputRenderer> = cx
             .renderer_arc::<PasswordInputMarker, dyn PasswordInputRenderer>()
             .expect("PasswordInputRenderer registered")
             .clone();
-        let theme = &*theme_arc;
-
-        let id = self.id.clone();
-        let placeholder_str = self.placeholder.clone();
-        let disabled = self.disabled;
-        let max_length = self.max_length;
-        let on_change = self.on_change.clone();
-        let on_submit = self.on_submit.clone();
-        let mask_char = self.mask_char;
-
-        let state = window.use_keyed_state(self.id.clone(), cx, |_window, cx| {
-            TextInputState::new(&mut *cx)
-        });
-        state.update(cx, |s, _cx| {
-            s.placeholder = gpui::SharedString::from(placeholder_str);
-            s.max_length = max_length;
-            s.on_change = on_change.clone();
-            s.on_submit = on_submit.clone();
-        });
-
-        let focus_handle = state.read(cx).focus_handle();
-        let focused = focus_handle.is_focused(window);
-
-        let render_state = PasswordInputRenderState {
-            disabled,
-            focused,
-            has_custom_bg: self.has_custom_bg,
-            has_custom_border: self.has_custom_border,
-            has_custom_focus_border: self.has_custom_focus_border,
-            custom_bg: self.custom_bg,
-            custom_border: self.custom_border,
-            custom_focus_border: self.custom_focus_border,
-            custom_fg: self.custom_text_color,
-        };
-        let bg = r.bg(&render_state, theme);
-        let border_color = if focused {
-            r.focus_border(&render_state, theme)
-        } else {
-            r.border(&render_state, theme)
-        };
-        let text_color = r.fg(&render_state, theme);
-        let min_h = r.min_height(&render_state, theme);
-        let padding: Edges<gpui::Pixels> = r.padding(&render_state, theme);
-        let radius = r.border_radius(&render_state, theme);
-
-        if focused {
-            start_cursor_blink(state.clone(), window, cx);
-        } else {
-            state.update(cx, |s, _cx| s.cursor_visible = true);
-        }
-
-        let value_len = state.read(cx).value.chars().count();
-        let masked: String = std::iter::repeat_n(mask_char, value_len).collect();
-
-        let inner = TextInputElement {
-            state: state.clone(),
-            focus_handle: focus_handle.clone(),
-            disabled,
-            text_color,
-            hint_color: theme.get_color("content.tertiary").unwrap_or_default(),
-            cursor_color: text_color,
-            selection_color: text_color,
-            placeholder: state.read(cx).placeholder.clone(),
-            value_override: Some(masked),
-        };
-
-        let base: Stateful<gpui::Div> = div()
-            .id(id.clone())
-            .bg(bg)
-            .border_1()
-            .border_color(border_color)
-            .min_h(min_h)
-            .rounded(radius)
-            .px(padding.left)
-            .py(padding.top)
-            .flex()
-            .items_center()
-            .text_color(text_color)
-            .overflow_hidden()
-            .cursor(if disabled {
-                CursorStyle::Arrow
-            } else {
-                CursorStyle::IBeam
-            })
-            .child(inner);
-
-        let focused_div: Stateful<gpui::Div> = base.track_focus(&focus_handle);
-        let keyed = wire_input_keyboard(
-            focused_div,
-            state.clone(),
-            focus_handle.clone(),
-            disabled,
-            on_submit,
-        );
-
-        let hover_border = r.hover_border(&render_state, theme);
-        let active_border = r.active_border(&render_state, theme);
-        keyed
-            .hover(|s| s.border_color(hover_border))
-            .active(|s| s.border_color(active_border))
-            .into_any_element()
+        r.compose(&self, cx, window)
     }
 }

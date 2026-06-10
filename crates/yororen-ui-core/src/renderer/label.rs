@@ -1,11 +1,19 @@
-//! `LabelRenderer` — the visual side of `Label`.
+//! `LabelRenderer` — visual contract for `Label`.
+//!
+//! Trait surface is just `compose`. The renderer takes the
+//! full `LabelProps` and returns a styled `Div`. Labels are
+//! a non-interactive primitive: no focus, no callbacks, no
+//! `Stateful<_>` wrapper required.
 
 use std::any::Any;
 
-use gpui::{FontWeight, Hsla, SharedString};
+use gpui::{App, Div};
 
-use crate::theme::Theme;
+use crate::headless::label::LabelProps;
 
+/// Projection of `LabelProps` used by built-in renderers when
+/// they want to factor out helpers. Not part of the
+/// `LabelRenderer` trait surface.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct LabelRenderState {
     pub muted: bool,
@@ -18,7 +26,8 @@ pub struct LabelRenderState {
 }
 
 pub trait LabelRenderer: Any + Send + Sync {
-    fn color(&self, state: &LabelRenderState, theme: &Theme) -> Hsla;
-    fn strong_weight(&self, state: &LabelRenderState, theme: &Theme) -> FontWeight;
-    fn family_mono(&self, state: &LabelRenderState, theme: &Theme) -> SharedString;
+    /// Build the styled `Div` for a label. The renderer is
+    /// responsible for colour, weight, font family, ellipsis
+    /// and max_lines behaviour.
+    fn compose(&self, props: &LabelProps, cx: &App) -> Div;
 }

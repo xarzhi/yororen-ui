@@ -1,31 +1,27 @@
-//! `SelectRenderer` — visual side of `Select`.
+//! `SelectRenderer` — visual contract for `Select`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (bg / border / focus_border / fg / hint_color /
+//! min_height / padding / border_radius / chevron_rotation)
+//! stay on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::renderer::spec::Edges;
-use crate::theme::Theme;
+use crate::headless::select::SelectProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct SelectRenderState {
     pub open: bool,
     pub disabled: bool,
     pub has_value: bool,
-    pub custom_bg: Option<Hsla>,
-    pub custom_border: Option<Hsla>,
-    pub custom_focus_border: Option<Hsla>,
-    pub custom_fg: Option<Hsla>,
+    pub custom_bg: Option<gpui::Hsla>,
+    pub custom_border: Option<gpui::Hsla>,
+    pub custom_focus_border: Option<gpui::Hsla>,
+    pub custom_fg: Option<gpui::Hsla>,
 }
 
 pub trait SelectRenderer: Any + Send + Sync {
-    fn bg(&self, state: &SelectRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &SelectRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &SelectRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &SelectRenderState, theme: &Theme) -> Hsla;
-    fn hint_color(&self, state: &SelectRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &SelectRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &SelectRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &SelectRenderState, theme: &Theme) -> Pixels;
-    fn chevron_rotation(&self, state: &SelectRenderState, theme: &Theme) -> f32;
+    fn compose(&self, props: &SelectProps, cx: &App) -> Div;
 }

@@ -133,4 +133,20 @@ impl SelectProps {
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
     }
+
+    /// Render the select trigger using the registered
+    /// `SelectRenderer`. Returns a `Stateful<Div>` with the
+    /// element id. The renderer decides bg / border / padding
+    /// based on the `state` entity.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::select::SelectRenderer;
+        use crate::renderer::markers::Select as SelectMarker;
+
+        let r: &Arc<dyn SelectRenderer> = cx
+            .renderer_arc::<SelectMarker, dyn SelectRenderer>()
+            .expect("SelectRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
+    }
 }

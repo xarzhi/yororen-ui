@@ -1,10 +1,14 @@
-//! `BadgeRenderer` — the visual side of `Badge`.
+//! `BadgeRenderer` — visual contract for `Badge`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (bg / fg / padding_x / height / font_size / font_weight /
+//! border_radius) stay on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{FontWeight, Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::theme::Theme;
+use crate::headless::badge::BadgeProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct BadgeRenderState {
@@ -13,11 +17,5 @@ pub struct BadgeRenderState {
 }
 
 pub trait BadgeRenderer: Any + Send + Sync {
-    fn bg(&self, state: &BadgeRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &BadgeRenderState, theme: &Theme) -> Hsla;
-    fn padding_x(&self, state: &BadgeRenderState, theme: &Theme) -> Pixels;
-    fn height(&self, state: &BadgeRenderState, theme: &Theme) -> Pixels;
-    fn font_size(&self, state: &BadgeRenderState, theme: &Theme) -> Pixels;
-    fn font_weight(&self, state: &BadgeRenderState, theme: &Theme) -> FontWeight;
-    fn border_radius(&self, state: &BadgeRenderState, theme: &Theme) -> Pixels;
+    fn compose(&self, props: &BadgeProps, cx: &App) -> Div;
 }

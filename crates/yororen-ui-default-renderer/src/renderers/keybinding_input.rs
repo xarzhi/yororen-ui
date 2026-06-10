@@ -1,16 +1,16 @@
-//! `KeybindingInputRenderer` — visual side of `KeybindingInput`.
-//!
-//! The text input / keymap / IME pipeline plus the Idle /
-//! Capturing mode layout live in
-//! `yororen-ui-core/src/headless/keybinding_input.rs` (and the
-//! shared helpers in `text_input_element.rs`). This module
-//! only provides the `TokenKeybindingInputRenderer` default
-//! impl.
+//! `TokenKeybindingInputRenderer` — default `KeybindingInputRenderer` impl.
 
 use std::sync::Arc;
 
-use gpui::{Hsla, Pixels, px};
+use gpui::{
+    AnyElement, App, CursorStyle, Div, Hsla, InteractiveElement, IntoElement, KeyDownEvent,
+    MouseButton, ParentElement, Pixels, SharedString, Stateful, StatefulInteractiveElement,
+    Styled, Window, div, px,
+};
 
+use yororen_ui_core::headless::keybinding_input::{KeybindingInputMode, KeybindingInputProps};
+use yororen_ui_core::headless::text_input::TextInputState;
+use yororen_ui_core::headless::text_input_element::{start_cursor_blink, wire_input_keyboard};
 use yororen_ui_core::renderer::keybinding_input::{
     KeybindingInputRenderState, KeybindingInputRenderer,
 };
@@ -18,35 +18,197 @@ use yororen_ui_core::theme::Theme;
 
 pub struct TokenKeybindingInputRenderer;
 
-impl KeybindingInputRenderer for TokenKeybindingInputRenderer {
-    fn bg(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
+// Inherent helpers — *not* part of the `KeybindingInputRenderer`
+// trait surface.
+impl TokenKeybindingInputRenderer {
+    pub fn bg(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("surface.base").unwrap_or_default()
     }
-    fn border(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
+    pub fn border(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.default").unwrap_or_default()
     }
-    fn focus_border(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
+    pub fn focus_border(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.focus").unwrap_or_default()
     }
-    fn hover_border(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
+    pub fn hover_border(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.muted").unwrap_or_default()
     }
-    fn active_border(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
+    pub fn active_border(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.default").unwrap_or_default()
     }
-    fn kbd_bg(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
+    pub fn kbd_bg(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("surface.hover").unwrap_or_default()
     }
-    fn kbd_fg(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
+    pub fn kbd_fg(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("content.primary").unwrap_or_default()
     }
-    fn min_height(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Pixels {
+    pub fn min_height(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Pixels {
         px(theme
             .get_number("tokens.control.input.min_height")
             .unwrap_or(0.0) as f32)
     }
-    fn border_radius(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Pixels {
+    pub fn border_radius(&self, _state: &KeybindingInputRenderState, theme: &Theme) -> Pixels {
         px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
+    }
+}
+
+impl KeybindingInputRenderer for TokenKeybindingInputRenderer {
+    fn compose(
+        &self,
+        props: &KeybindingInputProps,
+        cx: &mut App,
+        window: &mut Window,
+    ) -> AnyElement {
+        use yororen_ui_core::theme::ActiveTheme;
+
+        let placeholder_str = props.placeholder.clone();
+        let disabled = props.disabled;
+        let on_change = props.on_change.clone();
+        let on_start_capture = props.on_start_capture.clone();
+        let on_cancel_capture = props.on_cancel_capture.clone();
+        let mode = props.mode;
+
+        let state = window.use_keyed_state(props.id.clone(), cx, |_window, cx| {
+            TextInputState::new(&mut *cx)
+        });
+        state.update(cx, |s, _cx| {
+            s.placeholder = SharedString::from(placeholder_str);
+            s.on_change = on_change.clone();
+        });
+
+        let focus_handle = state.read(cx).focus_handle();
+        let focused = focus_handle.is_focused(window);
+
+        if focused {
+            start_cursor_blink(state.clone(), window, cx);
+        } else {
+            state.update(cx, |s, _cx| s.cursor_visible = true);
+        }
+
+        let theme = cx.theme().clone();
+        let render_state = KeybindingInputRenderState {
+            capturing: mode == KeybindingInputMode::Capturing,
+            disabled,
+            custom_bg: props.custom_bg,
+            custom_border: props.custom_border,
+            custom_focus_border: props.custom_focus_border,
+            custom_fg: props.custom_text_color,
+        };
+        let bg = self.bg(&render_state, &theme);
+        let border_color = if focused {
+            self.focus_border(&render_state, &theme)
+        } else {
+            self.border(&render_state, &theme)
+        };
+        let kbd_bg = self.kbd_bg(&render_state, &theme);
+        let kbd_fg = self.kbd_fg(&render_state, &theme);
+        let min_h = self.min_height(&render_state, &theme);
+        let radius = self.border_radius(&render_state, &theme);
+        let hover_border = self.hover_border(&render_state, &theme);
+        let active_border = self.active_border(&render_state, &theme);
+        drop(theme);
+
+        let base: Stateful<Div> = div()
+            .id(props.id.clone())
+            .bg(bg)
+            .border_1()
+            .border_color(border_color)
+            .min_h(min_h)
+            .rounded(radius)
+            .px(px(10.))
+            .py(px(4.))
+            .flex()
+            .items_center()
+            .text_color(kbd_fg)
+            .overflow_hidden()
+            .cursor(if disabled {
+                CursorStyle::Arrow
+            } else {
+                CursorStyle::IBeam
+            })
+            .track_focus(&focus_handle);
+
+        let mut keyed: Stateful<Div> = wire_input_keyboard(
+            base,
+            state.clone(),
+            focus_handle.clone(),
+            disabled,
+            None,
+        );
+
+        if mode == KeybindingInputMode::Capturing && !disabled {
+            let state_for_capture = state.clone();
+            let on_change_for_capture = on_change.clone();
+            let on_cancel_for_capture = on_cancel_capture.clone();
+            keyed = keyed.on_key_down(move |ev: &KeyDownEvent, window, cx| {
+                let ks = &ev.keystroke;
+                if ks.key.as_str() == "escape" {
+                    if let Some(cb) = on_cancel_for_capture.as_ref() {
+                        cb(window, cx);
+                    }
+                    return;
+                }
+                let mut parts: Vec<String> = Vec::new();
+                if ks.modifiers.control {
+                    parts.push("ctrl".into());
+                }
+                if ks.modifiers.alt {
+                    parts.push("alt".into());
+                }
+                if ks.modifiers.shift {
+                    parts.push("shift".into());
+                }
+                if ks.modifiers.platform {
+                    parts.push("cmd".into());
+                }
+                if ks.key.is_empty() {
+                    return;
+                }
+                parts.push(ks.key.clone());
+                let combo = parts.join("-");
+                state_for_capture.update(cx, |s, _cx| {
+                    s.value = combo.clone();
+                    s.caret = combo.len();
+                    s.selection_start = combo.len();
+                    s.selection_end = combo.len();
+                });
+                if let Some(cb) = on_change_for_capture.as_ref() {
+                    cb(&combo, window, cx);
+                }
+            });
+        }
+
+        let on_start_clone = on_start_capture.clone();
+        let display_text = if mode == KeybindingInputMode::Capturing {
+            if state.read(cx).value.is_empty() {
+                "Press a key…".to_string()
+            } else {
+                state.read(cx).value.clone()
+            }
+        } else if state.read(cx).value.is_empty() {
+            "(unset)".to_string()
+        } else {
+            state.read(cx).value.clone()
+        };
+
+        keyed
+            .hover(|s| s.border_color(hover_border))
+            .active(|s| s.border_color(active_border))
+            .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
+                if let Some(cb) = on_start_clone.as_ref() {
+                    cb(window, cx);
+                }
+            })
+            .child(
+                div()
+                    .bg(kbd_bg)
+                    .rounded(px(4.0))
+                    .px(px(8.))
+                    .py(px(2.))
+                    .text_color(kbd_fg)
+                    .child(display_text),
+            )
+            .into_any_element()
     }
 }
 

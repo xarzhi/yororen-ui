@@ -1,10 +1,15 @@
-//! `DropdownMenuRenderer` — visual side of `DropdownMenu`.
+//! `DropdownMenuRenderer` — visual contract for `DropdownMenu`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (trigger_bg / trigger_hover_bg / trigger_fg /
+//! min_height / border_radius / chevron_rotation)
+//! stay on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::theme::Theme;
+use crate::headless::dropdown_menu::DropdownMenuProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct DropdownMenuRenderState {
@@ -12,10 +17,5 @@ pub struct DropdownMenuRenderState {
 }
 
 pub trait DropdownMenuRenderer: Any + Send + Sync {
-    fn trigger_bg(&self, state: &DropdownMenuRenderState, theme: &Theme) -> Hsla;
-    fn trigger_hover_bg(&self, state: &DropdownMenuRenderState, theme: &Theme) -> Hsla;
-    fn trigger_fg(&self, state: &DropdownMenuRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &DropdownMenuRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &DropdownMenuRenderState, theme: &Theme) -> Pixels;
-    fn chevron_rotation(&self, state: &DropdownMenuRenderState, theme: &Theme) -> f32;
+    fn compose(&self, props: &DropdownMenuProps, cx: &App) -> Div;
 }

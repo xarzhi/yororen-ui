@@ -1,12 +1,21 @@
-//! `TextInputRenderer` — visual side of `TextInput`.
+//! `TextInputRenderer` — visual contract for `TextInput`.
+//!
+//! Trait surface is just `compose`. The renderer takes the
+//! full `TextInputProps`, the `cx` / `window` it needs to mint
+//! the input state and wire the keymap, and returns a
+//! fully-built `AnyElement`. Data flow is one-way: headless
+//! hands the renderer everything and gets back the
+//! ready-to-paint element.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{AnyElement, App, Hsla, Window};
 
-use crate::renderer::spec::Edges;
-use crate::theme::Theme;
+use crate::headless::text_input::TextInputProps;
 
+/// Projection of `TextInputProps` used by built-in renderers
+/// when they want to factor out helpers. Not part of the
+/// `TextInputRenderer` trait surface.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct TextInputRenderState {
     pub disabled: bool,
@@ -21,17 +30,12 @@ pub struct TextInputRenderState {
 }
 
 pub trait TextInputRenderer: Any + Send + Sync {
-    fn bg(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn hover_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn active_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn text_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn hint_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn cursor_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn selection_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &TextInputRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &TextInputRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &TextInputRenderState, theme: &Theme) -> Pixels;
-    fn disabled_opacity(&self, state: &TextInputRenderState, theme: &Theme) -> f32;
+    /// Build the full `AnyElement` for the input (wrapper +
+    /// inner `TextInputElement` + keymap + focus tracking).
+    fn compose(
+        &self,
+        props: &TextInputProps,
+        cx: &mut App,
+        window: &mut Window,
+    ) -> AnyElement;
 }

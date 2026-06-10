@@ -44,4 +44,19 @@ impl FormProps {
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
     }
+
+    /// Render the form using the registered `FormRenderer`.
+    /// Returns a `Stateful<Div>` with the element id and the
+    /// renderer-built gap / column.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::form::FormRenderer;
+        use crate::renderer::markers::Form as FormMarker;
+
+        let r: &Arc<dyn FormRenderer> = cx
+            .renderer_arc::<FormMarker, dyn FormRenderer>()
+            .expect("FormRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
+    }
 }

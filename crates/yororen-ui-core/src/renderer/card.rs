@@ -1,11 +1,14 @@
-//! `CardRenderer` — visual side of `Card`.
+//! `CardRenderer` — visual contract for `Card`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (bg / border / padding / border_radius / shadow_alpha)
+//! stay on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::renderer::spec::Edges;
-use crate::theme::Theme;
+use crate::headless::card::CardProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct CardRenderState {
@@ -13,9 +16,5 @@ pub struct CardRenderState {
 }
 
 pub trait CardRenderer: Any + Send + Sync {
-    fn bg(&self, state: &CardRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &CardRenderState, theme: &Theme) -> Hsla;
-    fn padding(&self, state: &CardRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &CardRenderState, theme: &Theme) -> Pixels;
-    fn shadow_alpha(&self, state: &CardRenderState, theme: &Theme) -> f32;
+    fn compose(&self, props: &CardProps, cx: &App) -> Div;
 }

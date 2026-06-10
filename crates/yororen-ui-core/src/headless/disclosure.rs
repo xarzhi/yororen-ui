@@ -57,4 +57,19 @@ impl DisclosureProps {
         }
         s
     }
+
+    /// Render the disclosure trigger using the registered
+    /// `DisclosureRenderer`. Returns a `Stateful<Div>` with the
+    /// element id and on_toggle wired by `apply`.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::disclosure::DisclosureRenderer;
+        use crate::renderer::markers::Disclosure as DisclosureMarker;
+
+        let r: &Arc<dyn DisclosureRenderer> = cx
+            .renderer_arc::<DisclosureMarker, dyn DisclosureRenderer>()
+            .expect("DisclosureRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
+    }
 }

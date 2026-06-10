@@ -4,18 +4,23 @@
 //! `apply` is purely a11y: focus handle + click handler. The
 //! caller (or the renderer via `default_render`) owns every
 //! visual concern, including hover / active feedback.
+//!
+//! For the common case where the caller wants a styled icon
+//! button, set the icon via `.icon(source)` and call
+//! `.render(cx)`. The headless wraps the icon with the
+//! renderer's tokens (size / radius / bg / fg). The icon's
+//! colour is read from the renderer's `fg` so it stays
+//! readable on the variant's bg.
 
 use std::sync::Arc;
 
 use gpui::{
-    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Stateful,
-    StatefulInteractiveElement, Styled, Window, div,
+    App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, Pixels, Stateful,
+    StatefulInteractiveElement, Window,
 };
 
-use crate::renderer::RendererContext;
-use crate::renderer::icon_button::{IconButtonRenderState, IconButtonRenderer};
-use crate::renderer::markers::IconButton as IconButtonMarker;
-use crate::theme::ActiveTheme;
+use super::icon::IconSource;
+use crate::renderer::icon_button::IconButtonRenderer;
 
 /// Click handler shared by every interactive headless primitive.
 pub type ClickCallback = Arc<dyn Fn(&ClickEvent, &mut Window, &mut App) + Send + Sync>;
@@ -27,6 +32,12 @@ pub struct IconButtonProps {
     pub on_click: Option<ClickCallback>,
     pub disabled: bool,
     pub variant: crate::renderer::ActionVariantKind,
+    /// Optional icon source. Used by `render` to render the
+    /// icon inline. `apply` is unaffected — the caller can
+    /// still chain `.child(icon(...))` for the a11y path.
+    pub icon: Option<IconSource>,
+    /// Pixel size of the icon, when `icon` is set.
+    pub icon_size: Pixels,
 }
 
 pub fn icon_button(id: impl Into<ElementId>, cx: &mut App) -> IconButtonProps {
@@ -36,6 +47,8 @@ pub fn icon_button(id: impl Into<ElementId>, cx: &mut App) -> IconButtonProps {
         on_click: None,
         disabled: false,
         variant: crate::renderer::ActionVariantKind::default(),
+        icon: None,
+        icon_size: gpui::px(16.),
     }
 }
 
@@ -62,6 +75,21 @@ impl IconButtonProps {
         self
     }
 
+    /// Set the icon source. Consumed by `render` — the icon is
+    /// rendered inline with the variant's `fg` colour (so the
+    /// icon stays readable on the bg without the caller having
+    /// to know the right colour).
+    pub fn icon(mut self, source: IconSource) -> Self {
+        self.icon = Some(source);
+        self
+    }
+
+    /// Override the icon's pixel size. Default: 16.
+    pub fn icon_size(mut self, size: Pixels) -> Self {
+        self.icon_size = size;
+        self
+    }
+
     /// Wire the headless contract onto the caller's `el`.
     ///
     /// Purely a11y: id, focus, click. No visual feedback
@@ -79,37 +107,26 @@ impl IconButtonProps {
     }
 
     /// Render the icon button using the registered `IconButtonRenderer`.
+    ///
+    /// Data flow is one-way: the renderer takes the full
+    /// `IconButtonProps` and returns a fully-built `Stateful<Div>`
+    /// (visuals + optional icon + hover / active + id + focus).
+    /// This method only layers `on_click` on top. **No** token
+    /// values are pulled from the renderer in headless.
     pub fn render(self, cx: &App) -> Stateful<Div> {
-        let theme = cx.theme();
+        use crate::renderer::RendererContext;
+        use crate::renderer::markers::IconButton as IconButtonMarker;
+
         let r: &Arc<dyn IconButtonRenderer> = cx
             .renderer_arc::<IconButtonMarker, dyn IconButtonRenderer>()
             .expect("IconButtonRenderer registered");
-        let state = IconButtonRenderState {
-            variant: self.variant,
-            disabled: self.disabled,
-            has_custom_bg: false,
-            has_custom_hover_bg: false,
-            custom_style: None,
-        };
-        let bg = r.bg(&state, theme);
-        let radius = r.border_radius(&state, theme);
-        let opacity = if self.disabled {
-            r.disabled_opacity(&state, theme)
-        } else {
-            1.0
-        };
-        let el = div()
-            .bg(bg)
-            .rounded(radius)
-            .size(gpui::px(36.))
-            .opacity(opacity)
-            .flex()
-            .items_center()
-            .justify_center();
-        let hover_bg = r.hover_bg(&state, theme);
-        let active_bg = r.active_bg(&state, theme);
-        self.apply(el)
-            .hover(|s| s.bg(hover_bg))
-            .active(|s| s.bg(active_bg))
+
+        let mut styled = r.compose(&self, &self.focus_handle, cx);
+        if !self.disabled
+            && let Some(f) = self.on_click.clone()
+        {
+            styled = styled.on_click(move |ev, window, cx| f(ev, window, cx));
+        }
+        styled
     }
 }

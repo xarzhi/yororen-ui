@@ -1,11 +1,12 @@
-//! `TextAreaRenderer` — visual side of `TextArea`.
+//! `TextAreaRenderer` — visual contract for `TextArea`.
+//!
+//! Trait surface is just `compose`.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{AnyElement, App, Hsla, Window};
 
-use crate::renderer::spec::Edges;
-use crate::theme::Theme;
+use crate::headless::text_area::TextAreaProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct TextAreaRenderState {
@@ -20,13 +21,10 @@ pub struct TextAreaRenderState {
 }
 
 pub trait TextAreaRenderer: Any + Send + Sync {
-    fn bg(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
-    fn hover_border(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
-    fn active_border(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
-    fn text_color(&self, state: &TextAreaRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &TextAreaRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &TextAreaRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &TextAreaRenderState, theme: &Theme) -> Pixels;
+    fn compose(
+        &self,
+        props: &TextAreaProps,
+        cx: &mut App,
+        window: &mut Window,
+    ) -> AnyElement;
 }

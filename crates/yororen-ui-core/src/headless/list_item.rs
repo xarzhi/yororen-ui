@@ -1,6 +1,8 @@
 //! Headless `list_item` — a single row in a list. Pure data
 //! carrier; visual lives in the renderer.
 
+use std::sync::Arc;
+
 use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
@@ -53,5 +55,20 @@ impl ListItemProps {
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the list item using the registered `ListItemRenderer`.
+    /// Returns a `Stateful<Div>` with the element id and the
+    /// renderer-built bg / padding / min_h / radius.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::list_item::ListItemRenderer;
+        use crate::renderer::markers::ListItem as ListItemMarker;
+
+        let r: &Arc<dyn ListItemRenderer> = cx
+            .renderer_arc::<ListItemMarker, dyn ListItemRenderer>()
+            .expect("ListItemRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
     }
 }

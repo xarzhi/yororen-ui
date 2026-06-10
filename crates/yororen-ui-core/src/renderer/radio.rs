@@ -1,11 +1,16 @@
-//! `RadioRenderer` — the visual side of `Radio`.
+//! `RadioRenderer` — visual contract for `Radio`.
+//!
+//! Trait surface is just `compose`.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div, FocusHandle, Hsla, Stateful};
 
-use crate::theme::Theme;
+use crate::headless::radio::RadioProps;
 
+/// Projection of `RadioProps` used by built-in renderers when
+/// they want to factor out helpers. Not part of the
+/// `RadioRenderer` trait surface.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct RadioRenderState {
     pub checked: bool,
@@ -15,13 +20,11 @@ pub struct RadioRenderState {
 }
 
 pub trait RadioRenderer: Any + Send + Sync {
-    fn ring_size(&self, state: &RadioRenderState, theme: &Theme) -> Pixels;
-    fn dot_size(&self, state: &RadioRenderState, theme: &Theme) -> Pixels;
-    fn ring_bg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
-    fn ring_border(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
-    fn ring_hover_bg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
-    fn ring_active_bg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
-    fn dot_fg(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
-    fn focus_color(&self, state: &RadioRenderState, theme: &Theme) -> Hsla;
-    fn disabled_opacity(&self, state: &RadioRenderState, theme: &Theme) -> f32;
+    /// Build the full `Stateful<Div>` for a radio.
+    fn compose(
+        &self,
+        props: &RadioProps,
+        focus_handle: &FocusHandle,
+        cx: &App,
+    ) -> Stateful<Div>;
 }

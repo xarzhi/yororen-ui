@@ -94,4 +94,20 @@ impl ModalProps {
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
     }
+
+    /// Render the modal using the registered `ModalRenderer`.
+    /// Returns a `Stateful<Div>` with the element id. The renderer
+    /// decides scrim / panel bg / border / padding based on
+    /// the `state` entity.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::modal::ModalRenderer;
+        use crate::renderer::markers::Modal as ModalMarker;
+
+        let r: &Arc<dyn ModalRenderer> = cx
+            .renderer_arc::<ModalMarker, dyn ModalRenderer>()
+            .expect("ModalRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
+    }
 }

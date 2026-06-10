@@ -1,18 +1,18 @@
-//! `PopoverRenderer` — visual side of `Popover`.
+//! `PopoverRenderer` — visual contract for `Popover`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (bg / border / shadow_alpha / border_radius / offset)
+//! stay on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::theme::Theme;
+use crate::headless::popover::PopoverProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct PopoverRenderState {}
 
 pub trait PopoverRenderer: Any + Send + Sync {
-    fn bg(&self, state: &PopoverRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &PopoverRenderState, theme: &Theme) -> Hsla;
-    fn shadow_alpha(&self, state: &PopoverRenderState, theme: &Theme) -> f32;
-    fn border_radius(&self, state: &PopoverRenderState, theme: &Theme) -> Pixels;
-    fn offset(&self, state: &PopoverRenderState, theme: &Theme) -> Pixels;
+    fn compose(&self, props: &PopoverProps, cx: &App) -> Div;
 }

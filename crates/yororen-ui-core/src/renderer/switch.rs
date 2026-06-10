@@ -1,11 +1,16 @@
-//! `SwitchRenderer` — the visual side of `Switch`.
+//! `SwitchRenderer` — visual contract for `Switch`.
+//!
+//! Trait surface is just `compose`.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div, FocusHandle, Hsla, Stateful};
 
-use crate::theme::Theme;
+use crate::headless::switch::SwitchProps;
 
+/// Projection of `SwitchProps` used by built-in renderers when
+/// they want to factor out helpers. Not part of the
+/// `SwitchRenderer` trait surface.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct SwitchRenderState {
     pub checked: bool,
@@ -15,15 +20,11 @@ pub struct SwitchRenderState {
 }
 
 pub trait SwitchRenderer: Any + Send + Sync {
-    fn track_w(&self, state: &SwitchRenderState, theme: &Theme) -> Pixels;
-    fn track_h(&self, state: &SwitchRenderState, theme: &Theme) -> Pixels;
-    fn knob_size(&self, state: &SwitchRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &SwitchRenderState, theme: &Theme) -> Pixels;
-    fn track_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
-    fn track_border(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
-    fn track_hover_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
-    fn track_active_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
-    fn knob_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
-    fn focus_color(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla;
-    fn disabled_opacity(&self, state: &SwitchRenderState, theme: &Theme) -> f32;
+    /// Build the full `Stateful<Div>` for a switch.
+    fn compose(
+        &self,
+        props: &SwitchProps,
+        focus_handle: &FocusHandle,
+        cx: &App,
+    ) -> Stateful<Div>;
 }

@@ -1,11 +1,16 @@
-//! `CheckboxRenderer` — the visual side of `Checkbox`.
+//! `CheckboxRenderer` — visual contract for `Checkbox`.
+//!
+//! Trait surface is just `compose`.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div, FocusHandle, Hsla, Stateful};
 
-use crate::theme::Theme;
+use crate::headless::checkbox::CheckboxProps;
 
+/// Projection of `CheckboxProps` used by built-in renderers
+/// when they want to factor out helpers. Not part of the
+/// `CheckboxRenderer` trait surface.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct CheckboxRenderState {
     pub checked: bool,
@@ -15,13 +20,11 @@ pub struct CheckboxRenderState {
 }
 
 pub trait CheckboxRenderer: Any + Send + Sync {
-    fn box_size(&self, state: &CheckboxRenderState, theme: &Theme) -> Pixels;
-    fn check_size(&self, state: &CheckboxRenderState, theme: &Theme) -> Pixels;
-    fn box_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
-    fn box_border(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
-    fn box_hover_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
-    fn box_active_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
-    fn check_fg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
-    fn focus_color(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla;
-    fn disabled_opacity(&self, state: &CheckboxRenderState, theme: &Theme) -> f32;
+    /// Build the full `Stateful<Div>` for a checkbox.
+    fn compose(
+        &self,
+        props: &CheckboxProps,
+        focus_handle: &FocusHandle,
+        cx: &App,
+    ) -> Stateful<Div>;
 }

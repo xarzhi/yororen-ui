@@ -1,10 +1,15 @@
-//! `SplitButtonRenderer` — visual side of `SplitButton`.
+//! `SplitButtonRenderer` — visual contract for `SplitButton`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (primary_bg / primary_fg / chevron_bg / chevron_fg /
+//! chevron_hover_bg / min_height / border_radius / gap)
+//! stay on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::theme::Theme;
+use crate::headless::split_button::SplitButtonProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct SplitButtonRenderState {
@@ -13,12 +18,5 @@ pub struct SplitButtonRenderState {
 }
 
 pub trait SplitButtonRenderer: Any + Send + Sync {
-    fn primary_bg(&self, state: &SplitButtonRenderState, theme: &Theme) -> Hsla;
-    fn primary_fg(&self, state: &SplitButtonRenderState, theme: &Theme) -> Hsla;
-    fn chevron_bg(&self, state: &SplitButtonRenderState, theme: &Theme) -> Hsla;
-    fn chevron_fg(&self, state: &SplitButtonRenderState, theme: &Theme) -> Hsla;
-    fn chevron_hover_bg(&self, state: &SplitButtonRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &SplitButtonRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &SplitButtonRenderState, theme: &Theme) -> Pixels;
-    fn gap(&self, state: &SplitButtonRenderState, theme: &Theme) -> Pixels;
+    fn compose(&self, props: &SplitButtonProps, cx: &App) -> Div;
 }

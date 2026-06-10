@@ -1,5 +1,7 @@
 //! Headless `heading` — a typographic level + text. No visual.
 
+use std::sync::Arc;
+
 use gpui::{Div, ElementId, InteractiveElement, Stateful};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -36,5 +38,20 @@ pub fn heading(
 impl HeadingProps {
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the heading using the registered `HeadingRenderer`.
+    /// Returns a `Stateful<Div>` with the element id and the
+    /// renderer-applied typography (size / weight / color).
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::heading::HeadingRenderer;
+        use crate::renderer::markers::Heading as HeadingMarker;
+
+        let r: &Arc<dyn HeadingRenderer> = cx
+            .renderer_arc::<HeadingMarker, dyn HeadingRenderer>()
+            .expect("HeadingRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
     }
 }

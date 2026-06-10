@@ -1,38 +1,44 @@
-//! `SwitchRenderer` — the visual side of `Switch`.
+//! `TokenSwitchRenderer` — default `SwitchRenderer` impl.
 
 use std::sync::Arc;
 
-use gpui::{Hsla, Pixels};
+use gpui::{
+    App, Div, FocusHandle, Hsla, InteractiveElement, ParentElement, Pixels, Stateful,
+    StatefulInteractiveElement, Styled, div, px,
+};
 
+use yororen_ui_core::headless::switch::SwitchProps;
 use yororen_ui_core::theme::Theme;
 
 pub use yororen_ui_core::renderer::switch::{SwitchRenderState, SwitchRenderer};
 
 pub struct TokenSwitchRenderer;
 
-impl SwitchRenderer for TokenSwitchRenderer {
-    fn track_w(&self, _state: &SwitchRenderState, theme: &Theme) -> Pixels {
+// Inherent helpers — *not* part of the `SwitchRenderer` trait
+// surface.
+impl TokenSwitchRenderer {
+    pub fn track_w(&self, _state: &SwitchRenderState, theme: &Theme) -> Pixels {
         gpui::px(
             theme
                 .get_number("tokens.control.switch.track_w")
                 .unwrap_or(0.0) as f32,
         )
     }
-    fn track_h(&self, _state: &SwitchRenderState, theme: &Theme) -> Pixels {
+    pub fn track_h(&self, _state: &SwitchRenderState, theme: &Theme) -> Pixels {
         gpui::px(
             theme
                 .get_number("tokens.control.switch.track_h")
                 .unwrap_or(0.0) as f32,
         )
     }
-    fn knob_size(&self, _state: &SwitchRenderState, theme: &Theme) -> Pixels {
+    pub fn knob_size(&self, _state: &SwitchRenderState, theme: &Theme) -> Pixels {
         gpui::px(
             theme
                 .get_number("tokens.control.switch.knob_size")
                 .unwrap_or(0.0) as f32,
         )
     }
-    fn padding(&self, _state: &SwitchRenderState, theme: &Theme) -> Pixels {
+    pub fn padding(&self, _state: &SwitchRenderState, theme: &Theme) -> Pixels {
         gpui::px(
             theme
                 .get_number("tokens.control.switch.padding")
@@ -40,7 +46,7 @@ impl SwitchRenderer for TokenSwitchRenderer {
         )
     }
 
-    fn track_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
+    pub fn track_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.get_color("surface.sunken").unwrap_or_default()
         } else if state.checked {
@@ -53,14 +59,14 @@ impl SwitchRenderer for TokenSwitchRenderer {
             theme.get_color("surface.hover").unwrap_or_default()
         }
     }
-    fn track_border(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
+    pub fn track_border(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
         if state.checked {
             theme.get_color("border.muted").unwrap_or_default()
         } else {
             theme.get_color("border.default").unwrap_or_default()
         }
     }
-    fn track_hover_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
+    pub fn track_hover_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
         if state.checked {
             theme
                 .get_color("action.primary.hover_bg")
@@ -69,7 +75,7 @@ impl SwitchRenderer for TokenSwitchRenderer {
             theme.get_color("surface.base").unwrap_or_default()
         }
     }
-    fn track_active_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
+    pub fn track_active_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
         if state.checked {
             theme
                 .get_color("action.primary.active_bg")
@@ -78,7 +84,7 @@ impl SwitchRenderer for TokenSwitchRenderer {
             theme.get_color("surface.sunken").unwrap_or_default()
         }
     }
-    fn knob_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
+    pub fn knob_bg(&self, state: &SwitchRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.get_color("content.disabled").unwrap_or_default()
         } else if state.checked {
@@ -87,11 +93,57 @@ impl SwitchRenderer for TokenSwitchRenderer {
             theme.get_color("content.primary").unwrap_or_default()
         }
     }
-    fn focus_color(&self, _state: &SwitchRenderState, theme: &Theme) -> Hsla {
+    pub fn focus_color(&self, _state: &SwitchRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.focus").unwrap_or_default()
     }
-    fn disabled_opacity(&self, _state: &SwitchRenderState, _theme: &Theme) -> f32 {
+    pub fn disabled_opacity(&self, _state: &SwitchRenderState, _theme: &Theme) -> f32 {
         0.5
+    }
+}
+
+impl SwitchRenderer for TokenSwitchRenderer {
+    fn compose(
+        &self,
+        props: &SwitchProps,
+        focus_handle: &FocusHandle,
+        cx: &App,
+    ) -> Stateful<Div> {
+        use yororen_ui_core::theme::ActiveTheme;
+        let theme = cx.theme();
+        let state = SwitchRenderState {
+            checked: props.checked,
+            disabled: props.disabled,
+            has_custom_tone: props.has_custom_tone,
+            custom_tone: props.custom_tone,
+        };
+        let track = self.track_bg(&state, theme);
+        let knob = self.knob_bg(&state, theme);
+        let w = self.track_w(&state, theme);
+        let h = self.track_h(&state, theme);
+        let knob_size = self.knob_size(&state, theme);
+        let pad = self.padding(&state, theme);
+        let pill_radius = px(theme.get_number("tokens.radii.pill").unwrap_or(0.0) as f32);
+        let track_hover = self.track_hover_bg(&state, theme);
+        let track_active = self.track_active_bg(&state, theme);
+
+        let mut el: Stateful<Div> = div()
+            .id(props.id.clone())
+            .bg(track)
+            .w(w)
+            .h(h)
+            .rounded(pill_radius)
+            .p(pad)
+            .flex()
+            .items_center()
+            .track_focus(focus_handle);
+        if props.checked {
+            el = el.justify_end();
+        } else {
+            el = el.justify_start();
+        }
+        el = el.child(div().bg(knob).size(knob_size).rounded(pill_radius));
+        el.hover(|s| s.bg(track_hover))
+            .active(|s| s.bg(track_active))
     }
 }
 
@@ -175,7 +227,6 @@ mod tests {
             disabled: true,
             ..Default::default()
         };
-        // All methods should not panic on a disabled state.
         let _ = r.track_bg(&state, &theme);
         let _ = r.knob_bg(&state, &theme);
         assert_eq!(r.disabled_opacity(&state, &theme), 0.5);

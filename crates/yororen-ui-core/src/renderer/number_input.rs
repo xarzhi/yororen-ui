@@ -1,11 +1,12 @@
-//! `NumberInputRenderer` — visual side of `NumberInput`.
+//! `NumberInputRenderer` — visual contract for `NumberInput`.
+//!
+//! Trait surface is just `compose`.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{AnyElement, App, Hsla, Window};
 
-use crate::renderer::spec::Edges;
-use crate::theme::Theme;
+use crate::headless::number_input::NumberInputProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct NumberInputRenderState {
@@ -18,13 +19,10 @@ pub struct NumberInputRenderState {
 }
 
 pub trait NumberInputRenderer: Any + Send + Sync {
-    fn bg(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
-    fn hover_border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
-    fn active_border(&self, state: &NumberInputRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &NumberInputRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &NumberInputRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn stepper_button_size(&self, state: &NumberInputRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &NumberInputRenderState, theme: &Theme) -> Pixels;
+    fn compose(
+        &self,
+        props: &NumberInputProps,
+        cx: &mut App,
+        window: &mut Window,
+    ) -> AnyElement;
 }

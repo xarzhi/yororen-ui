@@ -1,11 +1,15 @@
-//! `ListItemRenderer` — visual side of `ListItem`.
+//! `ListItemRenderer` — visual contract for `ListItem`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (bg / hover_bg / selected_bg / fg / padding /
+//! min_height / border_radius) stay on the concrete
+//! renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::renderer::spec::Edges;
-use crate::theme::Theme;
+use crate::headless::list_item::ListItemProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct ListItemRenderState {
@@ -15,11 +19,5 @@ pub struct ListItemRenderState {
 }
 
 pub trait ListItemRenderer: Any + Send + Sync {
-    fn bg(&self, state: &ListItemRenderState, theme: &Theme) -> Hsla;
-    fn hover_bg(&self, state: &ListItemRenderState, theme: &Theme) -> Hsla;
-    fn selected_bg(&self, state: &ListItemRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &ListItemRenderState, theme: &Theme) -> Hsla;
-    fn padding(&self, state: &ListItemRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn min_height(&self, state: &ListItemRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &ListItemRenderState, theme: &Theme) -> Pixels;
+    fn compose(&self, props: &ListItemProps, cx: &App) -> Div;
 }

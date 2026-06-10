@@ -1,31 +1,37 @@
-//! `CheckboxRenderer` — the visual side of `Checkbox`.
+//! `TokenCheckboxRenderer` — default `CheckboxRenderer` impl.
 
 use std::sync::Arc;
 
-use gpui::{Hsla, Pixels};
+use gpui::{
+    App, Div, FocusHandle, Hsla, InteractiveElement, ParentElement, Pixels, Stateful,
+    StatefulInteractiveElement, Styled, div, px,
+};
 
+use yororen_ui_core::headless::checkbox::CheckboxProps;
 use yororen_ui_core::theme::Theme;
 
 pub use yororen_ui_core::renderer::checkbox::{CheckboxRenderState, CheckboxRenderer};
 
 pub struct TokenCheckboxRenderer;
 
-impl CheckboxRenderer for TokenCheckboxRenderer {
-    fn box_size(&self, _state: &CheckboxRenderState, theme: &Theme) -> Pixels {
+// Inherent helpers — *not* part of the `CheckboxRenderer`
+// trait surface.
+impl TokenCheckboxRenderer {
+    pub fn box_size(&self, _state: &CheckboxRenderState, theme: &Theme) -> Pixels {
         gpui::px(
             theme
                 .get_number("tokens.control.checkbox.box_size")
                 .unwrap_or(0.0) as f32,
         )
     }
-    fn check_size(&self, _state: &CheckboxRenderState, theme: &Theme) -> Pixels {
+    pub fn check_size(&self, _state: &CheckboxRenderState, theme: &Theme) -> Pixels {
         gpui::px(
             theme
                 .get_number("tokens.control.checkbox.check_size")
                 .unwrap_or(0.0) as f32,
         )
     }
-    fn box_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
+    pub fn box_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.get_color("surface.sunken").unwrap_or_default()
         } else if state.checked {
@@ -38,7 +44,7 @@ impl CheckboxRenderer for TokenCheckboxRenderer {
             theme.get_color("surface.base").unwrap_or_default()
         }
     }
-    fn box_border(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
+    pub fn box_border(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         if state.checked {
             if state.has_custom_tone {
                 state.custom_tone.unwrap_or_default()
@@ -49,7 +55,7 @@ impl CheckboxRenderer for TokenCheckboxRenderer {
             theme.get_color("border.default").unwrap_or_default()
         }
     }
-    fn box_hover_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
+    pub fn box_hover_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         if state.checked {
             theme
                 .get_color("action.primary.hover_bg")
@@ -58,7 +64,7 @@ impl CheckboxRenderer for TokenCheckboxRenderer {
             theme.get_color("surface.hover").unwrap_or_default()
         }
     }
-    fn box_active_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
+    pub fn box_active_bg(&self, state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         if state.checked {
             theme
                 .get_color("action.primary.active_bg")
@@ -67,14 +73,54 @@ impl CheckboxRenderer for TokenCheckboxRenderer {
             theme.get_color("surface.sunken").unwrap_or_default()
         }
     }
-    fn check_fg(&self, _state: &CheckboxRenderState, theme: &Theme) -> Hsla {
+    pub fn check_fg(&self, _state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         theme.get_color("action.primary.fg").unwrap_or_default()
     }
-    fn focus_color(&self, _state: &CheckboxRenderState, theme: &Theme) -> Hsla {
+    pub fn focus_color(&self, _state: &CheckboxRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.focus").unwrap_or_default()
     }
-    fn disabled_opacity(&self, _state: &CheckboxRenderState, _theme: &Theme) -> f32 {
+    pub fn disabled_opacity(&self, _state: &CheckboxRenderState, _theme: &Theme) -> f32 {
         0.5
+    }
+}
+
+impl CheckboxRenderer for TokenCheckboxRenderer {
+    fn compose(
+        &self,
+        props: &CheckboxProps,
+        focus_handle: &FocusHandle,
+        cx: &App,
+    ) -> Stateful<Div> {
+        use yororen_ui_core::theme::ActiveTheme;
+        let theme = cx.theme();
+        let state = CheckboxRenderState {
+            checked: props.checked,
+            disabled: props.disabled,
+            has_custom_tone: props.has_custom_tone,
+            custom_tone: props.custom_tone,
+        };
+        let bg = self.box_bg(&state, theme);
+        let border = self.box_border(&state, theme);
+        let size = self.box_size(&state, theme);
+        let check_size = self.check_size(&state, theme);
+        let hover_bg = self.box_hover_bg(&state, theme);
+        let active_bg = self.box_active_bg(&state, theme);
+
+        let mut el: Stateful<Div> = div()
+            .id(props.id.clone())
+            .bg(bg)
+            .border_1()
+            .border_color(border)
+            .size(size)
+            .rounded(px(4.))
+            .flex()
+            .items_center()
+            .justify_center()
+            .track_focus(focus_handle);
+        if props.checked {
+            el = el.child(div().bg(border).size(check_size).rounded(px(2.)));
+        }
+        el.hover(|s| s.bg(hover_bg)).active(|s| s.bg(active_bg))
     }
 }
 
@@ -94,9 +140,6 @@ mod tests {
 
     #[test]
     fn custom_tone_overrides_checked_state_color() {
-        // Regression for the P2 audit finding:
-        // `has_custom_tone` is a *real* field, not a flag the
-        // renderer silently drops.
         let theme = fixture();
         let r = TokenCheckboxRenderer;
         let custom = rgb(0xabcdef).into();
@@ -108,7 +151,6 @@ mod tests {
         };
         assert_eq!(r.box_bg(&state, &theme), custom);
         assert_eq!(r.box_border(&state, &theme), custom);
-        // Unchecked state: tone does not apply.
         let state_unchecked = CheckboxRenderState {
             checked: false,
             ..state

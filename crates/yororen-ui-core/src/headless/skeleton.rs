@@ -1,5 +1,7 @@
 //! Headless `skeleton` — placeholder shape. No state.
 
+use std::sync::Arc;
+
 use gpui::{Div, ElementId, InteractiveElement, Stateful};
 
 #[derive(Clone, Debug)]
@@ -31,7 +33,6 @@ impl SkeletonProps {
     }
     pub fn block_sharp(mut self, v: bool) -> Self {
         self.block_sharp = v;
-        // Keep `rounded` consistent with the inverse.
         self.rounded = !v;
         self
     }
@@ -42,5 +43,19 @@ impl SkeletonProps {
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the skeleton using the registered `SkeletonRenderer`.
+    /// Returns a `Div`; caller chains `.w(...)` / `.h(...)` for
+    /// explicit sizing.
+    pub fn render(self, cx: &gpui::App) -> Div {
+        use crate::renderer::RendererContext;
+        use crate::renderer::markers::Skeleton as SkeletonMarker;
+        use crate::renderer::skeleton::SkeletonRenderer;
+
+        let r: &Arc<dyn SkeletonRenderer> = cx
+            .renderer_arc::<SkeletonMarker, dyn SkeletonRenderer>()
+            .expect("SkeletonRenderer registered");
+        r.compose(&self, cx)
     }
 }

@@ -1,18 +1,19 @@
-//! `HeadingRenderer` — the visual side of `Heading`.
+//! `TokenHeadingRenderer` — default `HeadingRenderer` impl.
 
 use std::sync::Arc;
 
-use gpui::{FontWeight, Hsla, Pixels};
+use gpui::{App, Div, FontWeight, Hsla, ParentElement, Pixels, Styled, div};
 
-use yororen_ui_core::headless::heading::HeadingLevel;
+use yororen_ui_core::headless::heading::{HeadingLevel, HeadingProps};
 use yororen_ui_core::theme::Theme;
 
 pub use yororen_ui_core::renderer::heading::{HeadingRenderState, HeadingRenderer};
 
 pub struct TokenHeadingRenderer;
 
-impl HeadingRenderer for TokenHeadingRenderer {
-    fn size(&self, state: &HeadingRenderState, theme: &Theme) -> Pixels {
+// Inherent helpers — *not* part of the trait surface.
+impl TokenHeadingRenderer {
+    pub fn size(&self, state: &HeadingRenderState, theme: &Theme) -> Pixels {
         let path = match state.level {
             HeadingLevel::H1 => "tokens.typography.font_size_2xl",
             HeadingLevel::H2 => "tokens.typography.font_size_xl",
@@ -24,7 +25,7 @@ impl HeadingRenderer for TokenHeadingRenderer {
         gpui::px(theme.get_number(path).unwrap_or(0.0) as f32)
     }
 
-    fn weight(&self, state: &HeadingRenderState, theme: &Theme) -> FontWeight {
+    pub fn weight(&self, state: &HeadingRenderState, theme: &Theme) -> FontWeight {
         let (path, default) = match state.level {
             HeadingLevel::H1 => ("tokens.typography.weight_bold", 700.0),
             _ => ("tokens.typography.weight_semibold", 600.0),
@@ -32,8 +33,26 @@ impl HeadingRenderer for TokenHeadingRenderer {
         FontWeight(theme.get_number(path).unwrap_or(default) as f32)
     }
 
-    fn color(&self, _state: &HeadingRenderState, theme: &Theme) -> Hsla {
+    pub fn color(&self, _state: &HeadingRenderState, theme: &Theme) -> Hsla {
         theme.get_color("content.primary").unwrap_or_default()
+    }
+}
+
+impl HeadingRenderer for TokenHeadingRenderer {
+    fn compose(&self, props: &HeadingProps, cx: &App) -> Div {
+        use yororen_ui_core::theme::ActiveTheme;
+        let theme = cx.theme();
+        let state = HeadingRenderState {
+            level: props.level,
+        };
+        let size = self.size(&state, theme);
+        let weight = self.weight(&state, theme);
+        let color = self.color(&state, theme);
+        div()
+            .text_color(color)
+            .text_size(size)
+            .font_weight(weight)
+            .child(props.text.clone())
     }
 }
 

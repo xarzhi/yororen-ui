@@ -158,4 +158,20 @@ impl DropdownMenuProps {
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
     }
+
+    /// Render the dropdown menu using the registered
+    /// `DropdownMenuRenderer`. Returns a `Stateful<Div>` with
+    /// the element id. The renderer decides trigger bg / fg /
+    /// chevron based on the `state` entity.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::dropdown_menu::DropdownMenuRenderer;
+        use crate::renderer::markers::DropdownMenu as DropdownMenuMarker;
+
+        let r: &Arc<dyn DropdownMenuRenderer> = cx
+            .renderer_arc::<DropdownMenuMarker, dyn DropdownMenuRenderer>()
+            .expect("DropdownMenuRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
+    }
 }

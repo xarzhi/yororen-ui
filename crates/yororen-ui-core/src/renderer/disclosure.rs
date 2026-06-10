@@ -1,10 +1,15 @@
-//! `DisclosureRenderer` — visual side of `Disclosure`.
+//! `DisclosureRenderer` — visual contract for `Disclosure`.
+//!
+//! Trait surface is just `compose`. Inherent helpers
+//! (trigger_bg / trigger_fg / trigger_hover_bg /
+//! min_height / border_radius / chevron_rotation /
+//! body_padding) stay on the concrete renderer type.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div};
 
-use crate::theme::Theme;
+use crate::headless::disclosure::DisclosureProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct DisclosureRenderState {
@@ -12,11 +17,5 @@ pub struct DisclosureRenderState {
 }
 
 pub trait DisclosureRenderer: Any + Send + Sync {
-    fn trigger_bg(&self, state: &DisclosureRenderState, theme: &Theme) -> Hsla;
-    fn trigger_fg(&self, state: &DisclosureRenderState, theme: &Theme) -> Hsla;
-    fn trigger_hover_bg(&self, state: &DisclosureRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &DisclosureRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &DisclosureRenderState, theme: &Theme) -> Pixels;
-    fn chevron_rotation(&self, state: &DisclosureRenderState, theme: &Theme) -> f32;
-    fn body_padding(&self, state: &DisclosureRenderState, theme: &Theme) -> Pixels;
+    fn compose(&self, props: &DisclosureProps, cx: &App) -> Div;
 }

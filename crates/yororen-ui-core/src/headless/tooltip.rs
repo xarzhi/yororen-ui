@@ -107,4 +107,19 @@ impl TooltipProps {
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
     }
+
+    /// Render the tooltip using the registered `TooltipRenderer`.
+    /// The renderer reads `state` to decide visibility; the headless
+    /// layer only attaches the element id.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::tooltip::TooltipRenderer;
+        use crate::renderer::markers::Tooltip as TooltipMarker;
+
+        let r: &Arc<dyn TooltipRenderer> = cx
+            .renderer_arc::<TooltipMarker, dyn TooltipRenderer>()
+            .expect("TooltipRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
+    }
 }

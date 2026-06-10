@@ -1,13 +1,22 @@
-//! `ToggleButtonRenderer` — visual side of `ToggleButton`.
+//! `ToggleButtonRenderer` — visual contract for `ToggleButton`.
+//!
+//! Trait surface is **just** `compose`. The renderer takes the
+//! full `ToggleButtonProps` and returns a fully-built
+//! `Stateful<Div>` (visuals + children + hover / active + id +
+//! focus). Headless layers `on_click` (firing `on_toggle`) on
+//! top.
 
 use std::any::Any;
 use std::sync::Arc;
 
-use gpui::{Hsla, Pixels};
+use gpui::{App, Div, FocusHandle, Stateful};
 
+use crate::headless::toggle_button::ToggleButtonProps;
 use crate::renderer::variant::{ActionVariantKind, VariantStyle};
-use crate::theme::Theme;
 
+/// Projection of `ToggleButtonProps` used by built-in
+/// renderers when they want to factor out helpers. Not part of
+/// the `ToggleButtonRenderer` trait surface.
 #[derive(Clone, Debug, Default)]
 pub struct ToggleButtonRenderState {
     pub variant: ActionVariantKind,
@@ -17,11 +26,11 @@ pub struct ToggleButtonRenderState {
 }
 
 pub trait ToggleButtonRenderer: Any + Send + Sync {
-    fn bg(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Hsla;
-    fn hover_bg(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Hsla;
-    fn active_bg(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Pixels;
-    fn border_radius(&self, state: &ToggleButtonRenderState, theme: &Theme) -> Pixels;
-    fn disabled_opacity(&self, state: &ToggleButtonRenderState, theme: &Theme) -> f32;
+    /// Build the full `Stateful<Div>` for a toggle button.
+    fn compose(
+        &self,
+        props: &ToggleButtonProps,
+        focus_handle: &FocusHandle,
+        cx: &App,
+    ) -> Stateful<Div>;
 }

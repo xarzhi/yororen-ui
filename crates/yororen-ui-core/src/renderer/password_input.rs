@@ -1,11 +1,12 @@
-//! `PasswordInputRenderer` — visual side of `PasswordInput`.
+//! `PasswordInputRenderer` — visual contract for `PasswordInput`.
+//!
+//! Trait surface is just `compose`.
 
 use std::any::Any;
 
-use gpui::{Hsla, Pixels};
+use gpui::{AnyElement, App, Hsla, Window};
 
-use crate::renderer::spec::Edges;
-use crate::theme::Theme;
+use crate::headless::password_input::PasswordInputProps;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct PasswordInputRenderState {
@@ -21,13 +22,10 @@ pub struct PasswordInputRenderState {
 }
 
 pub trait PasswordInputRenderer: Any + Send + Sync {
-    fn bg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
-    fn border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
-    fn focus_border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
-    fn hover_border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
-    fn active_border(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
-    fn fg(&self, state: &PasswordInputRenderState, theme: &Theme) -> Hsla;
-    fn min_height(&self, state: &PasswordInputRenderState, theme: &Theme) -> Pixels;
-    fn padding(&self, state: &PasswordInputRenderState, theme: &Theme) -> Edges<Pixels>;
-    fn border_radius(&self, state: &PasswordInputRenderState, theme: &Theme) -> Pixels;
+    fn compose(
+        &self,
+        props: &PasswordInputProps,
+        cx: &mut App,
+        window: &mut Window,
+    ) -> AnyElement;
 }

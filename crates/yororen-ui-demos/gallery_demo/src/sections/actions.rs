@@ -4,14 +4,19 @@
 //! `sections/mod.rs`) that shows a small `name` label above the
 //! component itself so the user can identify what they're
 //! looking at.
+//!
+//! Buttons / icon_buttons / toggle_buttons all accept a
+//! `caption(...)` / `icon(...)` builder method so the demo
+//! doesn't have to chain `.child(...)` after `.render(...)`.
+//! Icon colour is derived from the renderer's `fg` token
+//! automatically — no need to pass a hardcoded colour.
 
 use gpui::{Context, Div, ParentElement, Styled, div, px};
 
 use yororen_ui::ActionVariantKind;
-use yororen_ui::ActiveTheme;
 use yororen_ui::headless::button::button;
 use yororen_ui::headless::button_group::button_group;
-use yororen_ui::headless::icon::icon;
+use yororen_ui::headless::icon::IconSource;
 use yororen_ui::headless::icon_button::icon_button;
 use yororen_ui::headless::label::label;
 use yororen_ui::headless::split_button::split_button;
@@ -30,31 +35,21 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .flex_wrap()
         .items_center()
         .gap(px(12.))
-        .child(cell("button / Neutral", button("btn-neutral", cx).variant(ActionVariantKind::Neutral).on_click(|_, _, _| {}).render(cx).child("Neutral"), cx))
-        .child(cell("button / Primary", button("btn-primary", cx).variant(ActionVariantKind::Primary).on_click(|_, _, _| {}).render(cx).child("Primary"), cx))
-        .child(cell("button / Danger", button("btn-danger", cx).variant(ActionVariantKind::Danger).on_click(|_, _, _| {}).render(cx).child("Danger"), cx))
-        .child(cell("button / Disabled", button("btn-disabled", cx).disabled(true).on_click(|_, _, _| {}).render(cx).child("Disabled"), cx));
+        .child(cell("button / Neutral", button("btn-neutral", cx).variant(ActionVariantKind::Neutral).caption("Neutral").on_click(|_, _, _| {}).render(cx), cx))
+        .child(cell("button / Primary", button("btn-primary", cx).variant(ActionVariantKind::Primary).caption("Primary").on_click(|_, _, _| {}).render(cx), cx))
+        .child(cell("button / Danger", button("btn-danger", cx).variant(ActionVariantKind::Danger).caption("Danger").on_click(|_, _, _| {}).render(cx), cx))
+        .child(cell("button / Disabled", button("btn-disabled", cx).disabled(true).caption("Disabled").on_click(|_, _, _| {}).render(cx), cx));
 
-    // --- icon_button with a builtin "check" SVG ---
-    //     The icon colour is read from the active theme's
-    //     `action.<variant>.fg` so it stays readable on both
-    //     Neutral (light bg) and Primary (dark bg).
-    let check_color = cx
-        .theme()
-        .get_color("action.neutral.fg")
-        .unwrap_or(gpui::rgb(0x141416).into());
-    let primary_color = cx
-        .theme()
-        .get_color("action.primary.fg")
-        .unwrap_or(gpui::rgb(0xFFFFFF).into());
+    // --- icon_button: variant + icon only, colour is
+    //     auto-derived from the renderer's `fg` token. ---
     let row_icon_button = div()
         .flex()
         .flex_row()
         .flex_wrap()
         .items_center()
         .gap(px(12.))
-        .child(cell("icon_button (check)", icon_button("icon-btn-check", cx).on_click(|_, _, _| {}).render(cx).child(icon("icon-check-inside", yororen_ui::headless::icon::IconSource::Builtin("check".into()), cx).size(px(16.)).color(check_color).render()), cx))
-        .child(cell("icon_button / Primary (circle)", icon_button("icon-btn-circle", cx).variant(ActionVariantKind::Primary).on_click(|_, _, _| {}).render(cx).child(icon("icon-circle-inside", yororen_ui::headless::icon::IconSource::Builtin("circle".into()), cx).size(px(16.)).color(primary_color).render()), cx));
+        .child(cell("icon_button (check)", icon_button("icon-btn-check", cx).on_click(|_, _, _| {}).icon(IconSource::Builtin("check".into())).render(cx), cx))
+        .child(cell("icon_button / Primary (check)", icon_button("icon-btn-primary-check", cx).variant(ActionVariantKind::Primary).on_click(|_, _, _| {}).icon(IconSource::Builtin("check".into())).render(cx), cx));
 
     // --- toggle_button ---
     let entity_for_tb = entity.clone();
@@ -63,9 +58,13 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .flex_row()
         .items_center()
         .gap(px(12.))
-        .child(cell("toggle_button", toggle_button("toggle-1", cx).selected(app.toggle_btn_selected).on_toggle(move |_selected, _ev, _window, cx| { entity_for_tb.update(cx, |s, _cx| { s.toggle_btn_selected = !s.toggle_btn_selected; }); }).render(cx).child("Press me"), cx));
+        .child(cell("toggle_button", toggle_button("toggle-1", cx).selected(app.toggle_btn_selected).caption("Press me").on_toggle(move |_selected, _ev, _window, cx| { entity_for_tb.update(cx, |s, _cx| { s.toggle_btn_selected = !s.toggle_btn_selected; }); }).render(cx), cx));
 
     // --- split_button (primary action + secondary on chevron) ---
+    //     split_button is `apply()`-only — it has a custom two-slot
+    //     layout (primary label + chevron label) that doesn't fit
+    //     the simple caption/icon builder. We keep the explicit
+    //     .child(...) chain here.
     let entity_for_split = entity.clone();
     let split = split_button("split-1", move |_ev, _w, cx| { entity_for_split.update(cx, |s, _cx| { s.toast_count += 1; }); }, cx)
         .on_secondary(|_ev, _w, _cx| {})

@@ -143,4 +143,20 @@ impl ComboBoxProps {
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
     }
+
+    /// Render the combo box using the registered
+    /// `ComboBoxRenderer`. Returns a `Stateful<Div>` with the
+    /// element id. The renderer decides bg / border / padding
+    /// based on the `state` entity.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::combo_box::ComboBoxRenderer;
+        use crate::renderer::markers::ComboBox as ComboBoxMarker;
+
+        let r: &Arc<dyn ComboBoxRenderer> = cx
+            .renderer_arc::<ComboBoxMarker, dyn ComboBoxRenderer>()
+            .expect("ComboBoxRenderer registered");
+        let div = r.compose(&self, cx);
+        self.apply(div)
+    }
 }

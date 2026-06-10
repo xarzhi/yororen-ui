@@ -1,24 +1,36 @@
-//! `TextInputRenderer` — visual side of `TextInput`.
+//! `TokenTextInputRenderer` — default `TextInputRenderer` impl.
 //!
-//! The text input / keymap / IME pipeline lives in
-//! `yororen-ui-core/src/headless/text_input_element.rs`
-//! (`TextInputElement`, `wire_input_keyboard`,
-//! `start_cursor_blink`). This module only provides the
-//! `TokenTextInputRenderer` default impl that the headless
-//! `TextInputProps::render` looks up via the renderer registry.
+//! `compose` owns the entire visual pipeline: it mints the
+//! input state via `window.use_keyed_state`, reads tokens
+//! from the theme, builds the wrapper div, layers the inner
+//! `TextInputElement`, and wires the 14-action keymap. Data
+//! flow is one-way: headless just calls `compose` and returns
+//! the resulting `AnyElement`.
 
 use std::sync::Arc;
 
-use gpui::{Hsla, Pixels, hsla, px};
+use gpui::{
+    AnyElement, App, CursorStyle, Div, FocusHandle, Hsla, InteractiveElement, IntoElement,
+    ParentElement, Pixels, SharedString, Stateful, StatefulInteractiveElement, Styled, Window, div,
+    hsla, px,
+};
 
+use yororen_ui_core::headless::text_input::{TextInputProps, TextInputState};
+use yororen_ui_core::headless::text_input_element::{
+    TextInputElement, start_cursor_blink, wire_input_keyboard,
+};
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::renderer::text_input::{TextInputRenderState, TextInputRenderer};
 use yororen_ui_core::theme::Theme;
 
 pub struct TokenTextInputRenderer;
 
-impl TextInputRenderer for TokenTextInputRenderer {
-    fn bg(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
+// Inherent helpers — *not* part of the `TextInputRenderer`
+// trait surface. They exist so `compose` can stay readable
+// and so other text-input-like renderers can share the same
+// palette decisions.
+impl TokenTextInputRenderer {
+    pub fn bg(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.get_color("surface.sunken").unwrap_or_default()
         } else if state.has_custom_bg {
@@ -29,7 +41,7 @@ impl TextInputRenderer for TokenTextInputRenderer {
             theme.get_color("surface.base").unwrap_or_default()
         }
     }
-    fn border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
+    pub fn border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.get_color("border.muted").unwrap_or_default()
         } else if state.has_custom_border {
@@ -40,7 +52,7 @@ impl TextInputRenderer for TokenTextInputRenderer {
             theme.get_color("border.default").unwrap_or_default()
         }
     }
-    fn focus_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
+    pub fn focus_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
         if state.has_custom_focus_border {
             state
                 .custom_focus_border
@@ -49,13 +61,13 @@ impl TextInputRenderer for TokenTextInputRenderer {
             theme.get_color("border.focus").unwrap_or_default()
         }
     }
-    fn hover_border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
+    pub fn hover_border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.muted").unwrap_or_default()
     }
-    fn active_border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
+    pub fn active_border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.default").unwrap_or_default()
     }
-    fn text_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
+    pub fn text_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
         if state.disabled {
             theme.get_color("content.disabled").unwrap_or_default()
         } else if state.custom_text_color.is_some() {
@@ -64,10 +76,10 @@ impl TextInputRenderer for TokenTextInputRenderer {
             theme.get_color("content.primary").unwrap_or_default()
         }
     }
-    fn hint_color(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
+    pub fn hint_color(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
         theme.get_color("content.tertiary").unwrap_or_default()
     }
-    fn cursor_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
+    pub fn cursor_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
         if state.has_custom_focus_border {
             state
                 .custom_focus_border
@@ -76,16 +88,16 @@ impl TextInputRenderer for TokenTextInputRenderer {
             theme.get_color("border.focus").unwrap_or_default()
         }
     }
-    fn selection_color(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
+    pub fn selection_color(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
         let c = theme.get_color("border.focus").unwrap_or_default();
         hsla(c.h, c.s, c.l, 0.25)
     }
-    fn min_height(&self, _state: &TextInputRenderState, theme: &Theme) -> Pixels {
+    pub fn min_height(&self, _state: &TextInputRenderState, theme: &Theme) -> Pixels {
         px(theme
             .get_number("tokens.control.input.min_height")
             .unwrap_or(0.0) as f32)
     }
-    fn padding(&self, _state: &TextInputRenderState, theme: &Theme) -> Edges<Pixels> {
+    pub fn padding(&self, _state: &TextInputRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::symmetric(
             px(theme
                 .get_number("tokens.control.input.horizontal_padding")
@@ -95,11 +107,131 @@ impl TextInputRenderer for TokenTextInputRenderer {
                 .unwrap_or(0.0) as f32),
         )
     }
-    fn border_radius(&self, _state: &TextInputRenderState, theme: &Theme) -> Pixels {
+    pub fn border_radius(&self, _state: &TextInputRenderState, theme: &Theme) -> Pixels {
         px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
     }
-    fn disabled_opacity(&self, state: &TextInputRenderState, _theme: &Theme) -> f32 {
+    pub fn disabled_opacity(&self, state: &TextInputRenderState, _theme: &Theme) -> f32 {
         if state.disabled { 0.6 } else { 1.0 }
+    }
+
+    fn render_state(props: &TextInputProps, focused: bool) -> TextInputRenderState {
+        TextInputRenderState {
+            disabled: props.disabled,
+            focused,
+            has_custom_bg: props.has_custom_bg,
+            has_custom_border: props.has_custom_border,
+            has_custom_focus_border: props.has_custom_focus_border,
+            custom_bg: props.custom_bg,
+            custom_border: props.custom_border,
+            custom_focus_border: props.custom_focus_border,
+            custom_text_color: props.custom_text_color,
+        }
+    }
+}
+
+impl TextInputRenderer for TokenTextInputRenderer {
+    fn compose(
+        &self,
+        props: &TextInputProps,
+        cx: &mut App,
+        window: &mut Window,
+    ) -> AnyElement {
+        use yororen_ui_core::theme::ActiveTheme;
+
+        let placeholder_str = props.placeholder.clone();
+        let max_length = props.max_length;
+        let disabled = props.disabled;
+        let on_change = props.on_change.clone();
+        let on_submit = props.on_submit.clone();
+
+        // Mint / reuse the per-element state.
+        let state = window.use_keyed_state(props.id.clone(), cx, |_window, cx| {
+            TextInputState::new(&mut *cx)
+        });
+        state.update(cx, |s, _cx| {
+            s.placeholder = SharedString::from(placeholder_str);
+            s.max_length = max_length;
+            s.on_change = on_change;
+            s.on_submit = on_submit.clone();
+        });
+
+        let focus_handle = state.read(cx).focus_handle();
+        let focused = focus_handle.is_focused(window);
+
+        if focused {
+            start_cursor_blink(state.clone(), window, cx);
+        } else {
+            state.update(cx, |s, _cx| s.cursor_visible = true);
+        }
+
+        let placeholder_for_element = state.read(cx).placeholder.clone();
+
+        // Read tokens (snapshot the values before we hand the
+        // theme arc back to the borrow checker).
+        let theme = cx.theme().clone();
+        let render_state = Self::render_state(props, focused);
+        let bg = self.bg(&render_state, &theme);
+        let border_color = if focused {
+            self.focus_border(&render_state, &theme)
+        } else {
+            self.border(&render_state, &theme)
+        };
+        let text_color = self.text_color(&render_state, &theme);
+        let hint_color = self.hint_color(&render_state, &theme);
+        let cursor_color = self.cursor_color(&render_state, &theme);
+        let selection_color = self.selection_color(&render_state, &theme);
+        let min_h = self.min_height(&render_state, &theme);
+        let padding = self.padding(&render_state, &theme);
+        let radius = self.border_radius(&render_state, &theme);
+        let opacity = self.disabled_opacity(&render_state, &theme);
+        let hover_border = self.hover_border(&render_state, &theme);
+        let active_border = self.active_border(&render_state, &theme);
+        drop(theme);
+
+        // Build the wrapper.
+        let styled: Stateful<Div> = div()
+            .id(props.id.clone())
+            .bg(bg)
+            .border_1()
+            .border_color(border_color)
+            .min_h(min_h)
+            .rounded(radius)
+            .opacity(opacity)
+            .px(padding.left)
+            .py(padding.top)
+            .flex()
+            .items_center()
+            .text_color(text_color)
+            .overflow_hidden()
+            .cursor(if disabled {
+                CursorStyle::Arrow
+            } else {
+                CursorStyle::IBeam
+            })
+            .track_focus(&focus_handle);
+
+        // Inner text-painting element.
+        let inner = TextInputElement {
+            state: state.clone(),
+            focus_handle: focus_handle.clone(),
+            disabled,
+            text_color,
+            hint_color,
+            cursor_color,
+            selection_color,
+            placeholder: placeholder_for_element,
+            value_override: None,
+        };
+        let with_child = styled
+            .hover(|s| s.border_color(hover_border))
+            .active(|s| s.border_color(active_border))
+            .child(inner);
+
+        // Wire the keymap.
+        let keyed =
+            wire_input_keyboard(with_child, state.clone(), focus_handle.clone(), disabled, on_submit);
+
+        keyed.into_any_element()
     }
 }
 
