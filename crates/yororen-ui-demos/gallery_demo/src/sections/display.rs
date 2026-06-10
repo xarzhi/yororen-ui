@@ -35,10 +35,10 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .flex()
         .flex_col()
         .gap(px(4.))
-        .child(cell("heading / H1", heading("h-1", HeadingLevel::H1, "H1 heading", cx).apply(div()), cx))
-        .child(cell("heading / H2", heading("h-2", HeadingLevel::H2, "H2 heading", cx).apply(div()), cx))
-        .child(cell("heading / H3", heading("h-3", HeadingLevel::H3, "H3 heading", cx).apply(div()), cx))
-        .child(cell("heading / H4", heading("h-4", HeadingLevel::H4, "H4 heading", cx).apply(div()), cx));
+        .child(cell("heading / H1", heading("h-1", HeadingLevel::H1, "H1 heading", cx).render(cx), cx))
+        .child(cell("heading / H2", heading("h-2", HeadingLevel::H2, "H2 heading", cx).render(cx), cx))
+        .child(cell("heading / H3", heading("h-3", HeadingLevel::H3, "H3 heading", cx).render(cx), cx))
+        .child(cell("heading / H4", heading("h-4", HeadingLevel::H4, "H4 heading", cx).render(cx), cx));
 
     // --- 2 dividers ---
     let dividers = div()
