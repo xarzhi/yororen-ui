@@ -3154,15 +3154,23 @@ impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::spacer:
 pub fn yororen_ui_core::headless::spacer::spacer(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::spacer::SpacerProps
 pub mod yororen_ui_core::headless::split_button
 pub struct yororen_ui_core::headless::split_button::SplitButtonProps
+pub yororen_ui_core::headless::split_button::SplitButtonProps::caption: core::option::Option<gpui::shared_string::SharedString>
+pub yororen_ui_core::headless::split_button::SplitButtonProps::chevron_focus: gpui::window::FocusHandle
 pub yororen_ui_core::headless::split_button::SplitButtonProps::disabled: bool
 pub yororen_ui_core::headless::split_button::SplitButtonProps::id: gpui::window::ElementId
+pub yororen_ui_core::headless::split_button::SplitButtonProps::items: alloc::vec::Vec<yororen_ui_core::headless::dropdown_menu::DropdownItem>
+pub yororen_ui_core::headless::split_button::SplitButtonProps::on_select: core::option::Option<yororen_ui_core::headless::split_button::SelectCallback>
 pub yororen_ui_core::headless::split_button::SplitButtonProps::primary: yororen_ui_core::headless::split_button::ClickCallback
-pub yororen_ui_core::headless::split_button::SplitButtonProps::secondary: core::option::Option<yororen_ui_core::headless::split_button::ClickCallback>
+pub yororen_ui_core::headless::split_button::SplitButtonProps::primary_focus: gpui::window::FocusHandle
+pub yororen_ui_core::headless::split_button::SplitButtonProps::state: core::option::Option<gpui::app::entity_map::Entity<yororen_ui_core::headless::dropdown_menu::DropdownMenuState>>
 impl yororen_ui_core::headless::split_button::SplitButtonProps
 pub fn yororen_ui_core::headless::split_button::SplitButtonProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::split_button::SplitButtonProps::caption(self, impl core::convert::Into<gpui::shared_string::SharedString>) -> Self
 pub fn yororen_ui_core::headless::split_button::SplitButtonProps::disabled(self, bool) -> Self
-pub fn yororen_ui_core::headless::split_button::SplitButtonProps::on_secondary<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::split_button::SplitButtonProps::items(self, alloc::vec::Vec<yororen_ui_core::headless::dropdown_menu::DropdownItem>) -> Self
+pub fn yororen_ui_core::headless::split_button::SplitButtonProps::on_select<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::split_button::SplitButtonProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::split_button::SplitButtonProps::state(self, gpui::app::entity_map::Entity<yororen_ui_core::headless::dropdown_menu::DropdownMenuState>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::split_button::SplitButtonProps
 pub fn yororen_ui_core::headless::split_button::SplitButtonProps::clone(&self) -> yororen_ui_core::headless::split_button::SplitButtonProps
 impl core::marker::Freeze for yororen_ui_core::headless::split_button::SplitButtonProps
@@ -3174,6 +3182,7 @@ impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::spl
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::split_button::SplitButtonProps
 pub fn yororen_ui_core::headless::split_button::split_button(impl core::convert::Into<gpui::window::ElementId>, impl 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App), &mut gpui::app::App) -> yororen_ui_core::headless::split_button::SplitButtonProps
 pub type yororen_ui_core::headless::split_button::ClickCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
+pub type yororen_ui_core::headless::split_button::SelectCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
 pub mod yororen_ui_core::headless::switch
 pub struct yororen_ui_core::headless::switch::SwitchProps
 pub yororen_ui_core::headless::switch::SwitchProps::checked: bool

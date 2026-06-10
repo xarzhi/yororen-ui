@@ -4,7 +4,8 @@
     "canvas": "#F4F4F6",
     "raised": "#FBFBFD",
     "sunken": "#EFEFF2",
-    "hover": "#E6E6EA"
+    "hover": "#E6E6EA",
+    "popover": "#EFEFF2"
   },
   "content": {
     "primary": "#141416",

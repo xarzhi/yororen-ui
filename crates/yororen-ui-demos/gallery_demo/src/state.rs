@@ -65,6 +65,7 @@ pub struct GalleryApp {
     pub select_state: Entity<SelectState>,
     pub combo_state: Entity<ComboBoxState>,
     pub dropdown_state: Entity<DropdownMenuState>,
+    pub split_dropdown_state: Entity<DropdownMenuState>,
     pub menu_state: Entity<MenuState>,
 
     // -------- Input values (mirrored via on_change) --------
@@ -115,7 +116,7 @@ impl GalleryApp {
     // `&mut gpui::App` from a `&mut Context<Self>` (see `memory.md`).
     #[allow(clippy::explicit_auto_deref)]
     pub fn new(cx: &mut gpui::Context<Self>) -> Self {
-        // Mint all 7 composite `Entity<XxxState>`s here. Each
+        // Mint all 8 composite `Entity<XxxState>`s here. Each
         // `&mut **cx` is a temporary borrow that drops before the
         // next call, so successive `XxxState::new(&mut **cx)` calls
         // do not alias. The result is an owned `Entity<XxxState>`
@@ -126,6 +127,7 @@ impl GalleryApp {
         let select_state = SelectState::new(&mut **cx);
         let combo_state = ComboBoxState::new(&mut **cx);
         let dropdown_state = DropdownMenuState::new(&mut **cx);
+        let split_dropdown_state = DropdownMenuState::new(&mut **cx);
         let menu_state = MenuState::new(&mut **cx);
 
         // Seed the select / combo / dropdown / menu options so
@@ -156,6 +158,10 @@ impl GalleryApp {
                 DropdownItem::Item(DropdownMenuItem::new("select_all", "Select all")),
             ]);
         });
+        // `split_dropdown_state` is a `DropdownMenuState` re-used
+        // only for its `open` flag — the split_button demo cell
+        // passes its own items / on_select via builder methods,
+        // so we don't seed `items` here.
         menu_state.update(cx, |s, _cx| {
             use yororen_ui::headless::dropdown_menu::{DropdownItem, DropdownMenuItem};
             s.set_items(vec![
@@ -180,6 +186,7 @@ impl GalleryApp {
             select_state,
             combo_state,
             dropdown_state,
+            split_dropdown_state,
             menu_state,
 
             // Inputs

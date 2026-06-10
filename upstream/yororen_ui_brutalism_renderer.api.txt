@@ -10,17 +10,19 @@ pub use yororen_ui_brutalism_renderer::renderers::actions::SplitButtonRenderer
 pub use yororen_ui_brutalism_renderer::renderers::actions::ToggleButtonRenderState
 pub use yororen_ui_brutalism_renderer::renderers::actions::ToggleButtonRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer
-impl yororen_ui_default_renderer::renderers::button::ButtonRenderer for yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::active_bg(&self, &yororen_ui_default_renderer::renderers::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::bg(&self, &yororen_ui_default_renderer::renderers::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::border(&self, &yororen_ui_default_renderer::renderers::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> core::option::Option<yororen_ui_default_renderer::renderers::spec::BorderSpec>
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::disabled_opacity(&self, &yororen_ui_default_renderer::renderers::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::fg(&self, &yororen_ui_default_renderer::renderers::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::hover_bg(&self, &yororen_ui_default_renderer::renderers::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::padding(&self, &yororen_ui_default_renderer::renderers::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::shadow(&self, &yororen_ui_default_renderer::renderers::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> core::option::Option<yororen_ui_default_renderer::renderers::spec::ShadowSpec>
+impl yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::active_bg(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::bg(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::border(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> core::option::Option<yororen_ui_core::renderer::spec::BorderSpec>
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::border_radius(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> f32
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::fg(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::hover_bg(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::min_height(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::padding(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::shadow(&self, &yororen_ui_core::renderer::button::ButtonRenderState, &yororen_ui_core::theme::Theme) -> core::option::Option<yororen_ui_core::renderer::spec::ShadowSpec>
+impl yororen_ui_core::renderer::button::ButtonRenderer for yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer::compose(&self, &yororen_ui_core::headless::button::ButtonProps, &gpui::window::FocusHandle, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer
@@ -29,13 +31,16 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::act
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::actions::BrutalButtonRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer
-impl yororen_ui_default_renderer::renderers::icon_button::IconButtonRenderer for yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::active_bg(&self, &yororen_ui_default_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::bg(&self, &yororen_ui_default_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::disabled_opacity(&self, &yororen_ui_default_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::hover_bg(&self, &yororen_ui_default_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::size(&self, &yororen_ui_default_renderer::renderers::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::active_bg(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::bg(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::border_radius(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> f32
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::fg(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::hover_bg(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::size(&self, &yororen_ui_core::renderer::icon_button::IconButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::icon_button::IconButtonRenderer for yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer::compose(&self, &yororen_ui_core::headless::icon_button::IconButtonProps, &gpui::window::FocusHandle, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer
@@ -44,15 +49,17 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::act
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::actions::BrutalIconButtonRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer
-impl yororen_ui_default_renderer::renderers::split_button::SplitButtonRenderer for yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::chevron_bg(&self, &yororen_ui_default_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::chevron_fg(&self, &yororen_ui_default_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::chevron_hover_bg(&self, &yororen_ui_default_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::gap(&self, &yororen_ui_default_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::primary_bg(&self, &yororen_ui_default_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::primary_fg(&self, &yororen_ui_default_renderer::renderers::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::border_radius(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::chevron_bg(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::chevron_fg(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::chevron_hover_bg(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::gap(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::min_height(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::primary_bg(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::primary_fg(&self, &yororen_ui_core::renderer::split_button::SplitButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::split_button::SplitButtonRenderer for yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer::compose(&self, &yororen_ui_core::headless::split_button::SplitButtonProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer
@@ -61,14 +68,16 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::act
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::actions::BrutalSplitButtonRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer
-impl yororen_ui_default_renderer::renderers::toggle_button::ToggleButtonRenderer for yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::active_bg(&self, &yororen_ui_default_renderer::renderers::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::bg(&self, &yororen_ui_default_renderer::renderers::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::disabled_opacity(&self, &yororen_ui_default_renderer::renderers::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::fg(&self, &yororen_ui_default_renderer::renderers::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::hover_bg(&self, &yororen_ui_default_renderer::renderers::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::active_bg(&self, &yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::bg(&self, &yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::border_radius(&self, &yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> f32
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::fg(&self, &yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::hover_bg(&self, &yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::min_height(&self, &yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::toggle_button::ToggleButtonRenderer for yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer::compose(&self, &yororen_ui_core::headless::toggle_button::ToggleButtonProps, &gpui::window::FocusHandle, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::actions::BrutalToggleButtonRenderer
@@ -84,16 +93,18 @@ pub use yororen_ui_brutalism_renderer::renderers::controls::RadioRenderer
 pub use yororen_ui_brutalism_renderer::renderers::controls::SwitchRenderState
 pub use yororen_ui_brutalism_renderer::renderers::controls::SwitchRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer
-impl yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderer for yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::box_active_bg(&self, &yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::box_bg(&self, &yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::box_border(&self, &yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::box_hover_bg(&self, &yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::box_size(&self, &yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::check_fg(&self, &yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::check_size(&self, &yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::disabled_opacity(&self, &yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::focus_color(&self, &yororen_ui_default_renderer::renderers::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::box_active_bg(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::box_bg(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::box_border(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::box_hover_bg(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::box_size(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::check_fg(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::check_size(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> f32
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::focus_color(&self, &yororen_ui_core::renderer::checkbox::CheckboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::checkbox::CheckboxRenderer for yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer::compose(&self, &yororen_ui_core::headless::checkbox::CheckboxProps, &gpui::window::FocusHandle, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer
@@ -102,16 +113,18 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::con
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::controls::BrutalCheckboxRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer
-impl yororen_ui_default_renderer::renderers::radio::RadioRenderer for yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::disabled_opacity(&self, &yororen_ui_default_renderer::renderers::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::dot_fg(&self, &yororen_ui_default_renderer::renderers::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::dot_size(&self, &yororen_ui_default_renderer::renderers::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::focus_color(&self, &yororen_ui_default_renderer::renderers::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::ring_active_bg(&self, &yororen_ui_default_renderer::renderers::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::ring_bg(&self, &yororen_ui_default_renderer::renderers::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::ring_border(&self, &yororen_ui_default_renderer::renderers::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::ring_hover_bg(&self, &yororen_ui_default_renderer::renderers::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::ring_size(&self, &yororen_ui_default_renderer::renderers::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> f32
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::dot_fg(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::dot_size(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::focus_color(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::ring_active_bg(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::ring_bg(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::ring_border(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::ring_hover_bg(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::ring_size(&self, &yororen_ui_core::renderer::radio::RadioRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::radio::RadioRenderer for yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer::compose(&self, &yororen_ui_core::headless::radio::RadioProps, &gpui::window::FocusHandle, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer
@@ -120,18 +133,20 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::con
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::controls::BrutalRadioRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer
-impl yororen_ui_default_renderer::renderers::switch::SwitchRenderer for yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::disabled_opacity(&self, &yororen_ui_default_renderer::renderers::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::focus_color(&self, &yororen_ui_default_renderer::renderers::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::knob_bg(&self, &yororen_ui_default_renderer::renderers::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::knob_size(&self, &yororen_ui_default_renderer::renderers::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::padding(&self, &yororen_ui_default_renderer::renderers::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::track_active_bg(&self, &yororen_ui_default_renderer::renderers::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::track_bg(&self, &yororen_ui_default_renderer::renderers::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::track_border(&self, &yororen_ui_default_renderer::renderers::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::track_h(&self, &yororen_ui_default_renderer::renderers::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::track_hover_bg(&self, &yororen_ui_default_renderer::renderers::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::track_w(&self, &yororen_ui_default_renderer::renderers::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::disabled_opacity(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> f32
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::focus_color(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::knob_bg(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::knob_size(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::padding(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::track_active_bg(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::track_bg(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::track_border(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::track_h(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::track_hover_bg(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::track_w(&self, &yororen_ui_core::renderer::switch::SwitchRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::switch::SwitchRenderer for yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer::compose(&self, &yororen_ui_core::headless::switch::SwitchProps, &gpui::window::FocusHandle, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::controls::BrutalSwitchRenderer
@@ -159,14 +174,16 @@ pub use yororen_ui_brutalism_renderer::renderers::display::SkeletonRenderer
 pub use yororen_ui_brutalism_renderer::renderers::display::TagRenderState
 pub use yororen_ui_brutalism_renderer::renderers::display::TagRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer
-impl yororen_ui_default_renderer::renderers::badge::BadgeRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::bg(&self, &yororen_ui_default_renderer::renderers::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::fg(&self, &yororen_ui_default_renderer::renderers::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::font_size(&self, &yororen_ui_default_renderer::renderers::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::font_weight(&self, &yororen_ui_default_renderer::renderers::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::height(&self, &yororen_ui_default_renderer::renderers::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::padding_x(&self, &yororen_ui_default_renderer::renderers::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::bg(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::border_radius(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::fg(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::font_size(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::font_weight(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::height(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::padding_x(&self, &yororen_ui_core::renderer::badge::BadgeRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::badge::BadgeRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer::compose(&self, &yororen_ui_core::headless::badge::BadgeProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer
@@ -175,9 +192,11 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::dis
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalBadgeRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer
-impl yororen_ui_default_renderer::renderers::divider::DividerRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer::color(&self, &yororen_ui_default_renderer::renderers::divider::DividerRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer::thickness(&self, &yororen_ui_default_renderer::renderers::divider::DividerRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer::color(&self, &yororen_ui_core::renderer::divider::DividerRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer::thickness(&self, &yororen_ui_core::renderer::divider::DividerRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::divider::DividerRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer::compose(&self, &yororen_ui_core::headless::divider::DividerProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer
@@ -186,13 +205,15 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::dis
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalDividerRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer
-impl yororen_ui_default_renderer::renderers::empty_state::EmptyStateRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer::body_color(&self, &yororen_ui_default_renderer::renderers::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer::gap(&self, &yororen_ui_default_renderer::renderers::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer::icon_color(&self, &yororen_ui_default_renderer::renderers::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer::icon_size(&self, &yororen_ui_default_renderer::renderers::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer::padding(&self, &yororen_ui_default_renderer::renderers::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer::title_color(&self, &yororen_ui_default_renderer::renderers::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer::body_color(&self, &yororen_ui_core::renderer::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer::gap(&self, &yororen_ui_core::renderer::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer::icon_color(&self, &yororen_ui_core::renderer::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer::icon_size(&self, &yororen_ui_core::renderer::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer::padding(&self, &yororen_ui_core::renderer::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer::title_color(&self, &yororen_ui_core::renderer::empty_state::EmptyStateRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::empty_state::EmptyStateRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer::compose(&self, &yororen_ui_core::headless::empty_state::EmptyStateProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer
@@ -201,9 +222,11 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::dis
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalEmptyStateRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer
-impl yororen_ui_default_renderer::renderers::focus_ring::FocusRingRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer::color(&self, &yororen_ui_default_renderer::renderers::focus_ring::FocusRingRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer::width(&self, &yororen_ui_default_renderer::renderers::focus_ring::FocusRingRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer::color(&self, &yororen_ui_core::renderer::focus_ring::FocusRingRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer::width(&self, &yororen_ui_core::renderer::focus_ring::FocusRingRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::focus_ring::FocusRingRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer::compose(&self, &yororen_ui_core::headless::focus_ring::FocusRingProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer
@@ -212,10 +235,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::dis
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalFocusRingRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer
-impl yororen_ui_default_renderer::renderers::heading::HeadingRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer::color(&self, &yororen_ui_default_renderer::renderers::heading::HeadingRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer::size(&self, &yororen_ui_default_renderer::renderers::heading::HeadingRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer::weight(&self, &yororen_ui_default_renderer::renderers::heading::HeadingRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
+impl yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer::color(&self, &yororen_ui_core::renderer::heading::HeadingRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer::size(&self, &yororen_ui_core::renderer::heading::HeadingRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer::weight(&self, &yororen_ui_core::renderer::heading::HeadingRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
+impl yororen_ui_core::renderer::heading::HeadingRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer::compose(&self, &yororen_ui_core::headless::heading::HeadingProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer
@@ -224,10 +249,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::dis
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalHeadingRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer
-impl yororen_ui_default_renderer::renderers::label::LabelRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer::color(&self, &yororen_ui_default_renderer::renderers::label::LabelRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer::family_mono(&self, &yororen_ui_default_renderer::renderers::label::LabelRenderState, &yororen_ui_core::theme::Theme) -> gpui::shared_string::SharedString
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer::strong_weight(&self, &yororen_ui_default_renderer::renderers::label::LabelRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
+impl yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer::color(&self, &yororen_ui_core::renderer::label::LabelRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer::family_mono(&self, &yororen_ui_core::renderer::label::LabelRenderState, &yororen_ui_core::theme::Theme) -> gpui::shared_string::SharedString
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer::strong_weight(&self, &yororen_ui_core::renderer::label::LabelRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
+impl yororen_ui_core::renderer::label::LabelRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer::compose(&self, &yororen_ui_core::headless::label::LabelProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer
@@ -236,12 +263,14 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::dis
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalLabelRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer
-impl yororen_ui_default_renderer::renderers::progress::ProgressBarRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer::border_color(&self, &yororen_ui_default_renderer::renderers::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer::fill(&self, &yororen_ui_default_renderer::renderers::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer::height(&self, &yororen_ui_default_renderer::renderers::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer::track(&self, &yororen_ui_default_renderer::renderers::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer::border_color(&self, &yororen_ui_core::renderer::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer::border_radius(&self, &yororen_ui_core::renderer::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer::fill(&self, &yororen_ui_core::renderer::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer::height(&self, &yororen_ui_core::renderer::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer::track(&self, &yororen_ui_core::renderer::progress::ProgressBarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::progress::ProgressBarRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer::compose(&self, &yororen_ui_core::headless::progress::ProgressBarProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer
@@ -250,10 +279,12 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::dis
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalProgressBarRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer
-impl yororen_ui_default_renderer::renderers::skeleton::SkeletonRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer::bg(&self, &yororen_ui_default_renderer::renderers::skeleton::SkeletonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::skeleton::SkeletonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::skeleton::SkeletonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer::bg(&self, &yororen_ui_core::renderer::skeleton::SkeletonRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer::border_radius(&self, &yororen_ui_core::renderer::skeleton::SkeletonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer::min_height(&self, &yororen_ui_core::renderer::skeleton::SkeletonRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::skeleton::SkeletonRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer::compose(&self, &yororen_ui_core::headless::skeleton::SkeletonProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer
@@ -262,16 +293,18 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::dis
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::display::BrutalSkeletonRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer
-impl yororen_ui_default_renderer::renderers::tag::TagRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::bg(&self, &yororen_ui_default_renderer::renderers::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::close_hover_bg(&self, &yororen_ui_default_renderer::renderers::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::close_size(&self, &yororen_ui_default_renderer::renderers::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::fg(&self, &yororen_ui_default_renderer::renderers::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::font_size(&self, &yororen_ui_default_renderer::renderers::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::font_weight(&self, &yororen_ui_default_renderer::renderers::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::padding_x(&self, &yororen_ui_default_renderer::renderers::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::bg(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::border_radius(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::close_hover_bg(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::close_size(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::fg(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::font_size(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::font_weight(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::text_system::FontWeight
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::min_height(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::padding_x(&self, &yororen_ui_core::renderer::tag::TagRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::tag::TagRenderer for yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer::compose(&self, &yororen_ui_core::headless::tag::TagProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::display::BrutalTagRenderer
@@ -299,15 +332,17 @@ pub use yororen_ui_brutalism_renderer::renderers::inputs::TextAreaRenderer
 pub use yororen_ui_brutalism_renderer::renderers::inputs::TextInputRenderState
 pub use yororen_ui_brutalism_renderer::renderers::inputs::TextInputRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer
-impl yororen_ui_default_renderer::renderers::combo_box::ComboBoxRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::bg(&self, &yororen_ui_default_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::border(&self, &yororen_ui_default_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::fg(&self, &yororen_ui_default_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::focus_border(&self, &yororen_ui_default_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::padding(&self, &yororen_ui_default_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::search_bg(&self, &yororen_ui_default_renderer::renderers::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::bg(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::border(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::border_radius(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::fg(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::focus_border(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::min_height(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::padding(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::search_bg(&self, &yororen_ui_core::renderer::combo_box::ComboBoxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::combo_box::ComboBoxRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer::compose(&self, &yororen_ui_core::headless::combo_box::ComboBoxProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer
@@ -316,20 +351,8 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::inp
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalComboBoxRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer
-impl yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::action_gap(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::active_border(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::bg(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::border(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::button_bg(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::button_fg(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::button_hover_bg(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::focus_border(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::hover_border(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::icon_size(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::padding(&self, &yororen_ui_default_renderer::renderers::file_path_input::FilePathInputRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+impl yororen_ui_core::renderer::file_path_input::FilePathInputRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer::compose(&self, &yororen_ui_core::headless::file_path_input::FilePathInputProps, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer
@@ -338,16 +361,8 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::inp
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalFilePathInputRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer
-impl yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer::active_border(&self, &yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer::bg(&self, &yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer::border(&self, &yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer::focus_border(&self, &yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer::hover_border(&self, &yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer::kbd_bg(&self, &yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer::kbd_fg(&self, &yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::keybinding_input::KeybindingInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer::compose(&self, &yororen_ui_core::headless::keybinding_input::KeybindingInputProps, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer
@@ -356,16 +371,8 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::inp
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalKeybindingInputRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer
-impl yororen_ui_default_renderer::renderers::number_input::NumberInputRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer::active_border(&self, &yororen_ui_default_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer::bg(&self, &yororen_ui_default_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer::border(&self, &yororen_ui_default_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer::focus_border(&self, &yororen_ui_default_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer::hover_border(&self, &yororen_ui_default_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer::padding(&self, &yororen_ui_default_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer::stepper_button_size(&self, &yororen_ui_default_renderer::renderers::number_input::NumberInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::number_input::NumberInputRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer::compose(&self, &yororen_ui_core::headless::number_input::NumberInputProps, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer
@@ -374,16 +381,8 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::inp
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalNumberInputRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer
-impl yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer::active_border(&self, &yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer::bg(&self, &yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer::border(&self, &yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer::fg(&self, &yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer::focus_border(&self, &yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer::hover_border(&self, &yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer::padding(&self, &yororen_ui_default_renderer::renderers::password_input::PasswordInputRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+impl yororen_ui_core::renderer::password_input::PasswordInputRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer::compose(&self, &yororen_ui_core::headless::password_input::PasswordInputProps, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer
@@ -392,19 +391,8 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::inp
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalPasswordInputRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer
-impl yororen_ui_default_renderer::renderers::search_input::SearchInputRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer::active_border(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer::bg(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer::border(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer::fg(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer::focus_border(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer::hover_border(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer::icon_color(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer::icon_size(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer::input_gap(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer::padding(&self, &yororen_ui_default_renderer::renderers::search_input::SearchInputRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+impl yororen_ui_core::renderer::search_input::SearchInputRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer::compose(&self, &yororen_ui_core::headless::search_input::SearchInputProps, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer
@@ -413,16 +401,18 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::inp
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSearchInputRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer
-impl yororen_ui_default_renderer::renderers::select::SelectRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::bg(&self, &yororen_ui_default_renderer::renderers::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::border(&self, &yororen_ui_default_renderer::renderers::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::chevron_rotation(&self, &yororen_ui_default_renderer::renderers::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::fg(&self, &yororen_ui_default_renderer::renderers::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::focus_border(&self, &yororen_ui_default_renderer::renderers::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::hint_color(&self, &yororen_ui_default_renderer::renderers::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::padding(&self, &yororen_ui_default_renderer::renderers::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+impl yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::bg(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::border(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::border_radius(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::chevron_rotation(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> f32
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::fg(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::focus_border(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::hint_color(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::min_height(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::padding(&self, &yororen_ui_core::renderer::select::SelectRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+impl yororen_ui_core::renderer::select::SelectRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer::compose(&self, &yororen_ui_core::headless::select::SelectProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer
@@ -431,16 +421,8 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::inp
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalSelectRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer
-impl yororen_ui_default_renderer::renderers::text_area::TextAreaRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer::active_border(&self, &yororen_ui_default_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer::bg(&self, &yororen_ui_default_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer::border(&self, &yororen_ui_default_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer::focus_border(&self, &yororen_ui_default_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer::hover_border(&self, &yororen_ui_default_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer::padding(&self, &yororen_ui_default_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer::text_color(&self, &yororen_ui_default_renderer::renderers::text_area::TextAreaRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::text_area::TextAreaRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer::compose(&self, &yororen_ui_core::headless::text_area::TextAreaProps, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer
@@ -449,20 +431,8 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::inp
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextAreaRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer
-impl yororen_ui_default_renderer::renderers::text_input::TextInputRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::active_border(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::bg(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::border(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::cursor_color(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::disabled_opacity(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::focus_border(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::hint_color(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::hover_border(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::padding(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::selection_color(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::text_color(&self, &yororen_ui_default_renderer::renderers::text_input::TextInputRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::text_input::TextInputRenderer for yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer::compose(&self, &yororen_ui_core::headless::text_input::TextInputProps, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::inputs::BrutalTextInputRenderer
@@ -478,11 +448,13 @@ pub use yororen_ui_brutalism_renderer::renderers::lists::ListItemRenderer
 pub use yororen_ui_brutalism_renderer::renderers::lists::TreeItemRenderState
 pub use yororen_ui_brutalism_renderer::renderers::lists::TreeItemRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer
-impl yororen_ui_default_renderer::renderers::form::FormRenderer for yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer::error_color(&self, &yororen_ui_default_renderer::renderers::form::FormRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer::gap(&self, &yororen_ui_default_renderer::renderers::form::FormRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer::helper_color(&self, &yororen_ui_default_renderer::renderers::form::FormRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer::label_color(&self, &yororen_ui_default_renderer::renderers::form::FormRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer::error_color(&self, &yororen_ui_core::renderer::form::FormRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer::gap(&self, &yororen_ui_core::renderer::form::FormRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer::helper_color(&self, &yororen_ui_core::renderer::form::FormRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer::label_color(&self, &yororen_ui_core::renderer::form::FormRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::form::FormRenderer for yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer::compose(&self, &yororen_ui_core::headless::form::FormProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer
@@ -491,14 +463,16 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::lis
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::lists::BrutalFormRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer
-impl yororen_ui_default_renderer::renderers::list_item::ListItemRenderer for yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::bg(&self, &yororen_ui_default_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::fg(&self, &yororen_ui_default_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::hover_bg(&self, &yororen_ui_default_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::padding(&self, &yororen_ui_default_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::selected_bg(&self, &yororen_ui_default_renderer::renderers::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::bg(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::border_radius(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::fg(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::hover_bg(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::min_height(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::padding(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::selected_bg(&self, &yororen_ui_core::renderer::list_item::ListItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::list_item::ListItemRenderer for yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer::compose(&self, &yororen_ui_core::headless::list_item::ListItemProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer
@@ -507,15 +481,17 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::lis
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::lists::BrutalListItemRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer
-impl yororen_ui_default_renderer::renderers::tree_item::TreeItemRenderer for yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::bg(&self, &yororen_ui_default_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::chevron_size(&self, &yororen_ui_default_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::fg(&self, &yororen_ui_default_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::hover_bg(&self, &yororen_ui_default_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::indent(&self, &yororen_ui_default_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::padding(&self, &yororen_ui_default_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::selected_bg(&self, &yororen_ui_default_renderer::renderers::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::bg(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::chevron_size(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::fg(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::hover_bg(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::indent(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::min_height(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::padding(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::selected_bg(&self, &yororen_ui_core::renderer::tree_item::TreeItemRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::tree_item::TreeItemRenderer for yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer::compose(&self, &yororen_ui_core::headless::tree_item::TreeItemProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::lists::BrutalTreeItemRenderer
@@ -529,12 +505,12 @@ pub use yororen_ui_brutalism_renderer::renderers::notifications::NotificationRen
 pub use yororen_ui_brutalism_renderer::renderers::notifications::ToastRenderState
 pub use yororen_ui_brutalism_renderer::renderers::notifications::ToastRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer
-impl yororen_ui_default_renderer::renderers::notification::NotificationRenderer for yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer::bg(&self, &yororen_ui_default_renderer::renderers::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer::border(&self, &yororen_ui_default_renderer::renderers::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer::padding(&self, &yororen_ui_default_renderer::renderers::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer::shadow_alpha(&self, &yororen_ui_default_renderer::renderers::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_core::renderer::notification::NotificationRenderer for yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer::bg(&self, &yororen_ui_core::renderer::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer::border(&self, &yororen_ui_core::renderer::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer::border_radius(&self, &yororen_ui_core::renderer::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer::padding(&self, &yororen_ui_core::renderer::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::notification::NotificationRenderState, &yororen_ui_core::theme::Theme) -> f32
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer
@@ -543,13 +519,13 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::not
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::notifications::BrutalNotificationRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer
-impl yororen_ui_default_renderer::renderers::toast::ToastRenderer for yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer::bg(&self, &yororen_ui_default_renderer::renderers::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer::border(&self, &yororen_ui_default_renderer::renderers::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer::fg(&self, &yororen_ui_default_renderer::renderers::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer::padding(&self, &yororen_ui_default_renderer::renderers::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer::shadow_alpha(&self, &yororen_ui_default_renderer::renderers::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_core::renderer::toast::ToastRenderer for yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer::bg(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer::border(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer::border_radius(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer::fg(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer::padding(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::toast::ToastRenderState, &yororen_ui_core::theme::Theme) -> f32
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::notifications::BrutalToastRenderer
@@ -567,14 +543,16 @@ pub use yororen_ui_brutalism_renderer::renderers::overlays::ModalRenderer
 pub use yororen_ui_brutalism_renderer::renderers::overlays::PopoverRenderState
 pub use yororen_ui_brutalism_renderer::renderers::overlays::PopoverRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer
-impl yororen_ui_default_renderer::renderers::disclosure::DisclosureRenderer for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::body_padding(&self, &yororen_ui_default_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::chevron_rotation(&self, &yororen_ui_default_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::trigger_bg(&self, &yororen_ui_default_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::trigger_fg(&self, &yororen_ui_default_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::trigger_hover_bg(&self, &yororen_ui_default_renderer::renderers::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::body_padding(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::border_radius(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::chevron_rotation(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> f32
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::min_height(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::trigger_bg(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::trigger_fg(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::trigger_hover_bg(&self, &yororen_ui_core::renderer::disclosure::DisclosureRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::disclosure::DisclosureRenderer for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer::compose(&self, &yororen_ui_core::headless::disclosure::DisclosureProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer
@@ -583,13 +561,15 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::ove
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDisclosureRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer
-impl yororen_ui_default_renderer::renderers::dropdown_menu::DropdownMenuRenderer for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer::chevron_rotation(&self, &yororen_ui_default_renderer::renderers::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer::min_height(&self, &yororen_ui_default_renderer::renderers::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer::trigger_bg(&self, &yororen_ui_default_renderer::renderers::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer::trigger_fg(&self, &yororen_ui_default_renderer::renderers::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer::trigger_hover_bg(&self, &yororen_ui_default_renderer::renderers::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer::border_radius(&self, &yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer::chevron_rotation(&self, &yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> f32
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer::min_height(&self, &yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer::trigger_bg(&self, &yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer::trigger_fg(&self, &yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer::trigger_hover_bg(&self, &yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::dropdown_menu::DropdownMenuRenderer for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer::compose(&self, &yororen_ui_core::headless::dropdown_menu::DropdownMenuProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer
@@ -598,13 +578,15 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::ove
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::overlays::BrutalDropdownMenuRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer
-impl yororen_ui_default_renderer::renderers::modal::ModalRenderer for yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer::panel_bg(&self, &yororen_ui_default_renderer::renderers::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer::panel_border(&self, &yororen_ui_default_renderer::renderers::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer::panel_border_radius(&self, &yororen_ui_default_renderer::renderers::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer::panel_padding(&self, &yororen_ui_default_renderer::renderers::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer::panel_shadow_alpha(&self, &yororen_ui_default_renderer::renderers::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> f32
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer::scrim(&self, &yororen_ui_default_renderer::renderers::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer::panel_bg(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer::panel_border(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer::panel_border_radius(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer::panel_padding(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer::panel_shadow_alpha(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> f32
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer::scrim(&self, &yororen_ui_core::renderer::modal::ModalRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::modal::ModalRenderer for yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer::compose(&self, &yororen_ui_core::headless::modal::ModalProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer
@@ -613,12 +595,14 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::ove
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::overlays::BrutalModalRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer
-impl yororen_ui_default_renderer::renderers::popover::PopoverRenderer for yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer::bg(&self, &yororen_ui_default_renderer::renderers::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer::border(&self, &yororen_ui_default_renderer::renderers::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer::offset(&self, &yororen_ui_default_renderer::renderers::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer::shadow_alpha(&self, &yororen_ui_default_renderer::renderers::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer::bg(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer::border(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer::border_radius(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer::offset(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::popover::PopoverRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_core::renderer::popover::PopoverRenderer for yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer::compose(&self, &yororen_ui_core::headless::popover::PopoverProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::overlays::BrutalPopoverRenderer
@@ -636,13 +620,15 @@ pub use yororen_ui_brutalism_renderer::renderers::surfaces::PanelRenderer
 pub use yororen_ui_brutalism_renderer::renderers::surfaces::TooltipRenderState
 pub use yororen_ui_brutalism_renderer::renderers::surfaces::TooltipRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer
-impl yororen_ui_default_renderer::renderers::avatar::AvatarRenderer for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer::default_bg(&self, &yororen_ui_default_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer::status_border_color(&self, &yororen_ui_default_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer::status_border_w(&self, &yororen_ui_default_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer::status_dot_size(&self, &yororen_ui_default_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer::status_inset(&self, &yororen_ui_default_renderer::renderers::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer::border_radius(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer::default_bg(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer::status_border_color(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer::status_border_w(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer::status_dot_size(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer::status_inset(&self, &yororen_ui_core::renderer::avatar::AvatarRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+impl yororen_ui_core::renderer::avatar::AvatarRenderer for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer::compose(&self, &yororen_ui_core::headless::avatar::AvatarProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer
@@ -651,12 +637,14 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::sur
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalAvatarRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer
-impl yororen_ui_default_renderer::renderers::card::CardRenderer for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer::bg(&self, &yororen_ui_default_renderer::renderers::card::CardRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer::border(&self, &yororen_ui_default_renderer::renderers::card::CardRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::card::CardRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer::padding(&self, &yororen_ui_default_renderer::renderers::card::CardRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer::shadow_alpha(&self, &yororen_ui_default_renderer::renderers::card::CardRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer::bg(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer::border(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer::border_radius(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer::padding(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::card::CardRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_core::renderer::card::CardRenderer for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer::compose(&self, &yororen_ui_core::headless::card::CardProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer
@@ -665,12 +653,14 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::sur
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalCardRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer
-impl yororen_ui_default_renderer::renderers::panel::PanelRenderer for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer::bg(&self, &yororen_ui_default_renderer::renderers::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer::border(&self, &yororen_ui_default_renderer::renderers::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer::padding(&self, &yororen_ui_default_renderer::renderers::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer::shadow_alpha(&self, &yororen_ui_default_renderer::renderers::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer::bg(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer::border(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer::border_radius(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer::padding(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::panel::PanelRenderState, &yororen_ui_core::theme::Theme) -> f32
+impl yororen_ui_core::renderer::panel::PanelRenderer for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer::compose(&self, &yororen_ui_core::headless::panel::PanelProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer
@@ -679,12 +669,14 @@ impl core::marker::UnsafeUnpin for yororen_ui_brutalism_renderer::renderers::sur
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalPanelRenderer
 pub struct yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer
-impl yororen_ui_default_renderer::renderers::tooltip::TooltipRenderer for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer::bg(&self, &yororen_ui_default_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer::border_radius(&self, &yororen_ui_default_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer::fg(&self, &yororen_ui_default_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer::font_size(&self, &yororen_ui_default_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
-pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer::padding(&self, &yororen_ui_default_renderer::renderers::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_default_renderer::renderers::spec::Edges<gpui::geometry::Pixels>
+impl yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer::bg(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer::border_radius(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer::fg(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer::font_size(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer::padding(&self, &yororen_ui_core::renderer::tooltip::TooltipRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+impl yororen_ui_core::renderer::tooltip::TooltipRenderer for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer
+pub fn yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer::compose(&self, &yororen_ui_core::headless::tooltip::TooltipProps, &gpui::app::App) -> gpui::elements::div::Div
 impl core::marker::Freeze for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer
 impl core::marker::Send for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer
 impl core::marker::Sync for yororen_ui_brutalism_renderer::renderers::surfaces::BrutalTooltipRenderer

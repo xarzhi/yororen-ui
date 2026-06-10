@@ -583,41 +583,170 @@ impl SplitButtonRenderer for BrutalSplitButtonRenderer {
         props: &yororen_ui_core::headless::split_button::SplitButtonProps,
         cx: &App,
     ) -> Div {
+        use std::sync::Arc;
+        use yororen_ui_core::headless::dropdown_menu::DropdownItem;
+        use yororen_ui_core::headless::list_item::ListItemProps;
+        use yororen_ui_core::headless::split_button::ClickCallback;
         use yororen_ui_core::theme::ActiveTheme;
+
         let theme = cx.theme();
+        let open = props
+            .state
+            .as_ref()
+            .map(|s| s.read(cx).is_open())
+            .unwrap_or(false);
         let state = SplitButtonRenderState {
-            open: false,
+            open,
             disabled: props.disabled,
         };
-        let pbg = self.primary_bg(&state, theme);
-        let pfg = self.primary_fg(&state, theme);
-        let cbg = self.chevron_bg(&state, theme);
-        let cfg = self.chevron_fg(&state, theme);
-        let h = self.min_height(&state, theme);
-        let r = self.border_radius(&state, theme);
-        let _ = props;
-        gpui::div()
+
+        // ---- Primary button ----
+        let primary_id: ElementId = format!("{:?}-primary", props.id).into();
+        let primary = ButtonProps {
+            id: primary_id,
+            focus_handle: props.primary_focus.clone(),
+            on_click: Some(props.primary.clone()),
+            disabled: props.disabled,
+            clickable: true,
+            variant: ActionVariantKind::Neutral,
+            caption: props.caption.clone(),
+            icon: None,
+            icon_size: px(16.),
+        }
+        .render(cx);
+
+        // ---- Chevron button ----
+        let state_for_chevron = props.state.clone();
+        let chevron_click: ClickCallback = Arc::new(
+            move |_ev: &gpui::ClickEvent, _w: &mut gpui::Window, cx: &mut App| {
+                if let Some(s) = state_for_chevron.as_ref() {
+                    s.update(cx, |st, _cx| st.toggle());
+                }
+            },
+        );
+        let chevron_label = if open { "▴" } else { "▾" };
+        let chevron_id: ElementId = format!("{:?}-chevron", props.id).into();
+        let chevron_w = px(theme
+            .get_number("tokens.control.split_button.chevron_width")
+            .unwrap_or(36.0) as f32);
+        let chevron = ButtonProps {
+            id: chevron_id,
+            focus_handle: props.chevron_focus.clone(),
+            on_click: Some(chevron_click),
+            disabled: props.disabled,
+            clickable: true,
+            variant: ActionVariantKind::Neutral,
+            caption: Some(chevron_label.into()),
+            icon: None,
+            icon_size: px(16.),
+        }
+        .render(cx)
+        .w(chevron_w)
+        .px(px(0.));
+
+        // ---- Dropdown body ----
+        // `gpui::deferred(...)` so the popover paints *after*
+        // every other sibling in the tree. `.absolute()` only
+        // takes the menu out of layout flow; without `deferred`
+        // any later sibling would draw on top of it.
+        let gap = self.gap(&state, theme);
+        let root = div()
+            .relative()
             .flex()
+            .flex_row()
             .items_center()
-            .bg(pbg)
-            .text_color(pfg)
-            .min_h(h)
-            .rounded(r)
-            .child(
-                gpui::div()
-                    .flex()
-                    .items_center()
-                    .px(px(12.0))
-                    .child("Run"),
-            )
-            .child(
-                gpui::div()
-                    .flex()
-                    .items_center()
-                    .bg(cbg)
-                    .text_color(cfg)
-                    .px(px(8.0))
-                    .child("▼"),
-            )
+            .gap(gap)
+            .child(primary)
+            .child(chevron);
+        if open {
+            let panel_bg = theme
+                .get_color("surface.popover")
+                .or_else(|| theme.get_color("surface.raised"))
+                .unwrap_or(BRUTAL_BORDER);
+            let panel_border = brutal_border_color(theme);
+            let item_hover_bg = theme
+                .get_color("surface.hover")
+                .unwrap_or(BRUTAL_BORDER);
+            let divider_color = theme
+                .get_color("border.divider")
+                .unwrap_or(BRUTAL_BORDER);
+            let menu_w = px(theme
+                .get_number("tokens.control.split_button.menu_width")
+                .unwrap_or(200.0) as f32);
+            let min_h = self.min_height(&state, theme);
+            let menu_offset = min_h + px(4.);
+
+            let shadow_spec = brutal_shadow(theme);
+            let mut menu = div()
+                .absolute()
+                .top(menu_offset)
+                .left_0()
+                .w(menu_w)
+                .bg(panel_bg)
+                .border(px(BRUTAL_BORDER_WIDTH as f32))
+                .border_color(panel_border)
+                .rounded(px(BRUTAL_RADIUS))
+                .p(px(4.))
+                .flex()
+                .flex_col()
+                .gap(px(2.))
+                .shadow(vec![gpui::BoxShadow {
+                    color: shadow_spec.color,
+                    offset: gpui::point(px(0.0), shadow_spec.offset_y),
+                    blur_radius: shadow_spec.blur,
+                    spread_radius: px(0.0),
+                }]);
+
+            for it in &props.items {
+                match it {
+                    DropdownItem::Item(item) => {
+                        let item_id_str = item.id.clone();
+                        let item_label = item.label.clone();
+                        let item_disabled = item.disabled;
+                        let state_for_click = props.state.clone();
+                        let on_select_for_click = props.on_select.clone();
+                        let item_id_for_callback = item_id_str.clone();
+
+                        let row_id: ElementId =
+                            format!("{:?}-item-{}", props.id, item_id_str).into();
+                        let list_item_el = ListItemProps {
+                            id: row_id,
+                            title: item_label,
+                            description: None,
+                            leading_icon: None,
+                            trailing_icon: None,
+                            selected: false,
+                            disabled: item_disabled,
+                        }
+                        .render(cx);
+
+                        let item_el = if !item_disabled {
+                            list_item_el
+                                .w_full()
+                                .cursor_pointer()
+                                .hover(move |s| s.bg(item_hover_bg))
+                                .on_click(move |_ev, window, cx| {
+                                    if let Some(st) = state_for_click.as_ref() {
+                                        st.update(cx, |s, _cx| s.close());
+                                    }
+                                    if let Some(cb) = on_select_for_click.as_ref() {
+                                        cb(item_id_for_callback.clone(), window, cx);
+                                    }
+                                })
+                        } else {
+                            list_item_el.w_full()
+                        };
+                        menu = menu.child(item_el);
+                    }
+                    DropdownItem::Separator => {
+                        menu = menu.child(div().h(px(1.)).bg(divider_color).my(px(2.)));
+                    }
+                    DropdownItem::Group(_) => {}
+                }
+            }
+            root.child(gpui::deferred(menu).with_priority(1))
+        } else {
+            root
+        }
     }
 }
