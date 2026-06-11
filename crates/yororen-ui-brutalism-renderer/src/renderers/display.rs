@@ -2,12 +2,23 @@
 //! `FocusRing`, `Badge`, `Tag`, `Skeleton`, `ProgressBar`,
 //! `EmptyState`.
 
-use gpui::{App, BoxShadow, Div, FontWeight, Hsla, InteractiveElement, ParentElement, Pixels, SharedString, Stateful, Styled, point, px};
+use gpui::{
+    AbsoluteLength, App, BorderStyle, Bounds, BoxShadow, Corners, DefiniteLength, Div, Edges,
+    Element, ElementId, FontWeight, GlobalElementId, Hsla, InspectorElementId, InteractiveElement,
+    IntoElement, LayoutId, Length, Pixels, Position, SharedString, Stateful, StatefulInteractiveElement,
+    Style, Styled, Window, hsla, point, px,
+};
+use std::sync::OnceLock;
+use std::time::Instant;
+
+use yororen_ui_core::animation::ease_in_out;
 use yororen_ui_core::headless::badge::BadgeVariant;
 use yororen_ui_core::headless::label::LabelProps;
-use yororen_ui_core::renderer::spec::Edges;
+use yororen_ui_core::renderer::spec::Edges as SpecEdges;
 use yororen_ui_core::theme::ActiveTheme;
 use yororen_ui_core::theme::Theme;
+
+use gpui::ParentElement;
 
 use crate::style::{
     BRUTAL_BORDER, BRUTAL_BORDER_WIDTH, BRUTAL_FONT_FAMILY, BRUTAL_RADIUS, brutal_border_color,
@@ -332,6 +343,7 @@ impl BadgeRenderer for BrutalBadgeRenderer {
         gpui::div()
             .flex()
             .items_center()
+            .justify_center()
             .bg(bg)
             .text_color(fg)
             .px(px_v)
@@ -457,18 +469,41 @@ impl TagRenderer for BrutalTagRenderer {
             .font_weight(fw)
             .rounded(r)
             .gap(p / 2.)
+            .border_2()
+            .border_color(brutal_border_color(theme))
             .child(props.label.clone());
         if props.closable {
             let close_size = self.close_size(&state, theme);
-            el = el.child(
-                gpui::div()
-                    .flex()
-                    .items_center()
-                    .justify_center()
-                    .size(close_size)
-                    .rounded(close_size / 2.)
-                    .child("×"),
-            );
+            // `on_click` lives on `StatefulInteractiveElement`,
+            // which requires an id. Derive a stable, unique id
+            // from the tag's own id so the close button gets a
+            // distinct identity.
+            let close_id: gpui::ElementId = match &props.id {
+                gpui::ElementId::Name(name) => {
+                    let mut s = name.to_string();
+                    s.push_str("__close");
+                    s.into()
+                }
+                _ => "brutal_tag_close".into(),
+            };
+            let mut close_btn = gpui::div()
+                .id(close_id)
+                .flex()
+                .items_center()
+                .justify_center()
+                .size(close_size)
+                .rounded(close_size / 2.)
+                .cursor(gpui::CursorStyle::PointingHand)
+                .child("×");
+            if !props.disabled
+                && let Some(f) = props.on_close.clone()
+            {
+                close_btn = close_btn.on_click(move |ev, window, cx: &mut gpui::App| {
+                    cx.stop_propagation();
+                    f(ev, window, cx);
+                });
+            }
+            el = el.child(close_btn);
         }
         el
     }
@@ -502,6 +537,118 @@ impl BrutalSkeletonRenderer {
     }
 }
 
+/// Pulse opacity range (matches `yororen_ui_core::animation::preset::defaults`).
+const BRUTAL_SKELETON_PULSE_MIN: f32 = 0.55;
+const BRUTAL_SKELETON_PULSE_MAX: f32 = 0.95;
+
+/// Animation epoch — all skeletons in the app pulse in sync,
+/// which is the standard loading-animation behavior. Captured
+/// once on first paint via `OnceLock`.
+static BRUTAL_SKELETON_PULSE_EPOCH: OnceLock<Instant> = OnceLock::new();
+
+/// A `Length` of zero pixels for `Edges::all` — pins the
+/// absolutely-positioned overlay to all four sides of its parent
+/// Div (the "fill the parent" idiom).
+const BRUTAL_ZERO_LENGTH: Length =
+    Length::Definite(DefiniteLength::Absolute(AbsoluteLength::Pixels(gpui::px(0.))));
+
+/// Custom `gpui::Element` that paints a single rounded quad with
+/// a time-varying alpha, producing the skeleton pulse animation.
+struct BrutalSkeletonPulseElement {
+    bg: Hsla,
+    radius: Pixels,
+    duration_ms: u64,
+}
+
+impl IntoElement for BrutalSkeletonPulseElement {
+    type Element = Self;
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}
+
+impl Element for BrutalSkeletonPulseElement {
+    type RequestLayoutState = ();
+    type PrepaintState = ();
+
+    fn id(&self) -> Option<ElementId> {
+        None
+    }
+
+    fn source_location(&self) -> Option<&'static core::panic::Location<'static>> {
+        None
+    }
+
+    fn request_layout(
+        &mut self,
+        _id: Option<&GlobalElementId>,
+        _inspector_id: Option<&InspectorElementId>,
+        window: &mut Window,
+        cx: &mut App,
+    ) -> (LayoutId, Self::RequestLayoutState) {
+        let style = Style {
+            position: Position::Absolute,
+            inset: Edges::all(BRUTAL_ZERO_LENGTH),
+            ..Default::default()
+        };
+        (window.request_layout(style, [], cx), ())
+    }
+
+    fn prepaint(
+        &mut self,
+        _id: Option<&GlobalElementId>,
+        _inspector_id: Option<&InspectorElementId>,
+        _bounds: Bounds<Pixels>,
+        _request_layout: &mut Self::RequestLayoutState,
+        window: &mut Window,
+        _cx: &mut App,
+    ) -> Self::PrepaintState {
+        let _ = BRUTAL_SKELETON_PULSE_EPOCH.get_or_init(Instant::now);
+        window.request_animation_frame();
+    }
+
+    fn paint(
+        &mut self,
+        _id: Option<&GlobalElementId>,
+        _inspector_id: Option<&InspectorElementId>,
+        bounds: Bounds<Pixels>,
+        _request_layout: &mut Self::RequestLayoutState,
+        _prepaint: &mut Self::PrepaintState,
+        window: &mut Window,
+        _cx: &mut App,
+    ) {
+        let epoch = BRUTAL_SKELETON_PULSE_EPOCH.get_or_init(Instant::now);
+        let elapsed_ms = epoch.elapsed().as_millis() as u64;
+        let progress = if self.duration_ms == 0 {
+            0.0
+        } else {
+            (elapsed_ms % self.duration_ms) as f32 / self.duration_ms as f32
+        };
+        // Triangle wave 0 → 1 → 0 so the alpha ramps UP for
+        // the first half, then BACK DOWN — a true "breath"
+        // instead of a sawtooth that snaps from MAX back to MIN
+        // at the cycle boundary.
+        let tri = if progress < 0.5 {
+            progress * 2.0
+        } else {
+            2.0 - progress * 2.0
+        };
+        let eased = ease_in_out(tri);
+        let alpha_mult =
+            BRUTAL_SKELETON_PULSE_MIN + (BRUTAL_SKELETON_PULSE_MAX - BRUTAL_SKELETON_PULSE_MIN) * eased;
+        let color = hsla(self.bg.h, self.bg.s, self.bg.l, self.bg.a * alpha_mult);
+
+        window.paint_quad(gpui::PaintQuad {
+            bounds,
+            corner_radii: Corners::all(self.radius).clamp_radii_for_quad_size(bounds.size),
+            background: color.into(),
+            border_color: hsla(0., 0., 0., 0.),
+            border_widths: Edges::default(),
+            border_style: BorderStyle::default(),
+        });
+    }
+}
+
 impl SkeletonRenderer for BrutalSkeletonRenderer {
     fn compose(
         &self,
@@ -517,7 +664,18 @@ impl SkeletonRenderer for BrutalSkeletonRenderer {
         let bg = self.bg(&state, theme);
         let min_h = self.min_height(&state, theme);
         let radius = self.border_radius(&state, theme);
-        gpui::div().bg(bg).min_h(min_h).rounded(radius)
+        let duration_ms = theme
+            .get_number("motion.duration_skeleton_pulse")
+            .unwrap_or(1100.0) as u64;
+
+        gpui::div()
+            .min_h(min_h)
+            .rounded(radius)
+            .child(BrutalSkeletonPulseElement {
+                bg,
+                radius,
+                duration_ms,
+            })
     }
 }
 
@@ -618,11 +776,11 @@ impl BrutalEmptyStateRenderer {
             .get_color("content.secondary")
             .unwrap_or(BRUTAL_BORDER)
     }
-    pub fn padding(&self, _: &EmptyStateRenderState, theme: &Theme) -> Edges<Pixels> {
+    pub fn padding(&self, _: &EmptyStateRenderState, theme: &Theme) -> SpecEdges<Pixels> {
         let p = theme
             .get_number("tokens.control.empty_state.padding")
             .unwrap_or(32.0) as f32;
-        Edges::all(px(p))
+        SpecEdges::all(px(p))
     }
     pub fn icon_size(&self, _: &EmptyStateRenderState, _: &Theme) -> Pixels {
         px(48.0)
