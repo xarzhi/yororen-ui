@@ -8,10 +8,11 @@ use gpui::{
 };
 
 use yororen_ui_core::headless::combo_box::ComboBoxProps;
+use yororen_ui_core::headless::text_input_element::{
+    TextInputElement, start_cursor_blink, wire_input_keyboard,
+};
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
-
-use crate::renderers::text_input::TokenTextInputRenderer;
 
 pub use yororen_ui_core::renderer::combo_box::{ComboBoxRenderState, ComboBoxRenderer};
 
@@ -81,20 +82,28 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
         cx: &mut App,
         window: &mut Window,
     ) -> AnyElement {
-        use yororen_ui_core::headless::text_input::{TextInputProps, TextInputState};
-        use yororen_ui_core::renderer::text_input::TextInputRenderer;
         use yororen_ui_core::theme::ActiveTheme;
 
         let theme = cx.theme().clone();
-        let state_read = props.state.read(cx);
-        let state = ComboBoxRenderState {
-            open: state_read.is_open(),
-            disabled: false,
-            has_value: state_read.value.is_some(),
-            custom_bg: None,
-            custom_border: None,
-            custom_focus_border: None,
-            custom_fg: None,
+        let (state, text, value, options, is_open, placeholder) = {
+            let state_read = props.state.read(cx);
+            let state = ComboBoxRenderState {
+                open: state_read.is_open(),
+                disabled: false,
+                has_value: state_read.value.is_some(),
+                custom_bg: None,
+                custom_border: None,
+                custom_focus_border: None,
+                custom_fg: None,
+            };
+            (
+                state,
+                state_read.text.clone(),
+                state_read.value.clone(),
+                state_read.options.clone(),
+                state_read.is_open(),
+                state_read.placeholder.clone(),
+            )
         };
         let bg = self.bg(&state, &theme);
         let border = self.border(&state, &theme);
@@ -102,20 +111,17 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
         let pad = self.padding(&state, &theme);
         let h = self.min_height(&state, &theme);
         let r = self.border_radius(&state, &theme);
-        let text = state_read.text.clone();
-        let value = state_read.value.clone();
-        let options = state_read.options.clone();
-        let is_open = state_read.is_open();
-        let placeholder = state_read.placeholder.clone();
 
-        // Text-input trigger. Sync the input's value to
-        // `combo_state.text`; when text is empty but a
-        // value is picked, the input falls back to the
-        // value's label.
-        let ti_id: gpui::ElementId = (props.id.clone(), "combo-trigger-text-input").into();
-        let ti_state = window.use_keyed_state(ti_id.clone(), cx, |_window, cx| {
-            TextInputState::new(&mut *cx)
-        });
+        // The combo's trigger is a real text input backed directly by
+        // `ComboBoxState.core`. No separate `TextInputState` entity.
+        let focus_handle = props.state.read(cx).core.focus_handle();
+        let focused = focus_handle.is_focused(window);
+        if focused {
+            start_cursor_blink(props.state.clone(), window, cx);
+        } else {
+            props.state.update(cx, |s, _cx| s.core.cursor_visible = true);
+        }
+
         let display_str: String = if !text.is_empty() {
             text.clone()
         } else if let Some(v) = &value {
@@ -127,48 +133,28 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
         } else {
             String::new()
         };
-        ti_state.update(cx, |s, _cx| {
-            if s.value != display_str {
-                s.set_value(display_str.clone());
-            }
-        });
-
-        let combo_state_for_text = props.state.clone();
-
-        let ti_props = TextInputProps {
-            id: ti_id,
-            placeholder: placeholder.to_string(),
-            disabled: false,
-            max_length: None,
-            on_change: Some(Arc::new(move |new: &str, _w: &mut Window, cx: &mut App| {
-                combo_state_for_text.update(cx, |s, _cx| {
-                    s.text = new.to_string();
-                    if !s.is_open() {
-                        s.open();
-                    }
-                });
-            })),
-            on_submit: None,
-            // The text input lives INSIDE the trigger
-            // div which already supplies its own border. We
-            // want the input to look "naked" — no inner
-            // border ring around the editable area.
-            has_custom_bg: false,
-            has_custom_border: true,
-            has_custom_focus_border: true,
-            custom_bg: None,
-            custom_border: Some(gpui::hsla(0.0, 0.0, 0.0, 0.0)),
-            custom_focus_border: Some(gpui::hsla(0.0, 0.0, 0.0, 0.0)),
-            custom_text_color: None,
-        };
-        let ti_element = <TokenTextInputRenderer as TextInputRenderer>::compose(
-            &TokenTextInputRenderer,
-            &ti_props,
-            cx,
-            window,
-        );
 
         let hint_color = theme.get_color("content.tertiary").unwrap_or_default();
+        let text_color = theme.get_color("content.primary").unwrap_or_default();
+        let cursor_color = theme.get_color("border.focus").unwrap_or_default();
+        let selection_color = {
+            let c = theme.get_color("border.focus").unwrap_or_default();
+            gpui::hsla(c.h, c.s, c.l, 0.25)
+        };
+
+        let ti_element = TextInputElement {
+            state: props.state.clone(),
+            focus_handle: focus_handle.clone(),
+            disabled: false,
+            text_color,
+            hint_color,
+            cursor_color,
+            selection_color,
+            placeholder,
+            value_override: Some(display_str),
+        }
+        .into_any_element();
+
         let mut trigger: Stateful<Div> = div()
             .flex()
             .items_center()
@@ -179,6 +165,7 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
             .min_h(h)
             .rounded(r)
             .id("default-combo-trigger")
+            .track_focus(&focus_handle)
             .child(div().flex_1().min_w(px(0.)).child(ti_element))
             .child(
                 div()
@@ -193,6 +180,8 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
         trigger = trigger.on_click(move |_ev, _window, cx| {
             combo_state_for_open.update(cx, |s, _cx| s.toggle());
         });
+
+        let trigger = wire_input_keyboard(trigger, props.state.clone(), focus_handle, false, None);
 
         // Filtered options: case-insensitive `contains`.
         let needle = text.to_lowercase();

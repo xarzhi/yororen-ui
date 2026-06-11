@@ -83,6 +83,7 @@ pub mod text;
 pub mod text_area;
 pub mod text_area_element;
 pub mod text_input;
+pub mod text_input_core;
 pub mod text_input_element;
 pub mod toggle_button;
 pub mod tooltip;

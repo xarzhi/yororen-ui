@@ -1,9 +1,20 @@
 //! Headless `combo_box` — text input + option list + keyboard
 //! navigation. The renderer shows a text field + a dropdown list.
 
+use std::ops::Range;
 use std::sync::Arc;
 
-use gpui::{App, AppContext, Div, ElementId, Entity, InteractiveElement, SharedString, Stateful};
+use gpui::{
+    App, AppContext, Bounds, Context, Div, ElementId, Entity, EntityInputHandler, FocusHandle,
+    Focusable, InteractiveElement, Pixels, SharedString, ShapedLine, Stateful, UTF16Selection, Window,
+};
+
+use crate::headless::text_input::{
+    Backspace, Copy, Cut, Delete, End, Enter, Escape, Home, Left, Paste, Right, SelectAll,
+    SelectLeft, SelectRight, ShowCharacterPalette, TextInputActionHandler,
+};
+use crate::headless::text_input_core::TextInputCore;
+use crate::headless::text_input_element::TextInputPainterHost;
 
 #[derive(Clone, Debug)]
 pub struct ComboBoxOption {
@@ -31,11 +42,13 @@ pub struct ComboBoxState {
     pub highlighted_index: Option<usize>,
     pub placeholder: SharedString,
     pub dismiss_on_escape: bool,
+    pub core: TextInputCore,
     on_change: Option<ComboBoxChangeCallback>,
 }
 
 impl ComboBoxState {
     pub fn new(app: &mut App) -> Entity<Self> {
+        let core = TextInputCore::new(app);
         app.new(|_| Self {
             open: false,
             text: String::new(),
@@ -44,6 +57,7 @@ impl ComboBoxState {
             highlighted_index: None,
             placeholder: "Search…".into(),
             dismiss_on_escape: true,
+            core,
             on_change: None,
         })
     }
@@ -72,6 +86,11 @@ impl ComboBoxState {
         if let Some(opt) = self.options.iter().find(|o| o.value == v) {
             self.text = opt.label.to_string();
         }
+        // Keep the embedded text-input caret/selection valid.
+        self.core.move_to(&self.text, self.text.len());
+        self.core.selection_start = 0;
+        self.core.selection_end = 0;
+        self.core.scroll_x = Pixels::ZERO;
     }
     pub fn set_placeholder(&mut self, p: impl Into<SharedString>) {
         self.placeholder = p.into();
@@ -140,6 +159,264 @@ impl ComboBoxState {
             self.open = false;
             self.invoke_change(value, window, cx);
         }
+    }
+}
+
+// =====================================================================
+// `TextInputPainterHost` — lets the generic `TextInputElement` paint
+// the combo's embedded text input using `combo_state.text` as the
+// display value and `combo_state.core` for caret / selection / IME.
+// =====================================================================
+
+impl TextInputPainterHost for ComboBoxState {
+    fn display_value(&self) -> String {
+        self.text.clone()
+    }
+    fn placeholder(&self) -> SharedString {
+        self.placeholder.clone()
+    }
+    fn caret(&self) -> usize {
+        self.core.caret
+    }
+    fn selected_range(&self) -> Range<usize> {
+        self.core.selected_range()
+    }
+    fn scroll_x(&self) -> Pixels {
+        self.core.scroll_x
+    }
+    fn cursor_visible(&self) -> bool {
+        self.core.cursor_visible
+    }
+    fn set_cursor_visible(&mut self, visible: bool) {
+        self.core.cursor_visible = visible;
+    }
+    fn cursor_blink_epoch(&self) -> usize {
+        self.core.cursor_blink_epoch
+    }
+    fn set_cursor_blink_epoch(&mut self, epoch: usize) {
+        self.core.cursor_blink_epoch = epoch;
+    }
+    fn marked_range(&self) -> Option<Range<usize>> {
+        self.core.marked_range.clone()
+    }
+    fn last_line_layouts(&self) -> &[ShapedLine] {
+        &self.core.last_line_layouts
+    }
+    fn last_line_byte_ranges(&self) -> &[Range<usize>] {
+        &self.core.last_line_byte_ranges
+    }
+    fn last_line_height(&self) -> Option<Pixels> {
+        self.core.last_line_height
+    }
+    fn update_paint_state(&mut self, line: ShapedLine, bounds: Bounds<Pixels>, scroll_x: Pixels) {
+        self.core.last_layout = Some(line);
+        self.core.last_bounds = Some(bounds);
+        self.core.scroll_x = scroll_x;
+    }
+    fn focus_handle(&self) -> FocusHandle {
+        self.core.focus_handle()
+    }
+}
+
+// =====================================================================
+// `TextInputActionHandler` — keyboard actions for the embedded text
+// input. Text mutations automatically open the dropdown so the user
+// sees filtered options while typing.
+// =====================================================================
+
+impl TextInputActionHandler for ComboBoxState {
+    fn value(&self) -> String {
+        self.text.clone()
+    }
+
+    fn left(&mut self, _: &Left, _w: &mut Window, _cx: &mut App) {
+        self.core.left(&self.text);
+    }
+    fn right(&mut self, _: &Right, _w: &mut Window, _cx: &mut App) {
+        self.core.right(&self.text);
+    }
+    fn select_left(&mut self, _: &SelectLeft, _w: &mut Window, _cx: &mut App) {
+        self.core.select_left(&self.text);
+    }
+    fn select_right(&mut self, _: &SelectRight, _w: &mut Window, _cx: &mut App) {
+        self.core.select_right(&self.text);
+    }
+    fn select_all(&mut self, _: &SelectAll, _w: &mut Window, _cx: &mut App) {
+        self.core.select_all(&self.text);
+    }
+    fn home(&mut self, _: &Home, _w: &mut Window, _cx: &mut App) {
+        self.core.home();
+    }
+    fn end(&mut self, _: &End, _w: &mut Window, _cx: &mut App) {
+        self.core.end(&self.text);
+    }
+    fn backspace(&mut self, _: &Backspace, _w: &mut Window, _cx: &mut App) {
+        if self.core.backspace(&mut self.text) && !self.is_open() {
+            self.open();
+        }
+    }
+    fn delete(&mut self, _: &Delete, _w: &mut Window, _cx: &mut App) {
+        if self.core.delete(&mut self.text) && !self.is_open() {
+            self.open();
+        }
+    }
+    fn paste(&mut self, _: &Paste, _w: &mut Window, cx: &mut App) {
+        if self.core.paste(&mut self.text, false, cx) && !self.is_open() {
+            self.open();
+        }
+    }
+    fn copy(&mut self, _: &Copy, _w: &mut Window, cx: &mut App) {
+        self.core.copy(&self.text, cx);
+    }
+    fn cut(&mut self, _: &Cut, _w: &mut Window, cx: &mut App) {
+        if self.core.cut(&mut self.text, cx) && !self.is_open() {
+            self.open();
+        }
+    }
+    fn show_character_palette(
+        &mut self,
+        _: &ShowCharacterPalette,
+        window: &mut Window,
+        _cx: &mut App,
+    ) {
+        self.core.show_character_palette(window);
+    }
+
+    fn enter(&mut self, _: &Enter, window: &mut Window, cx: &mut App) {
+        if self.highlighted_index.is_some() {
+            self.select_highlighted(window, cx);
+        }
+    }
+    fn escape(&mut self, _: &Escape, _w: &mut Window, _cx: &mut App) {
+        if self.dismiss_on_escape {
+            self.close();
+        }
+    }
+
+    fn on_mouse_down(
+        &mut self,
+        position: gpui::Point<gpui::Pixels>,
+        window: &mut Window,
+        _cx: &mut App,
+    ) {
+        self.core.on_mouse_down(&self.text, position, window);
+    }
+    fn on_mouse_up(&mut self, _event: &gpui::MouseUpEvent, _w: &mut Window, _cx: &mut App) {
+        self.core.on_mouse_up();
+    }
+    fn on_mouse_move(&mut self, event: &gpui::MouseMoveEvent, _w: &mut Window, _cx: &mut App) {
+        self.core.on_mouse_move(&self.text, event);
+    }
+}
+
+// =====================================================================
+// `EntityInputHandler` — the platform IME / clipboard pipeline for the
+// embedded text input. Combo box fires `on_change` only on pick, not
+// while typing, so these handlers do NOT notify or invoke the callback.
+// =====================================================================
+
+impl EntityInputHandler for ComboBoxState {
+    fn text_for_range(
+        &mut self,
+        range_utf16: Range<usize>,
+        adjusted_range: &mut Option<Range<usize>>,
+        _window: &mut Window,
+        _cx: &mut Context<Self>,
+    ) -> Option<String> {
+        let (text, adjusted) = TextInputCore::text_for_range_utf16(&self.text, range_utf16);
+        *adjusted_range = Some(adjusted);
+        Some(text)
+    }
+
+    fn selected_text_range(
+        &mut self,
+        _ignore_disabled_input: bool,
+        _window: &mut Window,
+        _cx: &mut Context<Self>,
+    ) -> Option<UTF16Selection> {
+        Some(self.core.selected_text_range_inner(&self.text))
+    }
+
+    fn marked_text_range(
+        &self,
+        _window: &mut Window,
+        _cx: &mut Context<Self>,
+    ) -> Option<Range<usize>> {
+        self.core
+            .marked_range
+            .as_ref()
+            .map(|r| TextInputCore::range_to_utf16(&self.text, r))
+    }
+
+    fn unmark_text(&mut self, _window: &mut Window, _cx: &mut Context<Self>) {
+        self.core.marked_range = None;
+    }
+
+    fn replace_text_in_range(
+        &mut self,
+        range_utf16: Option<Range<usize>>,
+        new_text: &str,
+        _window: &mut Window,
+        _cx: &mut Context<Self>,
+    ) {
+        let range = range_utf16
+            .map(|r| TextInputCore::range_from_utf16(&self.text, &r))
+            .or_else(|| self.core.marked_range.clone())
+            .or_else(|| {
+                if !self.core.selected_range().is_empty() {
+                    Some(self.core.selected_range())
+                } else {
+                    None
+                }
+            });
+        self.core
+            .replace_text_in_range_bytes(&mut self.text, None, range, new_text);
+        self.core.marked_range = None;
+    }
+
+    fn replace_and_mark_text_in_range(
+        &mut self,
+        range_utf16: Option<Range<usize>>,
+        new_text: &str,
+        new_selected_range_utf16: Option<Range<usize>>,
+        _window: &mut Window,
+        _cx: &mut Context<Self>,
+    ) {
+        let range = range_utf16.map(|r| TextInputCore::range_from_utf16(&self.text, &r));
+        let new_sel = new_selected_range_utf16.map(|r| TextInputCore::range_from_utf16(&self.text, &r));
+        self.core
+            .replace_and_mark_text_in_range_bytes(&mut self.text, range, new_text, new_sel);
+    }
+
+    fn bounds_for_range(
+        &mut self,
+        range_utf16: Range<usize>,
+        element_bounds: Bounds<Pixels>,
+        _window: &mut Window,
+        _cx: &mut Context<Self>,
+    ) -> Option<Bounds<Pixels>> {
+        self.core
+            .bounds_for_range_inner(&self.text, range_utf16, element_bounds)
+    }
+
+    fn character_index_for_point(
+        &mut self,
+        point: gpui::Point<Pixels>,
+        _window: &mut Window,
+        _cx: &mut Context<Self>,
+    ) -> Option<usize> {
+        self.core.character_index_for_point_inner(&self.text, point)
+    }
+}
+
+// =====================================================================
+// `Focusable for ComboBoxState` — the platform uses this to find the
+// focus handle for the entity.
+// =====================================================================
+
+impl Focusable for ComboBoxState {
+    fn focus_handle(&self, _cx: &App) -> FocusHandle {
+        self.core.focus_handle()
     }
 }
 

@@ -5,7 +5,7 @@
 //! caret/selection (in UTF-8 bytes), UTF-16 mirror for the IME
 //! pipeline, scroll position, last shaped line, cursor blink.
 //!
-//! ## Why this is a `gpui::Entity<TextInputState>`
+//! ## Why a `gpui::Entity<TextInputState>`
 //!
 //! `gpui-ce 0.3` requires the `EntityInputHandler` trait to be
 //! implemented on a state held in an `Entity<T>`, so the platform
@@ -23,14 +23,36 @@
 //! calls). `init()` registers the keymap against the
 //! `"UITextInput"` context (idempotent via `OnceLock`); apps that
 //! want a different keymap simply don't call it.
+//!
+//! ## Shared core
+//!
+//! The caret / selection / IME / cursor-blink state machine is
+//! the same one `ComboBoxState` needs for its embedded text
+//! input. It's extracted to [`TextInputCore`](self::TextInputCore)
+//! so `combo_box` can hold the same logic directly on its own
+//! state — no separate `TextInputState` to sync.
+//!
+//! ## `Deref` pattern
+//!
+//! `TextInputState` composes a `TextInputCore` and implements
+//! `Deref<Target = TextInputCore>`. This lets the existing
+//! renderers and tests keep using `state.caret`,
+//! `state.last_layout = ...`, etc. without change — those field
+//! accesses auto-deref to `state.core.caret`,
+//! `state.core.last_layout = ...`. The consumer-specific bits
+//! (`value`, `placeholder`, `max_length`, `on_change`, …) live
+//! directly on `TextInputState`; the shared caret/selection/IME
+//! state lives on `TextInputCore`.
 
-use std::ops::Range;
+use std::ops::{Deref, DerefMut, Range};
 use std::sync::{Arc, OnceLock};
 
 use gpui::{
     App, Bounds, Context, EntityInputHandler, FocusHandle, Focusable, Hsla, KeyBinding, Pixels,
-    ShapedLine, SharedString, UTF16Selection, Window, actions, point,
+    SharedString, UTF16Selection, Window, actions,
 };
+
+pub use crate::headless::text_input_core::TextInputCore;
 
 pub type TextChangeCallback = Arc<dyn Fn(&str, &mut Window, &mut App) + Send + Sync>;
 
@@ -116,14 +138,112 @@ macro_rules! action_handler {
             if disabled {
                 return;
             }
-            let _ = state.update(cx, |s, ctx| s.$method(action, window, ctx));
+            let _ = state.update(cx, |s, app| s.$method(action, window, app));
         }
     }};
 }
 
 // =====================================================================
+// `TextInputActionHandler` — the trait the renderer's `wire_input_keyboard`
+// uses to wire the 14 actions + 3 mouse handlers to *any* state that
+// hosts a text input. Implemented by `TextInputState` (the
+// standalone input pipeline) and by `ComboBoxState` (which
+// embeds a text input as part of its trigger). The trait is what
+// lets the same `wire_input_keyboard` function drive both.
+//
+// All methods take `&mut App` (not `&mut Context<Self>`) so the
+// trait is implementable by any state — the call site in the
+// macro updates the entity through `cx.update(|s, app| …)`.
+// `Entity::update` triggers a re-render automatically when the
+// state is mutated, so no explicit `cx.notify()` is needed.
+// =====================================================================
+
+/// The state-machine contract that the text-input keymap wires
+/// to. `wire_input_keyboard` calls each method via the
+/// `action_handler!` macro; consumers must implement every
+/// method (or accept the no-op default).
+///
+/// All method signatures take the action reference as their
+/// first argument (even if unused) so the `action_handler!`
+/// macro's call shape `s.$method(action, window, cx)` works
+/// uniformly for all 14 actions.
+pub trait TextInputActionHandler: 'static {
+    /// Current text content. Used by the Enter handler to pass
+    /// the value to the `on_submit` callback.
+    fn value(&self) -> String;
+
+    /// Backspace. Default: no-op.
+    fn backspace(&mut self, _: &Backspace, _w: &mut Window, _cx: &mut App) {}
+    /// Forward delete. Default: no-op.
+    fn delete(&mut self, _: &Delete, _w: &mut Window, _cx: &mut App) {}
+    /// Left arrow. Default: no-op.
+    fn left(&mut self, _: &Left, _w: &mut Window, _cx: &mut App) {}
+    /// Right arrow. Default: no-op.
+    fn right(&mut self, _: &Right, _w: &mut Window, _cx: &mut App) {}
+    /// Shift+Left. Default: no-op.
+    fn select_left(&mut self, _: &SelectLeft, _w: &mut Window, _cx: &mut App) {}
+    /// Shift+Right. Default: no-op.
+    fn select_right(&mut self, _: &SelectRight, _w: &mut Window, _cx: &mut App) {}
+    /// Cmd/Ctrl+A. Default: no-op.
+    fn select_all(&mut self, _: &SelectAll, _w: &mut Window, _cx: &mut App) {}
+    /// Home. Default: no-op.
+    fn home(&mut self, _: &Home, _w: &mut Window, _cx: &mut App) {}
+    /// End. Default: no-op.
+    fn end(&mut self, _: &End, _w: &mut Window, _cx: &mut App) {}
+    /// Paste. Default: no-op.
+    fn paste(&mut self, _: &Paste, _w: &mut Window, _cx: &mut App) {}
+    /// Copy. Default: no-op.
+    fn copy(&mut self, _: &Copy, _w: &mut Window, _cx: &mut App) {}
+    /// Cut. Default: no-op.
+    fn cut(&mut self, _: &Cut, _w: &mut Window, _cx: &mut App) {}
+    /// Show the platform character palette. Default: no-op.
+    fn show_character_palette(
+        &mut self,
+        _: &ShowCharacterPalette,
+        _w: &mut Window,
+        _cx: &mut App,
+    ) {
+    }
+    /// Enter / Return. Default: no-op. The wrapper also fires the
+    /// consumer's `on_submit` callback after this hook.
+    fn enter(&mut self, _: &Enter, _w: &mut Window, _cx: &mut App) {}
+    /// Escape. Default: no-op.
+    fn escape(&mut self, _: &Escape, _w: &mut Window, _cx: &mut App) {}
+
+    /// Mouse-down on the input area. Default: no-op.
+    fn on_mouse_down(
+        &mut self,
+        _position: gpui::Point<gpui::Pixels>,
+        _w: &mut Window,
+        _cx: &mut App,
+    ) {
+    }
+    /// Mouse-up. Default: no-op.
+    fn on_mouse_up(
+        &mut self,
+        _event: &gpui::MouseUpEvent,
+        _w: &mut Window,
+        _cx: &mut App,
+    ) {
+    }
+    /// Mouse-move (drag-select). Default: no-op.
+    fn on_mouse_move(
+        &mut self,
+        _event: &gpui::MouseMoveEvent,
+        _w: &mut Window,
+        _cx: &mut App,
+    ) {
+    }
+}
+
+// =====================================================================
 // `TextInputState` — the live state. Held in `Entity<TextInputState>`
 // so the IME / action pipeline can update it.
+//
+// Composes [`TextInputCore`] (the shared caret/selection/IME
+// state machine) and `Deref`s to it. The consumer-specific bits
+// (the text content, placeholder, callbacks, `max_length`,
+// `paste_newlines`) live directly on `TextInputState`.
 // =====================================================================
 
 /// The text state, caret, selection, scroll, and IME bookkeeping.
@@ -131,66 +251,9 @@ pub struct TextInputState {
     /// Text content (UTF-8 byte string). `String` not `SharedString`
     /// because every keystroke rewrites it; interning wouldn't help.
     pub value: String,
-    /// Caret position, in UTF-8 bytes. `0..=value.len()`.
-    pub caret: usize,
-    /// Selection start, in UTF-8 bytes. `selection_start <=
-    /// selection_end`. When equal to `selection_end`, the selection
-    /// is empty (just a caret at `selection_end`).
-    pub selection_start: usize,
-    pub selection_end: usize,
     /// Placeholder text shown when `value` is empty. The renderer
     /// paints it in the hint color.
     pub placeholder: SharedString,
-    /// Horizontal scroll offset (pixels) when the text is wider
-    /// than the visible width. Updated by the renderer's
-    /// `prepaint`; read by `bounds_for_range` and
-    /// `character_index_for_point`.
-    pub scroll_x: Pixels,
-    /// The `ShapedLine` produced by the renderer's `prepaint`.
-    /// Cached here so the IME `bounds_for_range` /
-    /// `character_index_for_point` can answer without re-shaping.
-    pub last_layout: Option<ShapedLine>,
-    /// The bounds of the text area, in window coordinates. Cached
-    /// by the renderer's `paint` for the same reason.
-    pub last_bounds: Option<Bounds<Pixels>>,
-    /// Per-line shaped layouts from the renderer's last paint.
-    /// **Empty** for single-line inputs (text_input, search_input,
-    /// password_input, etc.). Populated by `TextAreaElement::paint`
-    /// for multi-line rendering. When non-empty, the IME's
-    /// `bounds_for_range` / `character_index_for_point` use this
-    /// for multi-row lookups (find the row from Y, then the
-    /// column from X).
-    pub last_line_layouts: Vec<ShapedLine>,
-    /// Byte range in `value` for each row in `last_line_layouts`.
-    /// Length matches `last_line_layouts`. The i-th range is
-    /// `line_i_start..line_i_end`; for non-final rows the end
-    /// includes the trailing `'\n'` so the next row's start is
-    /// `end`. The last row's end is `value.len()` (or the
-    /// position right after a trailing `'\n'`).
-    pub last_line_byte_ranges: Vec<Range<usize>>,
-    /// Line height in pixels, captured by the renderer at paint
-    /// time. Used by `character_index_for_point_inner` to find
-    /// the row from the click's Y coordinate.
-    pub last_line_height: Option<Pixels>,
-    /// `true` while the user is drag-selecting with the mouse.
-    /// Toggled by `MouseDown` / `MouseUp` handlers.
-    pub is_selecting: bool,
-    /// Whether the caret quad is currently painted. Toggled by
-    /// the cursor-blink timer in the renderer.
-    pub cursor_visible: bool,
-    /// Monotonically increasing epoch for the cursor-blink task.
-    /// Each focus-in bumps this; the running task checks it on
-    /// each tick and exits if the epoch has changed (so we never
-    /// have two blink tasks racing).
-    pub cursor_blink_epoch: usize,
-    /// Active IME composition range, in **UTF-8 bytes**. `Some`
-    /// when the platform IME is composing (e.g. typing Chinese
-    /// pinyin) — the renderer uses this to highlight the marked
-    /// span. The platform calls
-    /// `replace_and_mark_text_in_range` to start / update a
-    /// composition and `replace_text_in_range` (with this
-    /// range) to commit it.
-    pub marked_range: Option<Range<usize>>,
     /// Hard cap on `value.len()`. `None` = unlimited. The
     /// `replace_text_in_range_bytes` method (used by every
     /// action method and the platform's `EntityInputHandler`)
@@ -210,9 +273,24 @@ pub struct TextInputState {
     /// single-line input convention. `text_area`'s renderer
     /// sets this to `true` so multi-line paste works.
     pub paste_newlines: bool,
-    /// Focus handle minted in `new`. Private — external callers
-    /// go through `Focusable::focus_handle`.
-    focus_handle: FocusHandle,
+    /// The shared caret / selection / IME / cursor-blink state.
+    /// Public so callers (renderers) can read/mutate via the
+    /// `Deref` impl or directly via `state.core.X`. See
+    /// [`TextInputCore`] for the field-by-field docs.
+    pub core: TextInputCore,
+}
+
+impl Deref for TextInputState {
+    type Target = TextInputCore;
+    fn deref(&self) -> &TextInputCore {
+        &self.core
+    }
+}
+
+impl DerefMut for TextInputState {
+    fn deref_mut(&mut self) -> &mut TextInputCore {
+        &mut self.core
+    }
 }
 
 impl TextInputState {
@@ -221,25 +299,12 @@ impl TextInputState {
     pub fn new(cx: &mut App) -> Self {
         Self {
             value: String::new(),
-            caret: 0,
-            selection_start: 0,
-            selection_end: 0,
             placeholder: SharedString::new_static(""),
-            scroll_x: Pixels::ZERO,
-            last_layout: None,
-            last_bounds: None,
-            last_line_layouts: Vec::new(),
-            last_line_byte_ranges: Vec::new(),
-            last_line_height: None,
-            is_selecting: false,
-            cursor_visible: true,
-            cursor_blink_epoch: 0,
-            marked_range: None,
             max_length: None,
             on_change: None,
             on_submit: None,
             paste_newlines: false,
-            focus_handle: cx.focus_handle(),
+            core: TextInputCore::new(cx),
         }
     }
 
@@ -247,7 +312,7 @@ impl TextInputState {
     /// `focus_handle` field is private because we implement the
     /// `Focusable` trait which exposes the same name).
     pub fn focus_handle(&self) -> FocusHandle {
-        self.focus_handle.clone()
+        self.core.focus_handle()
     }
 
     // -- Pure data accessors -----------------------------------------
@@ -255,22 +320,22 @@ impl TextInputState {
     /// Currently selected byte range. Empty when there's no
     /// selection (just a caret).
     pub fn selected_range(&self) -> Range<usize> {
-        self.selection_start.min(self.selection_end)..self.selection_start.max(self.selection_end)
+        self.core.selected_range()
     }
 
     /// `true` if a non-empty selection is active.
     pub fn has_selection(&self) -> bool {
-        self.selection_start != self.selection_end
+        self.core.has_selection()
     }
 
     /// Set `value` programmatically (e.g. clear button, initial
     /// value, load from disk). Resets the caret and selection.
     pub fn set_value(&mut self, value: impl Into<String>) {
         self.value = value.into();
-        self.caret = self.value.len();
-        self.selection_start = 0;
-        self.selection_end = 0;
-        self.scroll_x = Pixels::ZERO;
+        self.core.move_to(&self.value, self.value.len());
+        self.core.selection_start = 0;
+        self.core.selection_end = 0;
+        self.core.scroll_x = Pixels::ZERO;
     }
 
     /// Convenience for external callers (e.g. on_submit) — clones
@@ -283,37 +348,23 @@ impl TextInputState {
 
     /// `byte_offset` (UTF-8) → `usize` UTF-16 code units.
     pub fn offset_to_utf16(&self, byte_offset: usize) -> usize {
-        let mut count = 0usize;
-        for (i, c) in self.value.char_indices() {
-            if i >= byte_offset {
-                return count;
-            }
-            count += c.len_utf16();
-        }
-        count
+        TextInputCore::offset_to_utf16(&self.value, byte_offset)
     }
 
     /// `utf16_offset` → UTF-8 byte offset.
     pub fn utf16_to_offset(&self, utf16_offset: usize) -> usize {
-        let mut count = 0usize;
-        for (i, c) in self.value.char_indices() {
-            if count >= utf16_offset {
-                return i;
-            }
-            count += c.len_utf16();
-        }
-        self.value.len()
+        TextInputCore::utf16_to_offset(&self.value, utf16_offset)
     }
 
     /// Convert a UTF-16 range to a UTF-8 byte range. `None` if
     /// either end fails to align to a char boundary.
     pub fn range_to_utf16(&self, byte_range: &Range<usize>) -> Range<usize> {
-        self.offset_to_utf16(byte_range.start)..self.offset_to_utf16(byte_range.end)
+        TextInputCore::range_to_utf16(&self.value, byte_range)
     }
 
     /// Inverse.
     pub fn range_from_utf16(&self, utf16_range: &Range<usize>) -> Range<usize> {
-        self.utf16_to_offset(utf16_range.start)..self.utf16_to_offset(utf16_range.end)
+        TextInputCore::range_from_utf16(&self.value, utf16_range)
     }
 
     /// `text_for_range` body — return the substring for a UTF-16
@@ -321,39 +372,19 @@ impl TextInputState {
     /// have requested (the platform passes `range_utf16` and we
     /// answer with what we actually returned).
     pub fn text_for_range_utf16(&self, range_utf16: Range<usize>) -> (String, Range<usize>) {
-        let start = self.utf16_to_offset(range_utf16.start);
-        let end = self.utf16_to_offset(range_utf16.end);
-        let text = self.value.get(start..end).unwrap_or("").to_string();
-        (text, start..end)
+        TextInputCore::text_for_range_utf16(&self.value, range_utf16)
     }
 
     // -- Char-boundary walking (UTF-8 safe) --------------------------
 
     /// `byte_offset` → previous char boundary (UTF-8 safe).
     pub fn prev_boundary(&self, byte_offset: usize) -> usize {
-        if byte_offset == 0 {
-            return 0;
-        }
-        let bytes = self.value.as_bytes();
-        let mut i = byte_offset - 1;
-        while i > 0 && (bytes[i] & 0b1100_0000) == 0b1000_0000 {
-            i -= 1;
-        }
-        i
+        TextInputCore::prev_boundary(&self.value, byte_offset)
     }
 
     /// `byte_offset` → next char boundary (UTF-8 safe).
     pub fn next_boundary(&self, byte_offset: usize) -> usize {
-        let len = self.value.len();
-        if byte_offset >= len {
-            return len;
-        }
-        let bytes = self.value.as_bytes();
-        let mut i = byte_offset + 1;
-        while i < len && (bytes[i] & 0b1100_0000) == 0b1000_0000 {
-            i += 1;
-        }
-        i
+        TextInputCore::next_boundary(&self.value, byte_offset)
     }
 
     // -- Selection / caret mutation ----------------------------------
@@ -371,18 +402,13 @@ impl TextInputState {
 
     /// Collapse selection to a single caret position.
     pub fn move_to(&mut self, offset: usize) {
-        let clamped = offset.min(self.value.len());
-        self.caret = clamped;
-        self.selection_start = clamped;
-        self.selection_end = clamped;
+        self.core.move_to(&self.value, offset);
     }
 
     /// Extend the selection to a new offset (keeps `selection_start`
     /// as the anchor and grows `selection_end`).
     pub fn select_to(&mut self, offset: usize) {
-        let clamped = offset.min(self.value.len());
-        self.caret = clamped;
-        self.selection_end = clamped;
+        self.core.select_to(&self.value, offset);
     }
 
     /// Replace the range `[start..end)` (UTF-8 bytes) with
@@ -391,13 +417,8 @@ impl TextInputState {
     /// (the renderer's key handler or the `replace_text_in_range`
     /// platform pipeline).
     pub fn replace_text(&mut self, start: usize, end: usize, new_text: &str) {
-        let start = start.min(self.value.len());
-        let end = end.max(start).min(self.value.len());
-        self.value.replace_range(start..end, new_text);
-        let new_caret = start + new_text.len();
-        self.caret = new_caret;
-        self.selection_start = new_caret;
-        self.selection_end = new_caret;
+        self.core
+            .replace_text(&mut self.value, start, end, new_text);
     }
 
     /// Apply a `Range<usize>` (UTF-8) replacement. Used by the
@@ -410,43 +431,12 @@ impl TextInputState {
         range: Option<Range<usize>>,
         new_text: &str,
     ) -> bool {
-        let before = self.value.clone();
-        // Lookup order: IME-sent range → active marked range
-        // (IME commit with no `replacementRange` still needs to
-        // find the pinyin) → active selection. The marked
-        // range wins over the selection because the caret sits
-        // at the end of the marked text — falling back to the
-        // selection would insert *after* the pinyin.
-        let resolved = range.or_else(|| self.marked_range.clone()).or_else(|| {
-            if !self.selected_range().is_empty() {
-                Some(self.selected_range())
-            } else {
-                None
-            }
-        });
-        // Decide the effective new text up front (honouring
-        // `max_length`). This avoids the "apply, then truncate"
-        // path which would leave the caret past the end.
-        let effective = if let Some(cap) = self.max_length {
-            let existing_len = match &resolved {
-                Some(r) => self.value.len() - (r.end - r.start),
-                None => self.value.len(),
-            };
-            let room = cap.saturating_sub(existing_len);
-            &new_text[..new_text.len().min(room)]
-        } else {
-            new_text
-        };
-        match &resolved {
-            Some(r) => self.replace_text(r.start, r.end, effective),
-            None => self.replace_text(self.caret, self.caret, effective),
-        }
-        // A `replace_text_in_range` outside of an active
-        // composition context ends any pending IME mark. The
-        // platform's commit call always lands here, so this is
-        // what actually clears the pinyin.
-        self.marked_range = None;
-        self.value != before
+        self.core.replace_text_in_range_bytes(
+            &mut self.value,
+            self.max_length,
+            range,
+            new_text,
+        )
     }
 
     /// Compose (IME marked text). Replaces the active selection
@@ -467,80 +457,24 @@ impl TextInputState {
         new_text: &str,
         new_selected_range: Option<Range<usize>>,
     ) {
-        // The actual range we replace follows the v0.2 lookup,
-        // with one extra priority: an active IME composition
-        // (marked range) wins over the active selection. The
-        // IME on macOS sends `replacementRange = NSNotFound`
-        // (None) when updating the *existing* composition —
-        // in that case the new text must replace the marked
-        // range, not be inserted at the caret (the caret is
-        // already at the end of the marked text, so falling
-        // back to the active selection would *append* the
-        // new pinyin after the existing composition and
-        // produce "sas" / "sa's" artefacts).
-        let range = range
-            .or_else(|| self.marked_range.clone())
-            .unwrap_or_else(|| self.selected_range());
-        let range_start = range.start.min(self.value.len());
-        let range_end = range.end.max(range_start).min(self.value.len());
-
-        // Apply the replacement. The just-inserted text
-        // occupies `[range_start, range_start + new_text.len())`
-        // in byte space — that's the new marked range.
-        self.value.replace_range(range_start..range_end, new_text);
-        let marked_start = range_start;
-        let marked_end = range_start + new_text.len();
-        self.caret = marked_end;
-        if !new_text.is_empty() {
-            self.marked_range = Some(marked_start..marked_end);
-        } else {
-            // Empty marked text (e.g. the IME sent an empty
-            // composition to clear) — no composition.
-            self.marked_range = None;
-        }
-
-        // The IME also tells us the cursor selection *within*
-        // the new marked text. Translate it from UTF-16 to
-        // bytes and offset by the marked start. If the IME
-        // didn't provide one, the caret sits at the end of
-        // the marked text.
-        if let Some(sel_utf16) = new_selected_range {
-            let start_in_marked = self
-                .utf16_to_offset(sel_utf16.start)
-                .saturating_sub(marked_start);
-            let end_in_marked = self
-                .utf16_to_offset(sel_utf16.end)
-                .saturating_sub(marked_start);
-            let sel_start = (marked_start + start_in_marked).min(marked_end);
-            let sel_end = (marked_start + end_in_marked).min(marked_end);
-            self.selection_start = sel_start;
-            self.selection_end = sel_end;
-        } else {
-            self.selection_start = marked_end;
-            self.selection_end = marked_end;
-        }
+        self.core.replace_and_mark_text_in_range_bytes(
+            &mut self.value,
+            range,
+            new_text,
+            new_selected_range,
+        );
     }
 
     // -- `EntityInputHandler` body methods (not the trait impl) -----
 
     /// UTF-8 version of `EntityInputHandler::text_for_range`.
     pub fn text_for_range_inner(&self, range_utf16: Range<usize>) -> (String, Range<usize>) {
-        self.text_for_range_utf16(range_utf16)
+        TextInputCore::text_for_range_inner(&self.value, range_utf16)
     }
 
     /// UTF-8 version of `EntityInputHandler::selected_text_range`.
     pub fn selected_text_range_inner(&self) -> UTF16Selection {
-        let byte_range = self.selected_range();
-        let start = self.offset_to_utf16(byte_range.start);
-        let end = self.offset_to_utf16(byte_range.end);
-        // gpui's `UTF16Selection` keeps the head/end (which side
-        // is the caret when the selection is non-empty). We treat
-        // `selection_end` as the caret head, which matches the
-        // rendering direction in `caret` above.
-        UTF16Selection {
-            range: start..end,
-            reversed: false,
-        }
+        self.core.selected_text_range_inner(&self.value)
     }
 
     /// UTF-8 version of `EntityInputHandler::bounds_for_range`.
@@ -551,118 +485,13 @@ impl TextInputState {
         range_utf16: Range<usize>,
         element_bounds: Bounds<Pixels>,
     ) -> Option<Bounds<Pixels>> {
-        if !self.last_line_layouts.is_empty() {
-            // Multi-line path: find every row the range touches
-            // and union the pixel bounds. The returned Bounds
-            // covers `[min_x, max_x] x [min_y, max_y]`, where
-            // the y-range may span multiple rows.
-            let range_bytes = self.range_from_utf16(&range_utf16);
-            let line_height = self.last_line_height?;
-            let mut min_x = Pixels::from(f32::INFINITY);
-            let mut max_x = Pixels::from(f32::NEG_INFINITY);
-            let mut min_y = Pixels::from(f32::INFINITY);
-            let mut max_y = Pixels::from(f32::NEG_INFINITY);
-            let mut any = false;
-            for (i, line) in self.last_line_layouts.iter().enumerate() {
-                let line_range = &self.last_line_byte_ranges[i];
-                // The i-th row's text occupies
-                // `[line_range.start, line_range.end)` in
-                // `value`. The last row's end is the value
-                // length; non-last rows include a trailing
-                // '\n'. For the *display* of the line itself,
-                // we want to clip the selection to
-                // `[line_range.start, line_range.end)` (the
-                // '\n' is not selectable as a visible glyph
-                // on this row).
-                let sel_start = range_bytes.start.max(line_range.start).min(line_range.end);
-                let sel_end = range_bytes.end.max(line_range.start).min(line_range.end);
-                if sel_start < sel_end {
-                    any = true;
-                    let col_start = sel_start - line_range.start;
-                    let col_end = sel_end - line_range.start;
-                    let start_x = line.x_for_index(col_start);
-                    let end_x = line.x_for_index(col_end);
-                    let y_top = (i as f32) * line_height;
-                    let y_bottom = y_top + line_height;
-                    min_x = min_x.min(start_x.min(end_x));
-                    max_x = max_x.max(start_x.max(end_x));
-                    min_y = min_y.min(y_top);
-                    max_y = max_y.max(y_bottom);
-                }
-            }
-            if !any {
-                return None;
-            }
-            return Some(Bounds::from_corners(
-                point(
-                    element_bounds.left() + min_x - self.scroll_x,
-                    element_bounds.top() + min_y,
-                ),
-                point(
-                    element_bounds.left() + max_x - self.scroll_x,
-                    element_bounds.top() + max_y,
-                ),
-            ));
-        }
-
-        let line = self.last_layout.as_ref()?;
-        let range_bytes = self.range_from_utf16(&range_utf16);
-        let start_x = line.x_for_index(range_bytes.start);
-        let end_x = line.x_for_index(range_bytes.end);
-        Some(Bounds::from_corners(
-            point(
-                element_bounds.left() + start_x - self.scroll_x,
-                element_bounds.top(),
-            ),
-            point(
-                element_bounds.left() + end_x - self.scroll_x,
-                element_bounds.bottom(),
-            ),
-        ))
+        self.core
+            .bounds_for_range_inner(&self.value, range_utf16, element_bounds)
     }
 
     /// UTF-8 version of `EntityInputHandler::character_index_for_point`.
     pub fn character_index_for_point_inner(&self, point: gpui::Point<Pixels>) -> Option<usize> {
-        if self.value.is_empty() {
-            return Some(0);
-        }
-
-        let bounds = self.last_bounds.as_ref()?;
-        let local = bounds.localize(&point)?;
-
-        if !self.last_line_layouts.is_empty() {
-            // Multi-line: figure out the row from the Y
-            // coordinate (clamped to the last row if past the
-            // bottom), then the column within that row from X.
-            let line_height = self.last_line_height?;
-            let row_count = self.last_line_layouts.len();
-            let row = ((local.y / line_height).floor() as i64)
-                .max(0)
-                .min((row_count - 1) as i64) as usize;
-            let line = &self.last_line_layouts[row];
-            // `index_for_x` returns the closest glyph *byte*
-            // index for the given x. Add `scroll_x` back so
-            // horizontal scroll is transparent.
-            let col_bytes = line
-                .index_for_x(local.x + self.scroll_x)
-                .unwrap_or(line.len());
-            // Translate (row, col) to a byte offset in `value`.
-            // The col is a byte offset *within the row's text*;
-            // adding the row's start byte gives the absolute
-            // offset. The row's last `byte_range.end` is the
-            // value's byte just past the last char of the row
-            // (for the last row, that's the value length; for
-            // other rows, it's the position of the '\n').
-            let row_start = self.last_line_byte_ranges[row].start;
-            let byte_in_value = row_start + col_bytes;
-            return Some(self.offset_to_utf16(byte_in_value));
-        }
-
-        let line = self.last_layout.as_ref()?;
-        let utf8_index = line
-            .index_for_x(local.x + self.scroll_x)
-            .unwrap_or(line.len());
-        Some(self.offset_to_utf16(utf8_index))
+        self.core.character_index_for_point_inner(&self.value, point)
     }
 }
 
@@ -797,172 +626,105 @@ impl EntityInputHandler for TextInputState {
 
 impl Focusable for TextInputState {
     fn focus_handle(&self, _cx: &App) -> FocusHandle {
-        self.focus_handle.clone()
+        self.core.focus_handle()
     }
 }
 
 // =====================================================================
-// Action handlers. Each takes `(&Action, &mut Window, &mut
-// Context<Self>)`. The `action_handler!` macro wires them into
-// `.on_action` closures in the renderer.
+// Action handlers. Each takes `(&Action, &mut Window, &mut App)`.
+// The `action_handler!` macro wires them into `.on_action` closures
+// in the renderer. `Entity::update` triggers a re-render
+// automatically when the state mutates, so no explicit
+// `cx.notify()` is needed.
+//
+// Each method delegates the actual caret/value mutation to
+// `self.core.method(&mut self.value)` (or similar), then fires
+// the consumer's `on_change` if the value actually changed.
+//
+// The same method names are used by `impl TextInputActionHandler`
+// below — the trait is what the generic `wire_input_keyboard`
+// requires.
 // =====================================================================
 
 impl TextInputState {
     /// The renderer calls this when the user focuses the input
-    /// via mouse / tab. (It's the entry point for cursor blink
-    /// setup; the actual focus call is `Window::focus(&handle)`,
-    /// done by the platform once `track_focus` is registered.)
-    pub fn focus_in(&mut self, _window: &mut Window, _cx: &mut Context<Self>) {
-        // The cursor-blink task is started by the renderer (which
-        // holds a `Window` to spawn the timer). We bump the epoch
-        // so any previous task exits.
-        self.cursor_blink_epoch = self.cursor_blink_epoch.wrapping_add(1);
-        self.cursor_visible = true;
+    /// via mouse / tab. Bumps the cursor-blink epoch so any
+    /// previous blink task exits.
+    pub fn focus_in(&mut self, _window: &mut Window, _cx: &mut App) {
+        self.core.focus_in();
     }
 
-    pub fn left(&mut self, _: &Left, _window: &mut Window, cx: &mut Context<Self>) {
-        if self.has_selection() {
-            // Collapse to the start of the selection.
-            let start = self.selected_range().start;
-            self.move_to(start);
-        } else {
-            self.move_to(self.prev_boundary(self.caret));
-        }
-        cx.notify();
+    pub fn left(&mut self, _: &Left, _window: &mut Window, _cx: &mut App) {
+        self.core.left(&self.value);
     }
 
-    pub fn right(&mut self, _: &Right, _window: &mut Window, cx: &mut Context<Self>) {
-        if self.has_selection() {
-            let end = self.selected_range().end;
-            self.move_to(end);
-        } else {
-            self.move_to(self.next_boundary(self.caret));
-        }
-        cx.notify();
+    pub fn right(&mut self, _: &Right, _window: &mut Window, _cx: &mut App) {
+        self.core.right(&self.value);
     }
 
-    pub fn select_left(&mut self, _: &SelectLeft, _window: &mut Window, cx: &mut Context<Self>) {
-        let new_end = self.prev_boundary(self.caret);
-        self.select_to(new_end);
-        cx.notify();
+    pub fn select_left(&mut self, _: &SelectLeft, _window: &mut Window, _cx: &mut App) {
+        self.core.select_left(&self.value);
     }
 
-    pub fn select_right(&mut self, _: &SelectRight, _window: &mut Window, cx: &mut Context<Self>) {
-        let new_end = self.next_boundary(self.caret);
-        self.select_to(new_end);
-        cx.notify();
+    pub fn select_right(&mut self, _: &SelectRight, _window: &mut Window, _cx: &mut App) {
+        self.core.select_right(&self.value);
     }
 
-    pub fn select_all(&mut self, _: &SelectAll, _window: &mut Window, cx: &mut Context<Self>) {
-        self.move_to(0);
-        self.select_to(self.value.len());
-        cx.notify();
+    pub fn select_all(&mut self, _: &SelectAll, _window: &mut Window, _cx: &mut App) {
+        self.core.select_all(&self.value);
     }
 
-    pub fn home(&mut self, _: &Home, _window: &mut Window, cx: &mut Context<Self>) {
-        self.move_to(0);
-        cx.notify();
+    pub fn home(&mut self, _: &Home, _window: &mut Window, _cx: &mut App) {
+        self.core.home();
     }
 
-    pub fn end(&mut self, _: &End, _window: &mut Window, cx: &mut Context<Self>) {
-        self.move_to(self.value.len());
-        cx.notify();
+    pub fn end(&mut self, _: &End, _window: &mut Window, _cx: &mut App) {
+        self.core.end(&self.value);
     }
 
-    pub fn backspace(&mut self, _: &Backspace, window: &mut Window, cx: &mut Context<Self>) {
-        let before = self.value.clone();
-        if self.has_selection() {
-            let r = self.selected_range();
-            self.replace_text(r.start, r.end, "");
-        } else if self.caret > 0 {
-            let prev = self.prev_boundary(self.caret);
-            self.replace_text(prev, self.caret, "");
-        }
-        // A direct keyboard backspace (not via the IME
-        // pipeline) cancels any active composition.
-        self.marked_range = None;
-        if self.value != before
+    pub fn backspace(&mut self, _: &Backspace, window: &mut Window, cx: &mut App) {
+        if self.core.backspace(&mut self.value)
             && let Some(cb) = self.on_change.as_ref()
         {
             cb(&self.value, window, cx);
         }
-        cx.notify();
     }
 
-    pub fn delete(&mut self, _: &Delete, window: &mut Window, cx: &mut Context<Self>) {
-        let before = self.value.clone();
-        if self.has_selection() {
-            let r = self.selected_range();
-            self.replace_text(r.start, r.end, "");
-        } else if self.caret < self.value.len() {
-            let next = self.next_boundary(self.caret);
-            self.replace_text(self.caret, next, "");
-        }
-        self.marked_range = None;
-        if self.value != before
+    pub fn delete(&mut self, _: &Delete, window: &mut Window, cx: &mut App) {
+        if self.core.delete(&mut self.value)
             && let Some(cb) = self.on_change.as_ref()
         {
             cb(&self.value, window, cx);
         }
-        cx.notify();
     }
 
-    pub fn paste(&mut self, _: &Paste, window: &mut Window, cx: &mut Context<Self>) {
-        if let Some(item) = cx.read_from_clipboard()
-            && let Some(text) = item.text()
+    pub fn paste(&mut self, _: &Paste, window: &mut Window, cx: &mut App) {
+        if self.core.paste(&mut self.value, self.paste_newlines, cx)
+            && let Some(cb) = self.on_change.as_ref()
         {
-            // Single-line inputs collapse newlines to spaces so
-            // pasted multi-line text doesn't break the layout.
-            // Multi-line inputs (text_area) keep them by
-            // setting `paste_newlines = true` in the renderer.
-            let text = if self.paste_newlines {
-                text.to_string()
-            } else {
-                text.replace('\n', " ")
-            };
-            let before = self.value.clone();
-            self.replace_text_in_range_bytes(None, &text);
-            self.marked_range = None;
-            if self.value != before
-                && let Some(cb) = self.on_change.as_ref()
-            {
-                cb(&self.value, window, cx);
-            }
-        }
-        cx.notify();
-    }
-
-    pub fn copy(&mut self, _: &Copy, _window: &mut Window, cx: &mut Context<Self>) {
-        if self.has_selection() {
-            let r = self.selected_range();
-            let text = self.value[r.clone()].to_string();
-            cx.write_to_clipboard(gpui::ClipboardItem::new_string(text));
+            cb(&self.value, window, cx);
         }
     }
 
-    pub fn cut(&mut self, _: &Cut, window: &mut Window, cx: &mut Context<Self>) {
-        if self.has_selection() {
-            let r = self.selected_range();
-            let text = self.value[r.clone()].to_string();
-            cx.write_to_clipboard(gpui::ClipboardItem::new_string(text));
-            let before = self.value.clone();
-            self.replace_text(r.start, r.end, "");
-            if self.value != before
-                && let Some(cb) = self.on_change.as_ref()
-            {
-                cb(&self.value, window, cx);
-            }
+    pub fn copy(&mut self, _: &Copy, _window: &mut Window, cx: &mut App) {
+        self.core.copy(&self.value, cx);
+    }
+
+    pub fn cut(&mut self, _: &Cut, window: &mut Window, cx: &mut App) {
+        if self.core.cut(&mut self.value, cx)
+            && let Some(cb) = self.on_change.as_ref()
+        {
+            cb(&self.value, window, cx);
         }
-        cx.notify();
     }
 
     pub fn show_character_palette(
         &mut self,
         _: &ShowCharacterPalette,
         window: &mut Window,
-        _cx: &mut Context<Self>,
+        _cx: &mut App,
     ) {
-        window.show_character_palette();
+        self.core.show_character_palette(window);
     }
 
     // -- Mouse handlers (used by the renderer's on_mouse_*) -------
@@ -971,41 +733,100 @@ impl TextInputState {
         &mut self,
         position: gpui::Point<Pixels>,
         window: &mut Window,
-        _cx: &mut Context<Self>,
+        _cx: &mut App,
     ) {
-        self.is_selecting = true;
-        // Map the click point to a UTF-16 offset, then to a byte
-        // offset, then move the caret. We use the cached
-        // `last_layout` / `last_bounds` from the previous paint.
-        if let Some(utf16) = self.character_index_for_point_inner(position) {
-            let byte = self.utf16_to_offset(utf16);
-            self.move_to(byte);
-        }
-        // Let the platform focus the input.
-        window.focus(&self.focus_handle);
+        self.core.on_mouse_down(&self.value, position, window);
     }
 
     pub fn on_mouse_up(
         &mut self,
         _event: &gpui::MouseUpEvent,
         _window: &mut Window,
-        _cx: &mut Context<Self>,
+        _cx: &mut App,
     ) {
-        self.is_selecting = false;
+        self.core.on_mouse_up();
     }
 
     pub fn on_mouse_move(
         &mut self,
         event: &gpui::MouseMoveEvent,
         _window: &mut Window,
-        _cx: &mut Context<Self>,
+        _cx: &mut App,
     ) {
-        if self.is_selecting
-            && let Some(utf16) = self.character_index_for_point_inner(event.position)
-        {
-            let byte = self.utf16_to_offset(utf16);
-            self.select_to(byte);
-        }
+        self.core.on_mouse_move(&self.value, event);
+    }
+}
+
+// =====================================================================
+// `TextInputActionHandler for TextInputState` — wires
+// `TextInputState`'s `value()` getter to the trait (so the Enter
+// handler in `wire_input_keyboard` can read the current text for
+// `on_submit`).
+// =====================================================================
+
+impl TextInputActionHandler for TextInputState {
+    fn value(&self) -> String {
+        self.value.clone()
+    }
+
+    fn backspace(&mut self, action: &Backspace, window: &mut Window, cx: &mut App) {
+        self.backspace(action, window, cx);
+    }
+    fn delete(&mut self, action: &Delete, window: &mut Window, cx: &mut App) {
+        self.delete(action, window, cx);
+    }
+    fn left(&mut self, action: &Left, window: &mut Window, cx: &mut App) {
+        self.left(action, window, cx);
+    }
+    fn right(&mut self, action: &Right, window: &mut Window, cx: &mut App) {
+        self.right(action, window, cx);
+    }
+    fn select_left(&mut self, action: &SelectLeft, window: &mut Window, cx: &mut App) {
+        self.select_left(action, window, cx);
+    }
+    fn select_right(&mut self, action: &SelectRight, window: &mut Window, cx: &mut App) {
+        self.select_right(action, window, cx);
+    }
+    fn select_all(&mut self, action: &SelectAll, window: &mut Window, cx: &mut App) {
+        self.select_all(action, window, cx);
+    }
+    fn home(&mut self, action: &Home, window: &mut Window, cx: &mut App) {
+        self.home(action, window, cx);
+    }
+    fn end(&mut self, action: &End, window: &mut Window, cx: &mut App) {
+        self.end(action, window, cx);
+    }
+    fn paste(&mut self, action: &Paste, window: &mut Window, cx: &mut App) {
+        self.paste(action, window, cx);
+    }
+    fn copy(&mut self, action: &Copy, window: &mut Window, cx: &mut App) {
+        self.copy(action, window, cx);
+    }
+    fn cut(&mut self, action: &Cut, window: &mut Window, cx: &mut App) {
+        self.cut(action, window, cx);
+    }
+    fn show_character_palette(
+        &mut self,
+        action: &ShowCharacterPalette,
+        window: &mut Window,
+        cx: &mut App,
+    ) {
+        self.show_character_palette(action, window, cx);
+    }
+
+    fn on_mouse_down(
+        &mut self,
+        position: gpui::Point<gpui::Pixels>,
+        window: &mut Window,
+        cx: &mut App,
+    ) {
+        self.on_mouse_down(position, window, cx);
+    }
+    fn on_mouse_up(&mut self, event: &gpui::MouseUpEvent, window: &mut Window, cx: &mut App) {
+        self.on_mouse_up(event, window, cx);
+    }
+    fn on_mouse_move(&mut self, event: &gpui::MouseMoveEvent, window: &mut Window, cx: &mut App) {
+        self.on_mouse_move(event, window, cx);
     }
 }
 
@@ -1155,14 +976,17 @@ mod tests {
         let ptr = state.as_mut_ptr();
         unsafe {
             (*ptr).value = value.into();
-            (*ptr).caret = 0;
-            (*ptr).selection_start = 0;
-            (*ptr).selection_end = 0;
+            // Fields on `core` (via DerefMut):
+            (*ptr).core.caret = 0;
+            (*ptr).core.selection_start = 0;
+            (*ptr).core.selection_end = 0;
+            (*ptr).core.scroll_x = Pixels::ZERO;
+            (*ptr).core.is_selecting = false;
+            (*ptr).core.cursor_visible = true;
+            (*ptr).core.cursor_blink_epoch = 0;
+            (*ptr).core.marked_range = None;
+            // Fields on TextInputState directly:
             (*ptr).placeholder = SharedString::new_static("");
-            (*ptr).scroll_x = Pixels::ZERO;
-            (*ptr).is_selecting = false;
-            (*ptr).cursor_visible = true;
-            (*ptr).cursor_blink_epoch = 0;
             (*ptr).max_length = None;
             (*ptr).on_change = None;
             (*ptr).on_submit = None;
@@ -1206,14 +1030,14 @@ mod tests {
     #[test]
     fn replace_text_collapses_selection() {
         let s = &mut *test_state("hello");
-        s.caret = 5;
-        s.selection_start = 1;
-        s.selection_end = 4;
+        s.core.caret = 5;
+        s.core.selection_start = 1;
+        s.core.selection_end = 4;
         s.replace_text(1, 4, "XY");
         assert_eq!(s.value, "hXYo");
-        assert_eq!(s.caret, 3);
-        assert_eq!(s.selection_start, 3);
-        assert_eq!(s.selection_end, 3);
+        assert_eq!(s.core.caret, 3);
+        assert_eq!(s.core.selection_start, 3);
+        assert_eq!(s.core.selection_end, 3);
     }
 
     #[test]
@@ -1223,35 +1047,35 @@ mod tests {
         // No selection, caret=0 → replace_text(0,0,"") is a no-op
         s.replace_text(0, 0, "");
         assert_eq!(s.value, "hi");
-        assert_eq!(s.caret, 0);
+        assert_eq!(s.core.caret, 0);
     }
 
     #[test]
     fn move_to_clamps() {
         let s = &mut *test_state("hi");
         s.move_to(100);
-        assert_eq!(s.caret, 2);
+        assert_eq!(s.core.caret, 2);
     }
 
     #[test]
     fn selected_range_is_normalised() {
         let s = &mut *test_state("hello");
-        s.selection_start = 4;
-        s.selection_end = 1;
+        s.core.selection_start = 4;
+        s.core.selection_end = 1;
         assert_eq!(s.selected_range(), 1..4);
     }
 
     #[test]
     fn set_value_resets_state() {
         let s = &mut *test_state("old");
-        s.caret = 2;
-        s.selection_start = 0;
-        s.selection_end = 2;
+        s.core.caret = 2;
+        s.core.selection_start = 0;
+        s.core.selection_end = 2;
         s.set_value("fresh");
         assert_eq!(s.value, "fresh");
-        assert_eq!(s.caret, 5);
-        assert_eq!(s.selection_start, 0);
-        assert_eq!(s.selection_end, 0);
+        assert_eq!(s.core.caret, 5);
+        assert_eq!(s.core.selection_start, 0);
+        assert_eq!(s.core.selection_end, 0);
     }
 
     #[test]
@@ -1268,16 +1092,16 @@ mod tests {
         //   3. Commit via `replace_text_in_range` with the
         //      marked range — the pinyin is replaced.
         let s = &mut *test_state("");
-        s.caret = 0;
+        s.core.caret = 0;
         // IME: insert "ni" at position 0, mark 0..2 as composition.
         s.replace_and_mark_text_in_range_bytes(Some(0..0), "ni", None);
         assert_eq!(s.value, "ni");
-        assert_eq!(s.marked_range.as_ref().unwrap().clone(), 0..2);
+        assert_eq!(s.core.marked_range.as_ref().unwrap().clone(), 0..2);
         // The IME's commit: `insertText(0..2, "你")` →
         // `replace_text_in_range(Some(0..2), "你")`.
         s.replace_text_in_range_bytes(Some(0..2), "你");
         assert_eq!(s.value, "你");
-        assert!(s.marked_range.is_none());
+        assert!(s.core.marked_range.is_none());
     }
 
     #[test]
@@ -1295,9 +1119,9 @@ mod tests {
         // (cursor at the start of the marked text).
         s.replace_and_mark_text_in_range_bytes(Some(0..0), "你好", Some(0..0));
         assert_eq!(s.value, "你好");
-        assert_eq!(s.marked_range.as_ref().unwrap().clone(), 0..6);
-        assert_eq!(s.selection_start, 0);
-        assert_eq!(s.selection_end, 0);
+        assert_eq!(s.core.marked_range.as_ref().unwrap().clone(), 0..6);
+        assert_eq!(s.core.selection_start, 0);
+        assert_eq!(s.core.selection_end, 0);
         // Commit replaces the marked span (0..6 bytes).
         s.replace_text_in_range_bytes(Some(0..6), "X");
         assert_eq!(s.value, "X");
@@ -1320,14 +1144,14 @@ mod tests {
         // replacementRange: 0..0). value = "s", marked = 0..1.
         s.replace_and_mark_text_in_range_bytes(Some(0..0), "s", Some(0..0));
         assert_eq!(s.value, "s");
-        assert_eq!(s.marked_range.as_ref().unwrap().clone(), 0..1);
+        assert_eq!(s.core.marked_range.as_ref().unwrap().clone(), 0..1);
         // Step 2: user types 'a'. IME: setMarkedText("sa", …,
         // replacementRange: NSNotFound). The IME expects the
         // existing marked "s" to be REPLACED by "sa", not
         // appended after.
         s.replace_and_mark_text_in_range_bytes(None, "sa", Some(0..0));
         assert_eq!(s.value, "sa");
-        assert_eq!(s.marked_range.as_ref().unwrap().clone(), 0..2);
+        assert_eq!(s.core.marked_range.as_ref().unwrap().clone(), 0..2);
         // Commit.
         s.replace_text_in_range_bytes(Some(0..2), "X");
         assert_eq!(s.value, "X");

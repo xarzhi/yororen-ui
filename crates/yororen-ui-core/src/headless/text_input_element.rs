@@ -11,17 +11,71 @@
 use std::time::Duration;
 
 use gpui::{
-    App, Bounds, Div, Element, ElementId, ElementInputHandler, FocusHandle, GlobalElementId, Hsla,
-    InteractiveElement, IntoElement, LayoutId, MouseButton, MouseDownEvent, MouseMoveEvent,
-    MouseUpEvent, PaintQuad, Pixels, ShapedLine, SharedString, Stateful, Style, TextRun, Window,
-    fill, hsla, point, px, relative, size,
+    App, Bounds, Div, Element, ElementId, ElementInputHandler, EntityInputHandler, FocusHandle,
+    GlobalElementId, Hsla, InteractiveElement, IntoElement, LayoutId, MouseButton, MouseDownEvent,
+    MouseMoveEvent, MouseUpEvent, PaintQuad, Pixels, ShapedLine, SharedString, Stateful, Style,
+    TextRun, Window, fill, hsla, point, px, relative, size,
 };
 
 use crate::action_handler;
 use crate::headless::text_input::{
-    Backspace, Copy, Cut, Delete, End, Enter, Home, Left, Paste, Right, SelectAll, SelectLeft,
-    SelectRight, ShowCharacterPalette, TextInputState,
+    Backspace, Copy, Cut, Delete, End, Enter, Escape, Home, Left, Paste, Right, SelectAll,
+    SelectLeft, SelectRight, ShowCharacterPalette, TextInputActionHandler, TextInputState,
 };
+
+use std::ops::Range;
+
+/// What the [`TextInputElement`] painter needs to read / write on
+/// the state. The painter is generic over `T: TextInputPainterHost`
+/// so the same painter drives both `TextInputState` (standalone
+/// text inputs) and `ComboBoxState` (combo's embedded text input).
+///
+/// Implementors: `TextInputState` (delegates to its composed
+/// `TextInputCore`) and `ComboBoxState` (composes its own
+/// `TextInputCore` directly).
+pub trait TextInputPainterHost: 'static {
+    /// The text the painter should lay out. For most callers this
+    /// is the raw value; for combo_box it's the *derived*
+    /// display string (the typed query, or the label of the
+    /// currently-selected option when the query is empty).
+    fn display_value(&self) -> String;
+    /// Placeholder shown when `display_value()` is empty.
+    fn placeholder(&self) -> SharedString;
+    /// Caret position, in UTF-8 bytes of `display_value()`.
+    fn caret(&self) -> usize;
+    /// Selected byte range (in `display_value()` bytes).
+    fn selected_range(&self) -> Range<usize>;
+    /// Horizontal scroll offset (pixels).
+    fn scroll_x(&self) -> Pixels;
+    /// Whether the caret quad should be painted.
+    fn cursor_visible(&self) -> bool;
+    fn set_cursor_visible(&mut self, visible: bool);
+    /// Cursor-blink epoch counter. The blink task exits when
+    /// this changes.
+    fn cursor_blink_epoch(&self) -> usize;
+    fn set_cursor_blink_epoch(&mut self, epoch: usize);
+    /// Active IME composition range, in bytes of `display_value()`.
+    fn marked_range(&self) -> Option<Range<usize>>;
+    /// Per-line shaped layouts (empty for single-line inputs).
+    fn last_line_layouts(&self) -> &[ShapedLine];
+    /// Per-line byte ranges (parallel to `last_line_layouts`).
+    fn last_line_byte_ranges(&self) -> &[Range<usize>];
+    /// Line height in pixels.
+    fn last_line_height(&self) -> Option<Pixels>;
+    /// Cache the freshly-painted `ShapedLine`, the laid-out
+    /// bounds, and the clamped horizontal scroll so the IME
+    /// pipeline (`bounds_for_range` / `character_index_for_point`)
+    /// can answer without re-shaping.
+    fn update_paint_state(
+        &mut self,
+        line: ShapedLine,
+        bounds: Bounds<Pixels>,
+        scroll_x: Pixels,
+    );
+    /// Focus handle for the embedded input. Used by the blink
+    /// task and the IME registration.
+    fn focus_handle(&self) -> FocusHandle;
+}
 
 /// How often the caret blinks while focused. 500ms matches the
 /// gpui / WebKit convention.
@@ -32,8 +86,8 @@ pub const CURSOR_BLINK_INTERVAL: Duration = Duration::from_millis(500);
 /// Embedded by `headless::XxxProps::render` (for `text_input`,
 /// `password_input`, `search_input`, etc.) inside the wrapper
 /// `div` that supplies focus / keymap / border / padding.
-pub struct TextInputElement {
-    pub state: gpui::Entity<TextInputState>,
+pub struct TextInputElement<T: TextInputPainterHost + EntityInputHandler> {
+    pub state: gpui::Entity<T>,
     pub focus_handle: FocusHandle,
     pub disabled: bool,
     pub text_color: Hsla,
@@ -50,6 +104,56 @@ pub struct TextInputElement {
     pub value_override: Option<String>,
 }
 
+impl TextInputPainterHost for TextInputState {
+    fn display_value(&self) -> String {
+        self.value.clone()
+    }
+    fn placeholder(&self) -> SharedString {
+        self.placeholder.clone()
+    }
+    fn caret(&self) -> usize {
+        self.core.caret
+    }
+    fn selected_range(&self) -> Range<usize> {
+        self.core.selected_range()
+    }
+    fn scroll_x(&self) -> Pixels {
+        self.core.scroll_x
+    }
+    fn cursor_visible(&self) -> bool {
+        self.core.cursor_visible
+    }
+    fn set_cursor_visible(&mut self, visible: bool) {
+        self.core.cursor_visible = visible;
+    }
+    fn cursor_blink_epoch(&self) -> usize {
+        self.core.cursor_blink_epoch
+    }
+    fn set_cursor_blink_epoch(&mut self, epoch: usize) {
+        self.core.cursor_blink_epoch = epoch;
+    }
+    fn marked_range(&self) -> Option<Range<usize>> {
+        self.core.marked_range.clone()
+    }
+    fn last_line_layouts(&self) -> &[ShapedLine] {
+        &self.core.last_line_layouts
+    }
+    fn last_line_byte_ranges(&self) -> &[Range<usize>] {
+        &self.core.last_line_byte_ranges
+    }
+    fn last_line_height(&self) -> Option<Pixels> {
+        self.core.last_line_height
+    }
+    fn update_paint_state(&mut self, line: ShapedLine, bounds: Bounds<Pixels>, scroll_x: Pixels) {
+        self.core.last_layout = Some(line);
+        self.core.last_bounds = Some(bounds);
+        self.core.scroll_x = scroll_x;
+    }
+    fn focus_handle(&self) -> FocusHandle {
+        self.core.focus_handle()
+    }
+}
+
 pub struct PrepaintState {
     pub line: Option<ShapedLine>,
     pub selection: Option<PaintQuad>,
@@ -59,14 +163,14 @@ pub struct PrepaintState {
     pub cursor_visible: bool,
 }
 
-impl IntoElement for TextInputElement {
+impl<T: TextInputPainterHost + EntityInputHandler> IntoElement for TextInputElement<T> {
     type Element = Self;
     fn into_element(self) -> Self::Element {
         self
     }
 }
 
-impl Element for TextInputElement {
+impl<T: TextInputPainterHost + EntityInputHandler> Element for TextInputElement<T> {
     type RequestLayoutState = ();
     type PrepaintState = PrepaintState;
 
@@ -100,12 +204,12 @@ impl Element for TextInputElement {
         cx: &mut App,
     ) -> Self::PrepaintState {
         let input = self.state.read(cx);
-        let value = input.value.clone();
-        let caret = input.caret;
+        let value = input.display_value();
+        let caret = input.caret();
         let selection = input.selected_range();
-        let placeholder = input.placeholder.clone();
-        let scroll_x_input = input.scroll_x;
-        let cursor_visible = input.cursor_visible;
+        let placeholder = input.placeholder();
+        let scroll_x_input = input.scroll_x();
+        let cursor_visible = input.cursor_visible();
 
         let is_empty = value.is_empty();
         let (display_text, run_color) = if is_empty {
@@ -240,9 +344,7 @@ impl Element for TextInputElement {
         }
 
         self.state.update(cx, |input, _cx| {
-            input.last_layout = Some(line);
-            input.last_bounds = Some(bounds);
-            input.scroll_x = prepaint.scroll_x;
+            input.update_paint_state(line, bounds, prepaint.scroll_x);
         });
     }
 }
@@ -255,12 +357,17 @@ pub type SubmitCallback = std::sync::Arc<dyn Fn(&str, &mut Window, &mut App) + S
 /// Apply the text-input keymap (`track_focus` + `key_context` +
 /// 14 `on_action` handlers + 3 mouse handlers) to `wrapper`.
 ///
+/// Generic over the state type so the same wiring drives
+/// `TextInputState` (the standalone input pipeline) and
+/// `ComboBoxState` (which embeds a text input as part of its
+/// trigger). Both implement [`TextInputActionHandler`].
+///
 /// The wrapper's `.id(...)` is NOT applied here — the caller is
 /// expected to set it before calling, and the `key_context`
 /// assumes the focus is in the right scope.
-pub fn wire_input_keyboard(
+pub fn wire_input_keyboard<T: TextInputActionHandler>(
     mut wrapper: Stateful<Div>,
-    state: gpui::Entity<TextInputState>,
+    state: gpui::Entity<T>,
     _focus_handle: FocusHandle,
     disabled: bool,
     on_submit: Option<SubmitCallback>,
@@ -304,15 +411,19 @@ pub fn wire_input_keyboard(
         ))
         .on_action(action_handler!(state.clone(), disabled, Paste, paste))
         .on_action(action_handler!(state.clone(), disabled, Cut, cut))
-        .on_action(action_handler!(state.clone(), disabled, Copy, copy));
+        .on_action(action_handler!(state.clone(), disabled, Copy, copy))
+        .on_action(action_handler!(state.clone(), disabled, Escape, escape));
 
     let state_for_enter = state.clone();
     let on_submit_for_enter = on_submit.clone();
-    wrapper = wrapper.on_action(move |_: &Enter, window, cx| {
+    wrapper = wrapper.on_action(move |action: &Enter, window, cx| {
         if disabled {
             return;
         }
-        let value = state_for_enter.read(cx).value.clone();
+        state_for_enter.update(cx, |s, app| {
+            s.enter(action, window, app);
+        });
+        let value = state_for_enter.read(cx).value();
         if let Some(cb) = on_submit_for_enter.as_ref() {
             cb(&value, window, cx);
         }
@@ -326,25 +437,31 @@ pub fn wire_input_keyboard(
         .on_mouse_down(
             MouseButton::Left,
             move |event: &MouseDownEvent, window, cx| {
-                state_for_mouse.update(cx, |s, cx| {
-                    s.on_mouse_down(event.position, window, cx);
+                state_for_mouse.update(cx, |s, app| {
+                    s.on_mouse_down(event.position, window, app);
                 });
             },
         )
         .on_mouse_up(
             MouseButton::Left,
             move |event: &MouseUpEvent, window, cx| {
-                state_for_up.update(cx, |s, cx| s.on_mouse_up(event, window, cx));
+                state_for_up.update(cx, |s, app| {
+                    s.on_mouse_up(event, window, app);
+                });
             },
         )
         .on_mouse_up_out(
             MouseButton::Left,
             move |event: &MouseUpEvent, window, cx| {
-                state_for_up_out.update(cx, |s, cx| s.on_mouse_up(event, window, cx));
+                state_for_up_out.update(cx, |s, app| {
+                    s.on_mouse_up(event, window, app);
+                });
             },
         )
         .on_mouse_move(move |event: &MouseMoveEvent, window, cx| {
-            state_for_move.update(cx, |s, cx| s.on_mouse_move(event, window, cx));
+            state_for_move.update(cx, |s, app| {
+                s.on_mouse_move(event, window, app);
+            });
         });
 
     wrapper
@@ -354,11 +471,15 @@ pub fn wire_input_keyboard(
 /// `cursor_blink_epoch` counter; the running task checks it on
 /// each tick and exits if it changed (i.e. focus moved
 /// elsewhere).
-pub fn start_cursor_blink(state: gpui::Entity<TextInputState>, window: &mut Window, cx: &mut App) {
+pub fn start_cursor_blink<T: TextInputPainterHost>(
+    state: gpui::Entity<T>,
+    window: &mut Window,
+    cx: &mut App,
+) {
     state.update(cx, |s, _cx| {
-        s.cursor_blink_epoch = s.cursor_blink_epoch.wrapping_add(1);
+        s.set_cursor_blink_epoch(s.cursor_blink_epoch().wrapping_add(1));
     });
-    let epoch = state.read(cx).cursor_blink_epoch;
+    let epoch = state.read(cx).cursor_blink_epoch();
     let state_weak = state.downgrade();
     window
         .spawn(cx, async move |async_cx| {
@@ -371,17 +492,17 @@ pub fn start_cursor_blink(state: gpui::Entity<TextInputState>, window: &mut Wind
                     .update(|window, cx| {
                         state_weak
                             .update(cx, |s, cx| {
-                                if s.cursor_blink_epoch != epoch {
-                                    s.cursor_visible = true;
+                                if s.cursor_blink_epoch() != epoch {
+                                    s.set_cursor_visible(true);
                                     cx.notify();
                                     return false;
                                 }
                                 if !s.focus_handle().is_focused(window) {
-                                    s.cursor_visible = true;
+                                    s.set_cursor_visible(true);
                                     cx.notify();
                                     return false;
                                 }
-                                s.cursor_visible = !s.cursor_visible;
+                                s.set_cursor_visible(!s.cursor_visible());
                                 cx.notify();
                                 true
                             })
