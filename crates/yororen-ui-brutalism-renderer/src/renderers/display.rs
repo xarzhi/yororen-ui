@@ -227,6 +227,13 @@ impl BrutalFocusRingRenderer {
             .get_number("tokens.control.focus_ring.width")
             .unwrap_or(BRUTAL_BORDER_WIDTH as f64) as f32)
     }
+
+    /// Brutalism keeps everything sharp-cornered, so the focus
+    /// ring is rendered with `BRUTAL_RADIUS` (0). The wrapper's
+    /// `rounded(...)` is what the `box-shadow` follows.
+    pub fn border_radius(&self, _: &FocusRingRenderState, _: &Theme) -> Pixels {
+        px(BRUTAL_RADIUS)
+    }
 }
 
 impl FocusRingRenderer for BrutalFocusRingRenderer {
@@ -242,9 +249,11 @@ impl FocusRingRenderer for BrutalFocusRingRenderer {
         };
         let color = self.color(&state, theme);
         let width = self.width(&state, theme);
+        let radius = self.border_radius(&state, theme);
         gpui::div()
             .id(props.id.clone())
             .track_focus(&props.focus_handle)
+            .rounded(radius)
             .shadow(vec![BoxShadow {
                 color,
                 offset: point(px(0.), px(0.)),
