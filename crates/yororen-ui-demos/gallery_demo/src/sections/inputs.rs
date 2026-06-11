@@ -166,7 +166,9 @@ pub fn render(
 /// Render a labelled input cell with a status line below it
 /// that shows the live value. The component name is the first
 /// line, the input is the second, and the status is the third.
-fn input_cell(
+/// Reused by `controls.rs` so checkbox/switch can show their
+/// `value: <bool>` status the same way the other inputs do.
+pub fn input_cell(
     name: &'static str,
     el: impl IntoElement,
     status: &str,

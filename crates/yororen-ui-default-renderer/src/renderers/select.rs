@@ -183,10 +183,16 @@ impl SelectRenderer for TokenSelectRenderer {
                     .text_color(item_fg)
                     .hover(move |s| s.bg(hover_bg))
                     .child(opt_label);
-                item = item.on_click(move |_ev, _window, cx| {
-                    state_for_opt.update(cx, |s, _cx| {
-                        s.set_value(opt_value.clone());
-                        s.close();
+                item = item.on_click(move |_ev, window, cx| {
+                    // Headless data action: `pick` writes
+                    // value, closes the dropdown, and fires
+                    // `on_change` in one call. We recover
+                    // `&mut App` from the `Context` via
+                    // `&mut *cx_inner` (the documented
+                    // `DerefMut<Target = App>` pattern — see
+                    // memory.md "Context<T> → App").
+                    state_for_opt.update(cx, |s, cx_inner| {
+                        s.pick(opt_value.clone(), window, &mut *cx_inner);
                     });
                 });
                 dropdown = dropdown.child(item);

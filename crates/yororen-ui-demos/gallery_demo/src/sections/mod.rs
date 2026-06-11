@@ -10,6 +10,8 @@ mod notifications;
 mod overlays;
 mod surfaces;
 
+pub use inputs::input_cell;
+
 use gpui::{Context, Div, IntoElement, ParentElement, Styled, Window, div, px};
 
 use yororen_ui::headless::heading::heading;

@@ -247,7 +247,6 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
                 } else {
                     theme.get_color("content.primary").unwrap_or_default()
                 };
-                let opt_label_for_click = opt_label.clone();
                 let mut item: Stateful<Div> = div()
                     .id(ElementId::Name(
                         format!("default-combo-opt-{}", orig_i).into(),
@@ -259,12 +258,17 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
                     .text_color(item_fg)
                     .hover(move |s| s.bg(hover_bg))
                     .child(opt_label);
-                item = item.on_click(move |_ev, _window, cx| {
-                    let label_for_text = opt_label_for_click.clone();
-                    state_for_opt.update(cx, |s, _cx| {
-                        s.set_value(opt_value.clone());
-                        s.text = label_for_text;
-                        s.close();
+                item = item.on_click(move |_ev, window, cx| {
+                    // Headless data action: `pick` writes
+                    // value (which also resyncs `text` to the
+                    // label), closes the dropdown, and fires
+                    // `on_change` in one call. Recover
+                    // `&mut App` from the `Context` via
+                    // `&mut *cx_inner` (the documented
+                    // `DerefMut<Target = App>` pattern — see
+                    // memory.md "Context<T> → App").
+                    state_for_opt.update(cx, |s, cx_inner| {
+                        s.pick(opt_value.clone(), window, &mut *cx_inner);
                     });
                 });
                 dropdown = dropdown.child(item);

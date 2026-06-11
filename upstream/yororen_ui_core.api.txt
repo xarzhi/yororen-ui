@@ -1104,7 +1104,9 @@ pub fn yororen_ui_core::headless::combo_box::ComboBoxState::highlight_prev(&mut 
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::invoke_change(&self, gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::is_open(&self) -> bool
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::new(&mut gpui::app::App) -> gpui::app::entity_map::Entity<Self>
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::on_change(&self) -> core::option::Option<&yororen_ui_core::headless::combo_box::ComboBoxChangeCallback>
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::open(&mut self)
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::pick(&mut self, gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::select_highlighted(&mut self, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::set_on_change<F>(&mut self, F) where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::set_options(&mut self, alloc::vec::Vec<yororen_ui_core::headless::combo_box::ComboBoxOption>)
@@ -3131,7 +3133,9 @@ pub fn yororen_ui_core::headless::select::SelectState::highlight_prev(&mut self)
 pub fn yororen_ui_core::headless::select::SelectState::invoke_change(&self, gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::select::SelectState::is_open(&self) -> bool
 pub fn yororen_ui_core::headless::select::SelectState::new(&mut gpui::app::App) -> gpui::app::entity_map::Entity<Self>
+pub fn yororen_ui_core::headless::select::SelectState::on_change(&self) -> core::option::Option<&yororen_ui_core::headless::select::SelectChangeCallback>
 pub fn yororen_ui_core::headless::select::SelectState::open(&mut self)
+pub fn yororen_ui_core::headless::select::SelectState::pick(&mut self, gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::select::SelectState::select_highlighted(&mut self, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::select::SelectState::set_on_change<F>(&mut self, F) where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::select::SelectState::set_options(&mut self, alloc::vec::Vec<yororen_ui_core::headless::select::SelectOption>)

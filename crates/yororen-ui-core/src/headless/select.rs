@@ -104,6 +104,23 @@ impl SelectState {
             f(value, window, cx);
         }
     }
+    /// Pick an option. Headless data-layer action — does
+    /// NOT belong in the renderer. Writes the new value,
+    /// closes the dropdown, and fires the user-supplied
+    /// `on_change` callback. Renderer composes visuals +
+    /// wires this as the item's click handler.
+    pub fn pick(&mut self, value: SharedString, window: &mut gpui::Window, cx: &mut App) {
+        self.value = Some(value.clone());
+        self.open = false;
+        self.invoke_change(value, window, cx);
+    }
+    /// Borrow the on_change callback (if any). Used by
+    /// renderers to fire the user's pick handler after
+    /// they mutate `value` themselves (since `set_value`
+    /// alone doesn't fire `on_change`).
+    pub fn on_change(&self) -> Option<&SelectChangeCallback> {
+        self.on_change.as_ref()
+    }
     pub fn select_highlighted(&mut self, window: &mut gpui::Window, cx: &mut App) {
         if let Some(i) = self.highlighted_index
             && let Some(opt) = self.options.get(i)

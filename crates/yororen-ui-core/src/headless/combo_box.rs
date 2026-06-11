@@ -113,6 +113,23 @@ impl ComboBoxState {
             f(value, window, cx);
         }
     }
+    /// Pick an option. Headless data-layer action — does
+    /// NOT belong in the renderer. Writes the new value
+    /// (which also resyncs `text` to the label), closes
+    /// the dropdown, and fires `on_change`. Renderer
+    /// composes visuals + wires this as the item's click.
+    pub fn pick(&mut self, value: SharedString, window: &mut gpui::Window, cx: &mut App) {
+        self.set_value(value.clone());
+        self.open = false;
+        self.invoke_change(value, window, cx);
+    }
+    /// Borrow the on_change callback (if any). Used by
+    /// renderers to fire the user's pick handler after
+    /// they mutate `value` themselves (since `set_value`
+    /// alone doesn't fire `on_change`).
+    pub fn on_change(&self) -> Option<&ComboBoxChangeCallback> {
+        self.on_change.as_ref()
+    }
     pub fn select_highlighted(&mut self, window: &mut gpui::Window, cx: &mut App) {
         if let Some(i) = self.highlighted_index
             && let Some(opt) = self.options.get(i)

@@ -1269,10 +1269,16 @@ impl SelectRenderer for BrutalSelectRenderer {
                     .text_color(item_fg)
                     .hover(move |s| s.bg(hover_bg))
                     .child(opt_label);
-                item = item.on_click(move |_ev, _window, cx| {
-                    state_for_opt.update(cx, |s, _cx| {
-                        s.set_value(opt_value.clone());
-                        s.close();
+                item = item.on_click(move |_ev, window, cx| {
+                    // Headless data action: `pick` writes
+                    // value, closes the dropdown, and fires
+                    // `on_change` in one call. We recover
+                    // `&mut App` from the `Context` via
+                    // `&mut *cx_inner` (the documented
+                    // `DerefMut<Target = App>` pattern — see
+                    // memory.md "Context<T> → App").
+                    state_for_opt.update(cx, |s, cx_inner| {
+                        s.pick(opt_value.clone(), window, &mut *cx_inner);
                     });
                 });
                 dropdown = dropdown.child(item);
@@ -1359,7 +1365,9 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
         };
         let bg = self.bg(&state, &theme);
         let border = self.border(&state, &theme);
-        let fg = self.fg(&state, &theme);
+        // The trigger's foreground colour is owned by the
+        // embedded text-input; the outer wrapper only carries
+        // bg / border / padding / radius.
         let pad = self.padding(&state, &theme);
         let h = self.min_height(&state, &theme);
         let r = self.border_radius(&state, &theme);
@@ -1535,7 +1543,6 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
                 } else {
                     theme.get_color("content.primary").unwrap_or(BRUTAL_BORDER)
                 };
-                let opt_label_for_click = opt_label.clone();
                 let mut item: Stateful<gpui::Div> = gpui::div()
                     .id(ElementId::Name(
                         format!("brutal-combo-opt-{}", orig_i).into(),
@@ -1547,15 +1554,19 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
                     .text_color(item_fg)
                     .hover(move |s| s.bg(hover_bg))
                     .child(opt_label);
-                // On pick: set value AND set text to the label
-                // so the trigger shows what was selected
-                // (otherwise the typed query would persist).
-                item = item.on_click(move |_ev, _window, cx| {
-                    let label_for_text = opt_label_for_click.clone();
-                    state_for_opt.update(cx, |s, _cx| {
-                        s.set_value(opt_value.clone());
-                        s.text = label_for_text;
-                        s.close();
+                // On pick: headless `pick` writes value
+                // (which also resyncs `text` to the label)
+                // AND closes the dropdown AND fires
+                // `on_change` in one call. The trigger's
+                // text_input will re-paint with the label
+                // on the next frame.
+                item = item.on_click(move |_ev, window, cx| {
+                    // Recover `&mut App` from the `Context`
+                    // via `&mut *cx_inner` (the documented
+                    // `DerefMut<Target = App>` pattern —
+                    // see memory.md "Context<T> → App").
+                    state_for_opt.update(cx, |s, cx_inner| {
+                        s.pick(opt_value.clone(), window, &mut *cx_inner);
                     });
                 });
                 dropdown = dropdown.child(item);

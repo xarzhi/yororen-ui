@@ -18,6 +18,7 @@ use yororen_ui::headless::slider::slider;
 use yororen_ui::headless::switch::switch;
 
 use crate::sections::cell;
+use crate::sections::input_cell;
 use crate::state::GalleryApp;
 
 pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
@@ -156,7 +157,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .flex()
         .flex_col()
         .gap(px(12.))
-        .child(div().flex().flex_row().flex_wrap().gap(px(12.)).items_center().child(cell("checkbox", cb, cx)).child(cell("switch", sw, cx)))
+        .child(div().flex().flex_row().flex_wrap().gap(px(12.)).items_center().child(input_cell("checkbox", cb, &format!("value: {}", app.checkbox_value), cx)).child(input_cell("switch", sw, &format!("value: {}", app.switch_value), cx)))
         .child(cell("radio_group (3 radios)", rg_with_radios, cx))
         .child(div().flex().flex_col().gap(px(4.)).child(cell("slider (track + knob)", slider_track, cx)).child(label("slider-lbl", format!("slider: {slider_value:.1}"), cx).muted(true).render(cx)))
 }

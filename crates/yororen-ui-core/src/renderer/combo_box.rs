@@ -17,7 +17,7 @@
 
 use std::any::Any;
 
-use gpui::{AnyElement, App, Div, Window};
+use gpui::{AnyElement, App, Window};
 
 use crate::headless::combo_box::ComboBoxProps;
 
