@@ -194,7 +194,7 @@ impl ButtonRenderer for BrutalButtonRenderer {
                 size: Some(props.icon_size),
                 color: Some(fg),
             }
-            .render();
+            .render(cx);
             el = el.child(icon_el);
         }
         if let Some(caption) = props.caption.clone() {
@@ -339,7 +339,7 @@ impl IconButtonRenderer for BrutalIconButtonRenderer {
                 size: Some(props.icon_size),
                 color: Some(fg),
             }
-            .render();
+            .render(cx);
             el = el.child(icon_el);
         }
 
@@ -516,7 +516,7 @@ impl ToggleButtonRenderer for BrutalToggleButtonRenderer {
                 size: Some(props.icon_size),
                 color: Some(fg),
             }
-            .render();
+            .render(cx);
             el = el.child(icon_el);
         }
         if let Some(caption) = props.caption.clone() {

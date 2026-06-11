@@ -41,6 +41,7 @@ marker!(
     Tag,
     ProgressBar,
     Skeleton,
+    Slider,
     Tooltip,
     Avatar,
     Switch,
@@ -71,6 +72,16 @@ marker!(
     Image,
     KeybindingDisplay,
     ShortcutHint,
+    Icon,
+    Text,
+    Spacer,
+    Overlay,
+    Menu,
+    FormField,
+    RadioGroup,
+    Table,
+    Tree,
+    VirtualList,
 );
 
 #[cfg(test)]

@@ -121,7 +121,7 @@ impl IconButtonRenderer for TokenIconButtonRenderer {
                 size: Some(icon_size),
                 color: Some(fg),
             }
-            .render();
+            .render(cx);
             el = el.child(icon_el);
         }
 

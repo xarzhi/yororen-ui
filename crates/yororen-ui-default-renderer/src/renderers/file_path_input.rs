@@ -195,7 +195,7 @@ impl FilePathInputRenderer for TokenFilePathInputRenderer {
                 )
                 .size(icon_size)
                 .color(text_color)
-                .render(),
+                .render(cx),
             )
             .child(div().flex_1().min_w(px(0.)).child(inner))
             .child(
@@ -260,7 +260,7 @@ impl FilePathInputRenderer for TokenFilePathInputRenderer {
                         )
                         .size(icon_size)
                         .color(button_fg)
-                        .render(),
+                        .render(cx),
                     ),
             )
             .into_any_element()

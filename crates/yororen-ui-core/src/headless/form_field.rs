@@ -2,7 +2,8 @@
 //! provides the input element as a child; the headless layer only
 //! owns the label and the error string.
 
-use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
+use gpui::{App, Div, ElementId, InteractiveElement, SharedString, Stateful};
+use crate::renderer::RendererContext;
 
 #[derive(Clone, Debug)]
 pub struct FormFieldProps {
@@ -48,5 +49,15 @@ impl FormFieldProps {
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the form field through the registered `FormFieldRenderer`.
+    ///
+    /// The input element should be added as a child after `.render(cx)`.
+    pub fn render(self, cx: &App) -> Stateful<Div> {
+        let r = cx
+            .renderer_arc::<crate::renderer::markers::FormField, dyn crate::renderer::form_field::FormFieldRenderer>()
+            .expect("FormFieldRenderer registered");
+        r.compose(&self, cx)
     }
 }

@@ -2,6 +2,7 @@
 //! index. Keyboard navigation lives in the renderer.
 
 use std::sync::Arc;
+use crate::renderer::RendererContext;
 
 use gpui::{App, Div, ElementId, InteractiveElement, SharedString, Stateful};
 
@@ -42,5 +43,15 @@ impl RadioGroupProps {
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the radio group shell through the registered
+    /// `RadioGroupRenderer`. Radio buttons are added as children after
+    /// `.render(cx)`.
+    pub fn render(self, cx: &App) -> Stateful<Div> {
+        let r = cx
+            .renderer_arc::<crate::renderer::markers::RadioGroup, dyn crate::renderer::radio_group::RadioGroupRenderer>()
+            .expect("RadioGroupRenderer registered");
+        r.compose(&self, cx)
     }
 }

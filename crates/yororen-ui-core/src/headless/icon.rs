@@ -1,6 +1,7 @@
 //! Headless `icon` — a `gpui::svg` with id. No state.
 
-use gpui::{Div, ElementId, Hsla, InteractiveElement, IntoElement, SharedString, Stateful, Styled};
+use gpui::{AnyElement, App, Div, ElementId, Hsla, InteractiveElement, IntoElement, SharedString, Stateful, Styled};
+use crate::renderer::RendererContext;
 
 #[derive(Clone, Debug)]
 pub struct IconProps {
@@ -45,11 +46,21 @@ impl IconProps {
         el.id(self.id)
     }
 
-    /// Render the icon as an `AnyElement` (`gpui::Svg`). The icon's
-    /// `source` resolves through the application's `AssetSource`
-    /// (builtin names map to `icons/<name>.svg`; resources pass
-    /// through).
-    pub fn render(self) -> gpui::AnyElement {
+    /// Render the icon through the registered `IconRenderer`.
+    ///
+    /// This is the preferred entry point; it lets themes control the
+    /// default size / colour. The no-argument [`Self::render_legacy`]
+    /// is kept for backward compatibility.
+    pub fn render(self, cx: &App) -> AnyElement {
+        let r = cx
+            .renderer_arc::<crate::renderer::markers::Icon, dyn crate::renderer::icon::IconRenderer>()
+            .expect("IconRenderer registered");
+        r.compose(&self, cx)
+    }
+
+    /// Legacy no-context render. Uses hard-coded defaults.
+    #[deprecated(note = "use `.render(cx)` so themes can supply defaults")]
+    pub fn render_legacy(self) -> gpui::AnyElement {
         let path = match &self.source {
             IconSource::Builtin(name) => gpui::SharedString::from(format!("icons/{}.svg", name)),
             IconSource::Resource(path) => path.clone(),

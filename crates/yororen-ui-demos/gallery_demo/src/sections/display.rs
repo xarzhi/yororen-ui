@@ -1,7 +1,7 @@
 //! Section 2 — Display. Each component is wrapped in a `cell`
 //! that labels the component above it.
 
-use gpui::{Context, Div, ParentElement, Styled, div, hsla, px};
+use gpui::{Context, Div, ParentElement, Styled, div, px};
 
 use yororen_ui::headless::badge::{BadgeVariant, badge};
 use yororen_ui::headless::divider::divider;
@@ -46,9 +46,9 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .flex_col()
         .gap(px(8.))
         .child(label("d-h-info", "divider / horizontal", cx).muted(true).render(cx))
-        .child(divider("d-h1", cx).apply(div().w_full().h(px(1.)).bg(hsla(0.0, 0.0, 0.5, 0.4))))
+        .child(divider("d-h1", cx).render(cx))
         .child(label("d-v-info", "divider / vertical", cx).muted(true).render(cx))
-        .child(divider("d-v1", cx).vertical().apply(div().h(px(24.)).w(px(1.)).bg(hsla(0.0, 0.0, 0.5, 0.4))));
+        .child(divider("d-v1", cx).vertical().render(cx).h(px(24.)));
 
     // --- 5 badge variants ---
     let badges = div()
@@ -130,9 +130,9 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .flex_row()
         .items_center()
         .gap(px(12.))
-        .child(cell("text", text("tx-1", "Plain text via `text`", cx).size(px(14.)).render(), cx))
-        .child(cell("icon (check)", icon("ic-1", yororen_ui::headless::icon::IconSource::Builtin("check".into()), cx).size(px(18.)).color(gpui::rgb(0x0A0A0A)).render(), cx))
-        .child(cell("icon (search)", icon("ic-2", yororen_ui::headless::icon::IconSource::Builtin("search".into()), cx).size(px(18.)).color(gpui::rgb(0x0A0A0A)).render(), cx));
+        .child(cell("text", text("tx-1", "Plain text via `text`", cx).size(px(14.)).render(cx), cx))
+        .child(cell("icon (check)", icon("ic-1", yororen_ui::headless::icon::IconSource::Builtin("check".into()), cx).size(px(18.)).color(gpui::rgb(0x0A0A0A)).render(cx), cx))
+        .child(cell("icon (search)", icon("ic-2", yororen_ui::headless::icon::IconSource::Builtin("search".into()), cx).size(px(18.)).color(gpui::rgb(0x0A0A0A)).render(cx), cx));
 
     div()
         .flex()

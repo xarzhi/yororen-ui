@@ -49,6 +49,10 @@
     "select": "Select",
     "combo": "Combo box"
   },
+  "modal": {
+    "title": "Modal Dialog",
+    "body": "This is a modal dialog. Click Close to dismiss."
+  },
   "tooltip": {
     "text": "Tooltip — a brief hint about this element."
   },

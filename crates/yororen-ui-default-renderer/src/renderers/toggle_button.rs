@@ -159,7 +159,7 @@ impl ToggleButtonRenderer for TokenToggleButtonRenderer {
                 size: Some(icon_size),
                 color: Some(fg),
             }
-            .render();
+            .render(cx);
             el = el.child(icon_el);
         }
         if let Some(caption) = props.caption.clone() {

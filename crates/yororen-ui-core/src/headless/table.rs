@@ -2,6 +2,7 @@
 //! visual lives in the renderer.
 
 use std::sync::Arc;
+use crate::renderer::RendererContext;
 
 use gpui::{App, Div, ElementId, InteractiveElement, SharedString, Stateful};
 
@@ -81,5 +82,13 @@ impl TableProps {
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the full table through the registered `TableRenderer`.
+    pub fn render(self, cx: &App) -> Stateful<Div> {
+        let r = cx
+            .renderer_arc::<crate::renderer::markers::Table, dyn crate::renderer::table::TableRenderer>()
+            .expect("TableRenderer registered");
+        r.compose(&self, cx)
     }
 }

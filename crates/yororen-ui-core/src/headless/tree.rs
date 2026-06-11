@@ -4,6 +4,7 @@
 //! produce rows.
 
 use std::collections::{BTreeMap, BTreeSet, HashMap};
+use crate::renderer::RendererContext;
 
 use gpui::{App, Div, ElementId, InteractiveElement, SharedString, Stateful};
 
@@ -72,6 +73,16 @@ impl TreeProps {
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the tree container through the registered `TreeRenderer`.
+    ///
+    /// Tree rows are added by the caller as children after `.render(cx)`.
+    pub fn render(self, cx: &App) -> Stateful<Div> {
+        let r = cx
+            .renderer_arc::<crate::renderer::markers::Tree, dyn crate::renderer::tree::TreeRenderer>()
+            .expect("TreeRenderer registered");
+        r.compose(&self, cx)
     }
 }
 

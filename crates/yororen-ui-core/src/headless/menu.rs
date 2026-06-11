@@ -2,6 +2,7 @@
 //! trigger (used inside `popover`s or as a context menu body).
 
 use std::sync::Arc;
+use crate::renderer::RendererContext;
 
 use gpui::{App, AppContext, Div, ElementId, Entity, InteractiveElement, SharedString, Stateful};
 
@@ -90,5 +91,15 @@ pub fn menu(id: impl Into<ElementId>, state: Entity<MenuState>) -> MenuProps {
 impl MenuProps {
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the menu shell through the registered `MenuRenderer`.
+    pub fn render(self, cx: &App) -> Stateful<Div> {
+        let r = cx
+            .renderer_arc::<crate::renderer::markers::Menu, dyn crate::renderer::menu::MenuRenderer>()
+            .expect("MenuRenderer registered");
+        let el = r.compose(&self, cx);
+        // Add the caller's children (menu items) are appended after this call.
+        el
     }
 }

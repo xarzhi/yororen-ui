@@ -32,12 +32,12 @@ const LIST_ITEMS: &[(&str, &str)] = &[
 
 pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     // --- list_item: 3 selectable rows ---
-    let mut list_col = div().flex().flex_col().gap(px(4.));
+    let mut list_col = div().flex().flex_col().gap(px(4.)).w(px(220.));
     for (i, (id, title)) in LIST_ITEMS.iter().enumerate() {
         list_col = list_col.child(
             list_item(*id, *title, cx)
                 .selected(app.selected_list_item == Some(i))
-                .apply(div().w(px(220.)).p(px(8.)).rounded(px(4.))),
+                .render(cx),
         );
     }
     let list_wrapped = cell("list_item (3 rows; selected via props)", list_col, cx);
@@ -59,12 +59,13 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
                 }
             });
         })
-        .apply(div().flex().flex_col().gap(px(8.)).w(px(300.)))
+        .render(cx)
+        .w(px(300.))
         .child(
             form_field("lists-ff-email", "email", cx)
                 .label(cx.t("form.email"))
                 .required(true)
-                .apply(div().flex().flex_col().gap(px(4.)))
+                .render(cx)
                 .child(
                     div()
                         .p(px(6.))
@@ -113,7 +114,8 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .on_select(move |i, _w, cx| {
             entity_table.update(cx, |s, _cx| s.selected_table_row = Some(i));
         })
-        .apply(div().w(px(320.)).border_1().rounded(px(4.)));
+        .render(cx)
+        .w(px(320.));
     let table_wrapped = cell("table (3 rows × 3 cols)", table_el, cx);
 
     // --- tree (with tree_item rows) ---
@@ -127,7 +129,8 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     let tree_expanded: BTreeSet<_> = app.tree_expanded.clone();
     let mut tree_el = tree("lists-tree", cx)
         .data(tree_data)
-        .apply(div().w(px(220.)).flex().flex_col().gap(px(2.)));
+        .render(cx)
+        .w(px(220.));
     for (id, label_text, depth) in [
         (node_id("root"), "Root", 0usize),
         (node_id("child1"), "Child 1", 1),
@@ -148,7 +151,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
                         }
                     });
                 })
-                .apply(div().p(px(4.)).rounded(px(4.))),
+                .render(cx),
         );
     }
     let tree_wrapped = cell("tree + tree_item (3 rows; click chevron to expand)", tree_el, cx);
@@ -156,18 +159,23 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     // --- virtual_list ---
     let vl = virtual_list("lists-vl", 1_000, cx)
         .overdraw(20.0)
-        .apply(div().w(px(220.)).h(px(120.)).border_1().rounded(px(4.)))
+        .render(cx)
+        .w(px(220.))
+        .h(px(120.))
         .child(label("vl-blank", "(1000 items; scroll to test)", cx).muted(true).render(cx));
     let vl_wrapped = cell("virtual_list (1000 items)", vl, cx);
 
     // --- spacer ---
-    let sp = spacer("lists-spacer", cx).apply(div().h(px(16.)).w_full());
+    let sp = spacer("lists-spacer", cx)
+        .render(cx)
+        .h(px(16.))
+        .w_full();
     let sp_wrapped = cell("spacer (16px tall)", sp, cx);
 
     // --- radio_group empty (also used as a layout shell) ---
     let rg_demo = radio_group("lists-rg", cx)
         .name("rg-2")
-        .apply(div().flex().flex_row().gap(px(8.)).items_center())
+        .render(cx)
         .child(label("rg-2-info", "Standalone radio_group (no children)", cx).muted(true).render(cx));
     let rg_wrapped = cell("radio_group (empty shell)", rg_demo, cx);
 

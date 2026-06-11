@@ -28,14 +28,20 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .child("Open modal");
     let modal_state = app.modal_state.clone();
     let is_modal_open = modal_state.read(cx).open;
+    let modal_panel = modal("ov-modal", modal_state.clone())
+        .render(cx)
+        .w(px(360.))
+        .child(label("ov-modal-title", cx.t("modal.title"), cx).strong(true).render(cx))
+        .child(label("ov-modal-body", cx.t("modal.body"), cx).render(cx))
+        .child(
+            button("ov-modal-close", cx)
+                .on_click(move |_, _, cx| {
+                    modal_state.update(cx, |st, _cx| st.close());
+                })
+                .render(cx)
+                .child("Close"),
+        );
     let modal_body = if is_modal_open {
-        let modal_state_id = modal_state.clone();
-        let close_btn = button("ov-modal-close", cx)
-            .on_click(move |_, _, cx| {
-                modal_state_id.update(cx, |st, _cx| st.close());
-            })
-            .render(cx)
-            .child("Close");
         div()
             .absolute()
             .inset_0()
@@ -43,24 +49,11 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
             .items_center()
             .justify_center()
             .bg(hsla(0.0, 0.0, 0.0, 0.5))
-            .child(
-                div()
-                    .w(px(360.))
-                    .p(px(20.))
-                    .rounded(px(8.))
-                    .bg(gpui::rgb(0xFFFFFF))
-                    .flex()
-                    .flex_col()
-                    .gap(px(12.))
-                    .child(label("ov-modal-title", cx.t("modal.title"), cx).strong(true).render(cx))
-                    .child(label("ov-modal-body", cx.t("modal.body"), cx).render(cx))
-                    .child(close_btn),
-            )
+            .child(modal_panel)
     } else {
         div()
     };
-    let modal_el = modal("ov-modal", modal_state.clone()).apply(modal_body);
-    let modal_wrapped = cell("modal (click to open)", modal_el, cx);
+    let modal_wrapped = cell("modal (click to open)", modal_body, cx);
 
     // --- popover: trigger + popover body ---
     let popover_state_for_btn = app.popover_state.clone();
@@ -84,21 +77,23 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
             });
         });
         let menu_el = menu("ov-menu", menu_state.clone())
-            .apply(div().w(px(160.)).p(px(4.)).rounded(px(6.)).border_1().bg(gpui::rgb(0xFFFFFF)))
+            .render(cx)
+            .w(px(160.))
             .child(label("menu-blank", "", cx).render(cx));
         div().child(menu_el)
     } else {
         div()
     };
     let popover_el = popover("ov-popover", popover_state.clone())
-        .apply(div().child(popover_trigger))
+        .render(cx)
+        .child(popover_trigger)
         .child(popover_body);
     let popover_wrapped = cell("popover (click trigger)", popover_el, cx);
 
     // --- tooltip ---
     let tooltip_state = app.tooltip_state.clone();
     let tooltip_el = tooltip("ov-tooltip", cx.t("tooltip.text"), tooltip_state.clone())
-        .apply(div().p(px(6.)).rounded(px(4.)).border_1())
+        .render(cx)
         .child(label("ov-tt-target", "Hover or focus me", cx).render(cx));
     let tooltip_wrapped = cell("tooltip (hover target)", tooltip_el, cx);
 
@@ -132,7 +127,8 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         div()
     };
     let dropdown_el = dropdown_menu("ov-dropdown", dropdown_state.clone())
-        .apply(div().child(dropdown_trigger))
+        .render(cx)
+        .child(dropdown_trigger)
         .child(dropdown_body);
     let dropdown_wrapped = cell("dropdown_menu (click trigger)", dropdown_el, cx);
 
@@ -140,6 +136,13 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     let entity_for_disc = cx.entity().clone();
     let disc_open = app.disclosure_open;
     let disc_label_str = if disc_open { "▼ " } else { "▶ " };
+    let disc_trigger = div()
+        .flex()
+        .flex_row()
+        .items_center()
+        .gap(px(4.))
+        .child(label("ov-disc-arrow", disc_label_str, cx).render(cx))
+        .child(label("ov-disc-text", cx.t("disclosure.title"), cx).strong(true).render(cx));
     let disc = disclosure("ov-disc", cx.t("disclosure.title"), cx)
         .open(disc_open)
         .on_toggle(move |_, _, cx| {
@@ -147,16 +150,8 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
                 s.disclosure_open = !s.disclosure_open;
             });
         })
-        .apply(div().flex().flex_col().gap(px(4.)))
-        .child(
-            div()
-                .flex()
-                .flex_row()
-                .items_center()
-                .gap(px(4.))
-                .child(label("ov-disc-arrow", disc_label_str, cx).render(cx))
-                .child(label("ov-disc-text", cx.t("disclosure.title"), cx).strong(true).render(cx)),
-        );
+        .render(cx)
+        .child(disc_trigger);
     let disc_with_body = if disc_open {
         disc.child(div().pl(px(16.)).child(label("ov-disc-body", cx.t("disclosure.body"), cx).render(cx)))
     } else {
@@ -167,7 +162,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     // --- overlay (scrim primitive; mirrors modal state) ---
     let overlay_el = overlay("ov-overlay", cx)
         .open(is_modal_open)
-        .apply(div())
+        .render(cx)
         .child(label("ov-overlay-info", "scrim follows modal state", cx).muted(true).render(cx));
     let overlay_wrapped = cell("overlay (scrim)", overlay_el, cx);
 

@@ -1470,6 +1470,7 @@ pub fn yororen_ui_core::headless::form_field::FormFieldProps::apply(self, gpui::
 pub fn yororen_ui_core::headless::form_field::FormFieldProps::error(self, impl core::convert::Into<gpui::shared_string::SharedString>) -> Self
 pub fn yororen_ui_core::headless::form_field::FormFieldProps::help(self, impl core::convert::Into<gpui::shared_string::SharedString>) -> Self
 pub fn yororen_ui_core::headless::form_field::FormFieldProps::label(self, impl core::convert::Into<gpui::shared_string::SharedString>) -> Self
+pub fn yororen_ui_core::headless::form_field::FormFieldProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::form_field::FormFieldProps::required(self, bool) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::form_field::FormFieldProps
 pub fn yororen_ui_core::headless::form_field::FormFieldProps::clone(&self) -> yororen_ui_core::headless::form_field::FormFieldProps
@@ -1551,7 +1552,8 @@ pub yororen_ui_core::headless::icon::IconProps::source: yororen_ui_core::headles
 impl yororen_ui_core::headless::icon::IconProps
 pub fn yororen_ui_core::headless::icon::IconProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::icon::IconProps::color(self, impl core::convert::Into<gpui::color::Hsla>) -> Self
-pub fn yororen_ui_core::headless::icon::IconProps::render(self) -> gpui::element::AnyElement
+pub fn yororen_ui_core::headless::icon::IconProps::render(self, &gpui::app::App) -> gpui::element::AnyElement
+pub fn yororen_ui_core::headless::icon::IconProps::render_legacy(self) -> gpui::element::AnyElement
 pub fn yororen_ui_core::headless::icon::IconProps::size(self, impl core::convert::Into<gpui::geometry::Pixels>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::icon::IconProps
 pub fn yororen_ui_core::headless::icon::IconProps::clone(&self) -> yororen_ui_core::headless::icon::IconProps
@@ -2112,6 +2114,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Form
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Form
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Form
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Form
+pub struct yororen_ui_core::headless::markers::FormField
+impl core::clone::Clone for yororen_ui_core::renderer::FormField
+pub fn yororen_ui_core::renderer::FormField::clone(&self) -> yororen_ui_core::renderer::FormField
+impl core::cmp::Eq for yororen_ui_core::renderer::FormField
+impl core::cmp::PartialEq for yororen_ui_core::renderer::FormField
+pub fn yororen_ui_core::renderer::FormField::eq(&self, &yororen_ui_core::renderer::FormField) -> bool
+impl core::default::Default for yororen_ui_core::renderer::FormField
+pub fn yororen_ui_core::renderer::FormField::default() -> yororen_ui_core::renderer::FormField
+impl core::fmt::Debug for yororen_ui_core::renderer::FormField
+pub fn yororen_ui_core::renderer::FormField::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::FormField
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::FormField
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::FormField
+impl core::marker::Freeze for yororen_ui_core::renderer::FormField
+impl core::marker::Send for yororen_ui_core::renderer::FormField
+impl core::marker::Sync for yororen_ui_core::renderer::FormField
+impl core::marker::Unpin for yororen_ui_core::renderer::FormField
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::FormField
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::FormField
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::FormField
 pub struct yororen_ui_core::headless::markers::Heading
 impl core::clone::Clone for yororen_ui_core::renderer::Heading
 pub fn yororen_ui_core::renderer::Heading::clone(&self) -> yororen_ui_core::renderer::Heading
@@ -2132,6 +2154,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Heading
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Heading
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Heading
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Heading
+pub struct yororen_ui_core::headless::markers::Icon
+impl core::clone::Clone for yororen_ui_core::renderer::Icon
+pub fn yororen_ui_core::renderer::Icon::clone(&self) -> yororen_ui_core::renderer::Icon
+impl core::cmp::Eq for yororen_ui_core::renderer::Icon
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Icon
+pub fn yororen_ui_core::renderer::Icon::eq(&self, &yororen_ui_core::renderer::Icon) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Icon
+pub fn yororen_ui_core::renderer::Icon::default() -> yororen_ui_core::renderer::Icon
+impl core::fmt::Debug for yororen_ui_core::renderer::Icon
+pub fn yororen_ui_core::renderer::Icon::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Icon
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Icon
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Icon
+impl core::marker::Freeze for yororen_ui_core::renderer::Icon
+impl core::marker::Send for yororen_ui_core::renderer::Icon
+impl core::marker::Sync for yororen_ui_core::renderer::Icon
+impl core::marker::Unpin for yororen_ui_core::renderer::Icon
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Icon
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Icon
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Icon
 pub struct yororen_ui_core::headless::markers::IconButton
 impl core::clone::Clone for yororen_ui_core::renderer::IconButton
 pub fn yororen_ui_core::renderer::IconButton::clone(&self) -> yororen_ui_core::renderer::IconButton
@@ -2252,6 +2294,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::ListItem
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::ListItem
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::ListItem
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::ListItem
+pub struct yororen_ui_core::headless::markers::Menu
+impl core::clone::Clone for yororen_ui_core::renderer::Menu
+pub fn yororen_ui_core::renderer::Menu::clone(&self) -> yororen_ui_core::renderer::Menu
+impl core::cmp::Eq for yororen_ui_core::renderer::Menu
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Menu
+pub fn yororen_ui_core::renderer::Menu::eq(&self, &yororen_ui_core::renderer::Menu) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Menu
+pub fn yororen_ui_core::renderer::Menu::default() -> yororen_ui_core::renderer::Menu
+impl core::fmt::Debug for yororen_ui_core::renderer::Menu
+pub fn yororen_ui_core::renderer::Menu::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Menu
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Menu
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Menu
+impl core::marker::Freeze for yororen_ui_core::renderer::Menu
+impl core::marker::Send for yororen_ui_core::renderer::Menu
+impl core::marker::Sync for yororen_ui_core::renderer::Menu
+impl core::marker::Unpin for yororen_ui_core::renderer::Menu
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Menu
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Menu
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Menu
 pub struct yororen_ui_core::headless::markers::Modal
 impl core::clone::Clone for yororen_ui_core::renderer::Modal
 pub fn yororen_ui_core::renderer::Modal::clone(&self) -> yororen_ui_core::renderer::Modal
@@ -2312,6 +2374,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::NumberInput
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::NumberInput
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::NumberInput
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::NumberInput
+pub struct yororen_ui_core::headless::markers::Overlay
+impl core::clone::Clone for yororen_ui_core::renderer::Overlay
+pub fn yororen_ui_core::renderer::Overlay::clone(&self) -> yororen_ui_core::renderer::Overlay
+impl core::cmp::Eq for yororen_ui_core::renderer::Overlay
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Overlay
+pub fn yororen_ui_core::renderer::Overlay::eq(&self, &yororen_ui_core::renderer::Overlay) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Overlay
+pub fn yororen_ui_core::renderer::Overlay::default() -> yororen_ui_core::renderer::Overlay
+impl core::fmt::Debug for yororen_ui_core::renderer::Overlay
+pub fn yororen_ui_core::renderer::Overlay::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Overlay
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Overlay
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Overlay
+impl core::marker::Freeze for yororen_ui_core::renderer::Overlay
+impl core::marker::Send for yororen_ui_core::renderer::Overlay
+impl core::marker::Sync for yororen_ui_core::renderer::Overlay
+impl core::marker::Unpin for yororen_ui_core::renderer::Overlay
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Overlay
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Overlay
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Overlay
 pub struct yororen_ui_core::headless::markers::Panel
 impl core::clone::Clone for yororen_ui_core::renderer::Panel
 pub fn yororen_ui_core::renderer::Panel::clone(&self) -> yororen_ui_core::renderer::Panel
@@ -2412,6 +2494,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Radio
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Radio
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Radio
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Radio
+pub struct yororen_ui_core::headless::markers::RadioGroup
+impl core::clone::Clone for yororen_ui_core::renderer::RadioGroup
+pub fn yororen_ui_core::renderer::RadioGroup::clone(&self) -> yororen_ui_core::renderer::RadioGroup
+impl core::cmp::Eq for yororen_ui_core::renderer::RadioGroup
+impl core::cmp::PartialEq for yororen_ui_core::renderer::RadioGroup
+pub fn yororen_ui_core::renderer::RadioGroup::eq(&self, &yororen_ui_core::renderer::RadioGroup) -> bool
+impl core::default::Default for yororen_ui_core::renderer::RadioGroup
+pub fn yororen_ui_core::renderer::RadioGroup::default() -> yororen_ui_core::renderer::RadioGroup
+impl core::fmt::Debug for yororen_ui_core::renderer::RadioGroup
+pub fn yororen_ui_core::renderer::RadioGroup::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::RadioGroup
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::RadioGroup
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::RadioGroup
+impl core::marker::Freeze for yororen_ui_core::renderer::RadioGroup
+impl core::marker::Send for yororen_ui_core::renderer::RadioGroup
+impl core::marker::Sync for yororen_ui_core::renderer::RadioGroup
+impl core::marker::Unpin for yororen_ui_core::renderer::RadioGroup
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::RadioGroup
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::RadioGroup
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::RadioGroup
 pub struct yororen_ui_core::headless::markers::SearchInput
 impl core::clone::Clone for yororen_ui_core::renderer::SearchInput
 pub fn yororen_ui_core::renderer::SearchInput::clone(&self) -> yororen_ui_core::renderer::SearchInput
@@ -2492,6 +2594,46 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Skeleton
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Skeleton
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Skeleton
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Skeleton
+pub struct yororen_ui_core::headless::markers::Slider
+impl core::clone::Clone for yororen_ui_core::renderer::Slider
+pub fn yororen_ui_core::renderer::Slider::clone(&self) -> yororen_ui_core::renderer::Slider
+impl core::cmp::Eq for yororen_ui_core::renderer::Slider
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Slider
+pub fn yororen_ui_core::renderer::Slider::eq(&self, &yororen_ui_core::renderer::Slider) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Slider
+pub fn yororen_ui_core::renderer::Slider::default() -> yororen_ui_core::renderer::Slider
+impl core::fmt::Debug for yororen_ui_core::renderer::Slider
+pub fn yororen_ui_core::renderer::Slider::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Slider
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Slider
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Slider
+impl core::marker::Freeze for yororen_ui_core::renderer::Slider
+impl core::marker::Send for yororen_ui_core::renderer::Slider
+impl core::marker::Sync for yororen_ui_core::renderer::Slider
+impl core::marker::Unpin for yororen_ui_core::renderer::Slider
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Slider
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Slider
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Slider
+pub struct yororen_ui_core::headless::markers::Spacer
+impl core::clone::Clone for yororen_ui_core::renderer::Spacer
+pub fn yororen_ui_core::renderer::Spacer::clone(&self) -> yororen_ui_core::renderer::Spacer
+impl core::cmp::Eq for yororen_ui_core::renderer::Spacer
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Spacer
+pub fn yororen_ui_core::renderer::Spacer::eq(&self, &yororen_ui_core::renderer::Spacer) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Spacer
+pub fn yororen_ui_core::renderer::Spacer::default() -> yororen_ui_core::renderer::Spacer
+impl core::fmt::Debug for yororen_ui_core::renderer::Spacer
+pub fn yororen_ui_core::renderer::Spacer::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Spacer
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Spacer
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Spacer
+impl core::marker::Freeze for yororen_ui_core::renderer::Spacer
+impl core::marker::Send for yororen_ui_core::renderer::Spacer
+impl core::marker::Sync for yororen_ui_core::renderer::Spacer
+impl core::marker::Unpin for yororen_ui_core::renderer::Spacer
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Spacer
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Spacer
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Spacer
 pub struct yororen_ui_core::headless::markers::SplitButton
 impl core::clone::Clone for yororen_ui_core::renderer::SplitButton
 pub fn yororen_ui_core::renderer::SplitButton::clone(&self) -> yororen_ui_core::renderer::SplitButton
@@ -2532,6 +2674,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Switch
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Switch
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Switch
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Switch
+pub struct yororen_ui_core::headless::markers::Table
+impl core::clone::Clone for yororen_ui_core::renderer::Table
+pub fn yororen_ui_core::renderer::Table::clone(&self) -> yororen_ui_core::renderer::Table
+impl core::cmp::Eq for yororen_ui_core::renderer::Table
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Table
+pub fn yororen_ui_core::renderer::Table::eq(&self, &yororen_ui_core::renderer::Table) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Table
+pub fn yororen_ui_core::renderer::Table::default() -> yororen_ui_core::renderer::Table
+impl core::fmt::Debug for yororen_ui_core::renderer::Table
+pub fn yororen_ui_core::renderer::Table::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Table
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Table
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Table
+impl core::marker::Freeze for yororen_ui_core::renderer::Table
+impl core::marker::Send for yororen_ui_core::renderer::Table
+impl core::marker::Sync for yororen_ui_core::renderer::Table
+impl core::marker::Unpin for yororen_ui_core::renderer::Table
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Table
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Table
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Table
 pub struct yororen_ui_core::headless::markers::Tag
 impl core::clone::Clone for yororen_ui_core::renderer::Tag
 pub fn yororen_ui_core::renderer::Tag::clone(&self) -> yororen_ui_core::renderer::Tag
@@ -2552,6 +2714,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Tag
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Tag
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Tag
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Tag
+pub struct yororen_ui_core::headless::markers::Text
+impl core::clone::Clone for yororen_ui_core::renderer::Text
+pub fn yororen_ui_core::renderer::Text::clone(&self) -> yororen_ui_core::renderer::Text
+impl core::cmp::Eq for yororen_ui_core::renderer::Text
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Text
+pub fn yororen_ui_core::renderer::Text::eq(&self, &yororen_ui_core::renderer::Text) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Text
+pub fn yororen_ui_core::renderer::Text::default() -> yororen_ui_core::renderer::Text
+impl core::fmt::Debug for yororen_ui_core::renderer::Text
+pub fn yororen_ui_core::renderer::Text::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Text
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Text
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Text
+impl core::marker::Freeze for yororen_ui_core::renderer::Text
+impl core::marker::Send for yororen_ui_core::renderer::Text
+impl core::marker::Sync for yororen_ui_core::renderer::Text
+impl core::marker::Unpin for yororen_ui_core::renderer::Text
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Text
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Text
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Text
 pub struct yororen_ui_core::headless::markers::TextArea
 impl core::clone::Clone for yororen_ui_core::renderer::TextArea
 pub fn yororen_ui_core::renderer::TextArea::clone(&self) -> yororen_ui_core::renderer::TextArea
@@ -2652,6 +2834,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Tooltip
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Tooltip
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Tooltip
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Tooltip
+pub struct yororen_ui_core::headless::markers::Tree
+impl core::clone::Clone for yororen_ui_core::renderer::Tree
+pub fn yororen_ui_core::renderer::Tree::clone(&self) -> yororen_ui_core::renderer::Tree
+impl core::cmp::Eq for yororen_ui_core::renderer::Tree
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Tree
+pub fn yororen_ui_core::renderer::Tree::eq(&self, &yororen_ui_core::renderer::Tree) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Tree
+pub fn yororen_ui_core::renderer::Tree::default() -> yororen_ui_core::renderer::Tree
+impl core::fmt::Debug for yororen_ui_core::renderer::Tree
+pub fn yororen_ui_core::renderer::Tree::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Tree
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Tree
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Tree
+impl core::marker::Freeze for yororen_ui_core::renderer::Tree
+impl core::marker::Send for yororen_ui_core::renderer::Tree
+impl core::marker::Sync for yororen_ui_core::renderer::Tree
+impl core::marker::Unpin for yororen_ui_core::renderer::Tree
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Tree
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Tree
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Tree
 pub struct yororen_ui_core::headless::markers::TreeItem
 impl core::clone::Clone for yororen_ui_core::renderer::TreeItem
 pub fn yororen_ui_core::renderer::TreeItem::clone(&self) -> yororen_ui_core::renderer::TreeItem
@@ -2672,12 +2874,33 @@ impl core::marker::Unpin for yororen_ui_core::renderer::TreeItem
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::TreeItem
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::TreeItem
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::TreeItem
+pub struct yororen_ui_core::headless::markers::VirtualList
+impl core::clone::Clone for yororen_ui_core::renderer::VirtualList
+pub fn yororen_ui_core::renderer::VirtualList::clone(&self) -> yororen_ui_core::renderer::VirtualList
+impl core::cmp::Eq for yororen_ui_core::renderer::VirtualList
+impl core::cmp::PartialEq for yororen_ui_core::renderer::VirtualList
+pub fn yororen_ui_core::renderer::VirtualList::eq(&self, &yororen_ui_core::renderer::VirtualList) -> bool
+impl core::default::Default for yororen_ui_core::renderer::VirtualList
+pub fn yororen_ui_core::renderer::VirtualList::default() -> yororen_ui_core::renderer::VirtualList
+impl core::fmt::Debug for yororen_ui_core::renderer::VirtualList
+pub fn yororen_ui_core::renderer::VirtualList::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::VirtualList
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::VirtualList
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::VirtualList
+impl core::marker::Freeze for yororen_ui_core::renderer::VirtualList
+impl core::marker::Send for yororen_ui_core::renderer::VirtualList
+impl core::marker::Sync for yororen_ui_core::renderer::VirtualList
+impl core::marker::Unpin for yororen_ui_core::renderer::VirtualList
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::VirtualList
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::VirtualList
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::VirtualList
 pub mod yororen_ui_core::headless::menu
 pub struct yororen_ui_core::headless::menu::MenuProps
 pub yororen_ui_core::headless::menu::MenuProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::menu::MenuProps::state: gpui::app::entity_map::Entity<yororen_ui_core::headless::menu::MenuState>
 impl yororen_ui_core::headless::menu::MenuProps
 pub fn yororen_ui_core::headless::menu::MenuProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::menu::MenuProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::clone::Clone for yororen_ui_core::headless::menu::MenuProps
 pub fn yororen_ui_core::headless::menu::MenuProps::clone(&self) -> yororen_ui_core::headless::menu::MenuProps
 impl core::marker::Freeze for yororen_ui_core::headless::menu::MenuProps
@@ -2854,6 +3077,7 @@ pub fn yororen_ui_core::headless::overlay::OverlayProps::dismiss_on_scrim(self, 
 pub fn yororen_ui_core::headless::overlay::OverlayProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::overlay::OverlayProps::on_close<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(yororen_ui_core::headless::overlay::OverlayCloseReason, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::overlay::OverlayProps::open(self, bool) -> Self
+pub fn yororen_ui_core::headless::overlay::OverlayProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::clone::Clone for yororen_ui_core::headless::overlay::OverlayProps
 pub fn yororen_ui_core::headless::overlay::OverlayProps::clone(&self) -> yororen_ui_core::headless::overlay::OverlayProps
 impl core::marker::Freeze for yororen_ui_core::headless::overlay::OverlayProps
@@ -3077,6 +3301,7 @@ impl yororen_ui_core::headless::radio_group::RadioGroupProps
 pub fn yororen_ui_core::headless::radio_group::RadioGroupProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::radio_group::RadioGroupProps::name(self, impl core::convert::Into<gpui::shared_string::SharedString>) -> Self
 pub fn yororen_ui_core::headless::radio_group::RadioGroupProps::on_change<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(usize, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::radio_group::RadioGroupProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::radio_group::RadioGroupProps::selected(self, usize) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::radio_group::RadioGroupProps
 pub fn yororen_ui_core::headless::radio_group::RadioGroupProps::clone(&self) -> yororen_ui_core::headless::radio_group::RadioGroupProps
@@ -3259,6 +3484,7 @@ pub fn yororen_ui_core::headless::slider::SliderProps::apply(self, gpui::element
 pub fn yororen_ui_core::headless::slider::SliderProps::disabled(self, bool) -> Self
 pub fn yororen_ui_core::headless::slider::SliderProps::on_change<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(f32, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::slider::SliderProps::range(self, f32, f32) -> Self
+pub fn yororen_ui_core::headless::slider::SliderProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::slider::SliderProps::step(self, f32) -> Self
 pub fn yororen_ui_core::headless::slider::SliderProps::value(self, f32) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::slider::SliderProps
@@ -3277,6 +3503,7 @@ pub struct yororen_ui_core::headless::spacer::SpacerProps
 pub yororen_ui_core::headless::spacer::SpacerProps::id: gpui::window::ElementId
 impl yororen_ui_core::headless::spacer::SpacerProps
 pub fn yororen_ui_core::headless::spacer::SpacerProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::spacer::SpacerProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::clone::Clone for yororen_ui_core::headless::spacer::SpacerProps
 pub fn yororen_ui_core::headless::spacer::SpacerProps::clone(&self) -> yororen_ui_core::headless::spacer::SpacerProps
 impl core::fmt::Debug for yororen_ui_core::headless::spacer::SpacerProps
@@ -3380,6 +3607,7 @@ pub fn yororen_ui_core::headless::table::TableProps::apply(self, gpui::elements:
 pub fn yororen_ui_core::headless::table::TableProps::column(self, yororen_ui_core::headless::table::TableColumn) -> Self
 pub fn yororen_ui_core::headless::table::TableProps::columns(self, impl core::iter::traits::collect::IntoIterator<Item = yororen_ui_core::headless::table::TableColumn>) -> Self
 pub fn yororen_ui_core::headless::table::TableProps::on_select<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(usize, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::table::TableProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::table::TableProps::row(self, yororen_ui_core::headless::table::TableRow) -> Self
 pub fn yororen_ui_core::headless::table::TableProps::rows(self, impl core::iter::traits::collect::IntoIterator<Item = yororen_ui_core::headless::table::TableRow>) -> Self
 pub fn yororen_ui_core::headless::table::TableProps::selected(self, usize) -> Self
@@ -3431,7 +3659,8 @@ pub yororen_ui_core::headless::text::TextProps::size: core::option::Option<gpui:
 pub yororen_ui_core::headless::text::TextProps::text: gpui::shared_string::SharedString
 impl yororen_ui_core::headless::text::TextProps
 pub fn yororen_ui_core::headless::text::TextProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-pub fn yororen_ui_core::headless::text::TextProps::render(self) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::text::TextProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::text::TextProps::render_legacy(self) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::text::TextProps::size(self, impl core::convert::Into<gpui::geometry::Pixels>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::text::TextProps
 pub fn yororen_ui_core::headless::text::TextProps::clone(&self) -> yororen_ui_core::headless::text::TextProps
@@ -4494,6 +4723,7 @@ impl yororen_ui_core::headless::tree::TreeProps
 pub fn yororen_ui_core::headless::tree::TreeProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::tree::TreeProps::data(self, yororen_ui_core::headless::tree::TreeData) -> Self
 pub fn yororen_ui_core::headless::tree::TreeProps::expanded(self, impl core::convert::Into<yororen_ui_core::headless::tree_item::TreeNodeId>) -> Self
+pub fn yororen_ui_core::headless::tree::TreeProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::tree::TreeProps::selected(self, impl core::convert::Into<yororen_ui_core::headless::tree_item::TreeNodeId>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::tree::TreeProps
 pub fn yororen_ui_core::headless::tree::TreeProps::clone(&self) -> yororen_ui_core::headless::tree::TreeProps
@@ -4605,6 +4835,7 @@ pub yororen_ui_core::headless::virtual_list::VirtualListProps::overdraw_px: core
 impl yororen_ui_core::headless::virtual_list::VirtualListProps
 pub fn yororen_ui_core::headless::virtual_list::VirtualListProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::virtual_list::VirtualListProps::overdraw(self, f32) -> Self
+pub fn yororen_ui_core::headless::virtual_list::VirtualListProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::clone::Clone for yororen_ui_core::headless::virtual_list::VirtualListProps
 pub fn yororen_ui_core::headless::virtual_list::VirtualListProps::clone(&self) -> yororen_ui_core::headless::virtual_list::VirtualListProps
 impl core::fmt::Debug for yororen_ui_core::headless::virtual_list::VirtualListProps
@@ -6190,6 +6421,26 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::form
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::form::FormRenderState
 pub trait yororen_ui_core::renderer::form::FormRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_core::renderer::form::FormRenderer::compose(&self, &yororen_ui_core::headless::form::FormProps, &gpui::app::App) -> gpui::elements::div::Div
+pub mod yororen_ui_core::renderer::form_field
+pub struct yororen_ui_core::renderer::form_field::FormFieldRenderState
+pub yororen_ui_core::renderer::form_field::FormFieldRenderState::has_error: bool
+pub yororen_ui_core::renderer::form_field::FormFieldRenderState::required: bool
+impl core::clone::Clone for yororen_ui_core::renderer::form_field::FormFieldRenderState
+pub fn yororen_ui_core::renderer::form_field::FormFieldRenderState::clone(&self) -> yororen_ui_core::renderer::form_field::FormFieldRenderState
+impl core::default::Default for yororen_ui_core::renderer::form_field::FormFieldRenderState
+pub fn yororen_ui_core::renderer::form_field::FormFieldRenderState::default() -> yororen_ui_core::renderer::form_field::FormFieldRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::form_field::FormFieldRenderState
+pub fn yororen_ui_core::renderer::form_field::FormFieldRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::form_field::FormFieldRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::form_field::FormFieldRenderState
+impl core::marker::Send for yororen_ui_core::renderer::form_field::FormFieldRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::form_field::FormFieldRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::form_field::FormFieldRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::form_field::FormFieldRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::form_field::FormFieldRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::form_field::FormFieldRenderState
+pub trait yororen_ui_core::renderer::form_field::FormFieldRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::form_field::FormFieldRenderer::compose(&self, &yororen_ui_core::headless::form_field::FormFieldProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub mod yororen_ui_core::renderer::heading
 pub struct yororen_ui_core::renderer::heading::HeadingRenderState
 pub yororen_ui_core::renderer::heading::HeadingRenderState::level: yororen_ui_core::headless::heading::HeadingLevel
@@ -6207,6 +6458,26 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::head
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::heading::HeadingRenderState
 pub trait yororen_ui_core::renderer::heading::HeadingRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_core::renderer::heading::HeadingRenderer::compose(&self, &yororen_ui_core::headless::heading::HeadingProps, &gpui::app::App) -> gpui::elements::div::Div
+pub mod yororen_ui_core::renderer::icon
+pub struct yororen_ui_core::renderer::icon::IconRenderState
+pub yororen_ui_core::renderer::icon::IconRenderState::has_custom_color: bool
+pub yororen_ui_core::renderer::icon::IconRenderState::has_custom_size: bool
+impl core::clone::Clone for yororen_ui_core::renderer::icon::IconRenderState
+pub fn yororen_ui_core::renderer::icon::IconRenderState::clone(&self) -> yororen_ui_core::renderer::icon::IconRenderState
+impl core::default::Default for yororen_ui_core::renderer::icon::IconRenderState
+pub fn yororen_ui_core::renderer::icon::IconRenderState::default() -> yororen_ui_core::renderer::icon::IconRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::icon::IconRenderState
+pub fn yororen_ui_core::renderer::icon::IconRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::icon::IconRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::icon::IconRenderState
+impl core::marker::Send for yororen_ui_core::renderer::icon::IconRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::icon::IconRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::icon::IconRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::icon::IconRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::icon::IconRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::icon::IconRenderState
+pub trait yororen_ui_core::renderer::icon::IconRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::icon::IconRenderer::compose(&self, &yororen_ui_core::headless::icon::IconProps, &gpui::app::App) -> gpui::element::AnyElement
 pub mod yororen_ui_core::renderer::icon_button
 pub struct yororen_ui_core::renderer::icon_button::IconButtonRenderState
 pub yororen_ui_core::renderer::icon_button::IconButtonRenderState::custom_style: core::option::Option<alloc::sync::Arc<dyn yororen_ui_core::renderer::variant::VariantStyle>>
@@ -6616,6 +6887,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Form
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Form
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Form
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Form
+pub struct yororen_ui_core::renderer::markers::FormField
+impl core::clone::Clone for yororen_ui_core::renderer::FormField
+pub fn yororen_ui_core::renderer::FormField::clone(&self) -> yororen_ui_core::renderer::FormField
+impl core::cmp::Eq for yororen_ui_core::renderer::FormField
+impl core::cmp::PartialEq for yororen_ui_core::renderer::FormField
+pub fn yororen_ui_core::renderer::FormField::eq(&self, &yororen_ui_core::renderer::FormField) -> bool
+impl core::default::Default for yororen_ui_core::renderer::FormField
+pub fn yororen_ui_core::renderer::FormField::default() -> yororen_ui_core::renderer::FormField
+impl core::fmt::Debug for yororen_ui_core::renderer::FormField
+pub fn yororen_ui_core::renderer::FormField::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::FormField
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::FormField
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::FormField
+impl core::marker::Freeze for yororen_ui_core::renderer::FormField
+impl core::marker::Send for yororen_ui_core::renderer::FormField
+impl core::marker::Sync for yororen_ui_core::renderer::FormField
+impl core::marker::Unpin for yororen_ui_core::renderer::FormField
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::FormField
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::FormField
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::FormField
 pub struct yororen_ui_core::renderer::markers::Heading
 impl core::clone::Clone for yororen_ui_core::renderer::Heading
 pub fn yororen_ui_core::renderer::Heading::clone(&self) -> yororen_ui_core::renderer::Heading
@@ -6636,6 +6927,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Heading
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Heading
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Heading
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Heading
+pub struct yororen_ui_core::renderer::markers::Icon
+impl core::clone::Clone for yororen_ui_core::renderer::Icon
+pub fn yororen_ui_core::renderer::Icon::clone(&self) -> yororen_ui_core::renderer::Icon
+impl core::cmp::Eq for yororen_ui_core::renderer::Icon
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Icon
+pub fn yororen_ui_core::renderer::Icon::eq(&self, &yororen_ui_core::renderer::Icon) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Icon
+pub fn yororen_ui_core::renderer::Icon::default() -> yororen_ui_core::renderer::Icon
+impl core::fmt::Debug for yororen_ui_core::renderer::Icon
+pub fn yororen_ui_core::renderer::Icon::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Icon
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Icon
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Icon
+impl core::marker::Freeze for yororen_ui_core::renderer::Icon
+impl core::marker::Send for yororen_ui_core::renderer::Icon
+impl core::marker::Sync for yororen_ui_core::renderer::Icon
+impl core::marker::Unpin for yororen_ui_core::renderer::Icon
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Icon
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Icon
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Icon
 pub struct yororen_ui_core::renderer::markers::IconButton
 impl core::clone::Clone for yororen_ui_core::renderer::IconButton
 pub fn yororen_ui_core::renderer::IconButton::clone(&self) -> yororen_ui_core::renderer::IconButton
@@ -6756,6 +7067,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::ListItem
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::ListItem
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::ListItem
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::ListItem
+pub struct yororen_ui_core::renderer::markers::Menu
+impl core::clone::Clone for yororen_ui_core::renderer::Menu
+pub fn yororen_ui_core::renderer::Menu::clone(&self) -> yororen_ui_core::renderer::Menu
+impl core::cmp::Eq for yororen_ui_core::renderer::Menu
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Menu
+pub fn yororen_ui_core::renderer::Menu::eq(&self, &yororen_ui_core::renderer::Menu) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Menu
+pub fn yororen_ui_core::renderer::Menu::default() -> yororen_ui_core::renderer::Menu
+impl core::fmt::Debug for yororen_ui_core::renderer::Menu
+pub fn yororen_ui_core::renderer::Menu::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Menu
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Menu
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Menu
+impl core::marker::Freeze for yororen_ui_core::renderer::Menu
+impl core::marker::Send for yororen_ui_core::renderer::Menu
+impl core::marker::Sync for yororen_ui_core::renderer::Menu
+impl core::marker::Unpin for yororen_ui_core::renderer::Menu
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Menu
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Menu
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Menu
 pub struct yororen_ui_core::renderer::markers::Modal
 impl core::clone::Clone for yororen_ui_core::renderer::Modal
 pub fn yororen_ui_core::renderer::Modal::clone(&self) -> yororen_ui_core::renderer::Modal
@@ -6816,6 +7147,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::NumberInput
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::NumberInput
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::NumberInput
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::NumberInput
+pub struct yororen_ui_core::renderer::markers::Overlay
+impl core::clone::Clone for yororen_ui_core::renderer::Overlay
+pub fn yororen_ui_core::renderer::Overlay::clone(&self) -> yororen_ui_core::renderer::Overlay
+impl core::cmp::Eq for yororen_ui_core::renderer::Overlay
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Overlay
+pub fn yororen_ui_core::renderer::Overlay::eq(&self, &yororen_ui_core::renderer::Overlay) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Overlay
+pub fn yororen_ui_core::renderer::Overlay::default() -> yororen_ui_core::renderer::Overlay
+impl core::fmt::Debug for yororen_ui_core::renderer::Overlay
+pub fn yororen_ui_core::renderer::Overlay::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Overlay
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Overlay
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Overlay
+impl core::marker::Freeze for yororen_ui_core::renderer::Overlay
+impl core::marker::Send for yororen_ui_core::renderer::Overlay
+impl core::marker::Sync for yororen_ui_core::renderer::Overlay
+impl core::marker::Unpin for yororen_ui_core::renderer::Overlay
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Overlay
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Overlay
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Overlay
 pub struct yororen_ui_core::renderer::markers::Panel
 impl core::clone::Clone for yororen_ui_core::renderer::Panel
 pub fn yororen_ui_core::renderer::Panel::clone(&self) -> yororen_ui_core::renderer::Panel
@@ -6916,6 +7267,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Radio
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Radio
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Radio
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Radio
+pub struct yororen_ui_core::renderer::markers::RadioGroup
+impl core::clone::Clone for yororen_ui_core::renderer::RadioGroup
+pub fn yororen_ui_core::renderer::RadioGroup::clone(&self) -> yororen_ui_core::renderer::RadioGroup
+impl core::cmp::Eq for yororen_ui_core::renderer::RadioGroup
+impl core::cmp::PartialEq for yororen_ui_core::renderer::RadioGroup
+pub fn yororen_ui_core::renderer::RadioGroup::eq(&self, &yororen_ui_core::renderer::RadioGroup) -> bool
+impl core::default::Default for yororen_ui_core::renderer::RadioGroup
+pub fn yororen_ui_core::renderer::RadioGroup::default() -> yororen_ui_core::renderer::RadioGroup
+impl core::fmt::Debug for yororen_ui_core::renderer::RadioGroup
+pub fn yororen_ui_core::renderer::RadioGroup::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::RadioGroup
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::RadioGroup
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::RadioGroup
+impl core::marker::Freeze for yororen_ui_core::renderer::RadioGroup
+impl core::marker::Send for yororen_ui_core::renderer::RadioGroup
+impl core::marker::Sync for yororen_ui_core::renderer::RadioGroup
+impl core::marker::Unpin for yororen_ui_core::renderer::RadioGroup
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::RadioGroup
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::RadioGroup
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::RadioGroup
 pub struct yororen_ui_core::renderer::markers::SearchInput
 impl core::clone::Clone for yororen_ui_core::renderer::SearchInput
 pub fn yororen_ui_core::renderer::SearchInput::clone(&self) -> yororen_ui_core::renderer::SearchInput
@@ -6996,6 +7367,46 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Skeleton
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Skeleton
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Skeleton
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Skeleton
+pub struct yororen_ui_core::renderer::markers::Slider
+impl core::clone::Clone for yororen_ui_core::renderer::Slider
+pub fn yororen_ui_core::renderer::Slider::clone(&self) -> yororen_ui_core::renderer::Slider
+impl core::cmp::Eq for yororen_ui_core::renderer::Slider
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Slider
+pub fn yororen_ui_core::renderer::Slider::eq(&self, &yororen_ui_core::renderer::Slider) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Slider
+pub fn yororen_ui_core::renderer::Slider::default() -> yororen_ui_core::renderer::Slider
+impl core::fmt::Debug for yororen_ui_core::renderer::Slider
+pub fn yororen_ui_core::renderer::Slider::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Slider
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Slider
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Slider
+impl core::marker::Freeze for yororen_ui_core::renderer::Slider
+impl core::marker::Send for yororen_ui_core::renderer::Slider
+impl core::marker::Sync for yororen_ui_core::renderer::Slider
+impl core::marker::Unpin for yororen_ui_core::renderer::Slider
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Slider
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Slider
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Slider
+pub struct yororen_ui_core::renderer::markers::Spacer
+impl core::clone::Clone for yororen_ui_core::renderer::Spacer
+pub fn yororen_ui_core::renderer::Spacer::clone(&self) -> yororen_ui_core::renderer::Spacer
+impl core::cmp::Eq for yororen_ui_core::renderer::Spacer
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Spacer
+pub fn yororen_ui_core::renderer::Spacer::eq(&self, &yororen_ui_core::renderer::Spacer) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Spacer
+pub fn yororen_ui_core::renderer::Spacer::default() -> yororen_ui_core::renderer::Spacer
+impl core::fmt::Debug for yororen_ui_core::renderer::Spacer
+pub fn yororen_ui_core::renderer::Spacer::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Spacer
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Spacer
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Spacer
+impl core::marker::Freeze for yororen_ui_core::renderer::Spacer
+impl core::marker::Send for yororen_ui_core::renderer::Spacer
+impl core::marker::Sync for yororen_ui_core::renderer::Spacer
+impl core::marker::Unpin for yororen_ui_core::renderer::Spacer
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Spacer
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Spacer
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Spacer
 pub struct yororen_ui_core::renderer::markers::SplitButton
 impl core::clone::Clone for yororen_ui_core::renderer::SplitButton
 pub fn yororen_ui_core::renderer::SplitButton::clone(&self) -> yororen_ui_core::renderer::SplitButton
@@ -7036,6 +7447,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Switch
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Switch
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Switch
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Switch
+pub struct yororen_ui_core::renderer::markers::Table
+impl core::clone::Clone for yororen_ui_core::renderer::Table
+pub fn yororen_ui_core::renderer::Table::clone(&self) -> yororen_ui_core::renderer::Table
+impl core::cmp::Eq for yororen_ui_core::renderer::Table
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Table
+pub fn yororen_ui_core::renderer::Table::eq(&self, &yororen_ui_core::renderer::Table) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Table
+pub fn yororen_ui_core::renderer::Table::default() -> yororen_ui_core::renderer::Table
+impl core::fmt::Debug for yororen_ui_core::renderer::Table
+pub fn yororen_ui_core::renderer::Table::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Table
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Table
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Table
+impl core::marker::Freeze for yororen_ui_core::renderer::Table
+impl core::marker::Send for yororen_ui_core::renderer::Table
+impl core::marker::Sync for yororen_ui_core::renderer::Table
+impl core::marker::Unpin for yororen_ui_core::renderer::Table
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Table
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Table
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Table
 pub struct yororen_ui_core::renderer::markers::Tag
 impl core::clone::Clone for yororen_ui_core::renderer::Tag
 pub fn yororen_ui_core::renderer::Tag::clone(&self) -> yororen_ui_core::renderer::Tag
@@ -7056,6 +7487,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Tag
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Tag
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Tag
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Tag
+pub struct yororen_ui_core::renderer::markers::Text
+impl core::clone::Clone for yororen_ui_core::renderer::Text
+pub fn yororen_ui_core::renderer::Text::clone(&self) -> yororen_ui_core::renderer::Text
+impl core::cmp::Eq for yororen_ui_core::renderer::Text
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Text
+pub fn yororen_ui_core::renderer::Text::eq(&self, &yororen_ui_core::renderer::Text) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Text
+pub fn yororen_ui_core::renderer::Text::default() -> yororen_ui_core::renderer::Text
+impl core::fmt::Debug for yororen_ui_core::renderer::Text
+pub fn yororen_ui_core::renderer::Text::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Text
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Text
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Text
+impl core::marker::Freeze for yororen_ui_core::renderer::Text
+impl core::marker::Send for yororen_ui_core::renderer::Text
+impl core::marker::Sync for yororen_ui_core::renderer::Text
+impl core::marker::Unpin for yororen_ui_core::renderer::Text
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Text
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Text
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Text
 pub struct yororen_ui_core::renderer::markers::TextArea
 impl core::clone::Clone for yororen_ui_core::renderer::TextArea
 pub fn yororen_ui_core::renderer::TextArea::clone(&self) -> yororen_ui_core::renderer::TextArea
@@ -7156,6 +7607,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Tooltip
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Tooltip
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Tooltip
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Tooltip
+pub struct yororen_ui_core::renderer::markers::Tree
+impl core::clone::Clone for yororen_ui_core::renderer::Tree
+pub fn yororen_ui_core::renderer::Tree::clone(&self) -> yororen_ui_core::renderer::Tree
+impl core::cmp::Eq for yororen_ui_core::renderer::Tree
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Tree
+pub fn yororen_ui_core::renderer::Tree::eq(&self, &yororen_ui_core::renderer::Tree) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Tree
+pub fn yororen_ui_core::renderer::Tree::default() -> yororen_ui_core::renderer::Tree
+impl core::fmt::Debug for yororen_ui_core::renderer::Tree
+pub fn yororen_ui_core::renderer::Tree::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Tree
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Tree
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Tree
+impl core::marker::Freeze for yororen_ui_core::renderer::Tree
+impl core::marker::Send for yororen_ui_core::renderer::Tree
+impl core::marker::Sync for yororen_ui_core::renderer::Tree
+impl core::marker::Unpin for yororen_ui_core::renderer::Tree
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Tree
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Tree
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Tree
 pub struct yororen_ui_core::renderer::markers::TreeItem
 impl core::clone::Clone for yororen_ui_core::renderer::TreeItem
 pub fn yororen_ui_core::renderer::TreeItem::clone(&self) -> yororen_ui_core::renderer::TreeItem
@@ -7176,6 +7647,44 @@ impl core::marker::Unpin for yororen_ui_core::renderer::TreeItem
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::TreeItem
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::TreeItem
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::TreeItem
+pub struct yororen_ui_core::renderer::markers::VirtualList
+impl core::clone::Clone for yororen_ui_core::renderer::VirtualList
+pub fn yororen_ui_core::renderer::VirtualList::clone(&self) -> yororen_ui_core::renderer::VirtualList
+impl core::cmp::Eq for yororen_ui_core::renderer::VirtualList
+impl core::cmp::PartialEq for yororen_ui_core::renderer::VirtualList
+pub fn yororen_ui_core::renderer::VirtualList::eq(&self, &yororen_ui_core::renderer::VirtualList) -> bool
+impl core::default::Default for yororen_ui_core::renderer::VirtualList
+pub fn yororen_ui_core::renderer::VirtualList::default() -> yororen_ui_core::renderer::VirtualList
+impl core::fmt::Debug for yororen_ui_core::renderer::VirtualList
+pub fn yororen_ui_core::renderer::VirtualList::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::VirtualList
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::VirtualList
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::VirtualList
+impl core::marker::Freeze for yororen_ui_core::renderer::VirtualList
+impl core::marker::Send for yororen_ui_core::renderer::VirtualList
+impl core::marker::Sync for yororen_ui_core::renderer::VirtualList
+impl core::marker::Unpin for yororen_ui_core::renderer::VirtualList
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::VirtualList
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::VirtualList
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::VirtualList
+pub mod yororen_ui_core::renderer::menu
+pub struct yororen_ui_core::renderer::menu::MenuRenderState
+impl core::clone::Clone for yororen_ui_core::renderer::menu::MenuRenderState
+pub fn yororen_ui_core::renderer::menu::MenuRenderState::clone(&self) -> yororen_ui_core::renderer::menu::MenuRenderState
+impl core::default::Default for yororen_ui_core::renderer::menu::MenuRenderState
+pub fn yororen_ui_core::renderer::menu::MenuRenderState::default() -> yororen_ui_core::renderer::menu::MenuRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::menu::MenuRenderState
+pub fn yororen_ui_core::renderer::menu::MenuRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::menu::MenuRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::menu::MenuRenderState
+impl core::marker::Send for yororen_ui_core::renderer::menu::MenuRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::menu::MenuRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::menu::MenuRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::menu::MenuRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::menu::MenuRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::menu::MenuRenderState
+pub trait yororen_ui_core::renderer::menu::MenuRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::menu::MenuRenderer::compose(&self, &yororen_ui_core::headless::menu::MenuProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub mod yororen_ui_core::renderer::modal
 pub struct yororen_ui_core::renderer::modal::ModalRenderState
 impl core::clone::Clone for yororen_ui_core::renderer::modal::ModalRenderState
@@ -7240,6 +7749,25 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::numb
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::number_input::NumberInputRenderState
 pub trait yororen_ui_core::renderer::number_input::NumberInputRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_core::renderer::number_input::NumberInputRenderer::compose(&self, &yororen_ui_core::headless::number_input::NumberInputProps, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
+pub mod yororen_ui_core::renderer::overlay
+pub struct yororen_ui_core::renderer::overlay::OverlayRenderState
+pub yororen_ui_core::renderer::overlay::OverlayRenderState::open: bool
+impl core::clone::Clone for yororen_ui_core::renderer::overlay::OverlayRenderState
+pub fn yororen_ui_core::renderer::overlay::OverlayRenderState::clone(&self) -> yororen_ui_core::renderer::overlay::OverlayRenderState
+impl core::default::Default for yororen_ui_core::renderer::overlay::OverlayRenderState
+pub fn yororen_ui_core::renderer::overlay::OverlayRenderState::default() -> yororen_ui_core::renderer::overlay::OverlayRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::overlay::OverlayRenderState
+pub fn yororen_ui_core::renderer::overlay::OverlayRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::overlay::OverlayRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::overlay::OverlayRenderState
+impl core::marker::Send for yororen_ui_core::renderer::overlay::OverlayRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::overlay::OverlayRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::overlay::OverlayRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::overlay::OverlayRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::overlay::OverlayRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::overlay::OverlayRenderState
+pub trait yororen_ui_core::renderer::overlay::OverlayRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::overlay::OverlayRenderer::compose(&self, &yororen_ui_core::headless::overlay::OverlayProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub mod yororen_ui_core::renderer::panel
 pub struct yororen_ui_core::renderer::panel::PanelRenderState
 pub yororen_ui_core::renderer::panel::PanelRenderState::has_custom_bg: bool
@@ -7348,6 +7876,25 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::radi
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::radio::RadioRenderState
 pub trait yororen_ui_core::renderer::radio::RadioRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_core::renderer::radio::RadioRenderer::compose(&self, &yororen_ui_core::headless::radio::RadioProps, &gpui::window::FocusHandle, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub mod yororen_ui_core::renderer::radio_group
+pub struct yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+pub yororen_ui_core::renderer::radio_group::RadioGroupRenderState::selected_index: core::option::Option<usize>
+impl core::clone::Clone for yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+pub fn yororen_ui_core::renderer::radio_group::RadioGroupRenderState::clone(&self) -> yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+impl core::default::Default for yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+pub fn yororen_ui_core::renderer::radio_group::RadioGroupRenderState::default() -> yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+pub fn yororen_ui_core::renderer::radio_group::RadioGroupRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+impl core::marker::Send for yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::radio_group::RadioGroupRenderState
+pub trait yororen_ui_core::renderer::radio_group::RadioGroupRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::radio_group::RadioGroupRenderer::compose(&self, &yororen_ui_core::headless::radio_group::RadioGroupProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub mod yororen_ui_core::renderer::search_input
 pub struct yororen_ui_core::renderer::search_input::SearchInputRenderState
 pub yororen_ui_core::renderer::search_input::SearchInputRenderState::custom_bg: core::option::Option<gpui::color::Hsla>
@@ -7436,6 +7983,53 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::skel
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::skeleton::SkeletonRenderState
 pub trait yororen_ui_core::renderer::skeleton::SkeletonRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_core::renderer::skeleton::SkeletonRenderer::compose(&self, &yororen_ui_core::headless::skeleton::SkeletonProps, &gpui::app::App) -> gpui::elements::div::Div
+pub mod yororen_ui_core::renderer::slider
+pub struct yororen_ui_core::renderer::slider::SliderRenderOutput
+pub yororen_ui_core::renderer::slider::SliderRenderOutput::track_bounds: alloc::sync::Arc<std::sync::poison::mutex::Mutex<core::option::Option<gpui::geometry::Bounds<gpui::geometry::Pixels>>>>
+pub yororen_ui_core::renderer::slider::SliderRenderOutput::visual: gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl core::marker::Freeze for yororen_ui_core::renderer::slider::SliderRenderOutput
+impl !core::marker::Send for yororen_ui_core::renderer::slider::SliderRenderOutput
+impl !core::marker::Sync for yororen_ui_core::renderer::slider::SliderRenderOutput
+impl core::marker::Unpin for yororen_ui_core::renderer::slider::SliderRenderOutput
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::slider::SliderRenderOutput
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::slider::SliderRenderOutput
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::slider::SliderRenderOutput
+pub struct yororen_ui_core::renderer::slider::SliderRenderState
+pub yororen_ui_core::renderer::slider::SliderRenderState::disabled: bool
+impl core::clone::Clone for yororen_ui_core::renderer::slider::SliderRenderState
+pub fn yororen_ui_core::renderer::slider::SliderRenderState::clone(&self) -> yororen_ui_core::renderer::slider::SliderRenderState
+impl core::default::Default for yororen_ui_core::renderer::slider::SliderRenderState
+pub fn yororen_ui_core::renderer::slider::SliderRenderState::default() -> yororen_ui_core::renderer::slider::SliderRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::slider::SliderRenderState
+pub fn yororen_ui_core::renderer::slider::SliderRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::slider::SliderRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::slider::SliderRenderState
+impl core::marker::Send for yororen_ui_core::renderer::slider::SliderRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::slider::SliderRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::slider::SliderRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::slider::SliderRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::slider::SliderRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::slider::SliderRenderState
+pub trait yororen_ui_core::renderer::slider::SliderRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::slider::SliderRenderer::compose(&self, &yororen_ui_core::headless::slider::SliderProps, &gpui::app::App) -> yororen_ui_core::renderer::slider::SliderRenderOutput
+pub mod yororen_ui_core::renderer::spacer
+pub struct yororen_ui_core::renderer::spacer::SpacerRenderState
+impl core::clone::Clone for yororen_ui_core::renderer::spacer::SpacerRenderState
+pub fn yororen_ui_core::renderer::spacer::SpacerRenderState::clone(&self) -> yororen_ui_core::renderer::spacer::SpacerRenderState
+impl core::default::Default for yororen_ui_core::renderer::spacer::SpacerRenderState
+pub fn yororen_ui_core::renderer::spacer::SpacerRenderState::default() -> yororen_ui_core::renderer::spacer::SpacerRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::spacer::SpacerRenderState
+pub fn yororen_ui_core::renderer::spacer::SpacerRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::spacer::SpacerRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::spacer::SpacerRenderState
+impl core::marker::Send for yororen_ui_core::renderer::spacer::SpacerRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::spacer::SpacerRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::spacer::SpacerRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::spacer::SpacerRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::spacer::SpacerRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::spacer::SpacerRenderState
+pub trait yororen_ui_core::renderer::spacer::SpacerRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::spacer::SpacerRenderer::compose(&self, &yororen_ui_core::headless::spacer::SpacerProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub mod yororen_ui_core::renderer::spec
 pub enum yororen_ui_core::renderer::spec::IconPosition
 pub yororen_ui_core::renderer::spec::IconPosition::Leading
@@ -7563,6 +8157,25 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::swit
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::switch::SwitchRenderState
 pub trait yororen_ui_core::renderer::switch::SwitchRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_core::renderer::switch::SwitchRenderer::compose(&self, &yororen_ui_core::headless::switch::SwitchProps, &gpui::window::FocusHandle, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub mod yororen_ui_core::renderer::table
+pub struct yororen_ui_core::renderer::table::TableRenderState
+pub yororen_ui_core::renderer::table::TableRenderState::selected_row: core::option::Option<usize>
+impl core::clone::Clone for yororen_ui_core::renderer::table::TableRenderState
+pub fn yororen_ui_core::renderer::table::TableRenderState::clone(&self) -> yororen_ui_core::renderer::table::TableRenderState
+impl core::default::Default for yororen_ui_core::renderer::table::TableRenderState
+pub fn yororen_ui_core::renderer::table::TableRenderState::default() -> yororen_ui_core::renderer::table::TableRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::table::TableRenderState
+pub fn yororen_ui_core::renderer::table::TableRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::table::TableRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::table::TableRenderState
+impl core::marker::Send for yororen_ui_core::renderer::table::TableRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::table::TableRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::table::TableRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::table::TableRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::table::TableRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::table::TableRenderState
+pub trait yororen_ui_core::renderer::table::TableRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::table::TableRenderer::compose(&self, &yororen_ui_core::headless::table::TableProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub mod yororen_ui_core::renderer::tag
 pub struct yororen_ui_core::renderer::tag::TagRenderState
 pub yororen_ui_core::renderer::tag::TagRenderState::closable: bool
@@ -7584,6 +8197,26 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::tag:
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::tag::TagRenderState
 pub trait yororen_ui_core::renderer::tag::TagRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_core::renderer::tag::TagRenderer::compose(&self, &yororen_ui_core::headless::tag::TagProps, &gpui::app::App) -> gpui::elements::div::Div
+pub mod yororen_ui_core::renderer::text
+pub struct yororen_ui_core::renderer::text::TextRenderState
+pub yororen_ui_core::renderer::text::TextRenderState::has_custom_color: bool
+pub yororen_ui_core::renderer::text::TextRenderState::has_custom_size: bool
+impl core::clone::Clone for yororen_ui_core::renderer::text::TextRenderState
+pub fn yororen_ui_core::renderer::text::TextRenderState::clone(&self) -> yororen_ui_core::renderer::text::TextRenderState
+impl core::default::Default for yororen_ui_core::renderer::text::TextRenderState
+pub fn yororen_ui_core::renderer::text::TextRenderState::default() -> yororen_ui_core::renderer::text::TextRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::text::TextRenderState
+pub fn yororen_ui_core::renderer::text::TextRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::text::TextRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::text::TextRenderState
+impl core::marker::Send for yororen_ui_core::renderer::text::TextRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::text::TextRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::text::TextRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::text::TextRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::text::TextRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::text::TextRenderState
+pub trait yororen_ui_core::renderer::text::TextRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::text::TextRenderer::compose(&self, &yororen_ui_core::headless::text::TextProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub mod yororen_ui_core::renderer::text_area
 pub struct yororen_ui_core::renderer::text_area::TextAreaRenderState
 pub yororen_ui_core::renderer::text_area::TextAreaRenderState::custom_bg: core::option::Option<gpui::color::Hsla>
@@ -7702,6 +8335,25 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::tool
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::tooltip::TooltipRenderState
 pub trait yororen_ui_core::renderer::tooltip::TooltipRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_core::renderer::tooltip::TooltipRenderer::compose(&self, &yororen_ui_core::headless::tooltip::TooltipProps, &gpui::app::App) -> gpui::elements::div::Div
+pub mod yororen_ui_core::renderer::tree
+pub struct yororen_ui_core::renderer::tree::TreeRenderState
+pub yororen_ui_core::renderer::tree::TreeRenderState::has_selection: bool
+impl core::clone::Clone for yororen_ui_core::renderer::tree::TreeRenderState
+pub fn yororen_ui_core::renderer::tree::TreeRenderState::clone(&self) -> yororen_ui_core::renderer::tree::TreeRenderState
+impl core::default::Default for yororen_ui_core::renderer::tree::TreeRenderState
+pub fn yororen_ui_core::renderer::tree::TreeRenderState::default() -> yororen_ui_core::renderer::tree::TreeRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::tree::TreeRenderState
+pub fn yororen_ui_core::renderer::tree::TreeRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::tree::TreeRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::tree::TreeRenderState
+impl core::marker::Send for yororen_ui_core::renderer::tree::TreeRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::tree::TreeRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::tree::TreeRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::tree::TreeRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::tree::TreeRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::tree::TreeRenderState
+pub trait yororen_ui_core::renderer::tree::TreeRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::tree::TreeRenderer::compose(&self, &yororen_ui_core::headless::tree::TreeProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub mod yororen_ui_core::renderer::tree_item
 pub struct yororen_ui_core::renderer::tree_item::TreeItemRenderState
 pub yororen_ui_core::renderer::tree_item::TreeItemRenderState::depth: u8
@@ -7904,6 +8556,25 @@ pub fn yororen_ui_core::renderer::variant::TokenVariantStyle::border(&self, &yor
 pub fn yororen_ui_core::renderer::variant::TokenVariantStyle::disabled_opacity(&self) -> f32
 pub fn yororen_ui_core::renderer::variant::TokenVariantStyle::fg(&self, &yororen_ui_core::renderer::variant::VariantState) -> gpui::color::Hsla
 pub fn yororen_ui_core::renderer::variant::variant_compose(alloc::sync::Arc<dyn yororen_ui_core::renderer::variant::VariantStyle>, &[(yororen_ui_core::renderer::variant::VariantKey, alloc::sync::Arc<dyn yororen_ui_core::renderer::variant::VariantStyle>)]) -> alloc::sync::Arc<dyn yororen_ui_core::renderer::variant::VariantStyle>
+pub mod yororen_ui_core::renderer::virtual_list
+pub struct yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+pub yororen_ui_core::renderer::virtual_list::VirtualListRenderState::item_count: usize
+impl core::clone::Clone for yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+pub fn yororen_ui_core::renderer::virtual_list::VirtualListRenderState::clone(&self) -> yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+impl core::default::Default for yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+pub fn yororen_ui_core::renderer::virtual_list::VirtualListRenderState::default() -> yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+pub fn yororen_ui_core::renderer::virtual_list::VirtualListRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+impl core::marker::Send for yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::virtual_list::VirtualListRenderState
+pub trait yororen_ui_core::renderer::virtual_list::VirtualListRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::virtual_list::VirtualListRenderer::compose(&self, &yororen_ui_core::headless::virtual_list::VirtualListProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub enum yororen_ui_core::renderer::ActionVariantKind
 pub yororen_ui_core::renderer::ActionVariantKind::Danger
 pub yororen_ui_core::renderer::ActionVariantKind::Neutral
@@ -8327,6 +8998,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Form
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Form
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Form
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Form
+pub struct yororen_ui_core::renderer::FormField
+impl core::clone::Clone for yororen_ui_core::renderer::FormField
+pub fn yororen_ui_core::renderer::FormField::clone(&self) -> yororen_ui_core::renderer::FormField
+impl core::cmp::Eq for yororen_ui_core::renderer::FormField
+impl core::cmp::PartialEq for yororen_ui_core::renderer::FormField
+pub fn yororen_ui_core::renderer::FormField::eq(&self, &yororen_ui_core::renderer::FormField) -> bool
+impl core::default::Default for yororen_ui_core::renderer::FormField
+pub fn yororen_ui_core::renderer::FormField::default() -> yororen_ui_core::renderer::FormField
+impl core::fmt::Debug for yororen_ui_core::renderer::FormField
+pub fn yororen_ui_core::renderer::FormField::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::FormField
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::FormField
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::FormField
+impl core::marker::Freeze for yororen_ui_core::renderer::FormField
+impl core::marker::Send for yororen_ui_core::renderer::FormField
+impl core::marker::Sync for yororen_ui_core::renderer::FormField
+impl core::marker::Unpin for yororen_ui_core::renderer::FormField
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::FormField
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::FormField
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::FormField
 pub struct yororen_ui_core::renderer::GlobalVariantRegistry(pub alloc::sync::Arc<yororen_ui_core::renderer::variant::VariantRegistry>)
 impl gpui::global::Global for yororen_ui_core::renderer::variant::GlobalVariantRegistry
 impl core::marker::Freeze for yororen_ui_core::renderer::variant::GlobalVariantRegistry
@@ -8356,6 +9047,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Heading
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Heading
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Heading
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Heading
+pub struct yororen_ui_core::renderer::Icon
+impl core::clone::Clone for yororen_ui_core::renderer::Icon
+pub fn yororen_ui_core::renderer::Icon::clone(&self) -> yororen_ui_core::renderer::Icon
+impl core::cmp::Eq for yororen_ui_core::renderer::Icon
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Icon
+pub fn yororen_ui_core::renderer::Icon::eq(&self, &yororen_ui_core::renderer::Icon) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Icon
+pub fn yororen_ui_core::renderer::Icon::default() -> yororen_ui_core::renderer::Icon
+impl core::fmt::Debug for yororen_ui_core::renderer::Icon
+pub fn yororen_ui_core::renderer::Icon::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Icon
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Icon
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Icon
+impl core::marker::Freeze for yororen_ui_core::renderer::Icon
+impl core::marker::Send for yororen_ui_core::renderer::Icon
+impl core::marker::Sync for yororen_ui_core::renderer::Icon
+impl core::marker::Unpin for yororen_ui_core::renderer::Icon
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Icon
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Icon
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Icon
 pub struct yororen_ui_core::renderer::IconButton
 impl core::clone::Clone for yororen_ui_core::renderer::IconButton
 pub fn yororen_ui_core::renderer::IconButton::clone(&self) -> yororen_ui_core::renderer::IconButton
@@ -8476,6 +9187,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::ListItem
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::ListItem
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::ListItem
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::ListItem
+pub struct yororen_ui_core::renderer::Menu
+impl core::clone::Clone for yororen_ui_core::renderer::Menu
+pub fn yororen_ui_core::renderer::Menu::clone(&self) -> yororen_ui_core::renderer::Menu
+impl core::cmp::Eq for yororen_ui_core::renderer::Menu
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Menu
+pub fn yororen_ui_core::renderer::Menu::eq(&self, &yororen_ui_core::renderer::Menu) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Menu
+pub fn yororen_ui_core::renderer::Menu::default() -> yororen_ui_core::renderer::Menu
+impl core::fmt::Debug for yororen_ui_core::renderer::Menu
+pub fn yororen_ui_core::renderer::Menu::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Menu
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Menu
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Menu
+impl core::marker::Freeze for yororen_ui_core::renderer::Menu
+impl core::marker::Send for yororen_ui_core::renderer::Menu
+impl core::marker::Sync for yororen_ui_core::renderer::Menu
+impl core::marker::Unpin for yororen_ui_core::renderer::Menu
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Menu
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Menu
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Menu
 pub struct yororen_ui_core::renderer::Modal
 impl core::clone::Clone for yororen_ui_core::renderer::Modal
 pub fn yororen_ui_core::renderer::Modal::clone(&self) -> yororen_ui_core::renderer::Modal
@@ -8536,6 +9267,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::NumberInput
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::NumberInput
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::NumberInput
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::NumberInput
+pub struct yororen_ui_core::renderer::Overlay
+impl core::clone::Clone for yororen_ui_core::renderer::Overlay
+pub fn yororen_ui_core::renderer::Overlay::clone(&self) -> yororen_ui_core::renderer::Overlay
+impl core::cmp::Eq for yororen_ui_core::renderer::Overlay
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Overlay
+pub fn yororen_ui_core::renderer::Overlay::eq(&self, &yororen_ui_core::renderer::Overlay) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Overlay
+pub fn yororen_ui_core::renderer::Overlay::default() -> yororen_ui_core::renderer::Overlay
+impl core::fmt::Debug for yororen_ui_core::renderer::Overlay
+pub fn yororen_ui_core::renderer::Overlay::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Overlay
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Overlay
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Overlay
+impl core::marker::Freeze for yororen_ui_core::renderer::Overlay
+impl core::marker::Send for yororen_ui_core::renderer::Overlay
+impl core::marker::Sync for yororen_ui_core::renderer::Overlay
+impl core::marker::Unpin for yororen_ui_core::renderer::Overlay
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Overlay
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Overlay
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Overlay
 pub struct yororen_ui_core::renderer::Panel
 impl core::clone::Clone for yororen_ui_core::renderer::Panel
 pub fn yororen_ui_core::renderer::Panel::clone(&self) -> yororen_ui_core::renderer::Panel
@@ -8636,6 +9387,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Radio
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Radio
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Radio
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Radio
+pub struct yororen_ui_core::renderer::RadioGroup
+impl core::clone::Clone for yororen_ui_core::renderer::RadioGroup
+pub fn yororen_ui_core::renderer::RadioGroup::clone(&self) -> yororen_ui_core::renderer::RadioGroup
+impl core::cmp::Eq for yororen_ui_core::renderer::RadioGroup
+impl core::cmp::PartialEq for yororen_ui_core::renderer::RadioGroup
+pub fn yororen_ui_core::renderer::RadioGroup::eq(&self, &yororen_ui_core::renderer::RadioGroup) -> bool
+impl core::default::Default for yororen_ui_core::renderer::RadioGroup
+pub fn yororen_ui_core::renderer::RadioGroup::default() -> yororen_ui_core::renderer::RadioGroup
+impl core::fmt::Debug for yororen_ui_core::renderer::RadioGroup
+pub fn yororen_ui_core::renderer::RadioGroup::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::RadioGroup
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::RadioGroup
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::RadioGroup
+impl core::marker::Freeze for yororen_ui_core::renderer::RadioGroup
+impl core::marker::Send for yororen_ui_core::renderer::RadioGroup
+impl core::marker::Sync for yororen_ui_core::renderer::RadioGroup
+impl core::marker::Unpin for yororen_ui_core::renderer::RadioGroup
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::RadioGroup
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::RadioGroup
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::RadioGroup
 pub struct yororen_ui_core::renderer::RendererRegistry
 impl yororen_ui_core::renderer::RendererRegistry
 pub fn yororen_ui_core::renderer::RendererRegistry::contains<T: yororen_ui_core::renderer::RendererMarker>(&self) -> bool
@@ -8754,6 +9525,46 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Skeleton
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Skeleton
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Skeleton
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Skeleton
+pub struct yororen_ui_core::renderer::Slider
+impl core::clone::Clone for yororen_ui_core::renderer::Slider
+pub fn yororen_ui_core::renderer::Slider::clone(&self) -> yororen_ui_core::renderer::Slider
+impl core::cmp::Eq for yororen_ui_core::renderer::Slider
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Slider
+pub fn yororen_ui_core::renderer::Slider::eq(&self, &yororen_ui_core::renderer::Slider) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Slider
+pub fn yororen_ui_core::renderer::Slider::default() -> yororen_ui_core::renderer::Slider
+impl core::fmt::Debug for yororen_ui_core::renderer::Slider
+pub fn yororen_ui_core::renderer::Slider::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Slider
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Slider
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Slider
+impl core::marker::Freeze for yororen_ui_core::renderer::Slider
+impl core::marker::Send for yororen_ui_core::renderer::Slider
+impl core::marker::Sync for yororen_ui_core::renderer::Slider
+impl core::marker::Unpin for yororen_ui_core::renderer::Slider
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Slider
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Slider
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Slider
+pub struct yororen_ui_core::renderer::Spacer
+impl core::clone::Clone for yororen_ui_core::renderer::Spacer
+pub fn yororen_ui_core::renderer::Spacer::clone(&self) -> yororen_ui_core::renderer::Spacer
+impl core::cmp::Eq for yororen_ui_core::renderer::Spacer
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Spacer
+pub fn yororen_ui_core::renderer::Spacer::eq(&self, &yororen_ui_core::renderer::Spacer) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Spacer
+pub fn yororen_ui_core::renderer::Spacer::default() -> yororen_ui_core::renderer::Spacer
+impl core::fmt::Debug for yororen_ui_core::renderer::Spacer
+pub fn yororen_ui_core::renderer::Spacer::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Spacer
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Spacer
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Spacer
+impl core::marker::Freeze for yororen_ui_core::renderer::Spacer
+impl core::marker::Send for yororen_ui_core::renderer::Spacer
+impl core::marker::Sync for yororen_ui_core::renderer::Spacer
+impl core::marker::Unpin for yororen_ui_core::renderer::Spacer
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Spacer
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Spacer
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Spacer
 pub struct yororen_ui_core::renderer::SplitButton
 impl core::clone::Clone for yororen_ui_core::renderer::SplitButton
 pub fn yororen_ui_core::renderer::SplitButton::clone(&self) -> yororen_ui_core::renderer::SplitButton
@@ -8794,6 +9605,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Switch
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Switch
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Switch
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Switch
+pub struct yororen_ui_core::renderer::Table
+impl core::clone::Clone for yororen_ui_core::renderer::Table
+pub fn yororen_ui_core::renderer::Table::clone(&self) -> yororen_ui_core::renderer::Table
+impl core::cmp::Eq for yororen_ui_core::renderer::Table
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Table
+pub fn yororen_ui_core::renderer::Table::eq(&self, &yororen_ui_core::renderer::Table) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Table
+pub fn yororen_ui_core::renderer::Table::default() -> yororen_ui_core::renderer::Table
+impl core::fmt::Debug for yororen_ui_core::renderer::Table
+pub fn yororen_ui_core::renderer::Table::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Table
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Table
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Table
+impl core::marker::Freeze for yororen_ui_core::renderer::Table
+impl core::marker::Send for yororen_ui_core::renderer::Table
+impl core::marker::Sync for yororen_ui_core::renderer::Table
+impl core::marker::Unpin for yororen_ui_core::renderer::Table
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Table
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Table
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Table
 pub struct yororen_ui_core::renderer::Tag
 impl core::clone::Clone for yororen_ui_core::renderer::Tag
 pub fn yororen_ui_core::renderer::Tag::clone(&self) -> yororen_ui_core::renderer::Tag
@@ -8814,6 +9645,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Tag
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Tag
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Tag
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Tag
+pub struct yororen_ui_core::renderer::Text
+impl core::clone::Clone for yororen_ui_core::renderer::Text
+pub fn yororen_ui_core::renderer::Text::clone(&self) -> yororen_ui_core::renderer::Text
+impl core::cmp::Eq for yororen_ui_core::renderer::Text
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Text
+pub fn yororen_ui_core::renderer::Text::eq(&self, &yororen_ui_core::renderer::Text) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Text
+pub fn yororen_ui_core::renderer::Text::default() -> yororen_ui_core::renderer::Text
+impl core::fmt::Debug for yororen_ui_core::renderer::Text
+pub fn yororen_ui_core::renderer::Text::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Text
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Text
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Text
+impl core::marker::Freeze for yororen_ui_core::renderer::Text
+impl core::marker::Send for yororen_ui_core::renderer::Text
+impl core::marker::Sync for yororen_ui_core::renderer::Text
+impl core::marker::Unpin for yororen_ui_core::renderer::Text
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Text
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Text
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Text
 pub struct yororen_ui_core::renderer::TextArea
 impl core::clone::Clone for yororen_ui_core::renderer::TextArea
 pub fn yororen_ui_core::renderer::TextArea::clone(&self) -> yororen_ui_core::renderer::TextArea
@@ -8936,6 +9787,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Tooltip
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Tooltip
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Tooltip
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Tooltip
+pub struct yororen_ui_core::renderer::Tree
+impl core::clone::Clone for yororen_ui_core::renderer::Tree
+pub fn yororen_ui_core::renderer::Tree::clone(&self) -> yororen_ui_core::renderer::Tree
+impl core::cmp::Eq for yororen_ui_core::renderer::Tree
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Tree
+pub fn yororen_ui_core::renderer::Tree::eq(&self, &yororen_ui_core::renderer::Tree) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Tree
+pub fn yororen_ui_core::renderer::Tree::default() -> yororen_ui_core::renderer::Tree
+impl core::fmt::Debug for yororen_ui_core::renderer::Tree
+pub fn yororen_ui_core::renderer::Tree::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Tree
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Tree
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Tree
+impl core::marker::Freeze for yororen_ui_core::renderer::Tree
+impl core::marker::Send for yororen_ui_core::renderer::Tree
+impl core::marker::Sync for yororen_ui_core::renderer::Tree
+impl core::marker::Unpin for yororen_ui_core::renderer::Tree
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Tree
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Tree
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Tree
 pub struct yororen_ui_core::renderer::TreeItem
 impl core::clone::Clone for yororen_ui_core::renderer::TreeItem
 pub fn yororen_ui_core::renderer::TreeItem::clone(&self) -> yororen_ui_core::renderer::TreeItem
@@ -9014,6 +9885,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::variant::VariantState
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::variant::VariantState
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::variant::VariantState
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::variant::VariantState
+pub struct yororen_ui_core::renderer::VirtualList
+impl core::clone::Clone for yororen_ui_core::renderer::VirtualList
+pub fn yororen_ui_core::renderer::VirtualList::clone(&self) -> yororen_ui_core::renderer::VirtualList
+impl core::cmp::Eq for yororen_ui_core::renderer::VirtualList
+impl core::cmp::PartialEq for yororen_ui_core::renderer::VirtualList
+pub fn yororen_ui_core::renderer::VirtualList::eq(&self, &yororen_ui_core::renderer::VirtualList) -> bool
+impl core::default::Default for yororen_ui_core::renderer::VirtualList
+pub fn yororen_ui_core::renderer::VirtualList::default() -> yororen_ui_core::renderer::VirtualList
+impl core::fmt::Debug for yororen_ui_core::renderer::VirtualList
+pub fn yororen_ui_core::renderer::VirtualList::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::VirtualList
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::VirtualList
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::VirtualList
+impl core::marker::Freeze for yororen_ui_core::renderer::VirtualList
+impl core::marker::Send for yororen_ui_core::renderer::VirtualList
+impl core::marker::Sync for yororen_ui_core::renderer::VirtualList
+impl core::marker::Unpin for yororen_ui_core::renderer::VirtualList
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::VirtualList
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::VirtualList
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::VirtualList
 pub trait yororen_ui_core::renderer::RenderState: core::any::Any + 'static + core::marker::Send + core::marker::Sync
 impl<T> yororen_ui_core::renderer::spec::RenderState for T where T: core::any::Any + 'static + core::marker::Send + core::marker::Sync
 pub trait yororen_ui_core::renderer::RendererContext
@@ -9039,34 +9930,45 @@ impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Em
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::FilePathInput
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::FocusRing
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Form
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::FormField
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Heading
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Icon
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::IconButton
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Image
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::KeybindingDisplay
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::KeybindingInput
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Label
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ListItem
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Menu
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Modal
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Notification
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::NumberInput
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Overlay
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Panel
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::PasswordInput
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Popover
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ProgressBar
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Radio
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::RadioGroup
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::SearchInput
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Select
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ShortcutHint
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Skeleton
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Slider
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Spacer
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::SplitButton
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Switch
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Table
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Tag
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Text
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::TextArea
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::TextInput
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Toast
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ToggleButton
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Tooltip
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Tree
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::TreeItem
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::VirtualList
 pub trait yororen_ui_core::renderer::VariantStyle: core::marker::Send + core::marker::Sync + core::fmt::Debug
 pub fn yororen_ui_core::renderer::VariantStyle::bg(&self, &yororen_ui_core::renderer::variant::VariantState) -> gpui::color::Hsla
 pub fn yororen_ui_core::renderer::VariantStyle::border(&self, &yororen_ui_core::renderer::variant::VariantState) -> core::option::Option<gpui::color::Hsla>

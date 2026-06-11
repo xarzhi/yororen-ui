@@ -1,8 +1,12 @@
 //! `TokenDropdownMenuRenderer` — default `DropdownMenuRenderer` impl.
+//!
+//! Returns a styled shell (bg, border, radius, shadow, padding).
+//! The caller supplies the trigger and dropdown body as children
+//! after `.render(cx)`.
 
 use std::sync::Arc;
 
-use gpui::{App, Div, Hsla, ParentElement, Pixels, Styled, div};
+use gpui::{App, Div, Hsla, Pixels, Styled, div};
 
 use yororen_ui_core::headless::dropdown_menu::DropdownMenuProps;
 use yororen_ui_core::theme::Theme;
@@ -11,31 +15,21 @@ pub use yororen_ui_core::renderer::dropdown_menu::{DropdownMenuRenderState, Drop
 
 pub struct TokenDropdownMenuRenderer;
 
-// Inherent helpers — *not* part of the trait surface.
 impl TokenDropdownMenuRenderer {
-    pub fn trigger_bg(&self, _state: &DropdownMenuRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("action.neutral.bg").unwrap_or_default()
+    pub fn bg(&self, _state: &DropdownMenuRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("surface.base").unwrap_or_default()
     }
-    pub fn trigger_hover_bg(&self, _state: &DropdownMenuRenderState, theme: &Theme) -> Hsla {
-        theme
-            .get_color("action.neutral.hover_bg")
-            .unwrap_or_default()
-    }
-    pub fn trigger_fg(&self, _state: &DropdownMenuRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("action.neutral.fg").unwrap_or_default()
-    }
-    pub fn min_height(&self, _state: &DropdownMenuRenderState, theme: &Theme) -> Pixels {
-        gpui::px(
-            theme
-                .get_number("tokens.control.button.min_height")
-                .unwrap_or(0.0) as f32,
-        )
+    pub fn border(&self, _state: &DropdownMenuRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("border.default").unwrap_or_default()
     }
     pub fn border_radius(&self, _state: &DropdownMenuRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.radii.md").unwrap_or(0.0) as f32)
+        gpui::px(theme.get_number("tokens.radii.md").unwrap_or(6.0) as f32)
     }
-    pub fn chevron_rotation(&self, state: &DropdownMenuRenderState, _theme: &Theme) -> f32 {
-        if state.open { 180.0 } else { 0.0 }
+    pub fn padding(&self, _state: &DropdownMenuRenderState, theme: &Theme) -> Pixels {
+        gpui::px(theme.get_number("tokens.spacing.inset_sm").unwrap_or(4.0) as f32)
+    }
+    pub fn shadow_alpha(&self, _state: &DropdownMenuRenderState, _theme: &Theme) -> f32 {
+        0.12
     }
 }
 
@@ -46,18 +40,24 @@ impl DropdownMenuRenderer for TokenDropdownMenuRenderer {
         let state = DropdownMenuRenderState {
             open: props.state.read(cx).is_open(),
         };
-        let bg = self.trigger_bg(&state, theme);
-        let fg = self.trigger_fg(&state, theme);
-        let h = self.min_height(&state, theme);
+        let bg = self.bg(&state, theme);
+        let border = self.border(&state, theme);
         let r = self.border_radius(&state, theme);
+        let pad = self.padding(&state, theme);
+        let alpha = self.shadow_alpha(&state, theme);
         div()
-            .flex()
-            .items_center()
             .bg(bg)
-            .text_color(fg)
-            .min_h(h)
+            .border_1()
+            .border_color(border)
             .rounded(r)
-            .child("▼")
+            .p(pad)
+            .shadow(vec![gpui::BoxShadow {
+                color: gpui::hsla(0.0, 0.0, 0.0, alpha),
+                blur_radius: gpui::px(12.0),
+                spread_radius: gpui::px(0.0),
+                offset: gpui::Point { x: gpui::px(0.0), y: gpui::px(4.0) },
+                
+            }])
     }
 }
 

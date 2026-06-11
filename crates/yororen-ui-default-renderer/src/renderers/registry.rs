@@ -46,34 +46,45 @@ use super::empty_state::TokenEmptyStateRenderer;
 use super::file_path_input::TokenFilePathInputRenderer;
 use super::focus_ring::TokenFocusRingRenderer;
 use super::form::TokenFormRenderer;
+use super::form_field::TokenFormFieldRenderer;
 use super::heading::TokenHeadingRenderer;
+use super::icon::TokenIconRenderer;
 use super::icon_button::TokenIconButtonRenderer;
 use super::image::TokenImageRenderer;
 use super::keybinding_display::TokenKeybindingDisplayRenderer;
 use super::keybinding_input::TokenKeybindingInputRenderer;
 use super::label::TokenLabelRenderer;
 use super::list_item::TokenListItemRenderer;
+use super::menu::TokenMenuRenderer;
 use super::modal::TokenModalRenderer;
 use super::notification::TokenNotificationRenderer;
 use super::number_input::TokenNumberInputRenderer;
+use super::overlay::TokenOverlayRenderer;
 use super::panel::TokenPanelRenderer;
 use super::password_input::TokenPasswordInputRenderer;
 use super::popover::TokenPopoverRenderer;
 use super::progress::TokenProgressBarRenderer;
 use super::radio::TokenRadioRenderer;
+use super::radio_group::TokenRadioGroupRenderer;
 use super::search_input::TokenSearchInputRenderer;
 use super::select::TokenSelectRenderer;
 use super::shortcut_hint::TokenShortcutHintRenderer;
 use super::skeleton::TokenSkeletonRenderer;
+use super::slider::TokenSliderRenderer;
+use super::spacer::TokenSpacerRenderer;
 use super::split_button::TokenSplitButtonRenderer;
 use super::switch::TokenSwitchRenderer;
+use super::table::TokenTableRenderer;
 use super::tag::TokenTagRenderer;
+use super::text::TokenTextRenderer;
 use super::text_area::TokenTextAreaRenderer;
 use super::text_input::TokenTextInputRenderer;
 use super::toast::TokenToastRenderer;
 use super::toggle_button::TokenToggleButtonRenderer;
 use super::tooltip::TokenTooltipRenderer;
+use super::tree::TokenTreeRenderer;
 use super::tree_item::TokenTreeItemRenderer;
+use super::virtual_list::TokenVirtualListRenderer;
 use yororen_ui_core::renderer::avatar::AvatarRenderer;
 use yororen_ui_core::renderer::badge::BadgeRenderer;
 use yororen_ui_core::renderer::button::ButtonRenderer;
@@ -88,34 +99,45 @@ use yororen_ui_core::renderer::empty_state::EmptyStateRenderer;
 use yororen_ui_core::renderer::file_path_input::FilePathInputRenderer;
 use yororen_ui_core::renderer::focus_ring::FocusRingRenderer;
 use yororen_ui_core::renderer::form::FormRenderer;
+use yororen_ui_core::renderer::form_field::FormFieldRenderer;
 use yororen_ui_core::renderer::heading::HeadingRenderer;
+use yororen_ui_core::renderer::icon::IconRenderer;
 use yororen_ui_core::renderer::icon_button::IconButtonRenderer;
 use yororen_ui_core::renderer::image::ImageRenderer;
 use yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderer;
 use yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderer;
 use yororen_ui_core::renderer::label::LabelRenderer;
 use yororen_ui_core::renderer::list_item::ListItemRenderer;
+use yororen_ui_core::renderer::menu::MenuRenderer;
 use yororen_ui_core::renderer::modal::ModalRenderer;
 use yororen_ui_core::renderer::notification::NotificationRenderer;
 use yororen_ui_core::renderer::number_input::NumberInputRenderer;
+use yororen_ui_core::renderer::overlay::OverlayRenderer;
 use yororen_ui_core::renderer::panel::PanelRenderer;
 use yororen_ui_core::renderer::password_input::PasswordInputRenderer;
 use yororen_ui_core::renderer::popover::PopoverRenderer;
 use yororen_ui_core::renderer::progress::ProgressBarRenderer;
 use yororen_ui_core::renderer::radio::RadioRenderer;
+use yororen_ui_core::renderer::radio_group::RadioGroupRenderer;
 use yororen_ui_core::renderer::search_input::SearchInputRenderer;
 use yororen_ui_core::renderer::select::SelectRenderer;
 use yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderer;
 use yororen_ui_core::renderer::skeleton::SkeletonRenderer;
+use yororen_ui_core::renderer::slider::SliderRenderer;
+use yororen_ui_core::renderer::spacer::SpacerRenderer;
 use yororen_ui_core::renderer::split_button::SplitButtonRenderer;
 use yororen_ui_core::renderer::switch::SwitchRenderer;
+use yororen_ui_core::renderer::table::TableRenderer;
 use yororen_ui_core::renderer::tag::TagRenderer;
+use yororen_ui_core::renderer::text::TextRenderer;
 use yororen_ui_core::renderer::text_area::TextAreaRenderer;
 use yororen_ui_core::renderer::text_input::TextInputRenderer;
 use yororen_ui_core::renderer::toast::ToastRenderer;
 use yororen_ui_core::renderer::toggle_button::ToggleButtonRenderer;
 use yororen_ui_core::renderer::tooltip::TooltipRenderer;
+use yororen_ui_core::renderer::tree::TreeRenderer;
 use yororen_ui_core::renderer::tree_item::TreeItemRenderer;
+use yororen_ui_core::renderer::virtual_list::VirtualListRenderer;
 
 use yororen_ui_core::renderer::avatar::AvatarRenderState;
 use yororen_ui_core::renderer::badge::BadgeRenderState;
@@ -131,34 +153,45 @@ use yororen_ui_core::renderer::empty_state::EmptyStateRenderState;
 use yororen_ui_core::renderer::file_path_input::FilePathInputRenderState;
 use yororen_ui_core::renderer::focus_ring::FocusRingRenderState;
 use yororen_ui_core::renderer::form::FormRenderState;
+use yororen_ui_core::renderer::form_field::FormFieldRenderState;
 use yororen_ui_core::renderer::heading::HeadingRenderState;
+use yororen_ui_core::renderer::icon::IconRenderState;
 use yororen_ui_core::renderer::icon_button::IconButtonRenderState;
 use yororen_ui_core::renderer::image::ImageRenderState;
 use yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState;
 use yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState;
 use yororen_ui_core::renderer::label::LabelRenderState;
 use yororen_ui_core::renderer::list_item::ListItemRenderState;
+use yororen_ui_core::renderer::menu::MenuRenderState;
 use yororen_ui_core::renderer::modal::ModalRenderState;
 use yororen_ui_core::renderer::notification::NotificationRenderState;
 use yororen_ui_core::renderer::number_input::NumberInputRenderState;
+use yororen_ui_core::renderer::overlay::OverlayRenderState;
 use yororen_ui_core::renderer::panel::PanelRenderState;
 use yororen_ui_core::renderer::password_input::PasswordInputRenderState;
 use yororen_ui_core::renderer::popover::PopoverRenderState;
 use yororen_ui_core::renderer::progress::ProgressBarRenderState;
 use yororen_ui_core::renderer::radio::RadioRenderState;
+use yororen_ui_core::renderer::radio_group::RadioGroupRenderState;
 use yororen_ui_core::renderer::search_input::SearchInputRenderState;
 use yororen_ui_core::renderer::select::SelectRenderState;
 use yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState;
 use yororen_ui_core::renderer::skeleton::SkeletonRenderState;
+use yororen_ui_core::renderer::slider::SliderRenderState;
+use yororen_ui_core::renderer::spacer::SpacerRenderState;
 use yororen_ui_core::renderer::split_button::SplitButtonRenderState;
 use yororen_ui_core::renderer::switch::SwitchRenderState;
+use yororen_ui_core::renderer::table::TableRenderState;
 use yororen_ui_core::renderer::tag::TagRenderState;
+use yororen_ui_core::renderer::text::TextRenderState;
 use yororen_ui_core::renderer::text_area::TextAreaRenderState;
 use yororen_ui_core::renderer::text_input::TextInputRenderState;
 use yororen_ui_core::renderer::toast::ToastRenderState;
 use yororen_ui_core::renderer::toggle_button::ToggleButtonRenderState;
 use yororen_ui_core::renderer::tooltip::TooltipRenderState;
+use yororen_ui_core::renderer::tree::TreeRenderState;
 use yororen_ui_core::renderer::tree_item::TreeItemRenderState;
+use yororen_ui_core::renderer::virtual_list::VirtualListRenderState;
 
 /// Collection of component renderers. Looked up at render time by
 /// `XxxRenderState` `TypeId`.
@@ -236,12 +269,14 @@ impl RendererRegistry {
         .with_toggle_button(Arc::new(TokenToggleButtonRenderer))
         .with_label(Arc::new(TokenLabelRenderer))
         .with_heading(Arc::new(TokenHeadingRenderer))
+        .with_icon(Arc::new(TokenIconRenderer))
         .with_divider(Arc::new(TokenDividerRenderer))
         .with_focus_ring(Arc::new(TokenFocusRingRenderer))
         .with_badge(Arc::new(TokenBadgeRenderer))
         .with_tag(Arc::new(TokenTagRenderer))
         .with_progress_bar(Arc::new(TokenProgressBarRenderer))
         .with_skeleton(Arc::new(TokenSkeletonRenderer))
+        .with_slider(Arc::new(TokenSliderRenderer))
         .with_tooltip(Arc::new(TokenTooltipRenderer))
         .with_avatar(Arc::new(TokenAvatarRenderer))
         .with_switch(Arc::new(TokenSwitchRenderer))
@@ -264,8 +299,17 @@ impl RendererRegistry {
         .with_panel(Arc::new(TokenPanelRenderer))
         .with_card(Arc::new(TokenCardRenderer))
         .with_form(Arc::new(TokenFormRenderer))
+        .with_form_field(Arc::new(TokenFormFieldRenderer))
         .with_list_item(Arc::new(TokenListItemRenderer))
+        .with_menu(Arc::new(TokenMenuRenderer))
+        .with_overlay(Arc::new(TokenOverlayRenderer))
+        .with_radio_group(Arc::new(TokenRadioGroupRenderer))
+        .with_spacer(Arc::new(TokenSpacerRenderer))
+        .with_table(Arc::new(TokenTableRenderer))
+        .with_text(Arc::new(TokenTextRenderer))
+        .with_tree(Arc::new(TokenTreeRenderer))
         .with_tree_item(Arc::new(TokenTreeItemRenderer))
+        .with_virtual_list(Arc::new(TokenVirtualListRenderer))
         .with_keybinding_input(Arc::new(TokenKeybindingInputRenderer))
         .with_split_button(Arc::new(TokenSplitButtonRenderer))
         .with_empty_state(Arc::new(TokenEmptyStateRenderer))
@@ -293,6 +337,7 @@ impl RendererRegistry {
     );
     renderer_setter!(with_label, LabelRenderState, LabelRenderer);
     renderer_setter!(with_heading, HeadingRenderState, HeadingRenderer);
+    renderer_setter!(with_icon, IconRenderState, IconRenderer);
     renderer_setter!(with_divider, DividerRenderState, DividerRenderer);
     renderer_setter!(with_focus_ring, FocusRingRenderState, FocusRingRenderer);
     renderer_setter!(with_badge, BadgeRenderState, BadgeRenderer);
@@ -303,6 +348,7 @@ impl RendererRegistry {
         ProgressBarRenderer
     );
     renderer_setter!(with_skeleton, SkeletonRenderState, SkeletonRenderer);
+    renderer_setter!(with_slider, SliderRenderState, SliderRenderer);
     renderer_setter!(with_tooltip, TooltipRenderState, TooltipRenderer);
     renderer_setter!(with_avatar, AvatarRenderState, AvatarRenderer);
     renderer_setter!(with_switch, SwitchRenderState, SwitchRenderer);
@@ -331,7 +377,16 @@ impl RendererRegistry {
     renderer_setter!(with_panel, PanelRenderState, PanelRenderer);
     renderer_setter!(with_card, CardRenderState, CardRenderer);
     renderer_setter!(with_form, FormRenderState, FormRenderer);
+    renderer_setter!(with_form_field, FormFieldRenderState, FormFieldRenderer);
     renderer_setter!(with_list_item, ListItemRenderState, ListItemRenderer);
+    renderer_setter!(with_menu, MenuRenderState, MenuRenderer);
+    renderer_setter!(with_overlay, OverlayRenderState, OverlayRenderer);
+    renderer_setter!(with_radio_group, RadioGroupRenderState, RadioGroupRenderer);
+    renderer_setter!(with_spacer, SpacerRenderState, SpacerRenderer);
+    renderer_setter!(with_table, TableRenderState, TableRenderer);
+    renderer_setter!(with_text, TextRenderState, TextRenderer);
+    renderer_setter!(with_tree, TreeRenderState, TreeRenderer);
+    renderer_setter!(with_virtual_list, VirtualListRenderState, VirtualListRenderer);
     renderer_setter!(with_text_area, TextAreaRenderState, TextAreaRenderer);
     renderer_setter!(
         with_password_input,
@@ -409,6 +464,7 @@ impl RendererRegistry {
     );
     renderer_getter!(get_label, LabelRenderState, LabelRenderer);
     renderer_getter!(get_heading, HeadingRenderState, HeadingRenderer);
+    renderer_getter!(get_icon, IconRenderState, IconRenderer);
     renderer_getter!(get_divider, DividerRenderState, DividerRenderer);
     renderer_getter!(get_focus_ring, FocusRingRenderState, FocusRingRenderer);
     renderer_getter!(get_badge, BadgeRenderState, BadgeRenderer);
@@ -419,6 +475,7 @@ impl RendererRegistry {
         ProgressBarRenderer
     );
     renderer_getter!(get_skeleton, SkeletonRenderState, SkeletonRenderer);
+    renderer_getter!(get_slider, SliderRenderState, SliderRenderer);
     renderer_getter!(get_tooltip, TooltipRenderState, TooltipRenderer);
     renderer_getter!(get_avatar, AvatarRenderState, AvatarRenderer);
     renderer_getter!(get_switch, SwitchRenderState, SwitchRenderer);
@@ -447,7 +504,16 @@ impl RendererRegistry {
     renderer_getter!(get_panel, PanelRenderState, PanelRenderer);
     renderer_getter!(get_card, CardRenderState, CardRenderer);
     renderer_getter!(get_form, FormRenderState, FormRenderer);
+    renderer_getter!(get_form_field, FormFieldRenderState, FormFieldRenderer);
     renderer_getter!(get_list_item, ListItemRenderState, ListItemRenderer);
+    renderer_getter!(get_menu, MenuRenderState, MenuRenderer);
+    renderer_getter!(get_overlay, OverlayRenderState, OverlayRenderer);
+    renderer_getter!(get_radio_group, RadioGroupRenderState, RadioGroupRenderer);
+    renderer_getter!(get_spacer, SpacerRenderState, SpacerRenderer);
+    renderer_getter!(get_table, TableRenderState, TableRenderer);
+    renderer_getter!(get_text, TextRenderState, TextRenderer);
+    renderer_getter!(get_tree, TreeRenderState, TreeRenderer);
+    renderer_getter!(get_virtual_list, VirtualListRenderState, VirtualListRenderer);
     renderer_getter!(get_text_area, TextAreaRenderState, TextAreaRenderer);
     renderer_getter!(
         get_password_input,
@@ -511,12 +577,14 @@ impl RendererRegistry {
         (TypeId::of::<ToggleButtonRenderState>(), "toggle_button"),
         (TypeId::of::<LabelRenderState>(), "label"),
         (TypeId::of::<HeadingRenderState>(), "heading"),
+        (TypeId::of::<IconRenderState>(), "icon"),
         (TypeId::of::<DividerRenderState>(), "divider"),
         (TypeId::of::<FocusRingRenderState>(), "focus_ring"),
         (TypeId::of::<BadgeRenderState>(), "badge"),
         (TypeId::of::<TagRenderState>(), "tag"),
         (TypeId::of::<ProgressBarRenderState>(), "progress_bar"),
         (TypeId::of::<SkeletonRenderState>(), "skeleton"),
+        (TypeId::of::<SliderRenderState>(), "slider"),
         (TypeId::of::<TooltipRenderState>(), "tooltip"),
         (TypeId::of::<AvatarRenderState>(), "avatar"),
         (TypeId::of::<SwitchRenderState>(), "switch"),
@@ -539,8 +607,17 @@ impl RendererRegistry {
         (TypeId::of::<PanelRenderState>(), "panel"),
         (TypeId::of::<CardRenderState>(), "card"),
         (TypeId::of::<FormRenderState>(), "form"),
+        (TypeId::of::<FormFieldRenderState>(), "form_field"),
         (TypeId::of::<ListItemRenderState>(), "list_item"),
+        (TypeId::of::<MenuRenderState>(), "menu"),
+        (TypeId::of::<OverlayRenderState>(), "overlay"),
+        (TypeId::of::<RadioGroupRenderState>(), "radio_group"),
+        (TypeId::of::<SpacerRenderState>(), "spacer"),
+        (TypeId::of::<TableRenderState>(), "table"),
+        (TypeId::of::<TextRenderState>(), "text"),
+        (TypeId::of::<TreeRenderState>(), "tree"),
         (TypeId::of::<TreeItemRenderState>(), "tree_item"),
+        (TypeId::of::<VirtualListRenderState>(), "virtual_list"),
         (
             TypeId::of::<KeybindingInputRenderState>(),
             "keybinding_input",
@@ -643,15 +720,15 @@ mod tests {
     }
 
     #[test]
-    fn empty_registry_reports_all_39_missing() {
+    fn empty_registry_reports_all_missing() {
         let r = RendererRegistry {
             map: HashMap::new(),
         };
         let err = r.validate().unwrap_err();
         assert_eq!(
             err.len(),
-            42,
-            "expected 42 missing entries, got {}: {:?}",
+            54,
+            "expected 54 missing entries, got {}: {:?}",
             err.len(),
             err
         );
@@ -667,13 +744,13 @@ mod tests {
     }
 
     #[test]
-    fn only_button_reports_38_missing() {
+    fn only_button_reports_missing() {
         let r = only_button();
         let err = r.validate().unwrap_err();
         assert_eq!(
             err.len(),
-            41,
-            "expected 41 missing entries, got {}: {:?}",
+            53,
+            "expected 53 missing entries, got {}: {:?}",
             err.len(),
             err
         );

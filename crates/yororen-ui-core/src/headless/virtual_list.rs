@@ -1,7 +1,8 @@
 //! Headless `virtual_list` — wraps `gpui::list` with id and a
 //! count. The caller passes a render-item closure to the renderer.
 
-use gpui::{Div, ElementId, InteractiveElement, Stateful};
+use gpui::{App, Div, ElementId, InteractiveElement, Stateful};
+use crate::renderer::RendererContext;
 
 #[derive(Clone, Debug)]
 pub struct VirtualListProps {
@@ -29,5 +30,15 @@ impl VirtualListProps {
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the virtual list container through the registered
+    /// `VirtualListRenderer`. Visible items are added as children after
+    /// `.render(cx)`.
+    pub fn render(self, cx: &App) -> Stateful<Div> {
+        let r = cx
+            .renderer_arc::<crate::renderer::markers::VirtualList, dyn crate::renderer::virtual_list::VirtualListRenderer>()
+            .expect("VirtualListRenderer registered");
+        r.compose(&self, cx)
     }
 }

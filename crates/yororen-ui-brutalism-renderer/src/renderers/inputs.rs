@@ -828,7 +828,7 @@ impl FilePathInputRenderer for BrutalFilePathInputRenderer {
                 )
                 .size(icon_size)
                 .color(text_color)
-                .render(),
+                .render(cx),
             )
             .child(div().flex_1().min_w(px(0.)).child(inner))
             .child(
@@ -893,7 +893,7 @@ impl FilePathInputRenderer for BrutalFilePathInputRenderer {
                         )
                         .size(icon_size)
                         .color(button_fg)
-                        .render(),
+                        .render(cx),
                     ),
             )
             .into_any_element()
@@ -1047,7 +1047,7 @@ impl SearchInputRenderer for BrutalSearchInputRenderer {
                 )
                 .size(icon_size)
                 .color(text_color)
-                .render(),
+                .render(cx),
             )
             .child(div().flex_1().min_w(px(0.)).child(inner))
             .when(!state_for_clear.read(cx).value.is_empty(), |d| {
@@ -1082,7 +1082,7 @@ impl SearchInputRenderer for BrutalSearchInputRenderer {
                             )
                             .size(icon_size)
                             .color(icon_color)
-                            .render(),
+                            .render(cx),
                         ),
                 )
             })

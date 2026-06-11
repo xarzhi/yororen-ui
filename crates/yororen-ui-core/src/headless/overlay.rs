@@ -3,8 +3,9 @@
 //! renderer.
 
 use std::sync::Arc;
+use crate::renderer::RendererContext;
 
-use gpui::{App, Div, ElementId, FocusHandle, InteractiveElement, Stateful};
+use gpui::{App, Div, ElementId, FocusHandle, InteractiveElement, Stateful, StatefulInteractiveElement};
 
 /// Reason an overlay was closed. Forwarded to the caller's
 /// `on_close` callback so the caller can branch on the cause.
@@ -64,5 +65,31 @@ impl OverlayProps {
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the overlay through the registered `OverlayRenderer`.
+    ///
+    /// The headless layer wires focus tracking and dismissal
+    /// handlers (Esc / scrim click) on top of the renderer's scrim.
+    pub fn render(self, cx: &App) -> Stateful<Div> {
+        let r = cx
+            .renderer_arc::<crate::renderer::markers::Overlay, dyn crate::renderer::overlay::OverlayRenderer>()
+            .expect("OverlayRenderer registered");
+        let mut el = r.compose(&self, cx);
+
+        if self.open {
+            el = el.track_focus(&self.focus_handle);
+            // Dismiss on scrim click when enabled.
+            if self.dismiss_on_scrim {
+                let on_close = self.on_close.clone();
+                el = el.on_click(move |_ev, window, cx| {
+                    if let Some(f) = &on_close {
+                        f(OverlayCloseReason::ScrimClick, window, cx);
+                    }
+                });
+            }
+        }
+
+        el
     }
 }

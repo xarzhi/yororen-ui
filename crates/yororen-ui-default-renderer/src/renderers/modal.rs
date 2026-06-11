@@ -1,11 +1,14 @@
 //! `TokenModalRenderer` — default `ModalRenderer` impl.
+//!
+//! Paints the modal *panel* (bg, border, padding, radius, shadow).
+//! The caller is responsible for the scrim / overlay and for adding
+//! children inside the panel after `.render(cx)`.
 
 use std::sync::Arc;
 
-use gpui::{App, Div, Hsla, ParentElement, Pixels, Styled, div};
+use gpui::{App, Div, Hsla, Pixels, Styled, div};
 
 use yororen_ui_core::headless::modal::ModalProps;
-use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
 
 pub use yororen_ui_core::renderer::modal::{ModalRenderState, ModalRenderer};
@@ -14,27 +17,20 @@ pub struct TokenModalRenderer;
 
 // Inherent helpers — *not* part of the trait surface.
 impl TokenModalRenderer {
-    pub fn scrim(&self, _state: &ModalRenderState, theme: &Theme) -> Hsla {
-        let mut c = theme.get_color("shadow.elevation_2").unwrap_or_default();
-        c.a = 0.5;
-        c
-    }
     pub fn panel_bg(&self, _state: &ModalRenderState, theme: &Theme) -> Hsla {
         theme.get_color("surface.raised").unwrap_or_default()
     }
     pub fn panel_border(&self, _state: &ModalRenderState, theme: &Theme) -> Hsla {
         theme.get_color("border.muted").unwrap_or_default()
     }
-    pub fn panel_padding(&self, _state: &ModalRenderState, theme: &Theme) -> Edges<Pixels> {
-        Edges::all(gpui::px(
-            theme.get_number("tokens.spacing.inset_lg").unwrap_or(0.0) as f32,
-        ))
+    pub fn panel_padding(&self, _state: &ModalRenderState, theme: &Theme) -> Pixels {
+        gpui::px(theme.get_number("tokens.spacing.inset_lg").unwrap_or(16.0) as f32)
     }
     pub fn panel_border_radius(&self, _state: &ModalRenderState, theme: &Theme) -> Pixels {
-        gpui::px(theme.get_number("tokens.radii.lg").unwrap_or(0.0) as f32)
+        gpui::px(theme.get_number("tokens.radii.lg").unwrap_or(8.0) as f32)
     }
-    pub fn panel_shadow_alpha(&self, _state: &ModalRenderState, theme: &Theme) -> f32 {
-        theme.get_color("shadow.elevation_2").unwrap_or_default().a
+    pub fn panel_shadow_alpha(&self, _state: &ModalRenderState, _theme: &Theme) -> f32 {
+        0.15
     }
 }
 
@@ -43,24 +39,25 @@ impl ModalRenderer for TokenModalRenderer {
         use yororen_ui_core::theme::ActiveTheme;
         let theme = cx.theme();
         let state = ModalRenderState {};
-        let _ = props; // state machine is consulted for visibility in the renderer wrapper
+        let _ = props;
         let panel_bg = self.panel_bg(&state, theme);
         let panel_border = self.panel_border(&state, theme);
         let pad = self.panel_padding(&state, theme);
         let r = self.panel_border_radius(&state, theme);
+        let alpha = self.panel_shadow_alpha(&state, theme);
         div()
-            .flex()
-            .items_center()
-            .justify_center()
-            .size_full()
-            .bg(self.scrim(&state, theme))
-            .child(
-                div()
-                    .bg(panel_bg)
-                    .border_color(panel_border)
-                    .p(pad.top)
-                    .rounded(r),
-            )
+            .bg(panel_bg)
+            .border_1()
+            .border_color(panel_border)
+            .p(pad)
+            .rounded(r)
+            .shadow(vec![gpui::BoxShadow {
+                color: gpui::hsla(0.0, 0.0, 0.0, alpha),
+                blur_radius: gpui::px(12.0),
+                spread_radius: gpui::px(0.0),
+                offset: gpui::Point { x: gpui::px(0.0), y: gpui::px(4.0) },
+                
+            }])
     }
 }
 

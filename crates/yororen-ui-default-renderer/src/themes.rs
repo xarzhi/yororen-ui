@@ -26,15 +26,17 @@ use crate::renderers::{
     TokenAvatarRenderer, TokenBadgeRenderer, TokenButtonGroupRenderer, TokenButtonRenderer,
     TokenCardRenderer, TokenCheckboxRenderer, TokenComboBoxRenderer, TokenDisclosureRenderer,
     TokenDividerRenderer, TokenDropdownMenuRenderer, TokenEmptyStateRenderer,
-    TokenFilePathInputRenderer, TokenFocusRingRenderer, TokenFormRenderer, TokenHeadingRenderer,
-    TokenIconButtonRenderer, TokenImageRenderer, TokenKeybindingDisplayRenderer,
-    TokenKeybindingInputRenderer, TokenLabelRenderer, TokenListItemRenderer, TokenModalRenderer,
-    TokenNotificationRenderer, TokenNumberInputRenderer, TokenPanelRenderer,
-    TokenPasswordInputRenderer, TokenPopoverRenderer, TokenProgressBarRenderer, TokenRadioRenderer,
+    TokenFilePathInputRenderer, TokenFocusRingRenderer, TokenFormRenderer, TokenFormFieldRenderer,
+    TokenHeadingRenderer, TokenIconButtonRenderer, TokenIconRenderer, TokenImageRenderer,
+    TokenKeybindingDisplayRenderer, TokenKeybindingInputRenderer, TokenLabelRenderer,
+    TokenListItemRenderer, TokenMenuRenderer, TokenModalRenderer, TokenNotificationRenderer,
+    TokenNumberInputRenderer, TokenOverlayRenderer, TokenPanelRenderer, TokenPasswordInputRenderer,
+    TokenPopoverRenderer, TokenProgressBarRenderer, TokenRadioRenderer, TokenRadioGroupRenderer,
     TokenSearchInputRenderer, TokenSelectRenderer, TokenShortcutHintRenderer, TokenSkeletonRenderer,
-    TokenSplitButtonRenderer, TokenSwitchRenderer, TokenTagRenderer, TokenTextAreaRenderer,
-    TokenTextInputRenderer, TokenToastRenderer, TokenToggleButtonRenderer, TokenTooltipRenderer,
-    TokenTreeItemRenderer,
+    TokenSliderRenderer, TokenSpacerRenderer, TokenSplitButtonRenderer, TokenSwitchRenderer,
+    TokenTableRenderer, TokenTagRenderer, TokenTextAreaRenderer, TokenTextInputRenderer,
+    TokenTextRenderer, TokenToastRenderer, TokenToggleButtonRenderer, TokenTooltipRenderer,
+    TokenTreeItemRenderer, TokenTreeRenderer, TokenVirtualListRenderer,
 };
 
 /// Load `themes/system-light.json` as a `Theme`.
@@ -104,6 +106,12 @@ pub fn register_default_renderers(cx: &mut App) {
     cx.register_renderer_arc::<markers::Heading, dyn crate::renderers::HeadingRenderer>(Arc::new(
         TokenHeadingRenderer,
     ));
+    cx.register_renderer_arc::<markers::Icon, dyn crate::renderers::IconRenderer>(Arc::new(
+        TokenIconRenderer,
+    ));
+    cx.register_renderer_arc::<markers::Text, dyn crate::renderers::TextRenderer>(Arc::new(
+        TokenTextRenderer,
+    ));
     cx.register_renderer_arc::<markers::Divider, dyn crate::renderers::DividerRenderer>(Arc::new(
         TokenDividerRenderer,
     ));
@@ -122,6 +130,9 @@ pub fn register_default_renderers(cx: &mut App) {
     cx.register_renderer_arc::<markers::Skeleton, dyn crate::renderers::SkeletonRenderer>(
         Arc::new(TokenSkeletonRenderer),
     );
+    cx.register_renderer_arc::<markers::Slider, dyn crate::renderers::SliderRenderer>(Arc::new(
+        TokenSliderRenderer,
+    ));
     cx.register_renderer_arc::<markers::Tooltip, dyn crate::renderers::TooltipRenderer>(Arc::new(
         TokenTooltipRenderer,
     ));
@@ -188,11 +199,35 @@ pub fn register_default_renderers(cx: &mut App) {
     cx.register_renderer_arc::<markers::Form, dyn crate::renderers::FormRenderer>(Arc::new(
         TokenFormRenderer,
     ));
+    cx.register_renderer_arc::<markers::FormField, dyn crate::renderers::FormFieldRenderer>(Arc::new(
+        TokenFormFieldRenderer,
+    ));
     cx.register_renderer_arc::<markers::ListItem, dyn crate::renderers::ListItemRenderer>(
         Arc::new(TokenListItemRenderer),
     );
+    cx.register_renderer_arc::<markers::Menu, dyn crate::renderers::MenuRenderer>(Arc::new(
+        TokenMenuRenderer,
+    ));
+    cx.register_renderer_arc::<markers::Overlay, dyn crate::renderers::OverlayRenderer>(Arc::new(
+        TokenOverlayRenderer,
+    ));
+    cx.register_renderer_arc::<markers::RadioGroup, dyn crate::renderers::RadioGroupRenderer>(
+        Arc::new(TokenRadioGroupRenderer),
+    );
+    cx.register_renderer_arc::<markers::Spacer, dyn crate::renderers::SpacerRenderer>(Arc::new(
+        TokenSpacerRenderer,
+    ));
+    cx.register_renderer_arc::<markers::Table, dyn crate::renderers::TableRenderer>(Arc::new(
+        TokenTableRenderer,
+    ));
+    cx.register_renderer_arc::<markers::Tree, dyn crate::renderers::TreeRenderer>(Arc::new(
+        TokenTreeRenderer,
+    ));
     cx.register_renderer_arc::<markers::TreeItem, dyn crate::renderers::TreeItemRenderer>(
         Arc::new(TokenTreeItemRenderer),
+    );
+    cx.register_renderer_arc::<markers::VirtualList, dyn crate::renderers::VirtualListRenderer>(
+        Arc::new(TokenVirtualListRenderer),
     );
     cx.register_renderer_arc::<markers::KeybindingInput, dyn crate::renderers::KeybindingInputRenderer>(
         Arc::new(TokenKeybindingInputRenderer),

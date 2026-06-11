@@ -1,6 +1,7 @@
 //! Headless `text` — a typed text span. No state.
 
-use gpui::{Div, ElementId, InteractiveElement, ParentElement, SharedString, Stateful, Styled};
+use gpui::{App, Div, ElementId, InteractiveElement, ParentElement, SharedString, Stateful, Styled};
+use crate::renderer::RendererContext;
 
 #[derive(Clone, Debug)]
 pub struct TextProps {
@@ -30,12 +31,17 @@ impl TextProps {
         el.id(self.id)
     }
 
-    /// Render the text span as a `Stateful<Div>` with the element
-    /// id, the text as a child, and the optional `size` applied.
-    /// Use this when you don't need to layer additional styles on
-    /// top of the renderer output — the same shape as
-    /// `IconProps::render` / `BadgeProps::render`.
-    pub fn render(self) -> Stateful<Div> {
+    /// Render the text span through the registered `TextRenderer`.
+    pub fn render(self, cx: &App) -> Stateful<Div> {
+        let r = cx
+            .renderer_arc::<crate::renderer::markers::Text, dyn crate::renderer::text::TextRenderer>()
+            .expect("TextRenderer registered");
+        r.compose(&self, cx)
+    }
+
+    /// Legacy no-context render. Uses hard-coded defaults.
+    #[deprecated(note = "use `.render(cx)` so themes can supply defaults")]
+    pub fn render_legacy(self) -> Stateful<Div> {
         let mut el = gpui::div().id(self.id).child(self.text.clone());
         if let Some(size) = self.size {
             el = el.text_size(size);
