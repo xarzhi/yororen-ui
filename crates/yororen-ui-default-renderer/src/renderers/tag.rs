@@ -3,7 +3,8 @@
 use std::sync::Arc;
 
 use gpui::{
-    App, Div, FontWeight, Hsla, ParentElement, Pixels, Styled, div,
+    App, Div, FontWeight, Hsla, InteractiveElement, ParentElement, Pixels,
+    StatefulInteractiveElement, Styled, div,
 };
 
 use yororen_ui_core::headless::tag::TagProps;
@@ -108,15 +109,42 @@ impl TagRenderer for TokenTagRenderer {
             .child(props.label.clone());
         if props.closable {
             let close_size = self.close_size(&state, theme);
-            el = el.child(
-                div()
-                    .flex()
-                    .items_center()
-                    .justify_center()
-                    .size(close_size)
-                    .rounded(close_size / 2.)
-                    .child("×"),
-            );
+            // `on_click` lives on `StatefulInteractiveElement`,
+            // which requires the Div to have an id. Derive a
+            // stable, unique id from the tag's own id so the
+            // close button gets a distinct identity.
+            let close_id: gpui::ElementId = match &props.id {
+                gpui::ElementId::Name(name) => {
+                    let mut s = name.to_string();
+                    s.push_str("__close");
+                    s.into()
+                }
+                _ => "tag_close".into(),
+            };
+            let mut close_btn = div()
+                .id(close_id)
+                .flex()
+                .items_center()
+                .justify_center()
+                .size(close_size)
+                .rounded(close_size / 2.)
+                .cursor(gpui::CursorStyle::PointingHand)
+                .child("×");
+            // Wire the close callback (mirrors how `apply`
+            // wires `on_click` on the tag itself). We
+            // `stop_propagation` so a click on `×` doesn't
+            // also fire the tag's select-toggle on_click —
+            // a click on the close affordance should close,
+            // not toggle.
+            if !props.disabled
+                && let Some(f) = props.on_close.clone()
+            {
+                close_btn = close_btn.on_click(move |ev, window, cx: &mut gpui::App| {
+                    cx.stop_propagation();
+                    f(ev, window, cx);
+                });
+            }
+            el = el.child(close_btn);
         }
         el
     }
