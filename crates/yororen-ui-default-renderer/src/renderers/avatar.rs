@@ -66,10 +66,16 @@ impl AvatarRenderer for TokenAvatarRenderer {
         let bg = self.default_bg(&state, theme);
         let r = self.border_radius(&state, theme);
         let size = props.size.unwrap_or(gpui::px(40.0));
-        let content = if let Some(initials) = &props.initials {
-            div().child(initials.clone())
-        } else if let Some(name) = &props.name {
-            div().child(name.to_string())
+        // Initials font sized at ~40% of avatar height so 2-letter
+        // initials always fit inside the circle/square.
+        let font_size = size * 0.4;
+        let label_text: Option<String> = if let Some(initials) = &props.initials {
+            Some(initials.clone())
+        } else {
+            props.name.as_ref().map(|n| initials_from_name(n.as_ref()))
+        };
+        let content = if let Some(text) = label_text {
+            div().text_size(font_size).child(text)
         } else {
             div()
         };
@@ -100,6 +106,59 @@ impl AvatarRenderer for TokenAvatarRenderer {
         }
         el
     }
+}
+
+/// Extract up to 2 uppercase initials from a person's name. For
+/// Latin / Cyrillic / Greek alphabets, takes the first letter of
+/// the first and last whitespace-separated tokens (`"Jane Doe"` →
+/// `"JD"`, `"Cher"` → `"C"`). For CJK names (Chinese / Japanese /
+/// Korean) it returns only the **first character** (`"张三"` →
+/// `"张"`, `"山田太郎"` → `"山"`), since each glyph is already a
+/// full unit and stacking two would crowd the avatar.
+fn initials_from_name(name: &str) -> String {
+    let trimmed = name.trim();
+    if trimmed.is_empty() {
+        return String::new();
+    }
+    if let Some(first) = trimmed.chars().next() {
+        if is_cjk_char(first) {
+            return first.to_string();
+        }
+    }
+    let parts: Vec<&str> = trimmed.split_whitespace().collect();
+    if parts.is_empty() {
+        return String::new();
+    }
+    let mut out = String::new();
+    if let Some(first) = parts.first().and_then(|w| w.chars().next()) {
+        for c in first.to_uppercase() {
+            out.push(c);
+        }
+    }
+    if parts.len() > 1 {
+        if let Some(last) = parts.last().and_then(|w| w.chars().next()) {
+            for c in last.to_uppercase() {
+                out.push(c);
+            }
+        }
+    }
+    out
+}
+
+/// True if `c` is in a CJK script range (Chinese Hanzi, Japanese
+/// Kanji / Hiragana / Katakana, Korean Hangul). Avatars treat
+/// these specially because each glyph is a full word-unit, not a
+/// letter, so the "first + last initial" heuristic doesn't apply.
+fn is_cjk_char(c: char) -> bool {
+    matches!(
+        c as u32,
+        0x3040..=0x309F   // Hiragana
+        | 0x30A0..=0x30FF // Katakana
+        | 0x3400..=0x4DBF // CJK Unified Ideographs Extension A
+        | 0x4E00..=0x9FFF // CJK Unified Ideographs
+        | 0xAC00..=0xD7AF // Hangul Syllables
+        | 0xF900..=0xFAFF // CJK Compatibility Ideographs
+    )
 }
 
 pub fn arc_avatar<T: AvatarRenderer + 'static>(r: T) -> Arc<dyn AvatarRenderer> {

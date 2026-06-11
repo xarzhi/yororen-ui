@@ -15,10 +15,13 @@ pub struct TokenCardRenderer;
 // Inherent helpers — *not* part of the trait surface.
 impl TokenCardRenderer {
     pub fn bg(&self, _state: &CardRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("surface.base").unwrap_or_default()
+        // Use `surface.raised` rather than `surface.base` so the card
+        // is visually distinct from the window background (which is
+        // usually `surface.base`).
+        theme.get_color("surface.raised").unwrap_or_default()
     }
     pub fn border(&self, _state: &CardRenderState, theme: &Theme) -> Hsla {
-        theme.get_color("border.muted").unwrap_or_default()
+        theme.get_color("border.default").unwrap_or_default()
     }
     pub fn padding(&self, _state: &CardRenderState, theme: &Theme) -> Edges<Pixels> {
         Edges::all(gpui::px(
@@ -30,6 +33,9 @@ impl TokenCardRenderer {
     }
     pub fn shadow_alpha(&self, _state: &CardRenderState, theme: &Theme) -> f32 {
         theme.get_color("shadow.elevation_1").unwrap_or_default().a
+    }
+    pub fn gap(&self, _state: &CardRenderState, theme: &Theme) -> Pixels {
+        gpui::px(theme.get_number("tokens.spacing.inset_sm").unwrap_or(8.0) as f32)
     }
 }
 
@@ -44,7 +50,16 @@ impl CardRenderer for TokenCardRenderer {
         let border = self.border(&state, theme);
         let pad = self.padding(&state, theme);
         let r = self.border_radius(&state, theme);
-        div().bg(bg).border_color(border).p(pad.top).rounded(r)
+        let gap = self.gap(&state, theme);
+        div()
+            .flex()
+            .flex_col()
+            .gap(gap)
+            .bg(bg)
+            .border_1()
+            .border_color(border)
+            .p(pad.top)
+            .rounded(r)
     }
 }
 

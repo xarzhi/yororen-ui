@@ -2,12 +2,20 @@
 
 use std::sync::Arc;
 
-use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
+use gpui::{Div, ElementId, InteractiveElement, Stateful};
+
+use crate::headless::icon::IconSource;
 
 #[derive(Clone, Debug)]
 pub struct EmptyStateProps {
     pub id: ElementId,
-    pub icon: Option<SharedString>,
+    /// Optional decorative icon shown above the title. Accepts any
+    /// [`IconSource`] — a builtin name like
+    /// `IconSource::Builtin("info".into())` resolves to the bundled
+    /// `icons/info.svg`; a `Resource(path)` passes the path through
+    /// the application's `AssetSource`, so callers can use their own
+    /// SVG assets.
+    pub icon: Option<IconSource>,
     pub title: Option<String>,
     pub description: Option<String>,
 }
@@ -22,7 +30,10 @@ pub fn empty_state(id: impl Into<ElementId>, _cx: &mut gpui::App) -> EmptyStateP
 }
 
 impl EmptyStateProps {
-    pub fn icon(mut self, i: impl Into<SharedString>) -> Self {
+    /// Set the decorative icon shown above the title. Pass a builtin
+    /// name as `IconSource::Builtin("info".into())`, or a custom
+    /// resource path as `IconSource::Resource("my/asset.svg".into())`.
+    pub fn icon(mut self, i: impl Into<IconSource>) -> Self {
         self.icon = Some(i.into());
         self
     }

@@ -29,6 +29,9 @@ use yororen_ui_core::renderer::{RendererContext, markers as m};
 use yororen_ui_core::theme::{Theme, install as install_theme};
 
 use yororen_ui_default_renderer::renderers::*;
+use yororen_ui_core::renderer::image::ImageRenderer;
+use yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderer;
+use yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderer;
 
 use crate::renderers::{
     actions::{
@@ -38,8 +41,9 @@ use crate::renderers::{
     controls::{BrutalCheckboxRenderer, BrutalRadioRenderer, BrutalSwitchRenderer},
     display::{
         BrutalBadgeRenderer, BrutalDividerRenderer, BrutalEmptyStateRenderer,
-        BrutalFocusRingRenderer, BrutalHeadingRenderer, BrutalLabelRenderer,
-        BrutalProgressBarRenderer, BrutalSkeletonRenderer, BrutalTagRenderer,
+        BrutalFocusRingRenderer, BrutalHeadingRenderer, BrutalKeybindingDisplayRenderer,
+        BrutalLabelRenderer, BrutalProgressBarRenderer, BrutalShortcutHintRenderer,
+        BrutalSkeletonRenderer, BrutalTagRenderer,
     },
     inputs::{
         BrutalComboBoxRenderer, BrutalFilePathInputRenderer, BrutalKeybindingInputRenderer,
@@ -53,7 +57,8 @@ use crate::renderers::{
         BrutalPopoverRenderer,
     },
     surfaces::{
-        BrutalAvatarRenderer, BrutalCardRenderer, BrutalPanelRenderer, BrutalTooltipRenderer,
+        BrutalAvatarRenderer, BrutalCardRenderer, BrutalImageRenderer, BrutalPanelRenderer,
+        BrutalTooltipRenderer,
     },
 };
 
@@ -120,12 +125,19 @@ pub fn register_brutal_renderers(cx: &mut App) {
     cx.register_renderer_arc::<m::EmptyState, dyn EmptyStateRenderer>(Arc::new(
         BrutalEmptyStateRenderer,
     ));
+    cx.register_renderer_arc::<m::KeybindingDisplay, dyn KeybindingDisplayRenderer>(Arc::new(
+        BrutalKeybindingDisplayRenderer,
+    ));
+    cx.register_renderer_arc::<m::ShortcutHint, dyn ShortcutHintRenderer>(Arc::new(
+        BrutalShortcutHintRenderer,
+    ));
 
     // Surfaces (4)
     cx.register_renderer_arc::<m::Tooltip, dyn TooltipRenderer>(Arc::new(BrutalTooltipRenderer));
     cx.register_renderer_arc::<m::Avatar, dyn AvatarRenderer>(Arc::new(BrutalAvatarRenderer));
     cx.register_renderer_arc::<m::Panel, dyn PanelRenderer>(Arc::new(BrutalPanelRenderer));
     cx.register_renderer_arc::<m::Card, dyn CardRenderer>(Arc::new(BrutalCardRenderer));
+    cx.register_renderer_arc::<m::Image, dyn ImageRenderer>(Arc::new(BrutalImageRenderer));
 
     // Inputs (9)
     cx.register_renderer_arc::<m::TextInput, dyn TextInputRenderer>(Arc::new(

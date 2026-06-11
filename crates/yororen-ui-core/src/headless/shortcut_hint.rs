@@ -1,5 +1,7 @@
 //! Headless `shortcut_hint` — small inline `Label` + `KeybindingDisplay`.
 
+use std::sync::Arc;
+
 use gpui::{Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
@@ -25,5 +27,19 @@ pub fn shortcut_hint(
 impl ShortcutHintProps {
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
+    }
+
+    /// Render the label + keybinding chord using the registered
+    /// `ShortcutHintRenderer`. Returns a `Stateful<Div>` with the
+    /// element id and the renderer-built row.
+    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+        use crate::renderer::RendererContext;
+        use crate::renderer::markers::ShortcutHint as ShortcutHintMarker;
+        use crate::renderer::shortcut_hint::ShortcutHintRenderer;
+
+        let r: &Arc<dyn ShortcutHintRenderer> = cx
+            .renderer_arc::<ShortcutHintMarker, dyn ShortcutHintRenderer>()
+            .expect("ShortcutHintRenderer registered");
+        r.compose(&self, cx)
     }
 }

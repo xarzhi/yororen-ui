@@ -48,6 +48,8 @@ use super::focus_ring::TokenFocusRingRenderer;
 use super::form::TokenFormRenderer;
 use super::heading::TokenHeadingRenderer;
 use super::icon_button::TokenIconButtonRenderer;
+use super::image::TokenImageRenderer;
+use super::keybinding_display::TokenKeybindingDisplayRenderer;
 use super::keybinding_input::TokenKeybindingInputRenderer;
 use super::label::TokenLabelRenderer;
 use super::list_item::TokenListItemRenderer;
@@ -61,6 +63,7 @@ use super::progress::TokenProgressBarRenderer;
 use super::radio::TokenRadioRenderer;
 use super::search_input::TokenSearchInputRenderer;
 use super::select::TokenSelectRenderer;
+use super::shortcut_hint::TokenShortcutHintRenderer;
 use super::skeleton::TokenSkeletonRenderer;
 use super::split_button::TokenSplitButtonRenderer;
 use super::switch::TokenSwitchRenderer;
@@ -87,6 +90,8 @@ use yororen_ui_core::renderer::focus_ring::FocusRingRenderer;
 use yororen_ui_core::renderer::form::FormRenderer;
 use yororen_ui_core::renderer::heading::HeadingRenderer;
 use yororen_ui_core::renderer::icon_button::IconButtonRenderer;
+use yororen_ui_core::renderer::image::ImageRenderer;
+use yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderer;
 use yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderer;
 use yororen_ui_core::renderer::label::LabelRenderer;
 use yororen_ui_core::renderer::list_item::ListItemRenderer;
@@ -100,6 +105,7 @@ use yororen_ui_core::renderer::progress::ProgressBarRenderer;
 use yororen_ui_core::renderer::radio::RadioRenderer;
 use yororen_ui_core::renderer::search_input::SearchInputRenderer;
 use yororen_ui_core::renderer::select::SelectRenderer;
+use yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderer;
 use yororen_ui_core::renderer::skeleton::SkeletonRenderer;
 use yororen_ui_core::renderer::split_button::SplitButtonRenderer;
 use yororen_ui_core::renderer::switch::SwitchRenderer;
@@ -127,6 +133,8 @@ use yororen_ui_core::renderer::focus_ring::FocusRingRenderState;
 use yororen_ui_core::renderer::form::FormRenderState;
 use yororen_ui_core::renderer::heading::HeadingRenderState;
 use yororen_ui_core::renderer::icon_button::IconButtonRenderState;
+use yororen_ui_core::renderer::image::ImageRenderState;
+use yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState;
 use yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState;
 use yororen_ui_core::renderer::label::LabelRenderState;
 use yororen_ui_core::renderer::list_item::ListItemRenderState;
@@ -140,6 +148,7 @@ use yororen_ui_core::renderer::progress::ProgressBarRenderState;
 use yororen_ui_core::renderer::radio::RadioRenderState;
 use yororen_ui_core::renderer::search_input::SearchInputRenderState;
 use yororen_ui_core::renderer::select::SelectRenderState;
+use yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState;
 use yororen_ui_core::renderer::skeleton::SkeletonRenderState;
 use yororen_ui_core::renderer::split_button::SplitButtonRenderState;
 use yororen_ui_core::renderer::switch::SwitchRenderState;
@@ -259,7 +268,10 @@ impl RendererRegistry {
         .with_tree_item(Arc::new(TokenTreeItemRenderer))
         .with_keybinding_input(Arc::new(TokenKeybindingInputRenderer))
         .with_split_button(Arc::new(TokenSplitButtonRenderer))
-        .with_empty_state(Arc::new(TokenEmptyStateRenderer));
+        .with_empty_state(Arc::new(TokenEmptyStateRenderer))
+        .with_image(Arc::new(TokenImageRenderer))
+        .with_keybinding_display(Arc::new(TokenKeybindingDisplayRenderer))
+        .with_shortcut_hint(Arc::new(TokenShortcutHintRenderer));
 
         if registry.validate().is_err() {
             panic_missing_renderers(&registry);
@@ -356,6 +368,17 @@ impl RendererRegistry {
         SplitButtonRenderer
     );
     renderer_setter!(with_empty_state, EmptyStateRenderState, EmptyStateRenderer);
+    renderer_setter!(with_image, ImageRenderState, ImageRenderer);
+    renderer_setter!(
+        with_keybinding_display,
+        KeybindingDisplayRenderState,
+        KeybindingDisplayRenderer
+    );
+    renderer_setter!(
+        with_shortcut_hint,
+        ShortcutHintRenderState,
+        ShortcutHintRenderer
+    );
 
     /// Internal: typed lookup. The component-side accessors are
     /// `get_<x>()` 1-liners that pin both the state and the trait.
@@ -461,6 +484,17 @@ impl RendererRegistry {
         SplitButtonRenderer
     );
     renderer_getter!(get_empty_state, EmptyStateRenderState, EmptyStateRenderer);
+    renderer_getter!(get_image, ImageRenderState, ImageRenderer);
+    renderer_getter!(
+        get_keybinding_display,
+        KeybindingDisplayRenderState,
+        KeybindingDisplayRenderer
+    );
+    renderer_getter!(
+        get_shortcut_hint,
+        ShortcutHintRenderState,
+        ShortcutHintRenderer
+    );
 
     /// All 38 `(TypeId, "name")` pairs that a complete registry must
     /// contain. Single source of truth for `validate()` and for the
@@ -513,6 +547,12 @@ impl RendererRegistry {
         ),
         (TypeId::of::<SplitButtonRenderState>(), "split_button"),
         (TypeId::of::<EmptyStateRenderState>(), "empty_state"),
+        (TypeId::of::<ImageRenderState>(), "image"),
+        (
+            TypeId::of::<KeybindingDisplayRenderState>(),
+            "keybinding_display",
+        ),
+        (TypeId::of::<ShortcutHintRenderState>(), "shortcut_hint"),
     ];
 
     /// Verify that this registry contains a renderer for **all** 38
@@ -610,8 +650,8 @@ mod tests {
         let err = r.validate().unwrap_err();
         assert_eq!(
             err.len(),
-            39,
-            "expected 39 missing entries, got {}: {:?}",
+            42,
+            "expected 42 missing entries, got {}: {:?}",
             err.len(),
             err
         );
@@ -621,6 +661,9 @@ mod tests {
         assert!(err.contains(&"modal"));
         assert!(err.contains(&"tree_item"));
         assert!(err.contains(&"empty_state"));
+        assert!(err.contains(&"image"));
+        assert!(err.contains(&"keybinding_display"));
+        assert!(err.contains(&"shortcut_hint"));
     }
 
     #[test]
@@ -629,8 +672,8 @@ mod tests {
         let err = r.validate().unwrap_err();
         assert_eq!(
             err.len(),
-            38,
-            "expected 38 missing entries, got {}: {:?}",
+            41,
+            "expected 41 missing entries, got {}: {:?}",
             err.len(),
             err
         );

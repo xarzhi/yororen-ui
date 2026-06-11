@@ -27,10 +27,11 @@ use crate::renderers::{
     TokenCardRenderer, TokenCheckboxRenderer, TokenComboBoxRenderer, TokenDisclosureRenderer,
     TokenDividerRenderer, TokenDropdownMenuRenderer, TokenEmptyStateRenderer,
     TokenFilePathInputRenderer, TokenFocusRingRenderer, TokenFormRenderer, TokenHeadingRenderer,
-    TokenIconButtonRenderer, TokenKeybindingInputRenderer, TokenLabelRenderer,
-    TokenListItemRenderer, TokenModalRenderer, TokenNotificationRenderer, TokenNumberInputRenderer,
-    TokenPanelRenderer, TokenPasswordInputRenderer, TokenPopoverRenderer, TokenProgressBarRenderer,
-    TokenRadioRenderer, TokenSearchInputRenderer, TokenSelectRenderer, TokenSkeletonRenderer,
+    TokenIconButtonRenderer, TokenImageRenderer, TokenKeybindingDisplayRenderer,
+    TokenKeybindingInputRenderer, TokenLabelRenderer, TokenListItemRenderer, TokenModalRenderer,
+    TokenNotificationRenderer, TokenNumberInputRenderer, TokenPanelRenderer,
+    TokenPasswordInputRenderer, TokenPopoverRenderer, TokenProgressBarRenderer, TokenRadioRenderer,
+    TokenSearchInputRenderer, TokenSelectRenderer, TokenShortcutHintRenderer, TokenSkeletonRenderer,
     TokenSplitButtonRenderer, TokenSwitchRenderer, TokenTagRenderer, TokenTextAreaRenderer,
     TokenTextInputRenderer, TokenToastRenderer, TokenToggleButtonRenderer, TokenTooltipRenderer,
     TokenTreeItemRenderer,
@@ -201,5 +202,14 @@ pub fn register_default_renderers(cx: &mut App) {
     );
     cx.register_renderer_arc::<markers::EmptyState, dyn crate::renderers::EmptyStateRenderer>(
         Arc::new(TokenEmptyStateRenderer),
+    );
+    cx.register_renderer_arc::<markers::Image, dyn crate::renderers::ImageRenderer>(Arc::new(
+        TokenImageRenderer,
+    ));
+    cx.register_renderer_arc::<markers::KeybindingDisplay, dyn crate::renderers::KeybindingDisplayRenderer>(
+        Arc::new(TokenKeybindingDisplayRenderer),
+    );
+    cx.register_renderer_arc::<markers::ShortcutHint, dyn crate::renderers::ShortcutHintRenderer>(
+        Arc::new(TokenShortcutHintRenderer),
     );
 }

@@ -8,7 +8,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, Hsla, Pixels, Styled, div};
+use gpui::{App, Div, Hsla, ParentElement, Pixels, Styled, div, px};
 
 use yororen_ui_core::headless::panel::PanelProps;
 use yororen_ui_core::renderer::spec::Edges;
@@ -37,6 +37,9 @@ impl TokenPanelRenderer {
     pub fn shadow_alpha(&self, _state: &PanelRenderState, theme: &Theme) -> f32 {
         theme.get_color("shadow.elevation_2").unwrap_or_default().a
     }
+    pub fn title_color(&self, _state: &PanelRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("content.primary").unwrap_or_default()
+    }
 }
 
 impl PanelRenderer for TokenPanelRenderer {
@@ -52,7 +55,23 @@ impl PanelRenderer for TokenPanelRenderer {
         let border = self.border(&state, theme);
         let pad = self.padding(&state, theme);
         let r = self.border_radius(&state, theme);
-        div().bg(bg).border_color(border).p(pad.top).rounded(r)
+        let title_fg = self.title_color(&state, theme);
+        let mut el = div()
+            .flex()
+            .flex_col()
+            .bg(bg)
+            .border_color(border)
+            .p(pad.top)
+            .rounded(r);
+        if let Some(title) = &props.title {
+            el = el.child(
+                div()
+                    .text_color(title_fg)
+                    .pb(px(6.))
+                    .child(title.clone()),
+            );
+        }
+        el
     }
 }
 

@@ -13,6 +13,7 @@ use std::time::Instant;
 
 use yororen_ui_core::animation::ease_in_out;
 use yororen_ui_core::headless::badge::BadgeVariant;
+use yororen_ui_core::headless::icon::IconSource;
 use yororen_ui_core::headless::label::LabelProps;
 use yororen_ui_core::renderer::spec::Edges as SpecEdges;
 use yororen_ui_core::theme::ActiveTheme;
@@ -813,7 +814,20 @@ impl EmptyStateRenderer for BrutalEmptyStateRenderer {
             .p(pad.top)
             .gap(g);
         if let Some(icon) = &props.icon {
-            el = el.child(gpui::div().text_color(ic).size(is).child(icon.clone()));
+            // Resolve the icon source the same way `IconProps::render`
+            // does: builtin names map to `icons/<name>.svg`; resource
+            // paths pass through.
+            let path: SharedString = match icon {
+                IconSource::Builtin(name) => format!("icons/{name}.svg").into(),
+                IconSource::Resource(p) => p.clone(),
+            };
+            el = el.child(
+                gpui::svg()
+                    .path(path)
+                    .size(is)
+                    .text_color(ic)
+                    .into_any_element(),
+            );
         }
         if let Some(title) = &props.title {
             el = el.child(gpui::div().text_color(tc).child(title.clone()));
@@ -826,3 +840,197 @@ impl EmptyStateRenderer for BrutalEmptyStateRenderer {
 }
 
 // End of empty-state impl.
+
+// =====================================================================
+// KeybindingDisplay
+// =====================================================================
+
+pub use yororen_ui_core::renderer::keybinding_display::{
+    KeybindingDisplayRenderState, KeybindingDisplayRenderer,
+};
+
+pub struct BrutalKeybindingDisplayRenderer;
+
+// Inherent helpers — *not* part of the trait surface.
+impl BrutalKeybindingDisplayRenderer {
+    pub fn kbd_bg(&self, _state: &KeybindingDisplayRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("surface.hover").unwrap_or(BRUTAL_BORDER)
+    }
+    pub fn kbd_fg(&self, _state: &KeybindingDisplayRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("content.primary").unwrap_or(BRUTAL_BORDER)
+    }
+    pub fn border(&self, _state: &KeybindingDisplayRenderState, theme: &Theme) -> Hsla {
+        brutal_border_color(theme)
+    }
+    pub fn padding_x(&self, _state: &KeybindingDisplayRenderState, theme: &Theme) -> Pixels {
+        px(theme
+            .get_number("tokens.control.keybinding_input.kbd_padding_x")
+            .unwrap_or(6.0) as f32)
+    }
+    pub fn padding_y(&self, _state: &KeybindingDisplayRenderState, theme: &Theme) -> Pixels {
+        px(theme
+            .get_number("tokens.control.keybinding_input.kbd_padding_y")
+            .unwrap_or(2.0) as f32)
+    }
+    pub fn gap(&self, _state: &KeybindingDisplayRenderState, theme: &Theme) -> Pixels {
+        px(theme
+            .get_number("tokens.control.keybinding_input.separator_gap")
+            .unwrap_or(4.0) as f32)
+    }
+    pub fn font_family(&self, _state: &KeybindingDisplayRenderState, theme: &Theme) -> SharedString {
+        theme
+            .get_string("tokens.typography.family_mono")
+            .unwrap_or(BRUTAL_FONT_FAMILY)
+            .to_string()
+            .into()
+    }
+}
+
+impl KeybindingDisplayRenderer for BrutalKeybindingDisplayRenderer {
+    fn compose(
+        &self,
+        props: &yororen_ui_core::headless::keybinding_display::KeybindingDisplayProps,
+        cx: &App,
+    ) -> Stateful<Div> {
+        let theme = cx.theme();
+        let state = KeybindingDisplayRenderState {};
+        let kbd_bg = self.kbd_bg(&state, theme);
+        let kbd_fg = self.kbd_fg(&state, theme);
+        let bd = self.border(&state, theme);
+        let px_h = self.padding_x(&state, theme);
+        let px_v = self.padding_y(&state, theme);
+        let g = self.gap(&state, theme);
+        let family = self.font_family(&state, theme);
+        let mut row = gpui::div()
+            .id(props.id.clone())
+            .flex()
+            .flex_row()
+            .items_center()
+            .gap(g);
+        for key in &props.keys {
+            row = row.child(
+                gpui::div()
+                    .bg(kbd_bg)
+                    .text_color(kbd_fg)
+                    .border(px(BRUTAL_BORDER_WIDTH))
+                    .border_color(bd)
+                    .rounded(px(BRUTAL_RADIUS))
+                    .px(px_h)
+                    .py(px_v)
+                    .font_family(family.clone())
+                    .text_size(px(12.))
+                    .child(key.clone()),
+            );
+        }
+        row
+    }
+}
+
+// End of keybinding-display impl.
+
+// =====================================================================
+// ShortcutHint
+// =====================================================================
+
+pub use yororen_ui_core::renderer::shortcut_hint::{
+    ShortcutHintRenderState, ShortcutHintRenderer,
+};
+
+pub struct BrutalShortcutHintRenderer;
+
+// Inherent helpers — *not* part of the trait surface.
+impl BrutalShortcutHintRenderer {
+    pub fn label_fg(&self, _state: &ShortcutHintRenderState, theme: &Theme) -> Hsla {
+        theme
+            .get_color("content.secondary")
+            .unwrap_or(BRUTAL_BORDER)
+    }
+    pub fn kbd_bg(&self, _state: &ShortcutHintRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("surface.hover").unwrap_or(BRUTAL_BORDER)
+    }
+    pub fn kbd_fg(&self, _state: &ShortcutHintRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("content.primary").unwrap_or(BRUTAL_BORDER)
+    }
+    pub fn border(&self, _state: &ShortcutHintRenderState, theme: &Theme) -> Hsla {
+        brutal_border_color(theme)
+    }
+    pub fn padding_x(&self, _state: &ShortcutHintRenderState, theme: &Theme) -> Pixels {
+        px(theme
+            .get_number("tokens.control.keybinding_input.kbd_padding_x")
+            .unwrap_or(6.0) as f32)
+    }
+    pub fn padding_y(&self, _state: &ShortcutHintRenderState, theme: &Theme) -> Pixels {
+        px(theme
+            .get_number("tokens.control.keybinding_input.kbd_padding_y")
+            .unwrap_or(2.0) as f32)
+    }
+    pub fn key_gap(&self, _state: &ShortcutHintRenderState, theme: &Theme) -> Pixels {
+        px(theme
+            .get_number("tokens.control.keybinding_input.separator_gap")
+            .unwrap_or(4.0) as f32)
+    }
+    pub fn label_gap(&self, _state: &ShortcutHintRenderState, theme: &Theme) -> Pixels {
+        px(theme.get_number("tokens.spacing.inset_sm").unwrap_or(8.0) as f32)
+    }
+    pub fn font_family(&self, _state: &ShortcutHintRenderState, theme: &Theme) -> SharedString {
+        theme
+            .get_string("tokens.typography.family_mono")
+            .unwrap_or(BRUTAL_FONT_FAMILY)
+            .to_string()
+            .into()
+    }
+}
+
+impl ShortcutHintRenderer for BrutalShortcutHintRenderer {
+    fn compose(
+        &self,
+        props: &yororen_ui_core::headless::shortcut_hint::ShortcutHintProps,
+        cx: &App,
+    ) -> Stateful<Div> {
+        let theme = cx.theme();
+        let state = ShortcutHintRenderState {};
+        let label_fg = self.label_fg(&state, theme);
+        let kbd_bg = self.kbd_bg(&state, theme);
+        let kbd_fg = self.kbd_fg(&state, theme);
+        let bd = self.border(&state, theme);
+        let px_h = self.padding_x(&state, theme);
+        let px_v = self.padding_y(&state, theme);
+        let key_g = self.key_gap(&state, theme);
+        let label_g = self.label_gap(&state, theme);
+        let family = self.font_family(&state, theme);
+
+        let mut keys_row = gpui::div().flex().flex_row().items_center().gap(key_g);
+        for key in &props.keys {
+            keys_row = keys_row.child(
+                gpui::div()
+                    .bg(kbd_bg)
+                    .text_color(kbd_fg)
+                    .border(px(BRUTAL_BORDER_WIDTH))
+                    .border_color(bd)
+                    .rounded(px(BRUTAL_RADIUS))
+                    .px(px_h)
+                    .py(px_v)
+                    .font_family(family.clone())
+                    .text_size(px(12.))
+                    .child(key.clone()),
+            );
+        }
+
+        gpui::div()
+            .id(props.id.clone())
+            .flex()
+            .flex_row()
+            .items_center()
+            .gap(label_g)
+            .child(
+                gpui::div()
+                    .text_color(label_fg)
+                    .font_family(family.clone())
+                    .text_size(px(12.))
+                    .child(props.label.clone()),
+            )
+            .child(keys_row)
+    }
+}
+
+// End of shortcut-hint impl.

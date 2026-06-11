@@ -5,7 +5,10 @@ use gpui::{App, Div, Hsla, ParentElement, Pixels, Styled, div, px};
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
-use crate::style::{BRUTAL_BORDER, BRUTAL_RADIUS, BRUTAL_SMALL_BORDER_WIDTH, brutal_border_color};
+use crate::style::{
+    BRUTAL_BORDER, BRUTAL_BORDER_WIDTH, BRUTAL_RADIUS, BRUTAL_SMALL_BORDER_WIDTH,
+    brutal_border_color,
+};
 
 // =====================================================================
 // Tooltip
@@ -137,10 +140,16 @@ impl AvatarRenderer for BrutalAvatarRenderer {
         let bg = self.default_bg(&state, theme);
         let r = self.border_radius(&state, theme);
         let size = props.size.unwrap_or(px(40.0));
-        let content = if let Some(initials) = &props.initials {
-            div().child(initials.clone())
-        } else if let Some(name) = &props.name {
-            div().child(name.to_string())
+        // Initials font sized at ~40% of avatar height so 2-letter
+        // initials always fit inside the box.
+        let font_size = size * 0.4;
+        let label_text: Option<String> = if let Some(initials) = &props.initials {
+            Some(initials.clone())
+        } else {
+            props.name.as_ref().map(|n| initials_from_name(n.as_ref()))
+        };
+        let content = if let Some(text) = label_text {
+            div().text_size(font_size).child(text)
         } else {
             div()
         };
@@ -171,6 +180,53 @@ impl AvatarRenderer for BrutalAvatarRenderer {
         }
         el
     }
+}
+
+/// Extract up to 2 uppercase initials from a person's name. For
+/// Latin / Cyrillic / Greek alphabets, takes the first letter of
+/// the first and last whitespace-separated tokens (`"Jane Doe"` →
+/// `"JD"`). For CJK names returns only the first character
+/// (`"张三"` → `"张"`).
+fn initials_from_name(name: &str) -> String {
+    let trimmed = name.trim();
+    if trimmed.is_empty() {
+        return String::new();
+    }
+    if let Some(first) = trimmed.chars().next() {
+        if is_cjk_char(first) {
+            return first.to_string();
+        }
+    }
+    let parts: Vec<&str> = trimmed.split_whitespace().collect();
+    if parts.is_empty() {
+        return String::new();
+    }
+    let mut out = String::new();
+    if let Some(first) = parts.first().and_then(|w| w.chars().next()) {
+        for c in first.to_uppercase() {
+            out.push(c);
+        }
+    }
+    if parts.len() > 1 {
+        if let Some(last) = parts.last().and_then(|w| w.chars().next()) {
+            for c in last.to_uppercase() {
+                out.push(c);
+            }
+        }
+    }
+    out
+}
+
+fn is_cjk_char(c: char) -> bool {
+    matches!(
+        c as u32,
+        0x3040..=0x309F
+        | 0x30A0..=0x30FF
+        | 0x3400..=0x4DBF
+        | 0x4E00..=0x9FFF
+        | 0xAC00..=0xD7AF
+        | 0xF900..=0xFAFF
+    )
 }
 
 // =====================================================================
@@ -205,12 +261,16 @@ impl BrutalPanelRenderer {
     pub fn shadow_alpha(&self, _: &PanelRenderState, _: &Theme) -> f32 {
         1.0
     }
+
+    pub fn title_color(&self, _: &PanelRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("content.primary").unwrap_or(BRUTAL_BORDER)
+    }
 }
 
 impl PanelRenderer for BrutalPanelRenderer {
     fn compose(
         &self,
-        _props: &yororen_ui_core::headless::panel::PanelProps,
+        props: &yororen_ui_core::headless::panel::PanelProps,
         cx: &App,
     ) -> Div {
         use yororen_ui_core::theme::ActiveTheme;
@@ -224,7 +284,24 @@ impl PanelRenderer for BrutalPanelRenderer {
         let border = self.border(&state, theme);
         let pad = self.padding(&state, theme);
         let r = self.border_radius(&state, theme);
-        div().bg(bg).border_color(border).p(pad.top).rounded(r)
+        let title_fg = self.title_color(&state, theme);
+        let mut el = div()
+            .flex()
+            .flex_col()
+            .bg(bg)
+            .border(px(BRUTAL_BORDER_WIDTH))
+            .border_color(border)
+            .p(pad.top)
+            .rounded(r);
+        if let Some(title) = &props.title {
+            el = el.child(
+                div()
+                    .text_color(title_fg)
+                    .pb(px(6.))
+                    .child(title.clone()),
+            );
+        }
+        el
     }
 }
 
@@ -275,8 +352,58 @@ impl CardRenderer for BrutalCardRenderer {
         let border = self.border(&state, theme);
         let pad = self.padding(&state, theme);
         let r = self.border_radius(&state, theme);
-        div().bg(bg).border_color(border).p(pad.top).rounded(r)
+        div()
+            .flex()
+            .flex_col()
+            .gap(px(8.))
+            .bg(bg)
+            .border(px(BRUTAL_BORDER_WIDTH))
+            .border_color(border)
+            .p(pad.top)
+            .rounded(r)
     }
 }
 
 // End of card impl.
+
+// =====================================================================
+// Image
+// =====================================================================
+
+pub use yororen_ui_core::renderer::image::{ImageRenderState, ImageRenderer};
+
+use gpui::{InteractiveElement, Stateful};
+use std::sync::Arc;
+use yororen_ui_core::headless::image::{ImageProps, ImageSource};
+
+pub struct BrutalImageRenderer;
+
+// Inherent helpers — *not* part of the trait surface.
+impl BrutalImageRenderer {
+    pub fn border(&self, _state: &ImageRenderState, theme: &Theme) -> Hsla {
+        brutal_border_color(theme)
+    }
+}
+
+impl ImageRenderer for BrutalImageRenderer {
+    fn compose(&self, props: &ImageProps, cx: &App) -> Stateful<Div> {
+        let theme = cx.theme();
+        let state = ImageRenderState {};
+        let bd = self.border(&state, theme);
+        let img = match &props.source {
+            ImageSource::Resource(path) => gpui::img(path.to_string()),
+            ImageSource::Handle(handle) => {
+                gpui::img(gpui::ImageSource::Image(Arc::new(handle.clone())))
+            }
+        };
+        gpui::div()
+            .id(props.id.clone())
+            .border(px(BRUTAL_BORDER_WIDTH))
+            .border_color(bd)
+            .rounded(px(BRUTAL_RADIUS))
+            .overflow_hidden()
+            .child(img.size_full())
+    }
+}
+
+// End of image impl.

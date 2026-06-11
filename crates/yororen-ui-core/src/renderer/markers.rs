@@ -68,6 +68,9 @@ marker!(
     KeybindingInput,
     SplitButton,
     EmptyState,
+    Image,
+    KeybindingDisplay,
+    ShortcutHint,
 );
 
 #[cfg(test)]

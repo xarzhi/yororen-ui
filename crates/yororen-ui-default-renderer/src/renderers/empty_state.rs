@@ -2,9 +2,10 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, Hsla, ParentElement, Pixels, Styled, div};
+use gpui::{App, Div, Hsla, IntoElement, ParentElement, Pixels, SharedString, Styled, div, svg};
 
 use yororen_ui_core::headless::empty_state::EmptyStateProps;
+use yororen_ui_core::headless::icon::IconSource;
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
 
@@ -55,7 +56,14 @@ impl EmptyStateRenderer for TokenEmptyStateRenderer {
             .p(pad.top)
             .gap(g);
         if let Some(icon) = &props.icon {
-            el = el.child(div().text_color(ic).size(is).child(icon.clone()));
+            // Resolve the icon source the same way `IconProps::render`
+            // does: builtin names map to `icons/<name>.svg`; resource
+            // paths pass through to the application's `AssetSource`.
+            let path: SharedString = match icon {
+                IconSource::Builtin(name) => format!("icons/{name}.svg").into(),
+                IconSource::Resource(p) => p.clone(),
+            };
+            el = el.child(svg().path(path).size(is).text_color(ic).into_any_element());
         }
         if let Some(title) = &props.title {
             el = el.child(div().text_color(tc).child(title.clone()));

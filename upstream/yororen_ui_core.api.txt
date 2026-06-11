@@ -1303,13 +1303,13 @@ pub type yororen_ui_core::headless::dropdown_menu::DropdownSelectCallback = allo
 pub mod yororen_ui_core::headless::empty_state
 pub struct yororen_ui_core::headless::empty_state::EmptyStateProps
 pub yororen_ui_core::headless::empty_state::EmptyStateProps::description: core::option::Option<alloc::string::String>
-pub yororen_ui_core::headless::empty_state::EmptyStateProps::icon: core::option::Option<gpui::shared_string::SharedString>
+pub yororen_ui_core::headless::empty_state::EmptyStateProps::icon: core::option::Option<yororen_ui_core::headless::icon::IconSource>
 pub yororen_ui_core::headless::empty_state::EmptyStateProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::empty_state::EmptyStateProps::title: core::option::Option<alloc::string::String>
 impl yororen_ui_core::headless::empty_state::EmptyStateProps
 pub fn yororen_ui_core::headless::empty_state::EmptyStateProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::empty_state::EmptyStateProps::description(self, impl core::convert::Into<alloc::string::String>) -> Self
-pub fn yororen_ui_core::headless::empty_state::EmptyStateProps::icon(self, impl core::convert::Into<gpui::shared_string::SharedString>) -> Self
+pub fn yororen_ui_core::headless::empty_state::EmptyStateProps::icon(self, impl core::convert::Into<yororen_ui_core::headless::icon::IconSource>) -> Self
 pub fn yororen_ui_core::headless::empty_state::EmptyStateProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::empty_state::EmptyStateProps::title(self, impl core::convert::Into<alloc::string::String>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::empty_state::EmptyStateProps
@@ -1567,6 +1567,7 @@ pub yororen_ui_core::headless::image::ImageProps::source: yororen_ui_core::headl
 impl yororen_ui_core::headless::image::ImageProps
 pub fn yororen_ui_core::headless::image::ImageProps::alt(self, impl core::convert::Into<gpui::shared_string::SharedString>) -> Self
 pub fn yororen_ui_core::headless::image::ImageProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::image::ImageProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::clone::Clone for yororen_ui_core::headless::image::ImageProps
 pub fn yororen_ui_core::headless::image::ImageProps::clone(&self) -> yororen_ui_core::headless::image::ImageProps
 impl core::fmt::Debug for yororen_ui_core::headless::image::ImageProps
@@ -1585,6 +1586,7 @@ pub yororen_ui_core::headless::keybinding_display::KeybindingDisplayProps::id: g
 pub yororen_ui_core::headless::keybinding_display::KeybindingDisplayProps::keys: alloc::vec::Vec<alloc::string::String>
 impl yororen_ui_core::headless::keybinding_display::KeybindingDisplayProps
 pub fn yororen_ui_core::headless::keybinding_display::KeybindingDisplayProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::keybinding_display::KeybindingDisplayProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::clone::Clone for yororen_ui_core::headless::keybinding_display::KeybindingDisplayProps
 pub fn yororen_ui_core::headless::keybinding_display::KeybindingDisplayProps::clone(&self) -> yororen_ui_core::headless::keybinding_display::KeybindingDisplayProps
 impl core::fmt::Debug for yororen_ui_core::headless::keybinding_display::KeybindingDisplayProps
@@ -2100,6 +2102,46 @@ impl core::marker::Unpin for yororen_ui_core::renderer::IconButton
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::IconButton
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::IconButton
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::IconButton
+pub struct yororen_ui_core::headless::markers::Image
+impl core::clone::Clone for yororen_ui_core::renderer::Image
+pub fn yororen_ui_core::renderer::Image::clone(&self) -> yororen_ui_core::renderer::Image
+impl core::cmp::Eq for yororen_ui_core::renderer::Image
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Image
+pub fn yororen_ui_core::renderer::Image::eq(&self, &yororen_ui_core::renderer::Image) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Image
+pub fn yororen_ui_core::renderer::Image::default() -> yororen_ui_core::renderer::Image
+impl core::fmt::Debug for yororen_ui_core::renderer::Image
+pub fn yororen_ui_core::renderer::Image::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Image
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Image
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Image
+impl core::marker::Freeze for yororen_ui_core::renderer::Image
+impl core::marker::Send for yororen_ui_core::renderer::Image
+impl core::marker::Sync for yororen_ui_core::renderer::Image
+impl core::marker::Unpin for yororen_ui_core::renderer::Image
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Image
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Image
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Image
+pub struct yororen_ui_core::headless::markers::KeybindingDisplay
+impl core::clone::Clone for yororen_ui_core::renderer::KeybindingDisplay
+pub fn yororen_ui_core::renderer::KeybindingDisplay::clone(&self) -> yororen_ui_core::renderer::KeybindingDisplay
+impl core::cmp::Eq for yororen_ui_core::renderer::KeybindingDisplay
+impl core::cmp::PartialEq for yororen_ui_core::renderer::KeybindingDisplay
+pub fn yororen_ui_core::renderer::KeybindingDisplay::eq(&self, &yororen_ui_core::renderer::KeybindingDisplay) -> bool
+impl core::default::Default for yororen_ui_core::renderer::KeybindingDisplay
+pub fn yororen_ui_core::renderer::KeybindingDisplay::default() -> yororen_ui_core::renderer::KeybindingDisplay
+impl core::fmt::Debug for yororen_ui_core::renderer::KeybindingDisplay
+pub fn yororen_ui_core::renderer::KeybindingDisplay::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::KeybindingDisplay
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::Freeze for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::Send for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::Sync for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::Unpin for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::KeybindingDisplay
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::KeybindingDisplay
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::KeybindingDisplay
 pub struct yororen_ui_core::headless::markers::KeybindingInput
 impl core::clone::Clone for yororen_ui_core::renderer::KeybindingInput
 pub fn yororen_ui_core::renderer::KeybindingInput::clone(&self) -> yororen_ui_core::renderer::KeybindingInput
@@ -2360,6 +2402,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Select
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Select
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Select
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Select
+pub struct yororen_ui_core::headless::markers::ShortcutHint
+impl core::clone::Clone for yororen_ui_core::renderer::ShortcutHint
+pub fn yororen_ui_core::renderer::ShortcutHint::clone(&self) -> yororen_ui_core::renderer::ShortcutHint
+impl core::cmp::Eq for yororen_ui_core::renderer::ShortcutHint
+impl core::cmp::PartialEq for yororen_ui_core::renderer::ShortcutHint
+pub fn yororen_ui_core::renderer::ShortcutHint::eq(&self, &yororen_ui_core::renderer::ShortcutHint) -> bool
+impl core::default::Default for yororen_ui_core::renderer::ShortcutHint
+pub fn yororen_ui_core::renderer::ShortcutHint::default() -> yororen_ui_core::renderer::ShortcutHint
+impl core::fmt::Debug for yororen_ui_core::renderer::ShortcutHint
+pub fn yororen_ui_core::renderer::ShortcutHint::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::ShortcutHint
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::Freeze for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::Send for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::Sync for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::Unpin for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::ShortcutHint
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::ShortcutHint
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::ShortcutHint
 pub struct yororen_ui_core::headless::markers::Skeleton
 impl core::clone::Clone for yororen_ui_core::renderer::Skeleton
 pub fn yororen_ui_core::renderer::Skeleton::clone(&self) -> yororen_ui_core::renderer::Skeleton
@@ -3094,6 +3156,7 @@ pub yororen_ui_core::headless::shortcut_hint::ShortcutHintProps::keys: alloc::ve
 pub yororen_ui_core::headless::shortcut_hint::ShortcutHintProps::label: gpui::shared_string::SharedString
 impl yororen_ui_core::headless::shortcut_hint::ShortcutHintProps
 pub fn yororen_ui_core::headless::shortcut_hint::ShortcutHintProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::shortcut_hint::ShortcutHintProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::clone::Clone for yororen_ui_core::headless::shortcut_hint::ShortcutHintProps
 pub fn yororen_ui_core::headless::shortcut_hint::ShortcutHintProps::clone(&self) -> yororen_ui_core::headless::shortcut_hint::ShortcutHintProps
 impl core::fmt::Debug for yororen_ui_core::headless::shortcut_hint::ShortcutHintProps
@@ -5854,6 +5917,42 @@ impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::ico
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::icon_button::IconButtonRenderState
 pub trait yororen_ui_core::renderer::icon_button::IconButtonRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_core::renderer::icon_button::IconButtonRenderer::compose(&self, &yororen_ui_core::headless::icon_button::IconButtonProps, &gpui::window::FocusHandle, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub mod yororen_ui_core::renderer::image
+pub struct yororen_ui_core::renderer::image::ImageRenderState
+impl core::clone::Clone for yororen_ui_core::renderer::image::ImageRenderState
+pub fn yororen_ui_core::renderer::image::ImageRenderState::clone(&self) -> yororen_ui_core::renderer::image::ImageRenderState
+impl core::default::Default for yororen_ui_core::renderer::image::ImageRenderState
+pub fn yororen_ui_core::renderer::image::ImageRenderState::default() -> yororen_ui_core::renderer::image::ImageRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::image::ImageRenderState
+pub fn yororen_ui_core::renderer::image::ImageRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::image::ImageRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::image::ImageRenderState
+impl core::marker::Send for yororen_ui_core::renderer::image::ImageRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::image::ImageRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::image::ImageRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::image::ImageRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::image::ImageRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::image::ImageRenderState
+pub trait yororen_ui_core::renderer::image::ImageRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::image::ImageRenderer::compose(&self, &yororen_ui_core::headless::image::ImageProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub mod yororen_ui_core::renderer::keybinding_display
+pub struct yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+impl core::clone::Clone for yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+pub fn yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState::clone(&self) -> yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+impl core::default::Default for yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+pub fn yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState::default() -> yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+pub fn yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+impl core::marker::Send for yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState
+pub trait yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderer::compose(&self, &yororen_ui_core::headless::keybinding_display::KeybindingDisplayProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub mod yororen_ui_core::renderer::keybinding_input
 pub struct yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState
 pub yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState::capturing: bool
@@ -6245,6 +6344,46 @@ impl core::marker::Unpin for yororen_ui_core::renderer::IconButton
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::IconButton
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::IconButton
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::IconButton
+pub struct yororen_ui_core::renderer::markers::Image
+impl core::clone::Clone for yororen_ui_core::renderer::Image
+pub fn yororen_ui_core::renderer::Image::clone(&self) -> yororen_ui_core::renderer::Image
+impl core::cmp::Eq for yororen_ui_core::renderer::Image
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Image
+pub fn yororen_ui_core::renderer::Image::eq(&self, &yororen_ui_core::renderer::Image) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Image
+pub fn yororen_ui_core::renderer::Image::default() -> yororen_ui_core::renderer::Image
+impl core::fmt::Debug for yororen_ui_core::renderer::Image
+pub fn yororen_ui_core::renderer::Image::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Image
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Image
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Image
+impl core::marker::Freeze for yororen_ui_core::renderer::Image
+impl core::marker::Send for yororen_ui_core::renderer::Image
+impl core::marker::Sync for yororen_ui_core::renderer::Image
+impl core::marker::Unpin for yororen_ui_core::renderer::Image
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Image
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Image
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Image
+pub struct yororen_ui_core::renderer::markers::KeybindingDisplay
+impl core::clone::Clone for yororen_ui_core::renderer::KeybindingDisplay
+pub fn yororen_ui_core::renderer::KeybindingDisplay::clone(&self) -> yororen_ui_core::renderer::KeybindingDisplay
+impl core::cmp::Eq for yororen_ui_core::renderer::KeybindingDisplay
+impl core::cmp::PartialEq for yororen_ui_core::renderer::KeybindingDisplay
+pub fn yororen_ui_core::renderer::KeybindingDisplay::eq(&self, &yororen_ui_core::renderer::KeybindingDisplay) -> bool
+impl core::default::Default for yororen_ui_core::renderer::KeybindingDisplay
+pub fn yororen_ui_core::renderer::KeybindingDisplay::default() -> yororen_ui_core::renderer::KeybindingDisplay
+impl core::fmt::Debug for yororen_ui_core::renderer::KeybindingDisplay
+pub fn yororen_ui_core::renderer::KeybindingDisplay::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::KeybindingDisplay
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::Freeze for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::Send for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::Sync for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::Unpin for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::KeybindingDisplay
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::KeybindingDisplay
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::KeybindingDisplay
 pub struct yororen_ui_core::renderer::markers::KeybindingInput
 impl core::clone::Clone for yororen_ui_core::renderer::KeybindingInput
 pub fn yororen_ui_core::renderer::KeybindingInput::clone(&self) -> yororen_ui_core::renderer::KeybindingInput
@@ -6505,6 +6644,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::Select
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Select
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Select
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Select
+pub struct yororen_ui_core::renderer::markers::ShortcutHint
+impl core::clone::Clone for yororen_ui_core::renderer::ShortcutHint
+pub fn yororen_ui_core::renderer::ShortcutHint::clone(&self) -> yororen_ui_core::renderer::ShortcutHint
+impl core::cmp::Eq for yororen_ui_core::renderer::ShortcutHint
+impl core::cmp::PartialEq for yororen_ui_core::renderer::ShortcutHint
+pub fn yororen_ui_core::renderer::ShortcutHint::eq(&self, &yororen_ui_core::renderer::ShortcutHint) -> bool
+impl core::default::Default for yororen_ui_core::renderer::ShortcutHint
+pub fn yororen_ui_core::renderer::ShortcutHint::default() -> yororen_ui_core::renderer::ShortcutHint
+impl core::fmt::Debug for yororen_ui_core::renderer::ShortcutHint
+pub fn yororen_ui_core::renderer::ShortcutHint::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::ShortcutHint
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::Freeze for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::Send for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::Sync for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::Unpin for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::ShortcutHint
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::ShortcutHint
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::ShortcutHint
 pub struct yororen_ui_core::renderer::markers::Skeleton
 impl core::clone::Clone for yororen_ui_core::renderer::Skeleton
 pub fn yororen_ui_core::renderer::Skeleton::clone(&self) -> yororen_ui_core::renderer::Skeleton
@@ -6926,6 +7085,24 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::sele
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::select::SelectRenderState
 pub trait yororen_ui_core::renderer::select::SelectRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_core::renderer::select::SelectRenderer::compose(&self, &yororen_ui_core::headless::select::SelectProps, &gpui::app::App) -> gpui::elements::div::Div
+pub mod yororen_ui_core::renderer::shortcut_hint
+pub struct yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+impl core::clone::Clone for yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+pub fn yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState::clone(&self) -> yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+impl core::default::Default for yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+pub fn yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState::default() -> yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+pub fn yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+impl core::marker::Send for yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderState
+pub trait yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::shortcut_hint::ShortcutHintRenderer::compose(&self, &yororen_ui_core::headless::shortcut_hint::ShortcutHintProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub mod yororen_ui_core::renderer::skeleton
 pub struct yororen_ui_core::renderer::skeleton::SkeletonRenderState
 pub yororen_ui_core::renderer::skeleton::SkeletonRenderState::block: bool
@@ -7887,6 +8064,46 @@ impl core::marker::Unpin for yororen_ui_core::renderer::IconButton
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::IconButton
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::IconButton
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::IconButton
+pub struct yororen_ui_core::renderer::Image
+impl core::clone::Clone for yororen_ui_core::renderer::Image
+pub fn yororen_ui_core::renderer::Image::clone(&self) -> yororen_ui_core::renderer::Image
+impl core::cmp::Eq for yororen_ui_core::renderer::Image
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Image
+pub fn yororen_ui_core::renderer::Image::eq(&self, &yororen_ui_core::renderer::Image) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Image
+pub fn yororen_ui_core::renderer::Image::default() -> yororen_ui_core::renderer::Image
+impl core::fmt::Debug for yororen_ui_core::renderer::Image
+pub fn yororen_ui_core::renderer::Image::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Image
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Image
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Image
+impl core::marker::Freeze for yororen_ui_core::renderer::Image
+impl core::marker::Send for yororen_ui_core::renderer::Image
+impl core::marker::Sync for yororen_ui_core::renderer::Image
+impl core::marker::Unpin for yororen_ui_core::renderer::Image
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Image
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Image
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Image
+pub struct yororen_ui_core::renderer::KeybindingDisplay
+impl core::clone::Clone for yororen_ui_core::renderer::KeybindingDisplay
+pub fn yororen_ui_core::renderer::KeybindingDisplay::clone(&self) -> yororen_ui_core::renderer::KeybindingDisplay
+impl core::cmp::Eq for yororen_ui_core::renderer::KeybindingDisplay
+impl core::cmp::PartialEq for yororen_ui_core::renderer::KeybindingDisplay
+pub fn yororen_ui_core::renderer::KeybindingDisplay::eq(&self, &yororen_ui_core::renderer::KeybindingDisplay) -> bool
+impl core::default::Default for yororen_ui_core::renderer::KeybindingDisplay
+pub fn yororen_ui_core::renderer::KeybindingDisplay::default() -> yororen_ui_core::renderer::KeybindingDisplay
+impl core::fmt::Debug for yororen_ui_core::renderer::KeybindingDisplay
+pub fn yororen_ui_core::renderer::KeybindingDisplay::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::KeybindingDisplay
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::Freeze for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::Send for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::Sync for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::Unpin for yororen_ui_core::renderer::KeybindingDisplay
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::KeybindingDisplay
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::KeybindingDisplay
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::KeybindingDisplay
 pub struct yororen_ui_core::renderer::KeybindingInput
 impl core::clone::Clone for yororen_ui_core::renderer::KeybindingInput
 pub fn yororen_ui_core::renderer::KeybindingInput::clone(&self) -> yororen_ui_core::renderer::KeybindingInput
@@ -8185,6 +8402,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::spec::ShadowSpec
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::spec::ShadowSpec
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::spec::ShadowSpec
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::spec::ShadowSpec
+pub struct yororen_ui_core::renderer::ShortcutHint
+impl core::clone::Clone for yororen_ui_core::renderer::ShortcutHint
+pub fn yororen_ui_core::renderer::ShortcutHint::clone(&self) -> yororen_ui_core::renderer::ShortcutHint
+impl core::cmp::Eq for yororen_ui_core::renderer::ShortcutHint
+impl core::cmp::PartialEq for yororen_ui_core::renderer::ShortcutHint
+pub fn yororen_ui_core::renderer::ShortcutHint::eq(&self, &yororen_ui_core::renderer::ShortcutHint) -> bool
+impl core::default::Default for yororen_ui_core::renderer::ShortcutHint
+pub fn yororen_ui_core::renderer::ShortcutHint::default() -> yororen_ui_core::renderer::ShortcutHint
+impl core::fmt::Debug for yororen_ui_core::renderer::ShortcutHint
+pub fn yororen_ui_core::renderer::ShortcutHint::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::ShortcutHint
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::Freeze for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::Send for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::Sync for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::Unpin for yororen_ui_core::renderer::ShortcutHint
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::ShortcutHint
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::ShortcutHint
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::ShortcutHint
 pub struct yororen_ui_core::renderer::Skeleton
 impl core::clone::Clone for yororen_ui_core::renderer::Skeleton
 pub fn yororen_ui_core::renderer::Skeleton::clone(&self) -> yororen_ui_core::renderer::Skeleton
@@ -8492,6 +8729,8 @@ impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Fo
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Form
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Heading
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::IconButton
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Image
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::KeybindingDisplay
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::KeybindingInput
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Label
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ListItem
@@ -8505,6 +8744,7 @@ impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Pr
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Radio
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::SearchInput
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Select
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ShortcutHint
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Skeleton
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::SplitButton
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Switch
