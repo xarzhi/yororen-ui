@@ -190,11 +190,12 @@ impl NumberInputRenderer for TokenNumberInputRenderer {
             .child(div().flex_1().min_w(px(0.)).child(inner))
             .child(
                 div()
+                    .id("number-input-decrement")
                     .size(stepper_size)
                     .flex()
                     .items_center()
                     .justify_center()
-                    .child("−")
+                    .cursor(CursorStyle::PointingHand)
                     .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
                         let next = value - step;
                         let clamped = match min {
@@ -215,15 +216,17 @@ impl NumberInputRenderer for TokenNumberInputRenderer {
                         if let Some(cb) = on_dec_clone.as_ref() {
                             cb(clamped, window, cx);
                         }
-                    }),
+                    })
+                    .child("−"),
             )
             .child(
                 div()
+                    .id("number-input-increment")
                     .size(stepper_size)
                     .flex()
                     .items_center()
                     .justify_center()
-                    .child("+")
+                    .cursor(CursorStyle::PointingHand)
                     .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
                         let next = value + step;
                         let clamped = match max {
@@ -244,7 +247,8 @@ impl NumberInputRenderer for TokenNumberInputRenderer {
                         if let Some(cb) = on_inc_clone.as_ref() {
                             cb(clamped, window, cx);
                         }
-                    }),
+                    })
+                    .child("+"),
             )
             .into_any_element()
     }

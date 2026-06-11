@@ -129,7 +129,6 @@ impl FilePathInputRenderer for TokenFilePathInputRenderer {
         let hint_color = theme.get_color("content.tertiary").unwrap_or_default();
         let button_fg = self.button_fg(&render_state, &theme);
         let button_bg = self.button_bg(&render_state, &theme);
-        let button_hover_bg = self.button_hover_bg(&render_state, &theme);
         let min_h = self.min_height(&render_state, &theme);
         let padding = self.padding(&render_state, &theme);
         let radius = self.border_radius(&render_state, &theme);
@@ -209,7 +208,7 @@ impl FilePathInputRenderer for TokenFilePathInputRenderer {
                     .items_center()
                     .justify_center()
                     .text_color(button_fg)
-                    .hover(|s| s.bg(button_hover_bg))
+                    .cursor(CursorStyle::PointingHand)
                     .on_mouse_down(MouseButton::Left, move |_ev, _window, cx| {
                         if disabled {
                             return;

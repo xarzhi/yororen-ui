@@ -223,6 +223,7 @@ impl SearchInputRenderer for TokenSearchInputRenderer {
                         .items_center()
                         .justify_center()
                         .text_color(icon_color)
+                        .cursor(CursorStyle::PointingHand)
                         .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
                             state_for_clear.update(cx, |s, cx| {
                                 s.value.clear();

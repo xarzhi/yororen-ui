@@ -160,7 +160,7 @@ pub fn render(
         .child(input_cell("password_input", pw_input_el, &format!("value: {:?}", pw_value), cx))
         .child(input_cell("number_input", num_input_el, &format!("value: {}", num_value), cx))
         .child(input_cell("search_input", search_input_el, &format!("value: {:?}", search_value), cx))
-        .child(input_cell("file_path_input (click 📁 to open dialog)", fp_input_el, &format!("value: {:?}", fp_value), cx))
+        .child(input_cell("file_path_input (click right icon to open dialog)", fp_input_el, &format!("value: {:?}", fp_value), cx))
         .child(input_cell("keybinding_input (click to start capture)", kb_input_el, &format!("value: {:?}  mode: {:?}", kb_value, kb_mode), cx))
         .child(input_cell("text_area (multi-line)", ta_input_el, &format!("value: {:?}", ta_value), cx))
         .child(input_cell("select (composite)", select_el, &format!("value: {}", app.select_demo_value), cx))
