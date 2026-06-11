@@ -1,10 +1,11 @@
 //! Headless `tree_item` — a single row in a `tree`. Pure data.
 
 use std::sync::Arc;
+use std::time::Instant;
 
 use gpui::{
     App, ClickEvent, Div, ElementId, FocusHandle, InteractiveElement, SharedString, Stateful,
-    StatefulInteractiveElement,
+    Window,
 };
 
 pub type ClickCallback = Arc<dyn Fn(&ClickEvent, &mut gpui::Window, &mut App) + Send + Sync>;
@@ -30,6 +31,12 @@ impl From<String> for TreeNodeId {
     }
 }
 
+/// Maximum delay between two clicks to be considered a
+/// double-click. Mirrors the platform's `GetDoubleClickTime`
+/// on Windows / `NSWindow.doubleClickInterval` on macOS; 300ms
+/// is the typical value used in editor UIs.
+pub const DOUBLE_CLICK_THRESHOLD: std::time::Duration = std::time::Duration::from_millis(300);
+
 #[derive(Clone)]
 pub struct TreeItemProps {
     pub id: ElementId,
@@ -41,8 +48,18 @@ pub struct TreeItemProps {
     pub selected: bool,
     pub disabled: bool,
     pub focus_handle: FocusHandle,
+    /// Fired on a single click on the row body (not the chevron).
+    /// A double-click fires `on_double_click` instead and
+    /// suppresses `on_click`.
     pub on_click: Option<ClickCallback>,
+    /// Fired on a single click of the chevron — and on a
+    /// double-click of the row body, so users can collapse /
+    /// expand without aiming at the small chevron target.
     pub on_toggle: Option<ClickCallback>,
+    /// Optional double-click callback. When unset the renderer
+    /// falls back to firing `on_toggle` on double-click (which
+    /// matches v0.2 behaviour: double-click toggles).
+    pub on_double_click: Option<ClickCallback>,
 }
 
 pub fn tree_item(
@@ -63,6 +80,7 @@ pub fn tree_item(
         focus_handle: cx.focus_handle(),
         on_click: None,
         on_toggle: None,
+        on_double_click: None,
     }
 }
 
@@ -101,32 +119,60 @@ impl TreeItemProps {
         self.on_toggle = Some(Arc::new(f));
         self
     }
+    pub fn on_double_click<F>(mut self, f: F) -> Self
+    where
+        F: 'static + Send + Sync + Fn(&ClickEvent, &mut gpui::Window, &mut App),
+    {
+        self.on_double_click = Some(Arc::new(f));
+        self
+    }
     pub fn focus_handle(&self) -> &FocusHandle {
         &self.focus_handle
     }
-    pub fn apply(self, el: Div) -> Stateful<Div> {
-        let mut s = el.id(self.id.clone()).track_focus(&self.focus_handle);
-        if !self.disabled
-            && let Some(f) = self.on_click.clone()
-        {
-            s = s.on_click(move |ev, window, cx| f(ev, window, cx));
-        }
-        s
-    }
-
     /// Render the tree item using the registered
-    /// `TreeItemRenderer`. Returns a `Stateful<Div>` with the
-    /// element id and on_click wired by `apply`. The renderer
-    /// decides bg / padding / indent / chevron.
-    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
-        use crate::renderer::RendererContext;
+    /// `TreeItemRenderer`. The renderer builds the full visual
+    /// (bg / padding / indent / chevron / hover / id / on_click)
+    /// and wires double-click detection using
+    /// `window.use_keyed_state` keyed by the row's `id`. The
+    /// headless layer only adds `track_focus` on top — the
+    /// focus handle is headless state that the renderer has
+    /// no business mutating.
+    pub fn render(self, cx: &mut App, window: &mut Window) -> Stateful<Div> {
         use crate::renderer::tree_item::TreeItemRenderer;
         use crate::renderer::markers::TreeItem as TreeItemMarker;
+        use crate::renderer::RendererContext;
 
-        let r: &Arc<dyn TreeItemRenderer> = cx
+        // Clone the renderer Arc to release the immutable
+        // borrow of `cx` from `renderer_arc` before we call
+        // `compose` (which needs `cx` mutably for `use_keyed_state`).
+        let r: Arc<dyn TreeItemRenderer> = cx
             .renderer_arc::<TreeItemMarker, dyn TreeItemRenderer>()
-            .expect("TreeItemRenderer registered");
-        let div = r.compose(&self, cx);
-        self.apply(div)
+            .expect("TreeItemRenderer registered")
+            .clone();
+        let mut div = r.compose(&self, cx, window);
+        div = div.track_focus(&self.focus_handle);
+        div
+    }
+}
+
+/// Re-export the helper used by the renderer's double-click
+/// tracker so both default and brutalism renderers can use the
+/// same threshold without duplicating the constant.
+pub use DOUBLE_CLICK_THRESHOLD as double_click_threshold;
+
+/// Keyed-state payload used by the renderers to track the last
+/// click on a given row. `None` means "no prior click".
+#[derive(Clone, Default)]
+pub struct LastClick(pub Option<Instant>);
+
+impl LastClick {
+    pub fn within(&self, threshold: std::time::Duration) -> bool {
+        match self.0 {
+            Some(t) => t.elapsed() <= threshold,
+            None => false,
+        }
+    }
+    pub fn stamp_now() -> Self {
+        Self(Some(Instant::now()))
     }
 }

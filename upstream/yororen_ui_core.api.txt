@@ -4707,6 +4707,7 @@ pub yororen_ui_core::headless::tree::TreeData::roots: alloc::vec::Vec<yororen_ui
 impl yororen_ui_core::headless::tree::TreeData
 pub fn yororen_ui_core::headless::tree::TreeData::add(&mut self, core::option::Option<yororen_ui_core::headless::tree_item::TreeNodeId>, yororen_ui_core::headless::tree_item::TreeNodeId, impl core::convert::Into<alloc::string::String>)
 pub fn yororen_ui_core::headless::tree::TreeData::children_of(&self, &yororen_ui_core::headless::tree_item::TreeNodeId) -> &[yororen_ui_core::headless::tree_item::TreeNodeId]
+pub fn yororen_ui_core::headless::tree::TreeData::flatten(&self, &alloc::collections::btree::set::BTreeSet<yororen_ui_core::headless::tree_item::TreeNodeId>) -> alloc::vec::Vec<(yororen_ui_core::headless::tree_item::TreeNodeId, usize)>
 pub fn yororen_ui_core::headless::tree::TreeData::is_disabled(&self, &yororen_ui_core::headless::tree_item::TreeNodeId) -> bool
 pub fn yororen_ui_core::headless::tree::TreeData::label_of(&self, &yororen_ui_core::headless::tree_item::TreeNodeId) -> core::option::Option<&str>
 pub fn yororen_ui_core::headless::tree::TreeData::new() -> Self
@@ -4774,6 +4775,21 @@ impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::tree_it
 pub fn yororen_ui_core::headless::tree::node_id(impl core::convert::Into<gpui::shared_string::SharedString>) -> yororen_ui_core::headless::tree_item::TreeNodeId
 pub fn yororen_ui_core::headless::tree::tree(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::tree::TreeProps
 pub mod yororen_ui_core::headless::tree_item
+pub struct yororen_ui_core::headless::tree_item::LastClick(pub core::option::Option<std::time::Instant>)
+impl yororen_ui_core::headless::tree_item::LastClick
+pub fn yororen_ui_core::headless::tree_item::LastClick::stamp_now() -> Self
+pub fn yororen_ui_core::headless::tree_item::LastClick::within(&self, core::time::Duration) -> bool
+impl core::clone::Clone for yororen_ui_core::headless::tree_item::LastClick
+pub fn yororen_ui_core::headless::tree_item::LastClick::clone(&self) -> yororen_ui_core::headless::tree_item::LastClick
+impl core::default::Default for yororen_ui_core::headless::tree_item::LastClick
+pub fn yororen_ui_core::headless::tree_item::LastClick::default() -> yororen_ui_core::headless::tree_item::LastClick
+impl core::marker::Freeze for yororen_ui_core::headless::tree_item::LastClick
+impl core::marker::Send for yororen_ui_core::headless::tree_item::LastClick
+impl core::marker::Sync for yororen_ui_core::headless::tree_item::LastClick
+impl core::marker::Unpin for yororen_ui_core::headless::tree_item::LastClick
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::tree_item::LastClick
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::tree_item::LastClick
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::tree_item::LastClick
 pub struct yororen_ui_core::headless::tree_item::TreeItemProps
 pub yororen_ui_core::headless::tree_item::TreeItemProps::depth: usize
 pub yororen_ui_core::headless::tree_item::TreeItemProps::disabled: bool
@@ -4784,18 +4800,19 @@ pub yororen_ui_core::headless::tree_item::TreeItemProps::id: gpui::window::Eleme
 pub yororen_ui_core::headless::tree_item::TreeItemProps::label: alloc::string::String
 pub yororen_ui_core::headless::tree_item::TreeItemProps::node_id: yororen_ui_core::headless::tree_item::TreeNodeId
 pub yororen_ui_core::headless::tree_item::TreeItemProps::on_click: core::option::Option<yororen_ui_core::headless::tree_item::ClickCallback>
+pub yororen_ui_core::headless::tree_item::TreeItemProps::on_double_click: core::option::Option<yororen_ui_core::headless::tree_item::ClickCallback>
 pub yororen_ui_core::headless::tree_item::TreeItemProps::on_toggle: core::option::Option<yororen_ui_core::headless::tree_item::ClickCallback>
 pub yororen_ui_core::headless::tree_item::TreeItemProps::selected: bool
 impl yororen_ui_core::headless::tree_item::TreeItemProps
-pub fn yororen_ui_core::headless::tree_item::TreeItemProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::tree_item::TreeItemProps::depth(self, usize) -> Self
 pub fn yororen_ui_core::headless::tree_item::TreeItemProps::disabled(self, bool) -> Self
 pub fn yororen_ui_core::headless::tree_item::TreeItemProps::expanded(self, bool) -> Self
 pub fn yororen_ui_core::headless::tree_item::TreeItemProps::focus_handle(&self) -> &gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::tree_item::TreeItemProps::has_children(self, bool) -> Self
 pub fn yororen_ui_core::headless::tree_item::TreeItemProps::on_click<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App)
+pub fn yororen_ui_core::headless::tree_item::TreeItemProps::on_double_click<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::tree_item::TreeItemProps::on_toggle<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App)
-pub fn yororen_ui_core::headless::tree_item::TreeItemProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::tree_item::TreeItemProps::render(self, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::tree_item::TreeItemProps::selected(self, bool) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::tree_item::TreeItemProps
 pub fn yororen_ui_core::headless::tree_item::TreeItemProps::clone(&self) -> yororen_ui_core::headless::tree_item::TreeItemProps
@@ -4834,6 +4851,8 @@ impl core::marker::Unpin for yororen_ui_core::headless::tree_item::TreeNodeId
 impl core::marker::UnsafeUnpin for yororen_ui_core::headless::tree_item::TreeNodeId
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::tree_item::TreeNodeId
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::tree_item::TreeNodeId
+pub const yororen_ui_core::headless::tree_item::DOUBLE_CLICK_THRESHOLD: core::time::Duration
+pub const yororen_ui_core::headless::tree_item::double_click_threshold: core::time::Duration
 pub fn yororen_ui_core::headless::tree_item::tree_item(impl core::convert::Into<gpui::window::ElementId>, impl core::convert::Into<yororen_ui_core::headless::tree_item::TreeNodeId>, impl core::convert::Into<alloc::string::String>, &mut gpui::app::App) -> yororen_ui_core::headless::tree_item::TreeItemProps
 pub type yororen_ui_core::headless::tree_item::ClickCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
 pub mod yororen_ui_core::headless::virtual_list
@@ -8384,7 +8403,7 @@ impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::tree_item::TreeIte
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::tree_item::TreeItemRenderState
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::tree_item::TreeItemRenderState
 pub trait yororen_ui_core::renderer::tree_item::TreeItemRenderer: core::any::Any + core::marker::Send + core::marker::Sync
-pub fn yororen_ui_core::renderer::tree_item::TreeItemRenderer::compose(&self, &yororen_ui_core::headless::tree_item::TreeItemProps, &gpui::app::App) -> gpui::elements::div::Div
+pub fn yororen_ui_core::renderer::tree_item::TreeItemRenderer::compose(&self, &yororen_ui_core::headless::tree_item::TreeItemProps, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub mod yororen_ui_core::renderer::variant
 pub enum yororen_ui_core::renderer::variant::ActionVariantKind
 pub yororen_ui_core::renderer::variant::ActionVariantKind::Danger

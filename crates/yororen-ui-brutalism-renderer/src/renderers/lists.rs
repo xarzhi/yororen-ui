@@ -1,6 +1,6 @@
 //! Brutalist list renderers: `ListItem`, `TreeItem`, `Form`.
 
-use gpui::{App, Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, Pixels, SharedString, StatefulInteractiveElement, Styled, Stateful, prelude::FluentBuilder, px};
+use gpui::{App, Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, Pixels, SharedString, Stateful, StatefulInteractiveElement, Styled, Window, prelude::FluentBuilder, px};
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
 
@@ -138,8 +138,21 @@ impl BrutalTreeItemRenderer {
     }
     pub fn chevron_size(&self, _: &TreeItemRenderState, theme: &Theme) -> Pixels {
         px(theme
-            .get_number("tokens.control.list_item.chevron_size")
-            .unwrap_or(16.0) as f32)
+            .get_number("tokens.control.tree_item.chevron_size")
+            .unwrap_or_else(|| {
+                theme
+                    .get_number("tokens.control.list_item.chevron_size")
+                    .unwrap_or(18.0)
+            }) as f32)
+    }
+    pub fn disabled_fg(&self, _: &TreeItemRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("content.disabled").unwrap_or(BRUTAL_BORDER)
+    }
+    pub fn border_radius(&self, _: &TreeItemRenderState, _: &Theme) -> Pixels {
+        px(BRUTAL_RADIUS)
+    }
+    pub fn gap(&self, _: &TreeItemRenderState, theme: &Theme) -> Pixels {
+        px(theme.get_number("tokens.spacing.gap_1").unwrap_or(4.0) as f32)
     }
 }
 
@@ -147,8 +160,10 @@ impl TreeItemRenderer for BrutalTreeItemRenderer {
     fn compose(
         &self,
         props: &yororen_ui_core::headless::tree_item::TreeItemProps,
-        cx: &App,
-    ) -> Div {
+        cx: &mut App,
+        window: &mut Window,
+    ) -> Stateful<Div> {
+        use yororen_ui_core::headless::tree_item::{DOUBLE_CLICK_THRESHOLD, LastClick};
         use yororen_ui_core::theme::ActiveTheme;
         let theme = cx.theme();
         let state = TreeItemRenderState {
@@ -162,19 +177,25 @@ impl TreeItemRenderer for BrutalTreeItemRenderer {
         } else {
             self.bg(&state, theme)
         };
+        let hover_bg = self.hover_bg(&state, theme);
         let fg = self.fg(&state, theme);
         let pad = self.padding(&state, theme);
         let h = self.min_height(&state, theme);
         let indent = self.indent(&state, theme);
         let chevron_size = self.chevron_size(&state, theme);
-        let gap = px(theme.get_number("tokens.spacing.gap_1").unwrap_or(4.0) as f32);
+        let gap = self.gap(&state, theme);
+        let radius = self.border_radius(&state, theme);
 
         let chevron_slot = if props.has_children {
-            let glyph: SharedString = if props.expanded { "▼".into() } else { "▶".into() };
-            let chevron_id: ElementId =
-                format!("{:?}-chevron", props.id).into();
+            let glyph: SharedString = if props.expanded { "▾".into() } else { "▸".into() };
+            let chevron_id: ElementId = format!("{}-chevron", props.id).into();
             let toggle_cb = props.on_toggle.clone();
             let disabled = props.disabled;
+            let chevron_color = if disabled {
+                self.disabled_fg(&state, theme)
+            } else {
+                fg
+            };
             gpui::div()
                 .id(chevron_id)
                 .w(chevron_size)
@@ -182,8 +203,8 @@ impl TreeItemRenderer for BrutalTreeItemRenderer {
                 .flex()
                 .items_center()
                 .justify_center()
-                .text_color(fg)
-                .when(!disabled, |s: Stateful<Div>| s.cursor_pointer())
+                .text_color(chevron_color)
+                .when(!disabled, |s| s.cursor_pointer())
                 .occlude()
                 .child(glyph)
                 .on_click(move |ev, window, cx| {
@@ -196,21 +217,74 @@ impl TreeItemRenderer for BrutalTreeItemRenderer {
                 })
                 .into_any_element()
         } else {
-            gpui::div().w(chevron_size).h(chevron_size).into_any_element()
+            gpui::div()
+                .w(chevron_size)
+                .h(chevron_size)
+                .flex()
+                .into_any_element()
         };
 
-        gpui::div()
+        let label_color = if props.disabled {
+            self.disabled_fg(&state, theme)
+        } else {
+            fg
+        };
+
+        // Double-click detector — same approach as the default
+        // renderer: stamp `now` on every click; if the prior
+        // stamp is within the threshold, treat as a
+        // double-click and fire `on_double_click` (or
+        // `on_toggle` as a v0.2-compatible fallback).
+        let last_click = window.use_keyed_state(props.id.clone(), cx, |_, _| LastClick::default());
+        let on_click_cb = props.on_click.clone();
+        let on_toggle_cb = props.on_toggle.clone();
+        let on_double_click_cb = props.on_double_click.clone();
+        let disabled = props.disabled;
+
+        let mut row = gpui::div()
+            .id(props.id.clone())
             .flex()
+            .flex_row()
             .items_center()
             .gap(gap)
+            .w_full()
+            .min_h(h)
             .bg(bg)
-            .text_color(fg)
+            .text_color(label_color)
             .pl(indent + pad.left)
             .pr(pad.right)
             .py(pad.top)
-            .min_h(h)
-            .child(chevron_slot)
-            .child(props.label.clone())
+            .rounded(radius);
+
+        if !props.selected && !props.disabled {
+            row = row.hover(move |s| s.bg(hover_bg));
+        }
+        if !props.disabled {
+            row = row.cursor_pointer();
+        }
+        if props.disabled {
+            row = row.opacity(0.5);
+        }
+
+        if !disabled {
+            row = row.on_click(move |ev, window, cx| {
+                let prior = last_click.read(cx).clone();
+                let is_double = prior.within(DOUBLE_CLICK_THRESHOLD);
+                last_click.update(cx, |s, _cx| *s = LastClick::stamp_now());
+
+                if is_double {
+                    if let Some(cb) = on_double_click_cb.as_ref() {
+                        cb(ev, window, cx);
+                    } else if let Some(cb) = on_toggle_cb.as_ref() {
+                        cb(ev, window, cx);
+                    }
+                } else if let Some(cb) = on_click_cb.as_ref() {
+                    cb(ev, window, cx);
+                }
+            });
+        }
+
+        row.child(chevron_slot).child(props.label.clone())
     }
 }
 

@@ -119,7 +119,7 @@
       "toggle_button":   { "min_height": 32, "horizontal_padding": 16, "icon_gap": 8, "radius": 6 },
       "empty_state":     { "icon_size": 40, "title_font_size": 16, "description_font_size": 14, "action_gap": 12, "vertical_padding": 24 },
       "list_item":       { "min_height": 36, "horizontal_padding": 12, "gap": 8, "icon_size": 14, "chevron_size": 14 },
-      "tree_item":       { "min_height": 28, "horizontal_padding": 8, "indent": 16, "chevron_size": 14, "icon_size": 14, "drag_handle_w": 4, "drop_indicator_h": 2 },
+      "tree_item":       { "min_height": 28, "horizontal_padding": 8, "indent": 16, "chevron_size": 18, "icon_size": 14, "drag_handle_w": 4, "drop_indicator_h": 2 },
       "card":            { "padding": 16, "gap": 12, "border_radius": 12 },
       "divider":         { "thickness": 1, "margin_x": 0, "margin_y": 4 },
       "form":            { "field_gap": 12, "label_gap": 4, "helper_gap": 4, "error_gap": 4, "group_gap": 24, "horizontal_field_gap": 16, "horizontal_label_width": 120 },

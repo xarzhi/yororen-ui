@@ -39,6 +39,34 @@ impl TreeData {
     pub fn is_disabled(&self, id: &TreeNodeId) -> bool {
         self.disabled.contains(id)
     }
+    /// Return a depth-first pre-order list of visible nodes.
+    ///
+    /// A node is visible iff every ancestor is in `expanded`.
+    /// The returned `Vec<(TreeNodeId, usize depth)>` is in render
+    /// order — iterate and emit one `tree_item` per entry.
+    pub fn flatten(&self, expanded: &BTreeSet<TreeNodeId>) -> Vec<(TreeNodeId, usize)> {
+        let mut out = Vec::new();
+        for root in &self.roots {
+            self.flatten_inner(root, 0, expanded, &mut out);
+        }
+        out
+    }
+    fn flatten_inner(
+        &self,
+        id: &TreeNodeId,
+        depth: usize,
+        expanded: &BTreeSet<TreeNodeId>,
+        out: &mut Vec<(TreeNodeId, usize)>,
+    ) {
+        out.push((id.clone(), depth));
+        if expanded.contains(id)
+            && let Some(kids) = self.children.get(id)
+        {
+            for child in kids {
+                self.flatten_inner(child, depth + 1, expanded, out);
+            }
+        }
+    }
 }
 
 #[derive(Clone)]

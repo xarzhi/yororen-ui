@@ -4,7 +4,7 @@
 
 use std::collections::BTreeSet;
 
-use gpui::{Context, Div, ParentElement, Styled, Window, div, px};
+use gpui::{Context, Div, ElementId, ParentElement, Styled, Window, div, px};
 
 use yororen_ui::headless::form::form;
 use yororen_ui::headless::form_field::form_field;
@@ -124,36 +124,71 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
     tree_data.add(Some(node_id("root")), node_id("child2"), "Child 2");
     tree_data.add(Some(node_id("child1")), node_id("leaf1"), "Leaf 1");
     tree_data.add(Some(node_id("child1")), node_id("leaf2"), "Leaf 2");
+    let tree_data_for_iter = tree_data.clone();
     let entity_tree = cx.entity().clone();
     let tree_expanded: BTreeSet<_> = app.tree_expanded.clone();
+    let tree_selected = app.tree_selected.clone();
     let mut tree_el = tree("lists-tree", cx)
         .data(tree_data)
         .render(cx)
-        .w(px(220.));
-    for (id, label_text, depth) in [
-        (node_id("root"), "Root", 0usize),
-        (node_id("child1"), "Child 1", 1),
-        (node_id("child2"), "Child 2", 1),
-    ] {
-        let entity_for_row = entity_tree.clone();
-        let id_for_row = id.clone();
+        .w(px(240.));
+    // Use the `TreeData::flatten` helper to walk only the
+    // currently-visible (expanded) nodes, in depth-first
+    // pre-order — mirrors v0.2's `flatten_tree` output.
+    let visible = tree_data_for_iter.flatten(&tree_expanded);
+    for (id, depth) in visible {
+        let has_children = !tree_data_for_iter.children_of(&id).is_empty();
+        let label_text = tree_data_for_iter
+            .label_of(&id)
+            .unwrap_or("")
+            .to_string();
         let is_expanded = tree_expanded.contains(&id);
+        let is_selected = tree_selected.as_ref() == Some(&id);
+
+        let entity_for_toggle = entity_tree.clone();
+        let entity_for_select = entity_tree.clone();
+        let toggle_id = id.clone();
+        let select_id = id.clone();
+        // Unique ElementId per row — gpui de-duplicates by id,
+        // so identical ids would collapse all rows into one.
+        let row_id: ElementId = format!("lists-tree-row-{}", id.0).into();
+        // Double-click toggles: the renderer falls back to
+        // `on_toggle` when `on_double_click` is not set, so we
+        // don't need to wire it explicitly — but we wire it
+        // here to make the behaviour explicit at the call site.
+        let entity_for_double = entity_tree.clone();
+        let double_id = id.clone();
         tree_el = tree_el.child(
-            tree_item("ti", id.clone(), label_text, cx)
+            tree_item(row_id, id.clone(), label_text, cx)
                 .depth(depth)
-                .has_children(true)
+                .has_children(has_children)
                 .expanded(is_expanded)
+                .selected(is_selected)
                 .on_toggle(move |_, _, cx| {
-                    entity_for_row.update(cx, |s, _cx| {
-                        if !s.tree_expanded.remove(&id_for_row) {
-                            s.tree_expanded.insert(id_for_row.clone());
+                    let toggle_id = toggle_id.clone();
+                    entity_for_toggle.update(cx, |s, _cx| {
+                        if !s.tree_expanded.remove(&toggle_id) {
+                            s.tree_expanded.insert(toggle_id);
                         }
                     });
                 })
-                .render(cx),
+                .on_click(move |_, _, cx| {
+                    entity_for_select.update(cx, |s, _cx| {
+                        s.tree_selected = Some(select_id.clone());
+                    });
+                })
+                .on_double_click(move |_, _, cx| {
+                    let double_id = double_id.clone();
+                    entity_for_double.update(cx, |s, _cx| {
+                        if !s.tree_expanded.remove(&double_id) {
+                            s.tree_expanded.insert(double_id);
+                        }
+                    });
+                })
+                .render(&mut **cx, window),
         );
     }
-    let tree_wrapped = cell("tree + tree_item (3 rows; click chevron to expand)", tree_el, cx);
+    let tree_wrapped = cell("tree + tree_item (3-5 rows; click chevron or double-click row to expand, click row to select)", tree_el, cx);
 
     // --- virtual_list ---
     let vl = virtual_list("lists-vl", 1_000, cx)

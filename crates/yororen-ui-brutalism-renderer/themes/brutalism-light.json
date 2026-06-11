@@ -108,7 +108,7 @@
       "card": { "radius": 0, "border_width": 3, "padding": 16 },
       "form": { "radius": 0, "border_width": 0, "padding": 16, "gap": 12 },
       "list_item": { "radius": 0, "border_width": 2, "padding": 10, "min_height": 36 },
-      "tree_item": { "radius": 0, "border_width": 2, "padding": 8, "min_height": 32 },
+      "tree_item": { "radius": 0, "border_width": 2, "padding": 8, "min_height": 32, "chevron_size": 18 },
       "empty_state": { "radius": 0, "border_width": 3, "padding": 32 }
     }
   }
