@@ -61,10 +61,26 @@ impl TokenTextInputRenderer {
             theme.get_color("border.focus").unwrap_or_default()
         }
     }
-    pub fn hover_border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
+    pub fn hover_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
+        // When the caller passes `has_custom_border: true`
+        // (e.g. the combo_box embedding this text input in
+        // its trigger) we want hover to keep the same custom
+        // border, not snap to the theme's `border.muted`. The
+        // default light hover otherwise introduces a visible
+        // ring the caller tried to suppress.
+        if state.has_custom_border {
+            return self.border(state, theme);
+        }
         theme.get_color("border.muted").unwrap_or_default()
     }
-    pub fn active_border(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
+    pub fn active_border(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
+        // Same as `hover_border`: when the caller suppressed
+        // the default border, also suppress the active state
+        // so a mouse-down on the input doesn't briefly
+        // re-introduce it.
+        if state.has_custom_border {
+            return self.border(state, theme);
+        }
         theme.get_color("border.default").unwrap_or_default()
     }
     pub fn text_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
@@ -80,16 +96,22 @@ impl TokenTextInputRenderer {
         theme.get_color("content.tertiary").unwrap_or_default()
     }
     pub fn cursor_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
+        // With `has_custom_focus_border: true` the focus border
+        // is the caller's transparent / themed override, so
+        // it would make the caret invisible. Fall back to the
+        // text colour (or the explicit `custom_text_color`)
+        // so the cursor stays visible.
         if state.has_custom_focus_border {
-            state
-                .custom_focus_border
-                .unwrap_or_else(|| theme.get_color("border.focus").unwrap_or_default())
+            return self.text_color(state, theme);
+        }
+        theme.get_color("border.focus").unwrap_or_default()
+    }
+    pub fn selection_color(&self, state: &TextInputRenderState, theme: &Theme) -> Hsla {
+        let c = if state.has_custom_focus_border {
+            self.text_color(state, theme)
         } else {
             theme.get_color("border.focus").unwrap_or_default()
-        }
-    }
-    pub fn selection_color(&self, _state: &TextInputRenderState, theme: &Theme) -> Hsla {
-        let c = theme.get_color("border.focus").unwrap_or_default();
+        };
         hsla(c.h, c.s, c.l, 0.25)
     }
     pub fn min_height(&self, _state: &TextInputRenderState, theme: &Theme) -> Pixels {

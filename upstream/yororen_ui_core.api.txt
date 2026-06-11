@@ -1078,7 +1078,7 @@ pub yororen_ui_core::headless::combo_box::ComboBoxProps::id: gpui::window::Eleme
 pub yororen_ui_core::headless::combo_box::ComboBoxProps::state: gpui::app::entity_map::Entity<yororen_ui_core::headless::combo_box::ComboBoxState>
 impl yororen_ui_core::headless::combo_box::ComboBoxProps
 pub fn yororen_ui_core::headless::combo_box::ComboBoxProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-pub fn yororen_ui_core::headless::combo_box::ComboBoxProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::combo_box::ComboBoxProps::render(self, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 impl core::clone::Clone for yororen_ui_core::headless::combo_box::ComboBoxProps
 pub fn yororen_ui_core::headless::combo_box::ComboBoxProps::clone(&self) -> yororen_ui_core::headless::combo_box::ComboBoxProps
 impl core::marker::Freeze for yororen_ui_core::headless::combo_box::ComboBoxProps
@@ -5741,7 +5741,7 @@ impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::combo_box::ComboBo
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::combo_box::ComboBoxRenderState
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::combo_box::ComboBoxRenderState
 pub trait yororen_ui_core::renderer::combo_box::ComboBoxRenderer: core::any::Any + core::marker::Send + core::marker::Sync
-pub fn yororen_ui_core::renderer::combo_box::ComboBoxRenderer::compose(&self, &yororen_ui_core::headless::combo_box::ComboBoxProps, &gpui::app::App) -> gpui::elements::div::Div
+pub fn yororen_ui_core::renderer::combo_box::ComboBoxRenderer::compose(&self, &yororen_ui_core::headless::combo_box::ComboBoxProps, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
 pub mod yororen_ui_core::renderer::disclosure
 pub struct yororen_ui_core::renderer::disclosure::DisclosureRenderState
 pub yororen_ui_core::renderer::disclosure::DisclosureRenderState::open: bool

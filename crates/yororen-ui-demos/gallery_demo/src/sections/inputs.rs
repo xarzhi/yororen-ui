@@ -144,7 +144,7 @@ pub fn render(
             });
         });
     });
-    let combo_el = combo_box("input-combo", combo_state.clone()).render(cx);
+    let combo_el = combo_box("input-combo", combo_state.clone()).render(cx, window);
 
     // assemble — each input goes in its own labelled cell,
     // followed by a status line that shows the live value.

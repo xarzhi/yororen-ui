@@ -152,18 +152,23 @@ impl ComboBoxProps {
     }
 
     /// Render the combo box using the registered
-    /// `ComboBoxRenderer`. Returns a `Stateful<Div>` with the
-    /// element id. The renderer decides bg / border / padding
-    /// based on the `state` entity.
-    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+    /// `ComboBoxRenderer`. The renderer composes the full
+    /// UI (a real text input trigger + a dropdown of filtered
+    /// options) and returns an `AnyElement`. We then layer the
+    /// headless `id` on top via `apply`.
+    pub fn render(self, cx: &mut gpui::App, window: &mut gpui::Window) -> gpui::AnyElement {
         use crate::renderer::RendererContext;
         use crate::renderer::combo_box::ComboBoxRenderer;
         use crate::renderer::markers::ComboBox as ComboBoxMarker;
 
-        let r: &Arc<dyn ComboBoxRenderer> = cx
+        // `renderer_arc` returns `&Arc<dyn …>` which holds an
+        // immutable borrow on `cx`. We need to pass `&mut cx`
+        // to `compose` next. Clone the Arc to release the
+        // immutable borrow before the call.
+        let r: Arc<dyn ComboBoxRenderer> = cx
             .renderer_arc::<ComboBoxMarker, dyn ComboBoxRenderer>()
-            .expect("ComboBoxRenderer registered");
-        let div = r.compose(&self, cx);
-        self.apply(div)
+            .expect("ComboBoxRenderer registered")
+            .clone();
+        r.compose(&self, cx, window)
     }
 }

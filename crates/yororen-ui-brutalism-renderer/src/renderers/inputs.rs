@@ -137,14 +137,40 @@ impl TextInputRenderer for BrutalTextInputRenderer {
         };
         let text_color = brutal_input_text_color(disabled, &theme);
         let hint_color = brutal_input_hint_color(&theme);
-        let cursor_color = brutal_input_focus_border(&theme);
+        // The cursor is normally the focus border (a vivid
+        // accent colour). But when the caller suppresses the
+        // focus border (e.g. the combo_box embedding this
+        // text input in its trigger), the focus border colour
+        // is transparent — the cursor would vanish. Fall back
+        // to the text colour so the caret is always visible.
+        let cursor_color = if props.has_custom_focus_border {
+            text_color
+        } else {
+            brutal_input_focus_border(&theme)
+        };
         let selection_color = {
-            let c = brutal_input_focus_border(&theme);
+            let c = if props.has_custom_focus_border {
+                text_color
+            } else {
+                brutal_input_focus_border(&theme)
+            };
             hsla(c.h, c.s, c.l, 0.5)
         };
         let min_h = brutal_input_min_height(&theme);
         let padding = brutal_input_padding(&theme);
-        let hover_border = brutal_border_color(&theme);
+        // When `has_custom_border` is set (e.g. the combo_box
+        // embedding this text input in its trigger) we want
+        // the hover state to keep the same custom border, not
+        // snap back to the theme's `border.default`. The
+        // default brutalist hover is
+        // `.hover(|s| s.border_color(brutal_border_color(&theme)))`
+        // which would re-introduce the very ring the caller
+        // tried to suppress.
+        let hover_border = if props.has_custom_border {
+            border_color
+        } else {
+            brutal_border_color(&theme)
+        };
         let active_border = brutal_input_focus_border(&theme);
         drop(theme);
 
@@ -244,9 +270,21 @@ impl TextAreaRenderer for BrutalTextAreaRenderer {
         };
         let text_color = brutal_input_text_color(disabled, &theme);
         let hint_color = brutal_input_hint_color(&theme);
-        let cursor_color = brutal_input_focus_border(&theme);
+        // See text_input: with `has_custom_focus_border: true`
+        // the focus border (and therefore the cursor) is
+        // transparent. Fall back to the text colour so the
+        // caret stays visible.
+        let cursor_color = if props.has_custom_focus_border {
+            text_color
+        } else {
+            brutal_input_focus_border(&theme)
+        };
         let selection_color = {
-            let c = brutal_input_focus_border(&theme);
+            let c = if props.has_custom_focus_border {
+                text_color
+            } else {
+                brutal_input_focus_border(&theme)
+            };
             hsla(c.h, c.s, c.l, 0.5)
         };
         let min_h = px(theme
@@ -1301,10 +1339,14 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
     fn compose(
         &self,
         props: &yororen_ui_core::headless::combo_box::ComboBoxProps,
-        cx: &App,
-    ) -> Div {
+        cx: &mut App,
+        window: &mut Window,
+    ) -> AnyElement {
+        use yororen_ui_core::headless::text_input::{TextInputProps, TextInputState};
+        use yororen_ui_core::renderer::text_input::TextInputRenderer;
         use yororen_ui_core::theme::ActiveTheme;
-        let theme = cx.theme();
+
+        let theme = cx.theme().clone();
         let state_read = props.state.read(cx);
         let state = ComboBoxRenderState {
             open: state_read.is_open(),
@@ -1315,21 +1357,38 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
             custom_focus_border: None,
             custom_fg: None,
         };
-        let bg = self.bg(&state, theme);
-        let border = self.border(&state, theme);
-        let fg = self.fg(&state, theme);
-        let pad = self.padding(&state, theme);
-        let h = self.min_height(&state, theme);
-        let r = self.border_radius(&state, theme);
+        let bg = self.bg(&state, &theme);
+        let border = self.border(&state, &theme);
+        let fg = self.fg(&state, &theme);
+        let pad = self.padding(&state, &theme);
+        let h = self.min_height(&state, &theme);
+        let r = self.border_radius(&state, &theme);
         let text = state_read.text.clone();
         let value = state_read.value.clone();
         let options = state_read.options.clone();
         let is_open = state_read.is_open();
+        let placeholder = state_read.placeholder.clone();
 
-        // Display: the typed text takes priority, then the
-        // selected option's label, then the placeholder.
-        let display = if !text.is_empty() {
-            text
+        // -------- Text-input trigger --------
+        // The combo box trigger is a real text input. The user
+        // types into it; `state.text` is the typed query that
+        // filters the dropdown. When the user picks an option
+        // we set `state.text` back to the option's label, so
+        // the input shows the label after a pick.
+        //
+        // We need a `TextInputState` keyed by the combo id so
+        // caret / selection / IME / focus persist across paints
+        // — that's what `window.use_keyed_state` is for.
+        let ti_id: gpui::ElementId = (props.id.clone(), "combo-trigger-text-input").into();
+        let ti_state = window.use_keyed_state(ti_id.clone(), cx, |_window, cx| {
+            TextInputState::new(&mut *cx)
+        });
+        // Sync the text-input value to `combo_state.text`. If
+        // the typed query is empty but a value is picked, the
+        // input falls back to the value's label so the user
+        // sees what they've selected.
+        let display_str: String = if !text.is_empty() {
+            text.clone()
         } else if let Some(v) = &value {
             options
                 .iter()
@@ -1337,30 +1396,109 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
                 .map(|o| o.label.to_string())
                 .unwrap_or_else(|| v.to_string())
         } else {
-            state_read.placeholder.to_string()
+            String::new()
+        };
+        ti_state.update(cx, |s, _cx| {
+            if s.value != display_str {
+                s.set_value(display_str.clone());
+            }
+        });
+
+        // The text input's `on_change` writes the typed
+        // text back into the combo state and also opens the
+        // dropdown so the user immediately sees the filtered
+        // options.
+        let combo_state_for_text = props.state.clone();
+        let ti_state_for_focus = ti_state.clone();
+        let text_color = theme.get_color("content.primary").unwrap_or(BRUTAL_BORDER);
+        let hint_color = theme.get_color("content.tertiary").unwrap_or(BRUTAL_BORDER);
+        let cursor_color = theme.get_color("border.focus").unwrap_or(BRUTAL_BORDER);
+        let selection_color = {
+            let c = theme.get_color("border.focus").unwrap_or(BRUTAL_BORDER);
+            gpui::hsla(c.h, c.s, c.l, 0.4)
         };
 
-        let state_for_toggle = props.state.clone();
+        let ti_props = TextInputProps {
+            id: ti_id,
+            placeholder: placeholder.to_string(),
+            disabled: false,
+            max_length: None,
+            on_change: Some(Arc::new(move |new: &str, _w: &mut Window, cx: &mut App| {
+                combo_state_for_text.update(cx, |s, _cx| {
+                    s.text = new.to_string();
+                    if !s.is_open() {
+                        s.open();
+                    }
+                });
+            })),
+            on_submit: None,
+            // The text input lives INSIDE the trigger
+            // div which already supplies its own border. We
+            // want the input to look "naked" — no inner
+            // border ring around the editable area.
+            has_custom_bg: false,
+            has_custom_border: true,
+            has_custom_focus_border: true,
+            custom_bg: None,
+            custom_border: Some(gpui::hsla(0.0, 0.0, 0.0, 0.0)),
+            custom_focus_border: Some(gpui::hsla(0.0, 0.0, 0.0, 0.0)),
+            custom_text_color: None,
+        };
+        let ti_element = <BrutalTextInputRenderer as TextInputRenderer>::compose(
+            &BrutalTextInputRenderer,
+            &ti_props,
+            cx,
+            window,
+        );
+
+        // The chevron is a static triangle, laid out on the
+        // right of the text input. Sized to the trigger
+        // height, vertically centred.
+        let chevron_w = px(20.0);
         let mut trigger: Stateful<gpui::Div> = gpui::div()
             .flex()
             .items_center()
             .bg(bg)
             .border_2()
             .border_color(border)
-            .text_color(fg)
             .px(pad.left)
-            .py(pad.top)
             .min_h(h)
             .rounded(r)
-            .child(display)
-            .id("brutal-combo-trigger");
+            .id("brutal-combo-trigger")
+            // The text input is the flex child that grows;
+            // the chevron is the fixed-size child on the
+            // right. Click anywhere on the trigger opens the
+            // dropdown (text input's own focus behaviour is
+            // orthogonal).
+            .child(div().flex_1().min_w(px(0.)).child(ti_element))
+            .child(
+                div()
+                    .w(chevron_w)
+                    .flex()
+                    .items_center()
+                    .justify_center()
+                    .text_color(hint_color)
+                    .child(if is_open { "▴" } else { "▾" }),
+            );
+        let combo_state_for_open = props.state.clone();
         trigger = trigger.on_click(move |_ev, _window, cx| {
-            state_for_toggle.update(cx, |s, _cx| s.toggle());
+            combo_state_for_open.update(cx, |s, _cx| s.toggle());
         });
 
-        let mut outer = gpui::div().relative().child(trigger);
+        // -------- Filtered dropdown --------
+        // Filter is case-insensitive `contains(label, text)`.
+        // When `text` is empty we show every option.
+        let needle = text.to_lowercase();
+        let filtered: Vec<(usize, &yororen_ui_core::headless::combo_box::ComboBoxOption)> = options
+            .iter()
+            .enumerate()
+            .filter(|(_, opt)| needle.is_empty() || opt.label.to_lowercase().contains(&needle))
+            .collect();
 
-        if is_open && !options.is_empty() {
+        let mut outer = gpui::div().relative().child(trigger);
+        let _ = (text_color, cursor_color, selection_color, ti_state_for_focus);
+
+        if is_open && !filtered.is_empty() {
             let h_f32: f32 = h.into();
             let state_for_close = props.state.clone();
             let mut dropdown: Stateful<gpui::Div> = gpui::div()
@@ -1381,7 +1519,7 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
                     state_for_close.update(cx, |s, _cx| s.close());
                 });
 
-            for (i, opt) in options.iter().enumerate() {
+            for (orig_i, opt) in filtered.iter() {
                 let opt_value = opt.value.clone();
                 let opt_label = opt.label.to_string();
                 let state_for_opt = props.state.clone();
@@ -1397,9 +1535,10 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
                 } else {
                     theme.get_color("content.primary").unwrap_or(BRUTAL_BORDER)
                 };
+                let opt_label_for_click = opt_label.clone();
                 let mut item: Stateful<gpui::Div> = gpui::div()
                     .id(ElementId::Name(
-                        format!("brutal-combo-opt-{}", i).into(),
+                        format!("brutal-combo-opt-{}", orig_i).into(),
                     ))
                     .px(px(8.))
                     .py(px(6.))
@@ -1408,9 +1547,14 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
                     .text_color(item_fg)
                     .hover(move |s| s.bg(hover_bg))
                     .child(opt_label);
+                // On pick: set value AND set text to the label
+                // so the trigger shows what was selected
+                // (otherwise the typed query would persist).
                 item = item.on_click(move |_ev, _window, cx| {
+                    let label_for_text = opt_label_for_click.clone();
                     state_for_opt.update(cx, |s, _cx| {
                         s.set_value(opt_value.clone());
+                        s.text = label_for_text;
                         s.close();
                     });
                 });
@@ -1420,7 +1564,7 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
             outer = outer.child(gpui::deferred(dropdown).with_priority(1));
         }
 
-        outer
+        outer.into_any_element()
     }
 }
 
