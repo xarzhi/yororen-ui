@@ -106,15 +106,22 @@ impl PopoverRenderer for TokenPopoverRenderer {
                     .get_number("motion.slide_distance")
                     .unwrap_or(10.0) as f32,
             );
+            // The animation wrapper is absolutely positioned at the
+            // top-left of the outer relative container so the panel
+            // inside keeps its original `top/left` offset.
             outer = outer.child(
                 gpui::deferred(
-                    div().child(AnimatedPresenceElement::new(
-                        props.state.clone(),
-                        (props.id.clone(), "content"),
-                        SlideDirection::Down,
-                        distance,
-                        panel,
-                    )),
+                    div()
+                        .absolute()
+                        .top_0()
+                        .left_0()
+                        .child(AnimatedPresenceElement::new(
+                            props.state.clone(),
+                            (props.id.clone(), "content"),
+                            SlideDirection::Down,
+                            distance,
+                            panel,
+                        )),
                 )
                 .with_priority(1),
             );

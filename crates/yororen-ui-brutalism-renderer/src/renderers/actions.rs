@@ -783,6 +783,9 @@ impl SplitButtonRenderer for BrutalSplitButtonRenderer {
                 }
             }
 
+            // The animation wrapper is absolutely positioned at the
+            // top-left of the root relative container so the menu
+            // inside keeps its original `top/left` offset.
             let distance = px(
                 theme
                     .get_number("motion.slide_distance")
@@ -794,13 +797,17 @@ impl SplitButtonRenderer for BrutalSplitButtonRenderer {
                 .expect("visible implies state is present");
             root.child(
                 gpui::deferred(
-                    div().child(AnimatedPresenceElement::new(
-                        state_entity,
-                        (props.id.clone(), "menu"),
-                        SlideDirection::Down,
-                        distance,
-                        menu,
-                    )),
+                    div()
+                        .absolute()
+                        .top_0()
+                        .left_0()
+                        .child(AnimatedPresenceElement::new(
+                            state_entity,
+                            (props.id.clone(), "menu"),
+                            SlideDirection::Down,
+                            distance,
+                            div().child(menu),
+                        )),
                 )
                 .with_priority(1),
             )

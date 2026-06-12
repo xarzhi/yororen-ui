@@ -1289,7 +1289,10 @@ impl SelectRenderer for BrutalSelectRenderer {
             }
 
             // `gpui::deferred` paints the dropdown after the
-            // next sibling cell so it isn't covered.
+            // next sibling cell so it isn't covered. The animation
+            // wrapper is absolutely positioned at the top-left of the
+            // outer relative container so the dropdown keeps its
+            // original `top/left/right` offsets.
             let distance = px(
                 theme
                     .get_number("motion.slide_distance")
@@ -1297,13 +1300,18 @@ impl SelectRenderer for BrutalSelectRenderer {
             );
             outer = outer.child(
                 gpui::deferred(
-                    gpui::div().child(AnimatedPresenceElement::new(
-                        props.state.clone(),
-                        (props.id.clone(), "dropdown"),
-                        SlideDirection::Down,
-                        distance,
-                        gpui::div().child(dropdown),
-                    )),
+                    gpui::div()
+                        .absolute()
+                        .top_0()
+                        .left_0()
+                        .right_0()
+                        .child(AnimatedPresenceElement::new(
+                            props.state.clone(),
+                            (props.id.clone(), "dropdown"),
+                            SlideDirection::Down,
+                            distance,
+                            gpui::div().child(dropdown),
+                        )),
                 )
                 .with_priority(1),
             );
@@ -1564,6 +1572,9 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
                 dropdown = dropdown.child(item);
             }
 
+            // The animation wrapper is absolutely positioned at the
+            // top-left of the outer relative container so the dropdown
+            // inside keeps its original `top/left/right` offsets.
             let distance = px(
                 theme
                     .get_number("motion.slide_distance")
@@ -1571,13 +1582,18 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
             );
             outer = outer.child(
                 gpui::deferred(
-                    gpui::div().child(AnimatedPresenceElement::new(
-                        props.state.clone(),
-                        (props.id.clone(), "dropdown"),
-                        SlideDirection::Down,
-                        distance,
-                        gpui::div().child(dropdown),
-                    )),
+                    gpui::div()
+                        .absolute()
+                        .top_0()
+                        .left_0()
+                        .right_0()
+                        .child(AnimatedPresenceElement::new(
+                            props.state.clone(),
+                            (props.id.clone(), "dropdown"),
+                            SlideDirection::Down,
+                            distance,
+                            gpui::div().child(dropdown),
+                        )),
                 )
                 .with_priority(1),
             );

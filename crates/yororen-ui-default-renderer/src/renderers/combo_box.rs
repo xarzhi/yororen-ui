@@ -275,15 +275,23 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
                     .get_number("motion.slide_distance")
                     .unwrap_or(10.0) as f32,
             );
+            // The animation wrapper is absolutely positioned at the
+            // top-left of the outer relative container so the dropdown
+            // inside keeps its original `top/left/right` offsets.
             outer = outer.child(
                 gpui::deferred(
-                    div().child(AnimatedPresenceElement::new(
-                        props.state.clone(),
-                        (props.id.clone(), "dropdown"),
-                        SlideDirection::Down,
-                        distance,
-                        div().child(dropdown),
-                    )),
+                    div()
+                        .absolute()
+                        .top_0()
+                        .left_0()
+                        .right_0()
+                        .child(AnimatedPresenceElement::new(
+                            props.state.clone(),
+                            (props.id.clone(), "dropdown"),
+                            SlideDirection::Down,
+                            distance,
+                            div().child(dropdown),
+                        )),
                 )
                 .with_priority(1),
             );

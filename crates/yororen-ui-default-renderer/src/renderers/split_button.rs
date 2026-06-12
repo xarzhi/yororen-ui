@@ -289,15 +289,22 @@ impl SplitButtonRenderer for TokenSplitButtonRenderer {
                 .state
                 .clone()
                 .expect("visible implies state is present");
+            // The animation wrapper is absolutely positioned at the
+            // top-left of the root relative container so the menu
+            // inside keeps its original `top/left` offset.
             root.child(
                 deferred(
-                    div().child(AnimatedPresenceElement::new(
-                        state_entity,
-                        (props.id.clone(), "menu"),
-                        SlideDirection::Down,
-                        distance,
-                        menu,
-                    )),
+                    div()
+                        .absolute()
+                        .top_0()
+                        .left_0()
+                        .child(AnimatedPresenceElement::new(
+                            state_entity,
+                            (props.id.clone(), "menu"),
+                            SlideDirection::Down,
+                            distance,
+                            div().child(menu),
+                        )),
                 )
                 .with_priority(1),
             )
