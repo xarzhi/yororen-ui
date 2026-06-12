@@ -49,8 +49,8 @@
 //! must be closed manually.
 
 use gpui::{
-    Context, Hsla, InteractiveElement, IntoElement, ParentElement, StatefulInteractiveElement,
-    Styled, deferred, div, hsla, px,
+    AnimationExt, Context, Hsla, InteractiveElement, IntoElement, ParentElement,
+    StatefulInteractiveElement, Styled, deferred, div, hsla, px,
 };
 
 use yororen_ui::notification::center::{Notification, NotificationCenter, NotificationId, ToastKind};
@@ -126,7 +126,20 @@ pub fn render(cx: &mut Context<GalleryApp>) -> impl IntoElement {
 
     for n in items.into_iter() {
         let id = n.id;
-        stack = stack.child(toast_card(cx, n, id));
+        let card = toast_card(cx, n, id);
+        let distance = px(24.0);
+        let animated = card.with_animation(
+            ("ui:notification:enter", id.raw()),
+            gpui::Animation::new(std::time::Duration::from_millis(200))
+                .with_easing(yororen_ui::animation::ease_out_cubic),
+            move |this, progress| {
+                let eased = yororen_ui::animation::ease_out_cubic(progress);
+                let translate: f32 = distance.into();
+                let translate = translate * (1.0 - eased);
+                this.opacity(eased).mr(px(translate))
+            },
+        );
+        stack = stack.child(animated);
     }
 
     stack
@@ -141,7 +154,7 @@ pub fn render(cx: &mut Context<GalleryApp>) -> impl IntoElement {
 /// the kind color with `kind_fg` as the text color, and the
 /// close (×) button is on the same row as the title (right
 /// side).
-fn toast_card(cx: &mut Context<GalleryApp>, n: Notification, id: NotificationId) -> impl IntoElement {
+fn toast_card(cx: &mut Context<GalleryApp>, n: Notification, id: NotificationId) -> gpui::Stateful<gpui::Div> {
     let kind_path = match n.kind {
         ToastKind::Success => "status.success",
         ToastKind::Warning => "status.warning",
