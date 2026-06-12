@@ -60,6 +60,7 @@ impl<S: AnimatedPresenceState> IntoElement for AnimatedPresenceElement<S> {
 struct PresenceElementState {
     start: Instant,
     previous_target: bool,
+    previous_progress: f32,
 }
 
 impl<S: AnimatedPresenceState> Element for AnimatedPresenceElement<S> {
@@ -90,6 +91,7 @@ impl<S: AnimatedPresenceState> Element for AnimatedPresenceElement<S> {
                 let state = state.unwrap_or(PresenceElementState {
                     start: now,
                     previous_target: false,
+                    previous_progress: 0.0,
                 });
                 ((state.clone(), ()), state)
             },
@@ -99,7 +101,7 @@ impl<S: AnimatedPresenceState> Element for AnimatedPresenceElement<S> {
         // so the entity always reflects the current progress and the
         // app can query `is_visible()` to decide whether to keep the
         // overlay mounted.
-        let (progress, target, is_animating, enter_config, exit_config) = self.state.update(
+        let (progress, target, _is_animating, enter_config, exit_config) = self.state.update(
             cx,
             |s, _cx| {
                 let v = s.visibility_mut();
@@ -126,13 +128,17 @@ impl<S: AnimatedPresenceState> Element for AnimatedPresenceElement<S> {
             },
         );
 
+        // Request another frame whenever progress changed. This keeps
+        // the animation running while it is active, and schedules one
+        // final frame after it reaches a boundary (e.g. progress == 0)
+        // so the parent can re-read `is_visible()` and unmount.
+        if el_state.previous_progress != progress {
+            window.request_animation_frame();
+            el_state.previous_progress = progress;
+        }
+
         // Save the element-local clock back.
         window.with_element_state(global_id.unwrap(), |_state, _window| ((), el_state));
-
-        // Keep requesting frames while the transition is running.
-        if is_animating {
-            window.request_animation_frame();
-        }
 
         let config = if target { enter_config } else { exit_config };
         let eased = (config.easing)(progress);

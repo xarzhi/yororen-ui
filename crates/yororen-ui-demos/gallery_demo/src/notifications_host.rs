@@ -136,7 +136,10 @@ pub fn render(cx: &mut Context<GalleryApp>) -> impl IntoElement {
                 let eased = yororen_ui::animation::ease_out_cubic(progress);
                 let translate: f32 = distance.into();
                 let translate = translate * (1.0 - eased);
-                this.opacity(eased).ml(px(translate))
+                // Negative margin-right shifts the card to the right
+                // off-screen; as the animation progresses it slides
+                // left into its final position.
+                this.opacity(eased).mr(px(-translate))
             },
         );
         stack = stack.child(animated);
