@@ -87,7 +87,7 @@ impl<S: AnimatedPresenceState> Element for AnimatedPresenceElement<S> {
         let (mut el_state, _) = window.with_element_state(
             global_id.unwrap(),
             |state: Option<PresenceElementState>, _window| {
-                let state = state.unwrap_or_else(|| PresenceElementState {
+                let state = state.unwrap_or(PresenceElementState {
                     start: now,
                     previous_target: false,
                 });
