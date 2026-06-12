@@ -42,13 +42,13 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     // --- popover: trigger + popover body ---
     let popover_state_for_btn = app.popover_state.clone();
     let popover_state = app.popover_state.clone();
-    let popover_is_open = popover_state.read(cx).open;
+    let popover_is_visible = popover_state.read(cx).is_visible();
     let popover_trigger = button("ov-popover-trigger", cx)
         .on_click(move |_, _, cx| {
             popover_state_for_btn.update(cx, |st, _cx| st.toggle());
         })
         .render(cx)
-        .child(if popover_is_open {
+        .child(if popover_is_visible {
             cx.t("demo.overlays.popover_close")
         } else {
             cx.t("demo.overlays.popover_open")
@@ -75,7 +75,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     // Empty placeholder so the popover's content slot is
     // always populated; the renderer decides visibility by
     // `popover_state.is_open()`.
-    let popover_content = if popover_is_open {
+    let popover_content = if popover_is_visible {
         menu_el.into_any_element()
     } else {
         div().into_any_element()
@@ -131,7 +131,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .render(cx)
         .child(cx.t("demo.overlays.dropdown_open"));
     let dropdown_menu_el = menu("ov-dropdown-body", menu_state_for_dropdown.clone()).render(cx);
-    let dropdown_content = if app.dropdown_state.read(cx).open {
+    let dropdown_content = if app.dropdown_state.read(cx).is_visible() {
         dropdown_menu_el.into_any_element()
     } else {
         div().into_any_element()

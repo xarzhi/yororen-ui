@@ -204,8 +204,8 @@ fn build_modal_overlay(
     app: &GalleryApp,
     cx: &mut Context<GalleryApp>,
 ) -> gpui::Deferred {
-    let is_modal_open = app.modal_state.read(cx).open;
-    if !is_modal_open {
+    let is_modal_visible = app.modal_state.read(cx).is_visible();
+    if !is_modal_visible {
         return gpui::deferred(div()).with_priority(2);
     }
 
