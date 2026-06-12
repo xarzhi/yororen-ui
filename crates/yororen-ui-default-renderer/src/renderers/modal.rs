@@ -38,7 +38,7 @@ impl TokenModalRenderer {
 }
 
 impl ModalRenderer for TokenModalRenderer {
-    fn compose(&self, props: &ModalProps, cx: &App) -> Div {
+    fn compose(&self, props: &mut ModalProps, cx: &App) -> Div {
         use yororen_ui_core::theme::ActiveTheme;
         let theme = cx.theme();
         let state = ModalRenderState {};
@@ -53,12 +53,18 @@ impl ModalRenderer for TokenModalRenderer {
             return div();
         }
 
+        let children = std::mem::take(&mut props.children);
         let panel = div()
             .bg(panel_bg)
             .border_1()
             .border_color(panel_border)
             .p(pad)
             .rounded(r)
+            .flex()
+            .flex_col()
+            .gap_2()
+            .w_full()
+            .children(children)
             .shadow(vec![gpui::BoxShadow {
                 color: gpui::hsla(0.0, 0.0, 0.0, alpha),
                 blur_radius: gpui::px(12.0),

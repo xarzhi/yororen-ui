@@ -3072,16 +3072,17 @@ impl core::marker::UnsafeUnpin for yororen_ui_core::headless::modal::ModalCloseR
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::modal::ModalCloseReason
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::modal::ModalCloseReason
 pub struct yororen_ui_core::headless::modal::ModalProps
+pub yororen_ui_core::headless::modal::ModalProps::children: alloc::vec::Vec<gpui::element::AnyElement>
 pub yororen_ui_core::headless::modal::ModalProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::modal::ModalProps::state: gpui::app::entity_map::Entity<yororen_ui_core::headless::modal::ModalState>
 impl yororen_ui_core::headless::modal::ModalProps
 pub fn yororen_ui_core::headless::modal::ModalProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::modal::ModalProps::child(self, impl gpui::element::IntoElement) -> Self
+pub fn yororen_ui_core::headless::modal::ModalProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
 pub fn yororen_ui_core::headless::modal::ModalProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-impl core::clone::Clone for yororen_ui_core::headless::modal::ModalProps
-pub fn yororen_ui_core::headless::modal::ModalProps::clone(&self) -> yororen_ui_core::headless::modal::ModalProps
 impl core::marker::Freeze for yororen_ui_core::headless::modal::ModalProps
-impl core::marker::Send for yororen_ui_core::headless::modal::ModalProps
-impl core::marker::Sync for yororen_ui_core::headless::modal::ModalProps
+impl !core::marker::Send for yororen_ui_core::headless::modal::ModalProps
+impl !core::marker::Sync for yororen_ui_core::headless::modal::ModalProps
 impl core::marker::Unpin for yororen_ui_core::headless::modal::ModalProps
 impl core::marker::UnsafeUnpin for yororen_ui_core::headless::modal::ModalProps
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::modal::ModalProps
@@ -7993,7 +7994,7 @@ impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::modal::ModalRender
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::modal::ModalRenderState
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::modal::ModalRenderState
 pub trait yororen_ui_core::renderer::modal::ModalRenderer: core::any::Any + core::marker::Send + core::marker::Sync
-pub fn yororen_ui_core::renderer::modal::ModalRenderer::compose(&self, &yororen_ui_core::headless::modal::ModalProps, &gpui::app::App) -> gpui::elements::div::Div
+pub fn yororen_ui_core::renderer::modal::ModalRenderer::compose(&self, &mut yororen_ui_core::headless::modal::ModalProps, &gpui::app::App) -> gpui::elements::div::Div
 pub mod yororen_ui_core::renderer::notification
 pub struct yororen_ui_core::renderer::notification::NotificationRenderState
 impl core::clone::Clone for yororen_ui_core::renderer::notification::NotificationRenderState

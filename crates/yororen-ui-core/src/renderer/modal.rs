@@ -15,5 +15,7 @@ use crate::headless::modal::ModalProps;
 pub struct ModalRenderState {}
 
 pub trait ModalRenderer: Any + Send + Sync {
-    fn compose(&self, props: &ModalProps, cx: &App) -> Div;
+    /// Compose the modal panel. The renderer may consume
+    /// `props.children` to place them inside the panel.
+    fn compose(&self, props: &mut ModalProps, cx: &App) -> Div;
 }

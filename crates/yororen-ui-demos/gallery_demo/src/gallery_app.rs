@@ -211,8 +211,6 @@ fn build_modal_overlay(
 
     let modal_state_for_close = app.modal_state.clone();
     let modal_panel = modal("ov-modal", app.modal_state.clone())
-        .render(cx)
-        .w(px(360.))
         .child(label("ov-modal-title", cx.t("demo.modal.title"), cx).strong(true).render(cx))
         .child(label("ov-modal-body", cx.t("demo.modal.body"), cx).render(cx))
         .child(
@@ -222,7 +220,9 @@ fn build_modal_overlay(
                 })
                 .render(cx)
                 .child(cx.t("common.close")),
-        );
+        )
+        .render(cx)
+        .w(px(360.));
 
     gpui::deferred(
         div()

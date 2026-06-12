@@ -136,7 +136,7 @@ pub fn render(cx: &mut Context<GalleryApp>) -> impl IntoElement {
                 let eased = yororen_ui::animation::ease_out_cubic(progress);
                 let translate: f32 = distance.into();
                 let translate = translate * (1.0 - eased);
-                this.opacity(eased).mr(px(translate))
+                this.opacity(eased).ml(px(translate))
             },
         );
         stack = stack.child(animated);

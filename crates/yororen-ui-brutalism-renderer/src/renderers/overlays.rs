@@ -54,7 +54,7 @@ impl BrutalModalRenderer {
 impl ModalRenderer for BrutalModalRenderer {
     fn compose(
         &self,
-        props: &yororen_ui_core::headless::modal::ModalProps,
+        props: &mut yororen_ui_core::headless::modal::ModalProps,
         cx: &App,
     ) -> Div {
         use yororen_ui_core::theme::ActiveTheme;
@@ -70,6 +70,7 @@ impl ModalRenderer for BrutalModalRenderer {
             return div();
         }
 
+        let children = std::mem::take(&mut props.children);
         // Brutalism Modal renderer paints *only* the panel
         // (bg / border / padding / radius / hard offset shadow).
         // The scrim and centering are the caller's responsibility
@@ -81,6 +82,11 @@ impl ModalRenderer for BrutalModalRenderer {
             .border_2()
             .p(pad.top)
             .rounded(r)
+            .flex()
+            .flex_col()
+            .gap_2()
+            .w_full()
+            .children(children)
             .shadow(vec![gpui::BoxShadow {
                 color: shadow.color,
                 blur_radius: shadow.blur,

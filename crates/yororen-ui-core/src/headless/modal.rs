@@ -4,7 +4,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, AppContext, Div, ElementId, Entity, FocusHandle, InteractiveElement, Stateful};
+use gpui::{App, AppContext, AnyElement, Div, ElementId, Entity, FocusHandle, InteractiveElement, IntoElement, Stateful};
 
 use crate::animation::{AnimatedPresenceState, AnimatedVisibility};
 
@@ -95,20 +95,37 @@ impl AnimatedPresenceState for ModalState {
     }
 }
 
-#[derive(Clone)]
 pub struct ModalProps {
     pub id: ElementId,
     pub state: Entity<ModalState>,
+    /// Children to render inside the modal panel. The renderer
+    /// consumes these when `compose` is called.
+    pub children: Vec<AnyElement>,
 }
 
 pub fn modal(id: impl Into<ElementId>, state: Entity<ModalState>) -> ModalProps {
     ModalProps {
         id: id.into(),
         state,
+        children: Vec::new(),
     }
 }
 
 impl ModalProps {
+    /// Add a child element inside the modal panel.
+    pub fn child(mut self, child: impl IntoElement) -> Self {
+        self.children.push(child.into_element().into_any_element());
+        self
+    }
+
+    /// Add multiple children inside the modal panel.
+    pub fn children(mut self, children: impl IntoIterator<Item = impl IntoElement>) -> Self {
+        for child in children {
+            self.children.push(child.into_element().into_any_element());
+        }
+        self
+    }
+
     pub fn apply(self, el: Div) -> Stateful<Div> {
         el.id(self.id)
     }
@@ -117,7 +134,7 @@ impl ModalProps {
     /// Returns a `Stateful<Div>` with the element id. The renderer
     /// decides scrim / panel bg / border / padding based on
     /// the `state` entity.
-    pub fn render(self, cx: &gpui::App) -> Stateful<Div> {
+    pub fn render(mut self, cx: &gpui::App) -> Stateful<Div> {
         use crate::renderer::RendererContext;
         use crate::renderer::modal::ModalRenderer;
         use crate::renderer::markers::Modal as ModalMarker;
@@ -125,7 +142,7 @@ impl ModalProps {
         let r: &Arc<dyn ModalRenderer> = cx
             .renderer_arc::<ModalMarker, dyn ModalRenderer>()
             .expect("ModalRenderer registered");
-        let div = r.compose(&self, cx);
+        let div = r.compose(&mut self, cx);
         self.apply(div)
     }
 }
