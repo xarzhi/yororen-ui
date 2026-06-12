@@ -3,8 +3,8 @@
 use std::sync::Arc;
 
 use gpui::{
-    App, Div, ElementId, InteractiveElement, MouseButton, MouseDownEvent, MouseMoveEvent,
-    Stateful, Window,
+    App, AppContext, Div, DragMoveEvent, ElementId, Empty, InteractiveElement, MouseButton,
+    MouseDownEvent, Stateful, StatefulInteractiveElement, Window,
 };
 
 pub type SliderCallback = Arc<dyn Fn(f32, &mut Window, &mut App)>;
@@ -61,10 +61,24 @@ impl SliderProps {
         el.id(self.id)
     }
 
+    /// Convert a window-relative x coordinate (and the slider bounds)
+    /// into a stepped, clamped value.
+    fn value_from_x(x: f32, track_w: f32, min: f32, max: f32, step: f32) -> f32 {
+        let pct = (x / track_w).clamp(0.0, 1.0);
+        let raw = min + pct * (max - min);
+        let stepped = (raw / step).round() * step;
+        stepped.clamp(min, max)
+    }
+
     /// Render the slider using the registered `SliderRenderer`.
     ///
     /// The renderer produces the visual tree (track + fill + knob);
     /// the headless layer layers drag behaviour on top.
+    ///
+    /// Dragging is implemented with GPUI's drag API: `on_drag` starts an
+    /// empty drag preview so that `on_drag_move` continues to fire while
+    /// the mouse is anywhere on screen, not only while it is over the
+    /// slider track.
     pub fn render(self, cx: &App) -> Stateful<Div> {
         use crate::renderer::RendererContext;
         use crate::renderer::markers::Slider as SliderMarker;
@@ -82,48 +96,40 @@ impl SliderProps {
             let min = self.min;
             let max = self.max;
             let step = self.step;
-            let on_change = self.on_change.clone();
-            let bounds_for_down = bounds.clone();
-            let bounds_for_move = bounds.clone();
 
-            styled = styled.on_mouse_down(
-                MouseButton::Left,
-                move |event: &MouseDownEvent, window, cx| {
-                    let b = *bounds_for_down.lock().unwrap();
-                    if let Some(b) = b
-                        && let Some(local) = b.localize(&event.position)
-                    {
-                        let x: f32 = local.x.into();
-                        let track_w: f32 = b.size.width.into();
-                        let pct = (x / track_w).clamp(0.0, 1.0);
-                        let raw = min + pct * (max - min);
-                        let stepped = (raw / step).round() * step;
-                        let value = stepped.clamp(min, max);
-                        if let Some(f) = on_change.clone() {
-                            f(value, window, cx);
+            if let Some(on_change) = self.on_change.clone() {
+                let bounds_for_down = bounds.clone();
+                let on_change_for_down = on_change.clone();
+
+                // Clicking anywhere on the slider jumps the handle to that
+                // position.
+                styled = styled.on_mouse_down(
+                    MouseButton::Left,
+                    move |event: &MouseDownEvent, window, cx| {
+                        let b = *bounds_for_down.lock().unwrap();
+                        if let Some(b) = b {
+                            let x: f32 = (event.position.x - b.left()).into();
+                            let track_w: f32 = b.size.width.into();
+                            let value = Self::value_from_x(x, track_w, min, max, step);
+                            on_change_for_down(value, window, cx);
                         }
-                    }
-                },
-            );
+                    },
+                );
 
-            if let Some(f) = self.on_change.clone() {
-                styled = styled.on_mouse_move(move |event: &MouseMoveEvent, window, cx| {
-                    if !event.dragging() {
-                        return;
-                    }
-                    let b = *bounds_for_move.lock().unwrap();
-                    if let Some(b) = b
-                        && let Some(local) = b.localize(&event.position)
-                    {
-                        let x: f32 = local.x.into();
+                // Use an empty drag preview so `on_drag_move` receives
+                // global mouse moves while the user is dragging, even if
+                // the cursor leaves the slider bounds.
+                styled = styled
+                    .on_drag((), move |_, _, _: &mut Window, cx: &mut App| {
+                        cx.new(|_| Empty)
+                    })
+                    .on_drag_move(move |event: &DragMoveEvent<()>, window, cx| {
+                        let b = event.bounds;
+                        let x: f32 = (event.event.position.x - b.left()).into();
                         let track_w: f32 = b.size.width.into();
-                        let pct = (x / track_w).clamp(0.0, 1.0);
-                        let raw = min + pct * (max - min);
-                        let stepped = (raw / step).round() * step;
-                        let value = stepped.clamp(min, max);
-                        f(value, window, cx);
-                    }
-                });
+                        let value = Self::value_from_x(x, track_w, min, max, step);
+                        on_change(value, window, cx);
+                    });
             }
         }
 
