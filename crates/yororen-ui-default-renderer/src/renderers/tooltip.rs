@@ -1,14 +1,18 @@
 //! `TokenTooltipRenderer` — default `TooltipRenderer` impl.
 //!
-//! Composes the tooltip shell: trigger in normal flow, then
-//! (when `state.is_open()`) the text floated with
-//! `gpui::deferred` + absolute positioning so it paints on
-//! top of subsequent sibling cells in the gallery.
+//! Composes the tooltip trigger and attaches gpui's built-in
+//! `hoverable_tooltip` so the tooltip panel is shown/hidden by
+//! the platform on hover. This avoids relying on the parent view
+//! re-rendering in response to `TooltipState` changes, which does
+//! not work reliably when the tooltip lives inside a virtual-list
+//! row. The core still owns the tooltip text / state; the renderer
+//! only decides how the floating panel looks.
 
 use std::sync::Arc;
 
 use gpui::{
-    App, Div, Hsla, ParentElement, Pixels, Styled, div,
+    App, AppContext, Context, Div, Hsla, InteractiveElement, IntoElement, ParentElement, Pixels,
+    Render, StatefulInteractiveElement, Styled, Window, div,
 };
 
 use yororen_ui_core::headless::tooltip::TooltipProps;
@@ -19,7 +23,33 @@ pub use yororen_ui_core::renderer::tooltip::{TooltipRenderState, TooltipRenderer
 
 pub struct TokenTooltipRenderer;
 
-// Inherent helpers — *not* part of the trait surface.
+/// View rendered by gpui's `hoverable_tooltip` builder.
+/// It captures the computed theme values so the tooltip panel
+/// matches the renderer's tokens.
+struct TooltipView {
+    text: String,
+    bg: Hsla,
+    fg: Hsla,
+    pad_top: Pixels,
+    font_size: Pixels,
+    border_radius: Pixels,
+    max_width: Pixels,
+}
+
+impl Render for TooltipView {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+        div()
+            .bg(self.bg)
+            .text_color(self.fg)
+            .p(self.pad_top)
+            .text_size(self.font_size)
+            .rounded(self.border_radius)
+            .max_w(self.max_width)
+            .child(self.text.clone())
+    }
+}
+
+// Inherent helpers — *not* part of the `TooltipRenderer` trait surface.
 impl TokenTooltipRenderer {
     pub fn bg(&self, _state: &TooltipRenderState, theme: &Theme) -> Hsla {
         theme.get_color("action.neutral.bg").unwrap_or_default()
@@ -58,34 +88,37 @@ impl TooltipRenderer for TokenTooltipRenderer {
         let pad = self.padding(&state, theme);
         let fs = self.font_size(&state, theme);
         let r = self.border_radius(&state, theme);
-        let open = props.state.read(cx).is_open();
+        let max_w = gpui::px(
+            theme
+                .get_number("tokens.control.tooltip.max_width")
+                .unwrap_or(240.0) as f32,
+        );
 
-        // Outer container is `relative` so the absolute tooltip
-        // below is positioned relative to it.
-        let mut outer = div().relative();
+        let mut outer = div().flex().flex_col().items_start();
 
-        // 1) Trigger — always rendered in normal flow so the
-        //    user has something to hover / focus.
+        // 1) Trigger — wrap it in a `Stateful<Div>` so we can attach
+        //    gpui's `hoverable_tooltip`. The tooltip content is built
+        //    from the core-provided text and renderer tokens.
         if let Some(t) = props.trigger.take() {
-            outer = outer.child(t);
-        }
-
-        // 2) Tooltip text — only when open, floated with
-        //    `gpui::deferred` so it paints over subsequent
-        //    sibling cells in the gallery.
-        if open {
             let text = props.text.clone();
-            let panel: Div = div()
-                .absolute()
-                .top(gpui::px(0.))
-                .left_0()
-                .bg(bg)
-                .text_color(fg)
-                .p(pad.top)
-                .text_size(fs)
-                .rounded(r)
-                .child(text);
-            outer = outer.child(gpui::deferred(panel).with_priority(1));
+            let trigger_id = format!("{}-trigger", props.id);
+            outer = outer.child(
+                div()
+                    .id(trigger_id)
+                    .child(t)
+                    .hoverable_tooltip(move |_window, cx| {
+                        cx.new(|_cx| TooltipView {
+                            text: text.clone(),
+                            bg,
+                            fg,
+                            pad_top: pad.top,
+                            font_size: fs,
+                            border_radius: r,
+                            max_width: max_w,
+                        })
+                        .into()
+                    }),
+            );
         }
 
         outer

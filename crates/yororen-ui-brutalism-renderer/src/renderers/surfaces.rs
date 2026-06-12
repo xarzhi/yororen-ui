@@ -1,7 +1,10 @@
 //! Brutalist surface renderers: `Tooltip`, `Avatar`, `Panel`,
 //! `Card`.
 
-use gpui::{App, CursorStyle, Div, Hsla, ParentElement, Pixels, Styled, div, px};
+use gpui::{
+    App, AppContext, Context, CursorStyle, Div, Hsla, InteractiveElement, IntoElement, ParentElement,
+    Pixels, Render, StatefulInteractiveElement, Styled, Window, div, px,
+};
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::{ActiveTheme, Theme};
 
@@ -17,6 +20,31 @@ use crate::style::{
 pub use yororen_ui_core::renderer::tooltip::{TooltipRenderState, TooltipRenderer};
 
 pub struct BrutalTooltipRenderer;
+
+/// View rendered by gpui's `hoverable_tooltip` builder for the
+/// brutalism tooltip panel.
+struct BrutalTooltipView {
+    text: String,
+    bg: Hsla,
+    fg: Hsla,
+    pad_top: Pixels,
+    font_size: Pixels,
+    border_radius: Pixels,
+    max_width: Pixels,
+}
+
+impl Render for BrutalTooltipView {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+        gpui::div()
+            .bg(self.bg)
+            .text_color(self.fg)
+            .p(self.pad_top)
+            .text_size(self.font_size)
+            .rounded(self.border_radius)
+            .max_w(self.max_width)
+            .child(self.text.clone())
+    }
+}
 
 // Inherent helpers — *not* part of the trait surface.
 impl BrutalTooltipRenderer {
@@ -66,33 +94,37 @@ impl TooltipRenderer for BrutalTooltipRenderer {
         let pad = self.padding(&state, theme);
         let fs = self.font_size(&state, theme);
         let r = self.border_radius(&state, theme);
-        let open = props.state.read(cx).is_open();
+        let max_w = px(
+            theme
+                .get_number("tokens.control.tooltip.max_width")
+                .unwrap_or(240.0) as f32,
+        );
 
-        // Outer container is `relative` so the absolute tooltip
-        // below is positioned relative to it.
-        let mut outer = gpui::div().relative();
+        // The trigger is wrapped in a `Stateful<Div>` so we can attach
+        // gpui's `hoverable_tooltip`. The floating panel is created by
+        // gpui on hover and styled with brutalism tokens.
+        let mut outer = gpui::div().flex().flex_col().items_start();
 
-        // 1) Trigger — always rendered in normal flow.
         if let Some(t) = props.trigger.take() {
-            outer = outer.child(t);
-        }
-
-        // 2) Tooltip text — only when open, floated with
-        //    `gpui::deferred` so it paints over subsequent
-        //    sibling cells in the gallery.
-        if open {
             let text = props.text.clone();
-            let panel: Div = gpui::div()
-                .absolute()
-                .top(gpui::px(0.))
-                .left_0()
-                .bg(bg)
-                .text_color(fg)
-                .p(pad.top)
-                .text_size(fs)
-                .rounded(r)
-                .child(text);
-            outer = outer.child(gpui::deferred(panel).with_priority(1));
+            let trigger_id = format!("{}-trigger", props.id);
+            outer = outer.child(
+                gpui::div()
+                    .id(trigger_id)
+                    .child(t)
+                    .hoverable_tooltip(move |_window, cx| {
+                        cx.new(|_cx| BrutalTooltipView {
+                            text: text.clone(),
+                            bg,
+                            fg,
+                            pad_top: pad.top,
+                            font_size: fs,
+                            border_radius: r,
+                            max_width: max_w,
+                        })
+                        .into()
+                    }),
+            );
         }
 
         outer
@@ -407,7 +439,7 @@ impl CardRenderer for BrutalCardRenderer {
 
 pub use yororen_ui_core::renderer::image::{ImageRenderState, ImageRenderer};
 
-use gpui::{InteractiveElement, Stateful};
+use gpui::Stateful;
 use std::sync::Arc;
 use yororen_ui_core::headless::image::{ImageProps, ImageSource};
 

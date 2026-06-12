@@ -1,9 +1,7 @@
 //! Section 6 — Overlays. Each component is wrapped in a
 //! labelled `cell`.
 
-use gpui::{
-    Context, Div, IntoElement, ParentElement, StatefulInteractiveElement, Styled, div, px,
-};
+use gpui::{Context, Div, IntoElement, ParentElement, Styled, div, px};
 
 use yororen_ui::headless::button::button;
 use yororen_ui::headless::disclosure::disclosure;
@@ -89,22 +87,12 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     let popover_wrapped = cell(cx.t("demo.overlays.popover_trigger"), popover_el, cx);
 
     // --- tooltip ---
-    // The trigger stays in flow; the tooltip text floats
-    // over it via `gpui::deferred` when `tooltip_state.is_open()`.
-    // The headless state machine drives open/close; the demo
-    // wires `on_hover` on the trigger so hover/focus state
-    // toggles `tooltip_state`.
+    // The trigger stays in flow; the renderer wraps it in a
+    // hitbox-bearing div and wires `on_hover` to the core
+    // `TooltipState`. The demo only supplies the trigger content.
     let tooltip_state = app.tooltip_state.clone();
-    let tooltip_state_for_hover = tooltip_state.clone();
     let tooltip_trigger = label("ov-tt-target", cx.t("demo.tooltip.hover_target"), cx)
         .render(cx)
-        .on_hover(move |hovered, _w, cx| {
-            if *hovered {
-                tooltip_state_for_hover.update(cx, |s, _cx| s.open());
-            } else {
-                tooltip_state_for_hover.update(cx, |s, _cx| s.close());
-            }
-        })
         .into_any_element();
     let tooltip_el = tooltip("ov-tooltip", cx.t("demo.tooltip.text"), tooltip_state.clone())
         .trigger(tooltip_trigger)
