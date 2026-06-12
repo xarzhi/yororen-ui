@@ -15,6 +15,7 @@ use yororen_ui::headless::keybinding_display::keybinding_display;
 use yororen_ui::headless::label::label;
 use yororen_ui::headless::panel::panel;
 use yororen_ui::headless::shortcut_hint::shortcut_hint;
+use yororen_ui::i18n::Translate;
 
 use crate::sections::cell;
 use crate::state::GalleryApp;
@@ -26,72 +27,72 @@ pub fn render(_app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .flex_row()
         .items_center()
         .gap(px(12.))
-        .child(cell("avatar / initials + status", avatar("av-1", cx).initials("AB").size(px(48.)).circle(true).has_status(true).render(cx), cx))
-        .child(cell("avatar / initials + square", avatar("av-2", cx).initials("CD").size(px(48.)).circle(false).render(cx), cx))
-        .child(cell("avatar / name (rendered)", avatar("av-3", cx).name("Jane Doe").size(px(48.)).render(cx), cx));
+        .child(cell(cx.t("demo.surfaces.cell_avatar_initials_status"), avatar("av-1", cx).initials(cx.t("demo.surfaces.avatar_initials_ab")).size(px(48.)).circle(true).has_status(true).render(cx), cx))
+        .child(cell(cx.t("demo.surfaces.cell_avatar_initials_square"), avatar("av-2", cx).initials(cx.t("demo.surfaces.avatar_initials_cd")).size(px(48.)).circle(false).render(cx), cx))
+        .child(cell(cx.t("demo.surfaces.cell_avatar_name"), avatar("av-3", cx).name(cx.t("demo.surfaces.avatar_name")).size(px(48.)).render(cx), cx));
 
     // --- card (interactive) ---
     let card_el = card("card-1", cx)
         .interactive(true)
         .render(cx)
         .w(px(220.))
-        .child(label("card-title", "Interactive card", cx).strong(true).render(cx))
-        .child(label("card-body", "Hover me to see the change.", cx).muted(true).render(cx))
-        .child(button("card-btn", cx).on_click(|_, _, _| {}).render(cx).child("Action"));
-    let card_wrapped = cell("card / interactive", card_el, cx);
+        .child(label("card-title", cx.t("demo.surfaces.card_title"), cx).strong(true).render(cx))
+        .child(label("card-body", cx.t("demo.surfaces.card_body"), cx).muted(true).render(cx))
+        .child(button("card-btn", cx).on_click(|_, _, _| {}).render(cx).child(cx.t("demo.surfaces.card_action")));
+    let card_wrapped = cell(cx.t("demo.surfaces.cell_card"), card_el, cx);
 
     // --- panel with title ---
     let panel_el = panel("panel-1", cx)
-        .title("Panel title")
+        .title(cx.t("demo.surfaces.panel_title"))
         .padded(true)
         .render(cx)
         .w(px(280.))
-        .child(label("panel-body", "Generic content surface.", cx).render(cx));
-    let panel_wrapped = cell("panel", panel_el, cx);
+        .child(label("panel-body", cx.t("demo.surfaces.panel_body"), cx).render(cx));
+    let panel_wrapped = cell(cx.t("demo.surfaces.cell_panel"), panel_el, cx);
 
     // --- empty_state ---
     let empty = empty_state("es-1", cx)
         .icon(IconSource::Builtin("info".into()))
-        .title("Nothing here yet")
-        .description("When you have items, they will show up here.")
+        .title(cx.t("demo.surfaces.empty_title"))
+        .description(cx.t("demo.surfaces.empty_desc"))
         .render(cx)
         .w(px(280.))
-        .child(label("es-extra", "Custom child (label)", cx).muted(true).render(cx));
-    let empty_wrapped = cell("empty_state", empty, cx);
+        .child(label("es-extra", cx.t("demo.surfaces.empty_custom_child"), cx).muted(true).render(cx));
+    let empty_wrapped = cell(cx.t("demo.surfaces.cell_empty"), empty, cx);
 
     // --- focus_ring wrapping a button ---
     let ring_target = button("focus-btn", cx)
         .on_click(|_, _, _| {})
         .render(cx)
-        .child("Focusable");
+        .child(cx.t("demo.surfaces.focusable"));
     let ring_focus_handle = cx.focus_handle();
     let ringed = focus_ring("ring-1", &ring_focus_handle, cx)
         .render(cx)
         .child(ring_target);
-    let ring_wrapped = cell("focus_ring (wraps button)", ringed, cx);
+    let ring_wrapped = cell(cx.t("demo.surfaces.cell_focus_ring"), ringed, cx);
 
     // --- image (resource path; the file is not bundled in the
     //     demo, but the headless contract is shown via the
     //     placeholder background). ---
     let img = image("img-1", ImageSource::Resource("images/sample.png".into()), cx)
-        .alt("sample")
+        .alt(cx.t("demo.surfaces.image_alt"))
         .render(cx)
         .w(px(120.))
         .h(px(80.))
         .bg(hsla(0.0, 0.0, 0.85, 1.0))
         .rounded(px(4.))
         .border_1();
-    let img_wrapped = cell("image (resource path)", img, cx);
+    let img_wrapped = cell(cx.t("demo.surfaces.cell_image"), img, cx);
 
     // --- keybinding_display ---
     let kbd_disp = keybinding_display("kbd-1", vec!["Ctrl".to_string(), "S".to_string()], cx)
         .render(cx);
-    let kbd_wrapped = cell("keybinding_display", kbd_disp, cx);
+    let kbd_wrapped = cell(cx.t("demo.surfaces.cell_keybinding_display"), kbd_disp, cx);
 
     // --- shortcut_hint ---
-    let sh = shortcut_hint("sh-1", "Save", vec!["Cmd".to_string(), "S".to_string()], cx)
+    let sh = shortcut_hint("sh-1", cx.t("demo.surfaces.shortcut_save_caption"), vec!["Cmd".to_string(), "S".to_string()], cx)
         .render(cx);
-    let sh_wrapped = cell("shortcut_hint", sh, cx);
+    let sh_wrapped = cell(cx.t("demo.surfaces.cell_shortcut_hint"), sh, cx);
 
     div()
         .flex()

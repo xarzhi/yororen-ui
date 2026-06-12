@@ -23,6 +23,7 @@ use yororen_ui::assets::UiAsset;
 use yororen_ui::notification::center::NotificationCenter;
 
 mod gallery_app;
+mod i18n;
 mod notifications_host;
 mod sections;
 mod state;
@@ -39,8 +40,12 @@ fn main() {
         //    trigger from the toolbar).
         cx.set_global(NotificationCenter::new());
 
-        // 3. Install English as the default locale.
-        yororen_ui::locale_en::install(cx);
+        // 3. Install English as the default locale. The
+        //    `gallery_demo::i18n::install_for_locale` helper
+        //    layers this crate's own demo translations on top
+        //    of the framework defaults from `yororen-ui-locale-en`.
+        //    The toolbar locale toggle calls it again to hot-swap.
+        crate::i18n::install_for_locale(cx, crate::state::LocaleChoice::En);
 
         // 4. Install the default renderer + light theme. The
         //    toolbar will hot-swap at runtime via

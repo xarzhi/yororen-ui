@@ -21,6 +21,7 @@ use yororen_ui::headless::icon::IconSource;
 use yororen_ui::headless::icon_button::icon_button;
 use yororen_ui::headless::split_button::split_button;
 use yororen_ui::headless::toggle_button::toggle_button;
+use yororen_ui::i18n::Translate;
 
 use crate::sections::cell;
 use crate::state::GalleryApp;
@@ -35,10 +36,10 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .flex_wrap()
         .items_center()
         .gap(px(12.))
-        .child(cell("button / Neutral", button("btn-neutral", cx).variant(ActionVariantKind::Neutral).caption("Neutral").on_click(|_, _, _| {}).render(cx), cx))
-        .child(cell("button / Primary", button("btn-primary", cx).variant(ActionVariantKind::Primary).caption("Primary").on_click(|_, _, _| {}).render(cx), cx))
-        .child(cell("button / Danger", button("btn-danger", cx).variant(ActionVariantKind::Danger).caption("Danger").on_click(|_, _, _| {}).render(cx), cx))
-        .child(cell("button / Disabled", button("btn-disabled", cx).disabled(true).caption("Disabled").on_click(|_, _, _| {}).render(cx), cx));
+        .child(cell(cx.t("demo.actions.cell_button_neutral"), button("btn-neutral", cx).variant(ActionVariantKind::Neutral).caption(cx.t("button.neutral")).on_click(|_, _, _| {}).render(cx), cx))
+        .child(cell(cx.t("demo.actions.cell_button_primary"), button("btn-primary", cx).variant(ActionVariantKind::Primary).caption(cx.t("button.primary")).on_click(|_, _, _| {}).render(cx), cx))
+        .child(cell(cx.t("demo.actions.cell_button_danger"), button("btn-danger", cx).variant(ActionVariantKind::Danger).caption(cx.t("button.danger")).on_click(|_, _, _| {}).render(cx), cx))
+        .child(cell(cx.t("demo.actions.cell_button_disabled"), button("btn-disabled", cx).disabled(true).caption(cx.t("button.disabled")).on_click(|_, _, _| {}).render(cx), cx));
 
     // --- icon_button: variant + icon only, colour is
     //     auto-derived from the renderer's `fg` token. ---
@@ -48,8 +49,8 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .flex_wrap()
         .items_center()
         .gap(px(12.))
-        .child(cell("icon_button (check)", icon_button("icon-btn-check", cx).on_click(|_, _, _| {}).icon(IconSource::Builtin("check".into())).render(cx), cx))
-        .child(cell("icon_button / Primary (check)", icon_button("icon-btn-primary-check", cx).variant(ActionVariantKind::Primary).on_click(|_, _, _| {}).icon(IconSource::Builtin("check".into())).render(cx), cx));
+        .child(cell(cx.t("demo.actions.cell_icon_button"), icon_button("icon-btn-check", cx).on_click(|_, _, _| {}).icon(IconSource::Builtin("check".into())).render(cx), cx))
+        .child(cell(cx.t("demo.actions.cell_icon_button_primary"), icon_button("icon-btn-primary-check", cx).variant(ActionVariantKind::Primary).on_click(|_, _, _| {}).icon(IconSource::Builtin("check".into())).render(cx), cx));
 
     // --- toggle_button ---
     let entity_for_tb = entity.clone();
@@ -58,7 +59,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .flex_row()
         .items_center()
         .gap(px(12.))
-        .child(cell("toggle_button", toggle_button("toggle-1", cx).selected(app.toggle_btn_selected).caption("Press me").on_toggle(move |_selected, _ev, _window, cx| { entity_for_tb.update(cx, |s, _cx| { s.toggle_btn_selected = !s.toggle_btn_selected; }); }).render(cx), cx));
+        .child(cell(cx.t("demo.actions.cell_toggle_button"), toggle_button("toggle-1", cx).selected(app.toggle_btn_selected).caption(cx.t("demo.actions.press_me")).on_toggle(move |_selected, _ev, _window, cx| { entity_for_tb.update(cx, |s, _cx| { s.toggle_btn_selected = !s.toggle_btn_selected; }); }).render(cx), cx));
 
     // --- split_button: primary action + chevron-toggled
     //     dropdown. The renderer handles the trigger row,
@@ -68,13 +69,16 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     //     `DropdownMenuState` for the open/closed bit.
     let entity_for_primary = entity.clone();
     let entity_for_select = entity.clone();
+    let split_caption = cx.t("demo.actions.save").to_string();
+    let split_save_as = cx.t("demo.actions.save_as").to_string();
+    let split_save_all = cx.t("demo.actions.save_all").to_string();
     let row_split = div()
         .flex()
         .flex_row()
         .items_center()
         .gap(px(12.))
         .child(cell(
-            "split_button",
+            cx.t("demo.actions.cell_split_button"),
             split_button(
                 "split-1",
                 move |_, _, cx| {
@@ -83,11 +87,11 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
                 cx,
             )
             .state(app.split_dropdown_state.clone())
-            .caption("Save")
+            .caption(split_caption.clone())
             .items(vec![
-                DropdownItem::Item(DropdownMenuItem::new("save", "Save")),
-                DropdownItem::Item(DropdownMenuItem::new("save_as", "Save as…")),
-                DropdownItem::Item(DropdownMenuItem::new("save_all", "Save all")),
+                DropdownItem::Item(DropdownMenuItem::new("save", split_caption)),
+                DropdownItem::Item(DropdownMenuItem::new("save_as", split_save_as)),
+                DropdownItem::Item(DropdownMenuItem::new("save_all", split_save_all)),
             ])
             .on_select(move |_id, _w, cx| {
                 entity_for_select.update(cx, |s, _cx| s.toast_count += 1);
@@ -102,15 +106,18 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     //     by `ButtonRenderer` (bg / fg / rounded / hover /
     //     active); the group renderer only owns the container's
     //     layout (flex direction + gap).
+    let left_caption = cx.t("demo.actions.left").to_string();
+    let mid_caption = cx.t("demo.actions.mid").to_string();
+    let right_caption = cx.t("demo.actions.right").to_string();
     let row_group = div()
         .flex()
         .flex_row()
         .items_center()
         .gap(px(12.))
-        .child(cell("button_group (3 buttons)", button_group("btn-group-1", cx)
-            .child(button("bg-left", cx).variant(ActionVariantKind::Neutral).caption("Left").on_click(|_, _, _| {}).render(cx))
-            .child(button("bg-mid", cx).variant(ActionVariantKind::Neutral).caption("Mid").on_click(|_, _, _| {}).render(cx))
-            .child(button("bg-right", cx).variant(ActionVariantKind::Neutral).caption("Right").on_click(|_, _, _| {}).render(cx))
+        .child(cell(cx.t("demo.actions.cell_button_group"), button_group("btn-group-1", cx)
+            .child(button("bg-left", cx).variant(ActionVariantKind::Neutral).caption(left_caption).on_click(|_, _, _| {}).render(cx))
+            .child(button("bg-mid", cx).variant(ActionVariantKind::Neutral).caption(mid_caption).on_click(|_, _, _| {}).render(cx))
+            .child(button("bg-right", cx).variant(ActionVariantKind::Neutral).caption(right_caption).on_click(|_, _, _| {}).render(cx))
             .render(cx), cx));
 
     div()

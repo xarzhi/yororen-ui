@@ -9,6 +9,7 @@ use yororen_ui::headless::radio::radio;
 use yororen_ui::headless::radio_group::radio_group;
 use yororen_ui::headless::slider::slider;
 use yororen_ui::headless::switch::switch;
+use yororen_ui::i18n::Translate;
 
 use crate::sections::cell;
 use crate::sections::input_cell;
@@ -16,6 +17,7 @@ use crate::state::GalleryApp;
 
 pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     let entity = cx.entity().clone();
+    let value_prefix = cx.t("demo.input.value").to_string();
 
     // --- checkbox ---
     let entity_cb = entity.clone();
@@ -36,7 +38,8 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .render(cx);
 
     // --- 3 radio buttons in a radio_group ---
-    let rg_label = label("rg-current", format!("selected: {}", app.radio_value), cx)
+    let selected_label = cx.t("demo.controls.selected").to_string();
+    let rg_label = label("rg-current", format!("{selected_label} {}", app.radio_value), cx)
         .muted(true)
         .render(cx);
     let rg_with_label = radio_group("ctrl-rg", cx)
@@ -68,13 +71,13 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         })
         .render(cx);
 
+    let slider_status_template = cx.t("demo.controls.slider_value").to_string();
+    let formatted_slider = format!("{:.1}", slider_value);
     div()
         .flex()
         .flex_col()
         .gap(px(12.))
-        .child(div().flex().flex_row().flex_wrap().gap(px(12.)).items_center().child(input_cell("checkbox", cb, &format!("value: {}", app.checkbox_value), cx)).child(input_cell("switch", sw, &format!("value: {}", app.switch_value), cx)))
-        .child(cell("radio_group (3 radios)", rg_with_radios, cx))
-        .child(div().flex().flex_col().gap(px(4.)).child(cell("slider (track + knob)", slider_track, cx)).child(label("slider-lbl", format!("slider: {slider_value:.1}"), cx).muted(true).render(cx)))
+        .child(div().flex().flex_row().flex_wrap().gap(px(12.)).items_center().child(input_cell(cx.t("demo.controls.cell_checkbox"), cb, &format!("{value_prefix} {}", app.checkbox_value), cx)).child(input_cell(cx.t("demo.controls.cell_switch"), sw, &format!("{value_prefix} {}", app.switch_value), cx)))
+        .child(cell(cx.t("demo.controls.cell_radio_group"), rg_with_radios, cx))
+        .child(div().flex().flex_col().gap(px(4.)).child(cell(cx.t("demo.controls.cell_slider"), slider_track, cx)).child(label("slider-lbl", slider_status_template.replacen("{}", &formatted_slider, 1), cx).muted(true).render(cx)))
 }
-
-

@@ -14,6 +14,7 @@ use yororen_ui::headless::search_input::search_input;
 use yororen_ui::headless::select::select;
 use yororen_ui::headless::text_area::text_area;
 use yororen_ui::headless::text_input::text_input;
+use yororen_ui::i18n::Translate;
 
 use crate::state::GalleryApp;
 
@@ -23,12 +24,14 @@ pub fn render(
     cx: &mut Context<GalleryApp>,
 ) -> Div {
     let entity = cx.entity().clone();
+    let value_prefix = cx.t("demo.input.value").to_string();
+    let mode_prefix = cx.t("demo.input.mode").to_string();
 
     // text_input
     let entity_text = entity.clone();
     let text_value = app.text_value.clone();
     let text_input_el = text_input("input-text")
-        .placeholder("Type here…")
+        .placeholder(cx.t("demo.input.placeholder_type_here"))
         .on_change(move |new: &str, _w, cx| {
             entity_text.update(cx, |s, _cx| s.text_value = new.to_string());
         })
@@ -38,7 +41,7 @@ pub fn render(
     let entity_pw = entity.clone();
     let pw_value = app.password_value.clone();
     let pw_input_el = password_input("input-password")
-        .placeholder("Enter password…")
+        .placeholder(cx.t("demo.input.placeholder_password"))
         .mask_char('•')
         .on_change(move |new: &str, _w, cx| {
             entity_pw.update(cx, |s, _cx| s.password_value = new.to_string());
@@ -70,7 +73,7 @@ pub fn render(
     let entity_search = entity.clone();
     let search_value = app.search_value.clone();
     let search_input_el = search_input("input-search")
-        .placeholder("Search…")
+        .placeholder(cx.t("demo.input.placeholder_search"))
         .on_change(move |new: &str, _w, cx| {
             entity_search.update(cx, |s, _cx| s.search_value = new.to_string());
         })
@@ -81,7 +84,7 @@ pub fn render(
     let entity_fp = entity.clone();
     let fp_value = app.file_path_value.clone();
     let fp_input_el = file_path_input("input-file-path")
-        .placeholder("/path/to/file")
+        .placeholder(cx.t("demo.input.placeholder_path"))
         .on_change(move |new: &str, _w, cx| {
             entity_fp.update(cx, |s, _cx| s.file_path_value = new.to_string());
         })
@@ -115,7 +118,7 @@ pub fn render(
     let entity_ta = entity.clone();
     let ta_value = app.text_area_value.clone();
     let ta_input_el = text_area("input-text-area")
-        .placeholder("Multi-line text…")
+        .placeholder(cx.t("demo.input.placeholder_text_area"))
         .on_change(move |new: &str, _w, cx| {
             entity_ta.update(cx, |s, _cx| s.text_area_value = new.to_string());
         })
@@ -152,15 +155,15 @@ pub fn render(
         .flex()
         .flex_col()
         .gap(px(16.))
-        .child(input_cell("text_input", text_input_el, &format!("value: {:?}", text_value), cx))
-        .child(input_cell("password_input", pw_input_el, &format!("value: {:?}", pw_value), cx))
-        .child(input_cell("number_input", num_input_el, &format!("value: {}", num_value), cx))
-        .child(input_cell("search_input", search_input_el, &format!("value: {:?}", search_value), cx))
-        .child(input_cell("file_path_input (click right icon to open dialog)", fp_input_el, &format!("value: {:?}", fp_value), cx))
-        .child(input_cell("keybinding_input (click to start capture)", kb_input_el, &format!("value: {:?}  mode: {:?}", kb_value, kb_mode), cx))
-        .child(input_cell("text_area (multi-line)", ta_input_el, &format!("value: {:?}", ta_value), cx))
-        .child(input_cell("select (composite)", select_el, &format!("value: {}", app.select_demo_value), cx))
-        .child(input_cell("combo_box (composite)", combo_el, &format!("value: {}", app.combo_demo_value), cx))
+        .child(input_cell(cx.t("input.text"), text_input_el, &format!("{value_prefix} {:?}", text_value), cx))
+        .child(input_cell(cx.t("input.password"), pw_input_el, &format!("{value_prefix} {:?}", pw_value), cx))
+        .child(input_cell(cx.t("input.number"), num_input_el, &format!("{value_prefix} {}", num_value), cx))
+        .child(input_cell(cx.t("input.search"), search_input_el, &format!("{value_prefix} {:?}", search_value), cx))
+        .child(input_cell(cx.t("demo.input.file_path_hint"), fp_input_el, &format!("{value_prefix} {:?}", fp_value), cx))
+        .child(input_cell(cx.t("demo.input.keybinding_hint"), kb_input_el, &format!("{value_prefix} {:?}  {mode_prefix} {:?}", kb_value, kb_mode), cx))
+        .child(input_cell(cx.t("demo.input.text_area_hint"), ta_input_el, &format!("{value_prefix} {:?}", ta_value), cx))
+        .child(input_cell(cx.t("input.select"), select_el, &format!("{value_prefix} {}", app.select_demo_value), cx))
+        .child(input_cell(cx.t("input.combo"), combo_el, &format!("{value_prefix} {}", app.combo_demo_value), cx))
 }
 
 /// Render a labelled input cell with a status line below it
@@ -169,7 +172,7 @@ pub fn render(
 /// Reused by `controls.rs` so checkbox/switch can show their
 /// `value: <bool>` status the same way the other inputs do.
 pub fn input_cell(
-    name: &'static str,
+    name: impl Into<String>,
     el: impl IntoElement,
     status: &str,
     cx: &mut Context<GalleryApp>,

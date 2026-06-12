@@ -33,9 +33,9 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
             modal_state_for_btn.update(cx, |st, _cx| st.open());
         })
         .render(cx)
-        .child("Open modal");
+        .child(cx.t("demo.modal.open"));
     let modal_wrapped = cell(
-        "modal (click to open)",
+        cx.t("demo.modal.cell"),
         div().flex().flex_col().child(open_modal_btn),
         cx,
     );
@@ -50,7 +50,11 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
             popover_state_for_btn.update(cx, |st, _cx| st.toggle());
         })
         .render(cx)
-        .child(if popover_is_open { "Close popover" } else { "Open popover" });
+        .child(if popover_is_open {
+            cx.t("demo.overlays.popover_close")
+        } else {
+            cx.t("demo.overlays.popover_open")
+        });
     // The popover's body is a real menu (with items). The
     // menu renderer iterates `menu_state.items` to draw the
     // rows, so we only need to set up the on_select handler
@@ -82,7 +86,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .trigger(popover_trigger.into_any_element())
         .content(popover_content)
         .render(cx);
-    let popover_wrapped = cell("popover (click trigger)", popover_el, cx);
+    let popover_wrapped = cell(cx.t("demo.overlays.popover_trigger"), popover_el, cx);
 
     // --- tooltip ---
     // The trigger stays in flow; the tooltip text floats
@@ -92,7 +96,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     // toggles `tooltip_state`.
     let tooltip_state = app.tooltip_state.clone();
     let tooltip_state_for_hover = tooltip_state.clone();
-    let tooltip_trigger = label("ov-tt-target", "Hover or focus me", cx)
+    let tooltip_trigger = label("ov-tt-target", cx.t("demo.tooltip.hover_target"), cx)
         .render(cx)
         .on_hover(move |hovered, _w, cx| {
             if *hovered {
@@ -102,10 +106,10 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
             }
         })
         .into_any_element();
-    let tooltip_el = tooltip("ov-tooltip", cx.t("tooltip.text"), tooltip_state.clone())
+    let tooltip_el = tooltip("ov-tooltip", cx.t("demo.tooltip.text"), tooltip_state.clone())
         .trigger(tooltip_trigger)
         .render(cx);
-    let tooltip_wrapped = cell("tooltip (hover target)", tooltip_el, cx);
+    let tooltip_wrapped = cell(cx.t("demo.tooltip.cell"), tooltip_el, cx);
 
     // --- dropdown_menu ---
     // Body is a real menu that iterates `dropdown_state.items`
@@ -137,7 +141,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
             dropdown_state_for_btn.update(cx, |st, _cx| st.toggle());
         })
         .render(cx)
-        .child("Open menu ▾");
+        .child(cx.t("demo.overlays.dropdown_open"));
     let dropdown_menu_el = menu("ov-dropdown-body", menu_state_for_dropdown.clone()).render(cx);
     let dropdown_content = if app.dropdown_state.read(cx).open {
         dropdown_menu_el.into_any_element()
@@ -148,7 +152,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .trigger(dropdown_trigger.into_any_element())
         .content(dropdown_content)
         .render(cx);
-    let dropdown_wrapped = cell("dropdown_menu (click trigger)", dropdown_el, cx);
+    let dropdown_wrapped = cell(cx.t("demo.overlays.dropdown_trigger"), dropdown_el, cx);
 
     // --- disclosure ---
     // The renderer (default or brutalism) draws the trigger
@@ -157,7 +161,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     // artifact.
     let entity_for_disc = cx.entity().clone();
     let disc_open = app.disclosure_open;
-    let disc = disclosure("ov-disc", cx.t("disclosure.title"), cx)
+    let disc = disclosure("ov-disc", cx.t("demo.disclosure.title"), cx)
         .open(disc_open)
         .on_toggle(move |_, _, cx| {
             entity_for_disc.update(cx, |s, _cx| {
@@ -169,20 +173,21 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         disc.child(
             div()
                 .pl(px(16.))
-                .child(label("ov-disc-body", cx.t("disclosure.body"), cx).render(cx)),
+                .child(label("ov-disc-body", cx.t("demo.disclosure.body"), cx).render(cx)),
         )
     } else {
         disc
     };
-    let disc_wrapped = cell("disclosure (click to expand)", disc_with_body, cx);
+    let disc_wrapped = cell(cx.t("demo.disclosure.cell"), disc_with_body, cx);
 
     // --- overlay (scrim primitive; mirrors modal state) ---
     let overlay_el = overlay("ov-overlay", cx)
         .open(is_modal_open)
         .render(cx)
-        .child(label("ov-overlay-info", "scrim follows modal state", cx).muted(true).render(cx));
-    let overlay_wrapped = cell("overlay (scrim)", overlay_el, cx);
+        .child(label("ov-overlay-info", cx.t("demo.overlays.scrim_info"), cx).muted(true).render(cx));
+    let overlay_wrapped = cell(cx.t("demo.overlays.scrim"), overlay_el, cx);
 
+    let summary_template = cx.t("demo.overlays.summary").to_string();
     div()
         .flex()
         .flex_col()
@@ -193,5 +198,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .child(dropdown_wrapped)
         .child(disc_wrapped)
         .child(overlay_wrapped)
-        .child(label("ov-summary", format!("dropdown: {} | menu: {}", app.dropdown_demo_value, app.menu_demo_value), cx).muted(true).render(cx))
+        .child(label("ov-summary", summary_template
+            .replacen("{}", &app.dropdown_demo_value, 1)
+            .replacen("{}", &app.menu_demo_value, 1), cx).muted(true).render(cx))
 }

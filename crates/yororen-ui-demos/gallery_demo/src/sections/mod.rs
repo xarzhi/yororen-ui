@@ -15,6 +15,7 @@ use gpui::{Context, Div, IntoElement, ParentElement, Styled, Window, div, px};
 
 use yororen_ui::headless::heading::heading;
 use yororen_ui::headless::heading::HeadingLevel;
+use yororen_ui::i18n::Translate;
 
 use crate::state::GalleryApp;
 
@@ -25,8 +26,12 @@ use crate::state::GalleryApp;
 ///
 /// Use `name` like `"button / Primary"` or `"tag (closable)"`
 /// — both the variant and the underlying headless primitive.
+/// `name` is `impl Into<String>` so callers can pass either a
+/// static literal (`"..."`) or the result of `cx.t("demo.foo")`
+/// (which is `SharedString` and converts via the `From<SharedString>
+/// for String` impl).
 pub fn cell(
-    name: &'static str,
+    name: impl Into<String>,
     el: impl IntoElement,
     cx: &mut Context<GalleryApp>,
 ) -> Div {
@@ -51,7 +56,7 @@ pub fn cell(
 
 fn section_title(
     id: &'static str,
-    text: &'static str,
+    text: impl Into<String>,
     cx: &mut Context<GalleryApp>,
 ) -> impl IntoElement {
     heading(id, HeadingLevel::H2, text, cx).apply(div()).mt(px(8.))
@@ -66,7 +71,7 @@ pub fn actions(
         .flex()
         .flex_col()
         .gap(px(12.))
-        .child(section_title("actions-title", "1. Actions", cx))
+        .child(section_title("actions-title", cx.t("demo.section_actions"), cx))
         .child(actions::render(app, cx))
 }
 
@@ -79,7 +84,7 @@ pub fn display(
         .flex()
         .flex_col()
         .gap(px(12.))
-        .child(section_title("display-title", "2. Display", cx))
+        .child(section_title("display-title", cx.t("demo.section_display"), cx))
         .child(display::render(app, cx))
 }
 
@@ -92,7 +97,7 @@ pub fn surfaces(
         .flex()
         .flex_col()
         .gap(px(12.))
-        .child(section_title("surfaces-title", "3. Surfaces", cx))
+        .child(section_title("surfaces-title", cx.t("demo.section_surfaces"), cx))
         .child(surfaces::render(app, cx))
 }
 
@@ -105,7 +110,7 @@ pub fn inputs(
         .flex()
         .flex_col()
         .gap(px(12.))
-        .child(section_title("inputs-title", "4. Inputs", cx))
+        .child(section_title("inputs-title", cx.t("demo.section_inputs"), cx))
         .child(inputs::render(app, window, cx))
 }
 
@@ -118,7 +123,7 @@ pub fn controls(
         .flex()
         .flex_col()
         .gap(px(12.))
-        .child(section_title("controls-title", "5. Controls", cx))
+        .child(section_title("controls-title", cx.t("demo.section_controls"), cx))
         .child(controls::render(app, cx))
 }
 
@@ -131,7 +136,7 @@ pub fn overlays(
         .flex()
         .flex_col()
         .gap(px(12.))
-        .child(section_title("overlays-title", "6. Overlays", cx))
+        .child(section_title("overlays-title", cx.t("demo.section_overlays"), cx))
         .child(overlays::render(app, cx))
 }
 
@@ -144,6 +149,6 @@ pub fn lists(
         .flex()
         .flex_col()
         .gap(px(12.))
-        .child(section_title("lists-title", "7. Lists, Tables, Trees, Forms", cx))
+        .child(section_title("lists-title", cx.t("demo.section_lists"), cx))
         .child(lists::render(app, window, cx))
 }

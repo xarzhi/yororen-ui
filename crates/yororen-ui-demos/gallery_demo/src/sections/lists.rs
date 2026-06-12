@@ -26,12 +26,6 @@ use yororen_ui::i18n::Translate;
 use crate::sections::cell;
 use crate::state::GalleryApp;
 
-const LIST_ITEMS: &[(&str, &str)] = &[
-    ("li-1", "First item"),
-    ("li-2", "Second item"),
-    ("li-3", "Third item"),
-];
-
 pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<GalleryApp>) -> Div {
     // Sync the virtual_list controller's item_count to the demo's
     // tracked `vl_item_count`. The `on_visible_range_change`
@@ -61,32 +55,45 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
     }
 
     // --- list_item: 3 selectable rows ---
+    let first_label = cx.t("demo.lists.first_item").to_string();
+    let second_label = cx.t("demo.lists.second_item").to_string();
+    let third_label = cx.t("demo.lists.third_item").to_string();
+    let list_items: Vec<(&'static str, String)> = vec![
+        ("li-1", first_label),
+        ("li-2", second_label),
+        ("li-3", third_label),
+    ];
     let mut list_col = div().flex().flex_col().gap(px(4.)).w(px(220.));
-    for (i, (id, title)) in LIST_ITEMS.iter().enumerate() {
+    for (i, (id, title)) in list_items.iter().enumerate() {
         list_col = list_col.child(
-            list_item(*id, *title, cx)
+            list_item(*id, title.clone(), cx)
                 .selected(app.selected_list_item == Some(i))
                 .render(cx),
         );
     }
-    let list_wrapped = cell("list_item (3 rows; selected via props)", list_col, cx);
+    let list_wrapped = cell(cx.t("demo.lists.cell_list"), list_col, cx);
 
     // --- form + form_field (with a real text_input + submit button) ---
     let entity_form = cx.entity().clone();
     let entity_text = cx.entity().clone();
     let email_input_el = text_input("lists-ff-email-input")
-        .placeholder(cx.t("form.email_placeholder"))
+        .placeholder(cx.t("demo.form.email_placeholder"))
         .on_change(move |new: &str, _w, cx| {
             entity_text.update(cx, |s, _cx| s.form_email_value = new.to_string());
         })
         .render(cx, window);
 
     let form_field_el = form_field("lists-ff-email", "email", cx)
-        .label(cx.t("form.email"))
+        .label(cx.t("demo.form.email_label"))
         .required(true)
         .input(email_input_el)
         .render(cx);
 
+    // Capture the must-contain-@ message as an owned `String` so
+    // the on_submit closure can read it without re-borrowing
+    // `cx` (which is already mutably borrowed by the outer
+    // `entity.update`).
+    let must_contain_at_msg = cx.t("demo.form.must_contain_at").to_string();
     let form_props = form("lists-form", cx)
         .value("email", app.form_email_value.clone())
         .on_submit(move |vals, _w, cx| {
@@ -97,17 +104,19 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
                     s.form_email_error = if e.contains('@') {
                         None
                     } else {
-                        Some("must contain @".to_string())
+                        Some(must_contain_at_msg.clone())
                     };
                 }
             });
         })
-        .submit("Submit");
+        .submit(cx.t("demo.form.email_label").to_string());
 
     let submit_btn_el = form_props
         .submit_button(cx)
         .expect("submit_label was set");
 
+    let submitted_label = cx.t("demo.form.submitted").to_string();
+    let last_error_label = cx.t("demo.form.last_error").to_string();
     let form_el = form_props
         .render(cx)
         .w(px(300.))
@@ -116,26 +125,41 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
         .child(
             label(
                 "form-submit-count",
-                format!("submitted: {} | last error: {:?}", app.form_submit_count, app.form_email_error),
+                format!(
+                    "{submitted_label} {} | {last_error_label} {:?}",
+                    app.form_submit_count, app.form_email_error
+                ),
                 cx,
             )
             .muted(true)
             .render(cx),
         );
-    let form_wrapped = cell("form + form_field (email validation)", form_el, cx);
+    let form_wrapped = cell(cx.t("demo.form.cell"), form_el, cx);
 
     // --- table ---
     let entity_table = cx.entity().clone();
+    let col_name = cx.t("demo.lists.table_col_name").to_string();
+    let col_age = cx.t("demo.lists.table_col_age").to_string();
+    let col_city = cx.t("demo.lists.table_col_city").to_string();
+    let row_alice = cx.t("demo.lists.table_row_alice").to_string();
+    let row_bob = cx.t("demo.lists.table_row_bob").to_string();
+    let row_carol = cx.t("demo.lists.table_row_carol").to_string();
+    let age_30 = cx.t("demo.lists.table_row_age_30").to_string();
+    let age_25 = cx.t("demo.lists.table_row_age_25").to_string();
+    let age_28 = cx.t("demo.lists.table_row_age_28").to_string();
+    let beijing = cx.t("demo.lists.table_row_beijing").to_string();
+    let shanghai = cx.t("demo.lists.table_row_shanghai").to_string();
+    let shenzhen = cx.t("demo.lists.table_row_shenzhen").to_string();
     let table_el = table("lists-table", cx)
         .columns(vec![
-            TableColumn::new("name", "Name").width(120.),
-            TableColumn::new("age", "Age").width(60.),
-            TableColumn::new("city", "City").width(120.),
+            TableColumn::new("name", col_name.clone()).width(120.),
+            TableColumn::new("age", col_age.clone()).width(60.),
+            TableColumn::new("city", col_city.clone()).width(120.),
         ])
         .rows(vec![
-            vec!["Alice".into(), "30".into(), "Beijing".into()],
-            vec!["Bob".into(), "25".into(), "Shanghai".into()],
-            vec!["Carol".into(), "28".into(), "Shenzhen".into()],
+            vec![row_alice.clone().into(), age_30.clone().into(), beijing.clone().into()],
+            vec![row_bob.clone().into(), age_25.clone().into(), shanghai.clone().into()],
+            vec![row_carol.clone().into(), age_28.clone().into(), shenzhen.clone().into()],
         ])
         .selected(app.selected_table_row.unwrap_or(0))
         .on_select(move |i, _w, cx| {
@@ -143,15 +167,15 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
         })
         .render(cx)
         .w(px(320.));
-    let table_wrapped = cell("table (3 rows × 3 cols)", table_el, cx);
+    let table_wrapped = cell(cx.t("demo.lists.cell_table"), table_el, cx);
 
     // --- tree (with tree_item rows) ---
     let mut tree_data = TreeData::new();
-    tree_data.add(None, node_id("root"), "Root");
-    tree_data.add(Some(node_id("root")), node_id("child1"), "Child 1");
-    tree_data.add(Some(node_id("root")), node_id("child2"), "Child 2");
-    tree_data.add(Some(node_id("child1")), node_id("leaf1"), "Leaf 1");
-    tree_data.add(Some(node_id("child1")), node_id("leaf2"), "Leaf 2");
+    tree_data.add(None, node_id("root"), cx.t("demo.lists.tree_root"));
+    tree_data.add(Some(node_id("root")), node_id("child1"), cx.t("demo.lists.tree_child1"));
+    tree_data.add(Some(node_id("root")), node_id("child2"), cx.t("demo.lists.tree_child2"));
+    tree_data.add(Some(node_id("child1")), node_id("leaf1"), cx.t("demo.lists.tree_leaf1"));
+    tree_data.add(Some(node_id("child1")), node_id("leaf2"), cx.t("demo.lists.tree_leaf2"));
     let tree_data_for_iter = tree_data.clone();
     let entity_tree = cx.entity().clone();
     let tree_expanded: BTreeSet<_> = app.tree_expanded.clone();
@@ -216,7 +240,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
                 .render(cx, window),
         );
     }
-    let tree_wrapped = cell("tree + tree_item (3-5 rows; click chevron or double-click row to expand, click row to select)", tree_el, cx);
+    let tree_wrapped = cell(cx.t("demo.lists.cell_tree"), tree_el, cx);
 
     // --- virtual_list ---
     // 1000+ items (grows via infinite scroll), each rendered as
@@ -243,6 +267,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
     // main thread inside the update callback.
     let app_entity_for_vl = cx.entity().clone();
     let app_entity_for_range = cx.entity().clone();
+    let vl_item_template = cx.t("demo.lists.vl_item").to_string();
     let vl = virtual_list("lists-vl", &app.list_controller, cx)
         .row(move |ix, _window, cx| {
             let app_entity = app_entity_for_vl.clone();
@@ -251,7 +276,8 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
             // re-invoked per visible row per frame.
             let selected = app_entity.read(cx).selected_list_item == Some(ix);
             let row_id: ElementId = format!("vl-row-{ix}").into();
-            list_item(row_id, format!("Item #{ix}"), cx)
+            let row_label = vl_item_template.replacen("{}", &ix.to_string(), 1);
+            list_item(row_id, row_label, cx)
                 .selected(selected)
                 .on_click(move |_ev, _window, cx| {
                     app_entity.update(cx, |s, _cx| {
@@ -288,25 +314,28 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
             entity_for_vl_top.update(cx, |s, _| s.list_controller.scroll_to_top());
         })
         .render(cx)
-        .child("Top");
+        .child(cx.t("demo.common.top"));
     let bottom_btn = button("vl-bottom", cx)
         .on_click(move |_, _, cx| {
             entity_for_vl_bottom.update(cx, |s, _| s.list_controller.scroll_to_bottom());
         })
         .render(cx)
-        .child("Bottom");
+        .child(cx.t("demo.common.bottom"));
     let controls_row = div()
         .flex()
         .flex_row()
         .gap(px(6.))
         .child(top_btn)
         .child(bottom_btn);
+    let vl_status_template = cx.t("demo.lists.vl_status").to_string();
+    let visible_str = format!("{:?}", app.vl_visible_range);
+    let vl_status_text = vl_status_template
+        .replacen("{:?}", &visible_str, 1)
+        .replacen("{}", &app.vl_item_count.to_string(), 1)
+        .replacen("{}", &app.vl_load_count.to_string(), 1);
     let status_label = label(
         "vl-status",
-        format!(
-            "visible: {:?} | item_count: {} | auto-loaded batches: {}",
-            app.vl_visible_range, app.vl_item_count, app.vl_load_count
-        ),
+        vl_status_text,
         cx,
     )
     .muted(true)
@@ -319,7 +348,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
         .child(controls_row)
         .child(status_label);
     let vl_wrapped = cell(
-        "virtual_list (scroll_to_top/bottom + on_visible_range_change + infinite loading)",
+        cx.t("demo.lists.cell_vl"),
         vl_col,
         cx,
     );
@@ -331,10 +360,12 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
     // also has Top / Bottom buttons wired to the
     // `UniformVirtualListController` (via `entity.update` for the
     // same Send + Sync reason as virtual_list above).
+    let uvl_item_template = cx.t("demo.lists.uvl_item").to_string();
     let uvl = uniform_virtual_list("lists-uvl", 1_000, &app.uniform_list_controller, cx)
         .row(move |ix, _w, cx| {
             let row_id: ElementId = format!("uvl-row-{ix}").into();
-            list_item(row_id, format!("Uniform row #{ix}"), cx)
+            let row_label = uvl_item_template.replacen("{}", &ix.to_string(), 1);
+            list_item(row_id, row_label, cx)
                 .render(cx)
                 .into_any_element()
         })
@@ -348,13 +379,13 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
             entity_for_uvl_top.update(cx, |s, _| s.uniform_list_controller.scroll_to_top());
         })
         .render(cx)
-        .child("Top");
+        .child(cx.t("demo.common.top"));
     let uvl_bottom_btn = button("uvl-bottom", cx)
         .on_click(move |_, _, cx| {
             entity_for_uvl_bottom.update(cx, |s, _| s.uniform_list_controller.scroll_to_bottom());
         })
         .render(cx)
-        .child("Bottom");
+        .child(cx.t("demo.common.bottom"));
     let uvl_controls = div()
         .flex()
         .flex_row()
@@ -368,7 +399,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
         .child(uvl)
         .child(uvl_controls);
     let uvl_wrapped = cell(
-        "uniform_virtual_list (1000 items; uniform-height fast path; scroll_to_top/bottom)",
+        cx.t("demo.lists.cell_uvl"),
         uvl_col,
         cx,
     );
@@ -378,14 +409,14 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
         .render(cx)
         .h(px(16.))
         .w_full();
-    let sp_wrapped = cell("spacer (16px tall)", sp, cx);
+    let sp_wrapped = cell(cx.t("demo.lists.cell_spacer"), sp, cx);
 
     // --- radio_group empty (also used as a layout shell) ---
     let rg_demo = radio_group("lists-rg", cx)
         .name("rg-2")
         .render(cx)
-        .child(label("rg-2-info", "Standalone radio_group (no children)", cx).muted(true).render(cx));
-    let rg_wrapped = cell("radio_group (empty shell)", rg_demo, cx);
+        .child(label("rg-2-info", cx.t("demo.controls.radio_group_empty_label"), cx).muted(true).render(cx));
+    let rg_wrapped = cell(cx.t("demo.controls.cell_radio_group_empty"), rg_demo, cx);
 
     div()
         .flex()

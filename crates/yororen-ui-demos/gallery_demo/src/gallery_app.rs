@@ -58,7 +58,6 @@ use yororen_ui::headless::toggle_button::toggle_button;
 use crate::sections;
 use crate::state::{GalleryApp, LocaleChoice};
 use crate::theme_switcher::{install_renderer, DarkMode, RendererKind};
-
 /// Number of rows in the top-level section virtual list.
 ///
 /// Row mapping:
@@ -214,15 +213,15 @@ fn build_modal_overlay(
     let modal_panel = modal("ov-modal", app.modal_state.clone())
         .render(cx)
         .w(px(360.))
-        .child(label("ov-modal-title", cx.t("modal.title"), cx).strong(true).render(cx))
-        .child(label("ov-modal-body", cx.t("modal.body"), cx).render(cx))
+        .child(label("ov-modal-title", cx.t("demo.modal.title"), cx).strong(true).render(cx))
+        .child(label("ov-modal-body", cx.t("demo.modal.body"), cx).render(cx))
         .child(
             button("ov-modal-close", cx)
                 .on_click(move |_, _, cx| {
                     modal_state_for_close.update(cx, |st, _cx| st.close());
                 })
                 .render(cx)
-                .child("Close"),
+                .child(cx.t("common.close")),
         );
 
     gpui::deferred(
@@ -253,7 +252,7 @@ fn build_toolbar(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .items_center()
         .gap(px(12.))
         .child(
-            heading("title", HeadingLevel::H1, "yororen-ui gallery", cx)
+            heading("title", HeadingLevel::H1, cx.t("demo.title"), cx)
                 .apply(div())
                 .mr(px(8.)),
         );
@@ -271,7 +270,7 @@ fn build_toolbar(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
                 });
             })
             .render(cx)
-            .child("Default"),
+            .child(cx.t("demo.renderer_default")),
     );
     let entity_for_renderer = entity.clone();
     row = row.child(
@@ -284,7 +283,7 @@ fn build_toolbar(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
                 });
             })
             .render(cx)
-            .child("Brutalism"),
+            .child(cx.t("demo.renderer_brutalism")),
     );
 
     // Dark mode toggle (2 toggle_buttons).
@@ -298,7 +297,7 @@ fn build_toolbar(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
                 });
             })
             .render(cx)
-            .child("Light"),
+            .child(cx.t("demo.theme_light")),
     );
     let entity_for_dark = entity.clone();
     row = row.child(
@@ -310,12 +309,17 @@ fn build_toolbar(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
                 });
             })
             .render(cx)
-            .child("Dark"),
+            .child(cx.t("demo.theme_dark")),
     );
 
-    // Locale: 3 toggle_buttons. Toggling calls the appropriate
-    // `yororen_ui::locale_xx::install(cx)` to overwrite the global
-    // I18n.
+    // Locale: 3 toggle_buttons. Toggling calls the gallery's
+    // `i18n::install_for_locale` to overwrite the global `I18n`
+    // with the chosen locale's component defaults + this demo's
+    // own translations (see `crate::i18n`).
+    //
+    // The button labels are the language's *own* name in its
+    // native script — not localizable text. They are language
+    // identifiers, not English descriptions of a language.
     for (id, choice, label) in [
         ("locale-en", LocaleChoice::En, "EN"),
         ("locale-zh", LocaleChoice::ZhCn, "中文"),
@@ -330,11 +334,7 @@ fn build_toolbar(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
                 entity_for_locale.update(cx, |s, _cx| {
                     s.current_locale = choice;
                 });
-                match choice {
-                    LocaleChoice::En => yororen_ui::locale_en::install(cx),
-                    LocaleChoice::ZhCn => yororen_ui::locale_zh_cn::install(cx),
-                    LocaleChoice::Ar => yororen_ui::locale_ar::install(cx),
-                };
+                crate::i18n::install_for_locale(cx, choice);
             })
             .render(cx)
             .child(label);
@@ -343,6 +343,7 @@ fn build_toolbar(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
 
     // Show toast button.
     let entity_for_toast = entity.clone();
+    let toast_title = cx.t("demo.toast_title").to_string();
     row = row.child(
         button("show-toast", cx)
             .variant(ActionVariantKind::Danger)
@@ -355,36 +356,39 @@ fn build_toolbar(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
                 // statement so the immutable borrow on `cx`
                 // ends before `notify` takes a `&mut`.
                 let center = cx.global::<NotificationCenter>().clone();
-                let msg = format!("Toast #{id}: gallery is alive");
+                let id_str = id.to_string();
+                let msg = cx.t_with_args("demo.toast_message", &[&id_str]);
                 center.notify(
                     Notification::new(msg)
-                        .title("Gallery")
+                        .title(toast_title.clone())
                         .kind(ToastKind::Info),
                     cx,
                 );
             })
             .render(cx)
-            .child("Show toast"),
+            .child(cx.t("demo.show_toast")),
     );
 
     // Show notification (sticky) button.
     let entity_for_notify = entity.clone();
+    let notification_title = cx.t("demo.notification_title").to_string();
     row = row.child(
         button("show-notification", cx)
             .on_click(move |_, _, cx| {
                 let id = entity_for_notify.update(cx, |s, _cx| s.toast_count + 1);
                 let center = cx.global::<NotificationCenter>().clone();
-                let msg = format!("Sticky notification #{id}");
+                let id_str = id.to_string();
+                let msg = cx.t_with_args("demo.notification_message", &[&id_str]);
                 center.notify(
                     Notification::new(msg)
-                        .title("Gallery")
+                        .title(notification_title.clone())
                         .kind(ToastKind::Success)
                         .sticky(true),
                     cx,
                 );
             })
             .render(cx)
-            .child("Show notification"),
+            .child(cx.t("demo.show_notification")),
     );
 
     row
@@ -393,6 +397,16 @@ fn build_toolbar(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
 /// Footer at the bottom: shows live counters so the user can
 /// verify state changes are wired correctly.
 fn footer_section(app: &GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
+    let form_submit_label = cx.t("demo.footer.form_submit_count").to_string();
+    let email_label = cx.t("demo.footer.email").to_string();
+    let error_label = cx.t("demo.footer.error").to_string();
+    let checkbox_label = cx.t("demo.footer.checkbox").to_string();
+    let switch_label = cx.t("demo.footer.switch").to_string();
+    let radio_label = cx.t("demo.footer.radio").to_string();
+    let slider_label = cx.t("demo.footer.slider").to_string();
+    let toast_label = cx.t("demo.footer.toast_count").to_string();
+    let locale_label = cx.t("demo.footer.locale").to_string();
+
     div()
         .flex()
         .flex_col()
@@ -405,7 +419,7 @@ fn footer_section(app: &GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .child(
             label(
                 "footer-title",
-                cx.t("gallery.footer.live_counters"),
+                cx.t("demo.footer.live_counters"),
                 cx,
             )
             .strong(true)
@@ -414,7 +428,7 @@ fn footer_section(app: &GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .child(label(
             "footer-form",
             format!(
-                "form_submit_count: {}  |  email: {:?}  |  error: {:?}",
+                "{form_submit_label} {}  |  {email_label} {:?}  |  {error_label} {:?}",
                 app.form_submit_count, app.form_email_value, app.form_email_error
             ),
             cx,
@@ -423,7 +437,7 @@ fn footer_section(app: &GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .child(label(
             "footer-controls",
             format!(
-                "checkbox: {}  |  switch: {}  |  radio: {}  |  slider: {:.1}",
+                "{checkbox_label} {}  |  {switch_label} {}  |  {radio_label} {}  |  {slider_label} {:.1}",
                 app.checkbox_value, app.switch_value, app.radio_value, app.slider_value
             ),
             cx,
@@ -431,7 +445,11 @@ fn footer_section(app: &GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .render(cx))
         .child(label(
             "footer-toast",
-            format!("toast_count: {}  |  locale: {}", app.toast_count, app.current_locale.tag()),
+            format!(
+                "{toast_label} {}  |  {locale_label} {}",
+                app.toast_count,
+                app.current_locale.tag()
+            ),
             cx,
         )
         .render(cx))
