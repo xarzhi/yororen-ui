@@ -413,7 +413,8 @@ impl VirtualListRenderer for BrutalVirtualListRenderer {
         // and scrolls *that* in addition to the list — a
         // regression the v0.3 wrapping div introduced (v0.2.0's
         // `VirtualList` was the styled list itself, no outer
-        // hitbox to bubble past).
+        // hitbox to bubble past). `occlude()` ensures hitboxes
+        // behind the list are not considered for scroll handling.
         gpui::div()
             .id(props.id)
             .flex()
@@ -430,6 +431,7 @@ impl VirtualListRenderer for BrutalVirtualListRenderer {
             .on_scroll_wheel(|_event, _window, cx| {
                 cx.stop_propagation();
             })
+            .occlude()
     }
 }
 
@@ -518,6 +520,7 @@ impl UniformVirtualListRenderer for BrutalUniformVirtualListRenderer {
             .on_scroll_wheel(|_event, _window, cx| {
                 cx.stop_propagation();
             })
+            .occlude()
     }
 }
 

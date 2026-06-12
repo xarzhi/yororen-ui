@@ -26,8 +26,8 @@ use std::cell::RefCell;
 use std::sync::Arc;
 
 use gpui::{
-    App, Div, ElementId, Hsla, InteractiveElement, ParentElement, Pixels, Stateful, Styled, div,
-    px, uniform_list,
+    App, Div, ElementId, Hsla, InteractiveElement, ParentElement, Pixels, Stateful, Styled, div, px,
+    uniform_list,
 };
 
 use yororen_ui_core::headless::virtual_list::{UniformRenderRowFn, UniformVirtualListProps};
@@ -93,6 +93,8 @@ impl UniformVirtualListRenderer for TokenUniformVirtualListRenderer {
         // necessary here — uniform_list scrolls through its own
         // `Interactivity` scroll offset, but the outer wrapping
         // div would otherwise bubble the wheel event to the page.
+        // `occlude()` ensures hitboxes behind the list are not
+        // considered for scroll handling.
         div()
             .id(props.id)
             .flex()
@@ -106,6 +108,7 @@ impl UniformVirtualListRenderer for TokenUniformVirtualListRenderer {
             .on_scroll_wheel(|_event, _window, cx| {
                 cx.stop_propagation();
             })
+            .occlude()
     }
 }
 

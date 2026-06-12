@@ -89,7 +89,9 @@ impl VirtualListRenderer for TokenVirtualListRenderer {
         // was the styled list element itself, so there was no
         // outer hitbox to bubble past). Register a bubble-phase
         // scroll handler on the outer div that stops the event
-        // after the list has handled it.
+        // after the list has handled it, and `occlude()` the
+        // wrapper so hitboxes behind the list (e.g. an outer
+        // page scroller) are not considered for scroll handling.
         div()
             .id(props.id)
             .flex()
@@ -103,6 +105,7 @@ impl VirtualListRenderer for TokenVirtualListRenderer {
             .on_scroll_wheel(|_event, _window, cx| {
                 cx.stop_propagation();
             })
+            .occlude()
     }
 }
 
