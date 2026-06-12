@@ -11,7 +11,7 @@ use gpui::{
     AnyElement, App, Div, Element, ElementId, Entity, GlobalElementId, InspectorElementId,
     InteractiveElement, IntoElement, LayoutId, Pixels, Styled, Window, px,
 };
-use yororen_ui_core::animation::{AnimatedPresenceState, SlideDirection};
+use yororen_ui_core::animation::{AnimatedPresenceState, AnimationConfig, SlideDirection};
 
 /// A custom element that keeps a child mounted while it exits and
 /// applies a fade + slide animation driven by an
@@ -205,4 +205,275 @@ pub fn fade_in_on_mount(
         let eased = easing(progress);
         this.opacity(eased)
     })
+}
+
+// =====================================================================
+// Boolean transition elements — used by toggle controls (switch,
+// checkbox) whose state is a plain `bool` rather than an entity-backed
+// `AnimatedVisibility`.
+// =====================================================================
+
+#[derive(Clone)]
+struct BooleanElementState {
+    start: Instant,
+    previous_value: bool,
+    previous_progress: f32,
+}
+
+impl BooleanElementState {
+    fn progress(&self, value: bool, config: &AnimationConfig) -> f32 {
+        let duration_secs = config.duration.as_secs_f32();
+        let rate = if duration_secs > 0.0 {
+            self.start.elapsed().as_secs_f32() / duration_secs
+        } else {
+            1.0
+        };
+        if value {
+            (self.previous_progress + rate).min(1.0)
+        } else {
+            (self.previous_progress - rate).max(0.0)
+        }
+    }
+}
+
+/// A custom element that animates a child's opacity based on a
+/// boolean value.
+///
+/// When `value` is `true` the child fades in; when `value` is `false`
+/// it fades out. The element keeps its own element-local animation
+/// clock so the transition is smooth even though the underlying state
+/// is not entity-backed.
+pub struct AnimatedOpacityElement {
+    pub id: ElementId,
+    pub value: bool,
+    child: Option<Div>,
+    pub config: AnimationConfig,
+}
+
+impl AnimatedOpacityElement {
+    pub fn new(id: impl Into<ElementId>, value: bool, child: Div) -> Self {
+        Self {
+            id: id.into(),
+            value,
+            child: Some(child),
+            config: AnimationConfig::default(),
+        }
+    }
+
+    pub fn with_config(mut self, config: AnimationConfig) -> Self {
+        self.config = config;
+        self
+    }
+}
+
+impl IntoElement for AnimatedOpacityElement {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}
+
+impl Element for AnimatedOpacityElement {
+    type RequestLayoutState = AnyElement;
+    type PrepaintState = ();
+
+    fn id(&self) -> Option<ElementId> {
+        Some(self.id.clone())
+    }
+
+    fn source_location(&self) -> Option<&'static core::panic::Location<'static>> {
+        None
+    }
+
+    fn request_layout(
+        &mut self,
+        global_id: Option<&GlobalElementId>,
+        _inspector_id: Option<&InspectorElementId>,
+        window: &mut Window,
+        cx: &mut App,
+    ) -> (LayoutId, Self::RequestLayoutState) {
+        let now = Instant::now();
+        let (progress, is_animating) = window.with_element_state(
+            global_id.unwrap(),
+            |state: Option<BooleanElementState>, _window| {
+                let mut state = state.unwrap_or(BooleanElementState {
+                    start: now,
+                    previous_value: self.value,
+                    previous_progress: if self.value { 1.0 } else { 0.0 },
+                });
+                if state.previous_value != self.value {
+                    state.start = now;
+                    state.previous_value = self.value;
+                }
+                let progress = state.progress(self.value, &self.config);
+                let is_animating =
+                    (self.value && progress < 1.0) || (!self.value && progress > 0.0);
+                state.previous_progress = progress;
+                ((progress, is_animating), state)
+            },
+        );
+
+        if is_animating {
+            window.request_animation_frame();
+        }
+
+        let eased = (self.config.easing)(progress);
+        let child = self
+            .child
+            .take()
+            .expect("AnimatedOpacityElement::request_layout called once");
+        let mut styled = child.id(self.id.clone()).opacity(eased);
+        if progress <= 0.0 {
+            styled = styled.invisible();
+        }
+        let mut element = styled.into_any_element();
+        (element.request_layout(window, cx), element)
+    }
+
+    fn prepaint(
+        &mut self,
+        _id: Option<&GlobalElementId>,
+        _inspector_id: Option<&InspectorElementId>,
+        _bounds: gpui::Bounds<Pixels>,
+        element: &mut Self::RequestLayoutState,
+        window: &mut Window,
+        cx: &mut App,
+    ) -> Self::PrepaintState {
+        element.prepaint(window, cx);
+    }
+
+    fn paint(
+        &mut self,
+        _id: Option<&GlobalElementId>,
+        _inspector_id: Option<&InspectorElementId>,
+        _bounds: gpui::Bounds<Pixels>,
+        element: &mut Self::RequestLayoutState,
+        _prepaint: &mut Self::PrepaintState,
+        window: &mut Window,
+        cx: &mut App,
+    ) {
+        element.paint(window, cx);
+    }
+}
+
+/// A custom element that animates a child's left margin based on a
+/// boolean value.
+///
+/// When `value` is `true` the child slides right by `distance`; when
+/// `value` is `false` it slides back to `margin-left: 0`. This is used
+/// for switch knobs.
+pub struct AnimatedMarginElement {
+    pub id: ElementId,
+    pub value: bool,
+    pub distance: Pixels,
+    child: Option<Div>,
+    pub config: AnimationConfig,
+}
+
+impl AnimatedMarginElement {
+    pub fn new(id: impl Into<ElementId>, value: bool, distance: Pixels, child: Div) -> Self {
+        Self {
+            id: id.into(),
+            value,
+            distance,
+            child: Some(child),
+            config: AnimationConfig::default(),
+        }
+    }
+
+    pub fn with_config(mut self, config: AnimationConfig) -> Self {
+        self.config = config;
+        self
+    }
+}
+
+impl IntoElement for AnimatedMarginElement {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}
+
+impl Element for AnimatedMarginElement {
+    type RequestLayoutState = AnyElement;
+    type PrepaintState = ();
+
+    fn id(&self) -> Option<ElementId> {
+        Some(self.id.clone())
+    }
+
+    fn source_location(&self) -> Option<&'static core::panic::Location<'static>> {
+        None
+    }
+
+    fn request_layout(
+        &mut self,
+        global_id: Option<&GlobalElementId>,
+        _inspector_id: Option<&InspectorElementId>,
+        window: &mut Window,
+        cx: &mut App,
+    ) -> (LayoutId, Self::RequestLayoutState) {
+        let now = Instant::now();
+        let (progress, is_animating) = window.with_element_state(
+            global_id.unwrap(),
+            |state: Option<BooleanElementState>, _window| {
+                let mut state = state.unwrap_or(BooleanElementState {
+                    start: now,
+                    previous_value: self.value,
+                    previous_progress: if self.value { 1.0 } else { 0.0 },
+                });
+                if state.previous_value != self.value {
+                    state.start = now;
+                    state.previous_value = self.value;
+                }
+                let progress = state.progress(self.value, &self.config);
+                let is_animating =
+                    (self.value && progress < 1.0) || (!self.value && progress > 0.0);
+                state.previous_progress = progress;
+                ((progress, is_animating), state)
+            },
+        );
+
+        if is_animating {
+            window.request_animation_frame();
+        }
+
+        let eased = (self.config.easing)(progress);
+        let distance_f: f32 = self.distance.into();
+        let translate = distance_f * eased;
+
+        let child = self
+            .child
+            .take()
+            .expect("AnimatedMarginElement::request_layout called once");
+        let mut element = child.id(self.id.clone()).ml(px(translate)).into_any_element();
+        (element.request_layout(window, cx), element)
+    }
+
+    fn prepaint(
+        &mut self,
+        _id: Option<&GlobalElementId>,
+        _inspector_id: Option<&InspectorElementId>,
+        _bounds: gpui::Bounds<Pixels>,
+        element: &mut Self::RequestLayoutState,
+        window: &mut Window,
+        cx: &mut App,
+    ) -> Self::PrepaintState {
+        element.prepaint(window, cx);
+    }
+
+    fn paint(
+        &mut self,
+        _id: Option<&GlobalElementId>,
+        _inspector_id: Option<&InspectorElementId>,
+        _bounds: gpui::Bounds<Pixels>,
+        element: &mut Self::RequestLayoutState,
+        _prepaint: &mut Self::PrepaintState,
+        window: &mut Window,
+        cx: &mut App,
+    ) {
+        element.paint(window, cx);
+    }
 }

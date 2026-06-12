@@ -20,12 +20,15 @@ use gpui::{
     StatefulInteractiveElement, Styled, Window, deferred, div, point, px,
 };
 
+use yororen_ui_core::animation::SlideDirection;
 use yororen_ui_core::headless::button::ButtonProps;
 use yororen_ui_core::headless::dropdown_menu::DropdownItem;
 use yororen_ui_core::headless::list_item::ListItemProps;
 use yororen_ui_core::headless::split_button::{ClickCallback, SplitButtonProps};
 use yororen_ui_core::renderer::variant::ActionVariantKind;
 use yororen_ui_core::theme::Theme;
+
+use crate::animation::AnimatedPresenceElement;
 
 pub use yororen_ui_core::renderer::split_button::{SplitButtonRenderState, SplitButtonRenderer};
 
@@ -79,11 +82,14 @@ impl SplitButtonRenderer for TokenSplitButtonRenderer {
     fn compose(&self, props: &SplitButtonProps, cx: &App) -> Div {
         use yororen_ui_core::theme::ActiveTheme;
         let theme = cx.theme();
-        let open = props
+        let (open, visible) = props
             .state
             .as_ref()
-            .map(|s| s.read(cx).is_open())
-            .unwrap_or(false);
+            .map(|s| {
+                let s = s.read(cx);
+                (s.is_open(), s.is_visible())
+            })
+            .unwrap_or((false, false));
         let state = SplitButtonRenderState {
             open,
             disabled: props.disabled,
@@ -167,7 +173,7 @@ impl SplitButtonRenderer for TokenSplitButtonRenderer {
                 }
             });
         }
-        if open {
+        if visible {
             // Dropdown bg prefers `surface.popover` (a dedicated
             // contrast colour the JSON theme can override) and
             // falls back to `surface.raised` so older theme
@@ -273,7 +279,28 @@ impl SplitButtonRenderer for TokenSplitButtonRenderer {
                     }
                 }
             }
-            root.child(deferred(menu).with_priority(1))
+
+            let distance = px(
+                theme
+                    .get_number("motion.slide_distance")
+                    .unwrap_or(10.0) as f32,
+            );
+            let state_entity = props
+                .state
+                .clone()
+                .expect("visible implies state is present");
+            root.child(
+                deferred(
+                    div().child(AnimatedPresenceElement::new(
+                        state_entity,
+                        (props.id.clone(), "menu"),
+                        SlideDirection::Down,
+                        distance,
+                        menu,
+                    )),
+                )
+                .with_priority(1),
+            )
         } else {
             root
         }

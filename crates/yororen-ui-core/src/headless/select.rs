@@ -5,6 +5,8 @@ use std::sync::Arc;
 
 use gpui::{App, AppContext, Div, ElementId, Entity, InteractiveElement, SharedString, Stateful};
 
+use crate::animation::{AnimatedPresenceState, AnimatedVisibility};
+
 #[derive(Clone, Debug)]
 pub struct SelectOption {
     pub value: SharedString,
@@ -31,6 +33,7 @@ pub type SelectChangeCallback = Arc<dyn Fn(SharedString, &mut gpui::Window, &mut
 #[derive(Clone)]
 pub struct SelectState {
     pub open: bool,
+    pub animation: AnimatedVisibility,
     pub value: Option<SharedString>,
     pub options: Vec<SelectOption>,
     pub highlighted_index: Option<usize>,
@@ -43,6 +46,7 @@ impl SelectState {
     pub fn new(app: &mut App) -> Entity<Self> {
         app.new(|_| Self {
             open: false,
+            animation: AnimatedVisibility::new(),
             value: None,
             options: Vec::new(),
             highlighted_index: None,
@@ -54,15 +58,21 @@ impl SelectState {
 
     pub fn open(&mut self) {
         self.open = true;
+        self.animation.show();
     }
     pub fn close(&mut self) {
         self.open = false;
+        self.animation.hide();
     }
     pub fn toggle(&mut self) {
         self.open = !self.open;
+        self.animation.toggle();
     }
     pub fn is_open(&self) -> bool {
         self.open
+    }
+    pub fn is_visible(&self) -> bool {
+        self.animation.is_visible()
     }
     pub fn set_options(&mut self, opts: Vec<SelectOption>) {
         self.options = opts;
@@ -112,6 +122,7 @@ impl SelectState {
     pub fn pick(&mut self, value: SharedString, window: &mut gpui::Window, cx: &mut App) {
         self.value = Some(value.clone());
         self.open = false;
+        self.animation.hide();
         self.invoke_change(value, window, cx);
     }
     /// Borrow the on_change callback (if any). Used by
@@ -128,8 +139,18 @@ impl SelectState {
             let value = opt.value.clone();
             self.value = Some(value.clone());
             self.open = false;
+            self.animation.hide();
             self.invoke_change(value, window, cx);
         }
+    }
+}
+
+impl AnimatedPresenceState for SelectState {
+    fn visibility(&self) -> &AnimatedVisibility {
+        &self.animation
+    }
+    fn visibility_mut(&mut self) -> &mut AnimatedVisibility {
+        &mut self.animation
     }
 }
 

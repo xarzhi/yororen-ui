@@ -9,6 +9,7 @@ use gpui::{
     Focusable, InteractiveElement, Pixels, SharedString, ShapedLine, Stateful, UTF16Selection, Window,
 };
 
+use crate::animation::{AnimatedPresenceState, AnimatedVisibility};
 use crate::headless::text_input::{
     Backspace, Copy, Cut, Delete, End, Enter, Escape, Home, Left, Paste, Right, SelectAll,
     SelectLeft, SelectRight, ShowCharacterPalette, TextInputActionHandler,
@@ -36,6 +37,7 @@ pub type ComboBoxChangeCallback = Arc<dyn Fn(SharedString, &mut gpui::Window, &m
 #[derive(Clone)]
 pub struct ComboBoxState {
     pub open: bool,
+    pub animation: AnimatedVisibility,
     pub text: String,
     pub value: Option<SharedString>,
     pub options: Vec<ComboBoxOption>,
@@ -51,6 +53,7 @@ impl ComboBoxState {
         let core = TextInputCore::new(app);
         app.new(|_| Self {
             open: false,
+            animation: AnimatedVisibility::new(),
             text: String::new(),
             value: None,
             options: Vec::new(),
@@ -64,15 +67,21 @@ impl ComboBoxState {
 
     pub fn open(&mut self) {
         self.open = true;
+        self.animation.show();
     }
     pub fn close(&mut self) {
         self.open = false;
+        self.animation.hide();
     }
     pub fn toggle(&mut self) {
         self.open = !self.open;
+        self.animation.toggle();
     }
     pub fn is_open(&self) -> bool {
         self.open
+    }
+    pub fn is_visible(&self) -> bool {
+        self.animation.is_visible()
     }
     pub fn set_text(&mut self, t: impl Into<String>) {
         self.text = t.into();
@@ -140,6 +149,7 @@ impl ComboBoxState {
     pub fn pick(&mut self, value: SharedString, window: &mut gpui::Window, cx: &mut App) {
         self.set_value(value.clone());
         self.open = false;
+        self.animation.hide();
         self.invoke_change(value, window, cx);
     }
     /// Borrow the on_change callback (if any). Used by
@@ -157,8 +167,18 @@ impl ComboBoxState {
             self.text = opt.label.to_string();
             self.value = Some(value.clone());
             self.open = false;
+            self.animation.hide();
             self.invoke_change(value, window, cx);
         }
+    }
+}
+
+impl AnimatedPresenceState for ComboBoxState {
+    fn visibility(&self) -> &AnimatedVisibility {
+        &self.animation
+    }
+    fn visibility_mut(&mut self) -> &mut AnimatedVisibility {
+        &mut self.animation
     }
 }
 

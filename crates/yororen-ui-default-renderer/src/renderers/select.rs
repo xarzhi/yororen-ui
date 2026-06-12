@@ -7,9 +7,12 @@ use gpui::{
     StatefulInteractiveElement, Styled, div, px,
 };
 
+use yororen_ui_core::animation::SlideDirection;
 use yororen_ui_core::headless::select::SelectProps;
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
+
+use crate::animation::AnimatedPresenceElement;
 
 pub use yororen_ui_core::renderer::select::{SelectRenderState, SelectRenderer};
 
@@ -97,7 +100,6 @@ impl SelectRenderer for TokenSelectRenderer {
         let r = self.border_radius(&state, theme);
         let value = state_read.value.clone();
         let options = state_read.options.clone();
-        let is_open = state_read.is_open();
 
         let display = if let Some(v) = &value {
             options
@@ -130,7 +132,7 @@ impl SelectRenderer for TokenSelectRenderer {
 
         let mut outer = div().relative().child(trigger);
 
-        if is_open && !options.is_empty() {
+        if state_read.is_visible() && !options.is_empty() {
             let h_f32: f32 = h.into();
             let state_for_close = props.state.clone();
             let mut dropdown: Stateful<Div> = div()
@@ -200,7 +202,23 @@ impl SelectRenderer for TokenSelectRenderer {
                 dropdown = dropdown.child(item);
             }
 
-            outer = outer.child(gpui::deferred(dropdown).with_priority(1));
+            let distance = px(
+                theme
+                    .get_number("motion.slide_distance")
+                    .unwrap_or(10.0) as f32,
+            );
+            outer = outer.child(
+                gpui::deferred(
+                    div().child(AnimatedPresenceElement::new(
+                        props.state.clone(),
+                        (props.id.clone(), "dropdown"),
+                        SlideDirection::Down,
+                        distance,
+                        div().child(dropdown),
+                    )),
+                )
+                .with_priority(1),
+            );
         }
 
         outer

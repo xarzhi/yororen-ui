@@ -28,9 +28,11 @@ use yororen_ui_core::headless::text_input::{
 use yororen_ui_core::headless::text_input_element::{
     TextInputElement, start_cursor_blink, wire_input_keyboard,
 };
+use yororen_ui_core::animation::SlideDirection;
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::ActiveTheme;
 use yororen_ui_core::theme::Theme;
+use yororen_ui_default_renderer::animation::AnimatedPresenceElement;
 
 use crate::style::{BRUTAL_BORDER, BRUTAL_RADIUS, brutal_border_color};
 
@@ -1167,7 +1169,7 @@ impl SelectRenderer for BrutalSelectRenderer {
         let r = self.border_radius(&state, theme);
         let value = state_read.value.clone();
         let options = state_read.options.clone();
-        let is_open = state_read.is_open();
+        let is_visible = state_read.is_visible();
 
         // Display label: selected option's label, or the placeholder.
         let display = if let Some(v) = &value {
@@ -1211,7 +1213,7 @@ impl SelectRenderer for BrutalSelectRenderer {
 
         let mut outer = gpui::div().relative().child(trigger);
 
-        if is_open && !options.is_empty() {
+        if is_visible && !options.is_empty() {
             let h_f32: f32 = h.into();
             let state_for_close = props.state.clone();
             let mut dropdown: Stateful<gpui::Div> = gpui::div()
@@ -1288,7 +1290,23 @@ impl SelectRenderer for BrutalSelectRenderer {
 
             // `gpui::deferred` paints the dropdown after the
             // next sibling cell so it isn't covered.
-            outer = outer.child(gpui::deferred(dropdown).with_priority(1));
+            let distance = px(
+                theme
+                    .get_number("motion.slide_distance")
+                    .unwrap_or(10.0) as f32,
+            );
+            outer = outer.child(
+                gpui::deferred(
+                    gpui::div().child(AnimatedPresenceElement::new(
+                        props.state.clone(),
+                        (props.id.clone(), "dropdown"),
+                        SlideDirection::Down,
+                        distance,
+                        gpui::div().child(dropdown),
+                    )),
+                )
+                .with_priority(1),
+            );
         }
 
         outer
@@ -1353,7 +1371,7 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
         use yororen_ui_core::theme::ActiveTheme;
 
         let theme = cx.theme().clone();
-        let (state, text, value, options, is_open, placeholder) = {
+        let (state, text, value, options, is_open, is_visible, placeholder) = {
             let state_read = props.state.read(cx);
             let state = ComboBoxRenderState {
                 open: state_read.is_open(),
@@ -1370,6 +1388,7 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
                 state_read.value.clone(),
                 state_read.options.clone(),
                 state_read.is_open(),
+                state_read.is_visible(),
                 state_read.placeholder.clone(),
             )
         };
@@ -1478,7 +1497,7 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
 
         let mut outer = gpui::div().relative().child(trigger);
 
-        if is_open && !filtered.is_empty() {
+        if is_visible && !filtered.is_empty() {
             let h_f32: f32 = h.into();
             let state_for_close = props.state.clone();
             let mut dropdown: Stateful<gpui::Div> = gpui::div()
@@ -1545,7 +1564,23 @@ impl ComboBoxRenderer for BrutalComboBoxRenderer {
                 dropdown = dropdown.child(item);
             }
 
-            outer = outer.child(gpui::deferred(dropdown).with_priority(1));
+            let distance = px(
+                theme
+                    .get_number("motion.slide_distance")
+                    .unwrap_or(10.0) as f32,
+            );
+            outer = outer.child(
+                gpui::deferred(
+                    gpui::div().child(AnimatedPresenceElement::new(
+                        props.state.clone(),
+                        (props.id.clone(), "dropdown"),
+                        SlideDirection::Down,
+                        distance,
+                        gpui::div().child(dropdown),
+                    )),
+                )
+                .with_priority(1),
+            );
         }
 
         outer.into_any_element()

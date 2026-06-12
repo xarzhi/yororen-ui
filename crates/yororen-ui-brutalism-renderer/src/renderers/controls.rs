@@ -11,6 +11,7 @@ use gpui::{
 };
 use yororen_ui_core::theme::ActiveTheme;
 use yororen_ui_core::theme::Theme;
+use yororen_ui_default_renderer::animation::{AnimatedMarginElement, AnimatedOpacityElement};
 
 use crate::style::{BRUTAL_BORDER, BRUTAL_BORDER_WIDTH, brutal_border_color};
 
@@ -117,7 +118,7 @@ impl SwitchRenderer for BrutalSwitchRenderer {
             custom_tone: props.custom_tone,
         };
         let track = self.track_bg(&state, theme);
-        let knob = self.knob_bg(&state, theme);
+        let _knob_color = self.knob_bg(&state, theme);
         let w = self.track_w(&state, theme);
         let h = self.track_h(&state, theme);
         let knob_size = self.knob_size(&state, theme);
@@ -126,7 +127,46 @@ impl SwitchRenderer for BrutalSwitchRenderer {
         let track_active = self.track_active_bg(&state, theme);
         let border = brutal_border_color(theme);
 
-        let mut el: Stateful<Div> = div()
+        // Cross-fade the knob colour between unchecked and checked
+        // states while it slides.
+        let unchecked_knob_color = self.knob_bg(&SwitchRenderState { checked: false, ..state }, theme);
+        let checked_knob_color = self.knob_bg(&SwitchRenderState { checked: true, ..state }, theme);
+        let knob_off = div()
+            .absolute()
+            .inset_0()
+            .bg(unchecked_knob_color);
+        let knob_on = div()
+            .absolute()
+            .inset_0()
+            .bg(checked_knob_color);
+        let knob_inner = div()
+            .relative()
+            .size(knob_size)
+            .child(AnimatedOpacityElement::new(
+                (props.id.clone(), "knob-off"),
+                !props.checked,
+                knob_off,
+            ))
+            .child(AnimatedOpacityElement::new(
+                (props.id.clone(), "knob-on"),
+                props.checked,
+                knob_on,
+            ));
+
+        let slide_distance = {
+            let w_f: f32 = w.into();
+            let knob_f: f32 = knob_size.into();
+            let pad_f: f32 = pad.into();
+            px((w_f - knob_f - pad_f * 2.0).max(0.0))
+        };
+        let knob_animated = AnimatedMarginElement::new(
+            (props.id.clone(), "knob-slide"),
+            props.checked,
+            slide_distance,
+            knob_inner,
+        );
+
+        div()
             .id(props.id.clone())
             .bg(track)
             .border_2()
@@ -136,14 +176,10 @@ impl SwitchRenderer for BrutalSwitchRenderer {
             .p(pad)
             .flex()
             .items_center()
-            .track_focus(focus_handle);
-        if props.checked {
-            el = el.justify_end();
-        } else {
-            el = el.justify_start();
-        }
-        el = el.child(div().bg(knob).size(knob_size));
-        el.hover(|s| s.bg(track_hover))
+            .justify_start()
+            .track_focus(focus_handle)
+            .child(knob_animated)
+            .hover(|s| s.bg(track_hover))
             .active(|s| s.bg(track_active))
             .cursor(if props.disabled {
                 CursorStyle::OperationNotAllowed
@@ -247,7 +283,20 @@ impl CheckboxRenderer for BrutalCheckboxRenderer {
         let hover_bg = self.box_hover_bg(&state, theme);
         let active_bg = self.box_active_bg(&state, theme);
 
-        let mut el: Stateful<Div> = div()
+        // The checkmark is always mounted and faded in/out so the
+        // checked state transition is animated.
+        let check_color = self.box_border(
+            &CheckboxRenderState {
+                checked: true,
+                ..state
+            },
+            theme,
+        );
+        let check = div().bg(check_color).size(check_size);
+        let animated_check =
+            AnimatedOpacityElement::new((props.id.clone(), "check"), props.checked, check);
+
+        div()
             .id(props.id.clone())
             .bg(bg)
             .border_2()
@@ -256,11 +305,9 @@ impl CheckboxRenderer for BrutalCheckboxRenderer {
             .flex()
             .items_center()
             .justify_center()
-            .track_focus(focus_handle);
-        if props.checked {
-            el = el.child(div().bg(border).size(check_size));
-        }
-        el.hover(|s| s.bg(hover_bg))
+            .track_focus(focus_handle)
+            .child(animated_check)
+            .hover(|s| s.bg(hover_bg))
             .active(|s| s.bg(active_bg))
             .cursor(if props.disabled {
                 CursorStyle::OperationNotAllowed

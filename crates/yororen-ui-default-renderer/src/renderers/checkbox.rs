@@ -10,6 +10,8 @@ use gpui::{
 use yororen_ui_core::headless::checkbox::CheckboxProps;
 use yororen_ui_core::theme::Theme;
 
+use crate::animation::AnimatedOpacityElement;
+
 pub use yororen_ui_core::renderer::checkbox::{CheckboxRenderState, CheckboxRenderer};
 
 pub struct TokenCheckboxRenderer;
@@ -106,7 +108,23 @@ impl CheckboxRenderer for TokenCheckboxRenderer {
         let hover_bg = self.box_hover_bg(&state, theme);
         let active_bg = self.box_active_bg(&state, theme);
 
-        let mut el: Stateful<Div> = div()
+        // The checkmark is always mounted and faded in/out so the
+        // checked state transition is animated.
+        let check_color = self.box_border(
+            &CheckboxRenderState {
+                checked: true,
+                ..state
+            },
+            theme,
+        );
+        let check = div()
+            .bg(check_color)
+            .size(check_size)
+            .rounded(px(2.));
+        let animated_check =
+            AnimatedOpacityElement::new((props.id.clone(), "check"), props.checked, check);
+
+        div()
             .id(props.id.clone())
             .bg(bg)
             .border_1()
@@ -116,11 +134,9 @@ impl CheckboxRenderer for TokenCheckboxRenderer {
             .flex()
             .items_center()
             .justify_center()
-            .track_focus(focus_handle);
-        if props.checked {
-            el = el.child(div().bg(border).size(check_size).rounded(px(2.)));
-        }
-        el.hover(|s| s.bg(hover_bg))
+            .track_focus(focus_handle)
+            .child(animated_check)
+            .hover(|s| s.bg(hover_bg))
             .active(|s| s.bg(active_bg))
             .cursor(if props.disabled {
                 CursorStyle::OperationNotAllowed

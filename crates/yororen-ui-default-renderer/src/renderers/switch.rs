@@ -10,6 +10,8 @@ use gpui::{
 use yororen_ui_core::headless::switch::SwitchProps;
 use yororen_ui_core::theme::Theme;
 
+use crate::animation::{AnimatedMarginElement, AnimatedOpacityElement};
+
 pub use yororen_ui_core::renderer::switch::{SwitchRenderState, SwitchRenderer};
 
 pub struct TokenSwitchRenderer;
@@ -120,7 +122,7 @@ impl SwitchRenderer for TokenSwitchRenderer {
             custom_tone: props.custom_tone,
         };
         let track = self.track_bg(&state, theme);
-        let knob = self.knob_bg(&state, theme);
+        let _knob_color = self.knob_bg(&state, theme);
         let w = self.track_w(&state, theme);
         let h = self.track_h(&state, theme);
         let knob_size = self.knob_size(&state, theme);
@@ -129,7 +131,48 @@ impl SwitchRenderer for TokenSwitchRenderer {
         let track_hover = self.track_hover_bg(&state, theme);
         let track_active = self.track_active_bg(&state, theme);
 
-        let mut el: Stateful<Div> = div()
+        // Cross-fade the knob colour between unchecked and checked
+        // states while it slides.
+        let unchecked_knob_color = self.knob_bg(&SwitchRenderState { checked: false, ..state }, theme);
+        let checked_knob_color = self.knob_bg(&SwitchRenderState { checked: true, ..state }, theme);
+        let knob_off = div()
+            .absolute()
+            .inset_0()
+            .bg(unchecked_knob_color)
+            .rounded(pill_radius);
+        let knob_on = div()
+            .absolute()
+            .inset_0()
+            .bg(checked_knob_color)
+            .rounded(pill_radius);
+        let knob_inner = div()
+            .relative()
+            .size(knob_size)
+            .child(AnimatedOpacityElement::new(
+                (props.id.clone(), "knob-off"),
+                !props.checked,
+                knob_off,
+            ))
+            .child(AnimatedOpacityElement::new(
+                (props.id.clone(), "knob-on"),
+                props.checked,
+                knob_on,
+            ));
+
+        let slide_distance = {
+            let w_f: f32 = w.into();
+            let knob_f: f32 = knob_size.into();
+            let pad_f: f32 = pad.into();
+            px((w_f - knob_f - pad_f * 2.0).max(0.0))
+        };
+        let knob_animated = AnimatedMarginElement::new(
+            (props.id.clone(), "knob-slide"),
+            props.checked,
+            slide_distance,
+            knob_inner,
+        );
+
+        div()
             .id(props.id.clone())
             .bg(track)
             .w(w)
@@ -138,14 +181,10 @@ impl SwitchRenderer for TokenSwitchRenderer {
             .p(pad)
             .flex()
             .items_center()
-            .track_focus(focus_handle);
-        if props.checked {
-            el = el.justify_end();
-        } else {
-            el = el.justify_start();
-        }
-        el = el.child(div().bg(knob).size(knob_size).rounded(pill_radius));
-        el.hover(|s| s.bg(track_hover))
+            .justify_start()
+            .track_focus(focus_handle)
+            .child(knob_animated)
+            .hover(|s| s.bg(track_hover))
             .active(|s| s.bg(track_active))
             .cursor(if props.disabled {
                 CursorStyle::OperationNotAllowed

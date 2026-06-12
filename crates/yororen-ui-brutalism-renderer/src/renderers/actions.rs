@@ -10,10 +10,12 @@ use yororen_ui_core::headless::icon::IconProps;
 use yororen_ui_core::headless::icon_button::IconButtonProps;
 use yororen_ui_core::headless::toggle_button::ToggleButtonProps;
 use yororen_ui_core::renderer::spec::{BorderSpec, Edges, ShadowSpec};
+use yororen_ui_core::animation::SlideDirection;
 use yororen_ui_core::renderer::variant::ActionVariantKind;
 use yororen_ui_core::renderer::variant::VariantState;
 use yororen_ui_core::theme::ActiveTheme;
 use yororen_ui_core::theme::Theme;
+use yororen_ui_default_renderer::animation::AnimatedPresenceElement;
 
 use crate::style::{
     BRUTAL_BORDER, BRUTAL_BORDER_WIDTH, BRUTAL_DISABLED_OPACITY, BRUTAL_RADIUS,
@@ -608,11 +610,14 @@ impl SplitButtonRenderer for BrutalSplitButtonRenderer {
         use yororen_ui_core::theme::ActiveTheme;
 
         let theme = cx.theme();
-        let open = props
+        let (open, visible) = props
             .state
             .as_ref()
-            .map(|s| s.read(cx).is_open())
-            .unwrap_or(false);
+            .map(|s| {
+                let s = s.read(cx);
+                (s.is_open(), s.is_visible())
+            })
+            .unwrap_or((false, false));
         let state = SplitButtonRenderState {
             open,
             disabled: props.disabled,
@@ -676,7 +681,7 @@ impl SplitButtonRenderer for BrutalSplitButtonRenderer {
             .gap(gap)
             .child(primary)
             .child(chevron);
-        if open {
+        if visible {
             let panel_bg = theme
                 .get_color("surface.popover")
                 .or_else(|| theme.get_color("surface.raised"))
@@ -777,7 +782,28 @@ impl SplitButtonRenderer for BrutalSplitButtonRenderer {
                     DropdownItem::Group(_) => {}
                 }
             }
-            root.child(gpui::deferred(menu).with_priority(1))
+
+            let distance = px(
+                theme
+                    .get_number("motion.slide_distance")
+                    .unwrap_or(10.0) as f32,
+            );
+            let state_entity = props
+                .state
+                .clone()
+                .expect("visible implies state is present");
+            root.child(
+                gpui::deferred(
+                    div().child(AnimatedPresenceElement::new(
+                        state_entity,
+                        (props.id.clone(), "menu"),
+                        SlideDirection::Down,
+                        distance,
+                        menu,
+                    )),
+                )
+                .with_priority(1),
+            )
         } else {
             root
         }

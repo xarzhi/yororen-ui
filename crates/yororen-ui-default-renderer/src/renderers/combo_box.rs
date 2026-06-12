@@ -7,12 +7,15 @@ use gpui::{
     ParentElement, Pixels, Stateful, StatefulInteractiveElement, Styled, Window, div, px,
 };
 
+use yororen_ui_core::animation::SlideDirection;
 use yororen_ui_core::headless::combo_box::ComboBoxProps;
 use yororen_ui_core::headless::text_input_element::{
     TextInputElement, start_cursor_blink, wire_input_keyboard,
 };
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
+
+use crate::animation::AnimatedPresenceElement;
 
 pub use yororen_ui_core::renderer::combo_box::{ComboBoxRenderState, ComboBoxRenderer};
 
@@ -85,7 +88,7 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
         use yororen_ui_core::theme::ActiveTheme;
 
         let theme = cx.theme().clone();
-        let (state, text, value, options, is_open, placeholder) = {
+        let (state, text, value, options, is_open, is_visible, placeholder) = {
             let state_read = props.state.read(cx);
             let state = ComboBoxRenderState {
                 open: state_read.is_open(),
@@ -102,6 +105,7 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
                 state_read.value.clone(),
                 state_read.options.clone(),
                 state_read.is_open(),
+                state_read.is_visible(),
                 state_read.placeholder.clone(),
             )
         };
@@ -195,7 +199,7 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
 
         let mut outer = div().relative().child(trigger);
 
-        if is_open && !filtered.is_empty() {
+        if is_visible && !filtered.is_empty() {
             let h_f32: f32 = h.into();
             let state_for_close = props.state.clone();
             let mut dropdown: Stateful<Div> = div()
@@ -266,7 +270,23 @@ impl ComboBoxRenderer for TokenComboBoxRenderer {
                 dropdown = dropdown.child(item);
             }
 
-            outer = outer.child(gpui::deferred(dropdown).with_priority(1));
+            let distance = px(
+                theme
+                    .get_number("motion.slide_distance")
+                    .unwrap_or(10.0) as f32,
+            );
+            outer = outer.child(
+                gpui::deferred(
+                    div().child(AnimatedPresenceElement::new(
+                        props.state.clone(),
+                        (props.id.clone(), "dropdown"),
+                        SlideDirection::Down,
+                        distance,
+                        div().child(dropdown),
+                    )),
+                )
+                .with_priority(1),
+            );
         }
 
         outer.into_any_element()

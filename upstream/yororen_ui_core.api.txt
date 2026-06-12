@@ -746,6 +746,9 @@ pub fn gpui::elements::div::Div::animate_slide(self, impl core::convert::Into<gp
 pub trait yororen_ui_core::animation::AnimatedPresenceState: 'static
 pub fn yororen_ui_core::animation::AnimatedPresenceState::visibility(&self) -> &yororen_ui_core::animation::AnimatedVisibility
 pub fn yororen_ui_core::animation::AnimatedPresenceState::visibility_mut(&mut self) -> &mut yororen_ui_core::animation::AnimatedVisibility
+impl yororen_ui_core::animation::AnimatedPresenceState for yororen_ui_core::headless::combo_box::ComboBoxState
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::visibility(&self) -> &yororen_ui_core::animation::AnimatedVisibility
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::visibility_mut(&mut self) -> &mut yororen_ui_core::animation::AnimatedVisibility
 impl yororen_ui_core::animation::AnimatedPresenceState for yororen_ui_core::headless::dropdown_menu::DropdownMenuState
 pub fn yororen_ui_core::headless::dropdown_menu::DropdownMenuState::visibility(&self) -> &yororen_ui_core::animation::AnimatedVisibility
 pub fn yororen_ui_core::headless::dropdown_menu::DropdownMenuState::visibility_mut(&mut self) -> &mut yororen_ui_core::animation::AnimatedVisibility
@@ -755,6 +758,9 @@ pub fn yororen_ui_core::headless::modal::ModalState::visibility_mut(&mut self) -
 impl yororen_ui_core::animation::AnimatedPresenceState for yororen_ui_core::headless::popover::PopoverState
 pub fn yororen_ui_core::headless::popover::PopoverState::visibility(&self) -> &yororen_ui_core::animation::AnimatedVisibility
 pub fn yororen_ui_core::headless::popover::PopoverState::visibility_mut(&mut self) -> &mut yororen_ui_core::animation::AnimatedVisibility
+impl yororen_ui_core::animation::AnimatedPresenceState for yororen_ui_core::headless::select::SelectState
+pub fn yororen_ui_core::headless::select::SelectState::visibility(&self) -> &yororen_ui_core::animation::AnimatedVisibility
+pub fn yororen_ui_core::headless::select::SelectState::visibility_mut(&mut self) -> &mut yororen_ui_core::animation::AnimatedVisibility
 pub trait yororen_ui_core::animation::OrchestrationBuilder: core::default::Default + core::marker::Sized + core::clone::Clone
 pub fn yororen_ui_core::animation::OrchestrationBuilder::with(self, core::time::Duration) -> Self
 pub fn yororen_ui_core::animation::OrchestrationBuilder::with_all(self, impl core::iter::traits::collect::IntoIterator<Item = core::time::Duration>) -> Self
@@ -1174,6 +1180,7 @@ impl core::marker::UnsafeUnpin for yororen_ui_core::headless::combo_box::ComboBo
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::combo_box::ComboBoxProps
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::combo_box::ComboBoxProps
 pub struct yororen_ui_core::headless::combo_box::ComboBoxState
+pub yororen_ui_core::headless::combo_box::ComboBoxState::animation: yororen_ui_core::animation::AnimatedVisibility
 pub yororen_ui_core::headless::combo_box::ComboBoxState::core: yororen_ui_core::headless::text_input_core::TextInputCore
 pub yororen_ui_core::headless::combo_box::ComboBoxState::dismiss_on_escape: bool
 pub yororen_ui_core::headless::combo_box::ComboBoxState::highlighted_index: core::option::Option<usize>
@@ -1189,6 +1196,7 @@ pub fn yororen_ui_core::headless::combo_box::ComboBoxState::highlight_next(&mut 
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::highlight_prev(&mut self)
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::invoke_change(&self, gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::is_open(&self) -> bool
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::is_visible(&self) -> bool
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::new(&mut gpui::app::App) -> gpui::app::entity_map::Entity<Self>
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::on_change(&self) -> core::option::Option<&yororen_ui_core::headless::combo_box::ComboBoxChangeCallback>
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::open(&mut self)
@@ -1213,6 +1221,9 @@ pub fn yororen_ui_core::headless::combo_box::ComboBoxState::text_for_range(&mut 
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::unmark_text(&mut self, &mut gpui::window::Window, &mut gpui::app::context::Context<'_, Self>)
 impl gpui::window::Focusable for yororen_ui_core::headless::combo_box::ComboBoxState
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::focus_handle(&self, &gpui::app::App) -> gpui::window::FocusHandle
+impl yororen_ui_core::animation::AnimatedPresenceState for yororen_ui_core::headless::combo_box::ComboBoxState
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::visibility(&self) -> &yororen_ui_core::animation::AnimatedVisibility
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::visibility_mut(&mut self) -> &mut yororen_ui_core::animation::AnimatedVisibility
 impl yororen_ui_core::headless::text_input::TextInputActionHandler for yororen_ui_core::headless::combo_box::ComboBoxState
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::backspace(&mut self, &yororen_ui_core::headless::text_input::Backspace, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::copy(&mut self, &yororen_ui_core::headless::text_input::Copy, &mut gpui::window::Window, &mut gpui::app::App)
@@ -3526,6 +3537,7 @@ impl core::marker::UnsafeUnpin for yororen_ui_core::headless::select::SelectProp
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::select::SelectProps
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::select::SelectProps
 pub struct yororen_ui_core::headless::select::SelectState
+pub yororen_ui_core::headless::select::SelectState::animation: yororen_ui_core::animation::AnimatedVisibility
 pub yororen_ui_core::headless::select::SelectState::dismiss_on_escape: bool
 pub yororen_ui_core::headless::select::SelectState::highlighted_index: core::option::Option<usize>
 pub yororen_ui_core::headless::select::SelectState::open: bool
@@ -3539,6 +3551,7 @@ pub fn yororen_ui_core::headless::select::SelectState::highlight_next(&mut self)
 pub fn yororen_ui_core::headless::select::SelectState::highlight_prev(&mut self)
 pub fn yororen_ui_core::headless::select::SelectState::invoke_change(&self, gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::select::SelectState::is_open(&self) -> bool
+pub fn yororen_ui_core::headless::select::SelectState::is_visible(&self) -> bool
 pub fn yororen_ui_core::headless::select::SelectState::new(&mut gpui::app::App) -> gpui::app::entity_map::Entity<Self>
 pub fn yororen_ui_core::headless::select::SelectState::on_change(&self) -> core::option::Option<&yororen_ui_core::headless::select::SelectChangeCallback>
 pub fn yororen_ui_core::headless::select::SelectState::open(&mut self)
@@ -3551,6 +3564,9 @@ pub fn yororen_ui_core::headless::select::SelectState::set_value(&mut self, impl
 pub fn yororen_ui_core::headless::select::SelectState::toggle(&mut self)
 impl core::clone::Clone for yororen_ui_core::headless::select::SelectState
 pub fn yororen_ui_core::headless::select::SelectState::clone(&self) -> yororen_ui_core::headless::select::SelectState
+impl yororen_ui_core::animation::AnimatedPresenceState for yororen_ui_core::headless::select::SelectState
+pub fn yororen_ui_core::headless::select::SelectState::visibility(&self) -> &yororen_ui_core::animation::AnimatedVisibility
+pub fn yororen_ui_core::headless::select::SelectState::visibility_mut(&mut self) -> &mut yororen_ui_core::animation::AnimatedVisibility
 impl core::marker::Freeze for yororen_ui_core::headless::select::SelectState
 impl !core::marker::Send for yororen_ui_core::headless::select::SelectState
 impl !core::marker::Sync for yororen_ui_core::headless::select::SelectState
