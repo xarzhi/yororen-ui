@@ -135,6 +135,14 @@ pub struct GalleryApp {
     // `uniform_virtual_list` cell to drive scroll_to_top /
     // scroll_to_bottom from buttons.
     pub uniform_list_controller: UniformVirtualListController,
+
+    // Section-level virtual-list controller. Drives the top-level
+    // `virtual_list` in `gallery_app.rs` that turns the 7 sections
+    // (+ toolbar/footer wrapper rows) into virtualized rows so
+    // off-screen sections are NOT rendered every frame. The
+    // controller's item_count is fixed (`SECTION_ROW_COUNT` in
+    // `gallery_app.rs`), so no per-frame sync is needed.
+    pub section_list_controller: VirtualListController,
 }
 
 impl GalleryApp {
@@ -268,6 +276,18 @@ impl GalleryApp {
             vl_item_count: 100,
             vl_load_count: 0,
             uniform_list_controller: UniformVirtualListController::new(),
+            // Section list — 9 rows. `400.px` overdraw means we
+            // pre-render a chunk of off-screen content so the
+            // first scroll input shows the next section
+            // immediately (without a one-frame "blank" gap as
+            // the row is built). The item count is fixed; we do
+            // NOT call reset/append on this controller, only
+            // scroll_to_*.
+            section_list_controller: VirtualListController::new(
+                crate::gallery_app::SECTION_ROW_COUNT,
+                gpui::ListAlignment::Top,
+                gpui::px(400.),
+            ),
         }
     }
 }

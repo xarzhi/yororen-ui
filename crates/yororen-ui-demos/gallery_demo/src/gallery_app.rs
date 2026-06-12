@@ -13,9 +13,23 @@
 //! 3. **Locale install on change** — when the toolbar picks a new
 //!    locale, we call the corresponding `yororen_ui::locale_xx::install`
 //!    to overwrite the global `I18n`.
-//! 4. **7 section call** — actions / display / surfaces / inputs /
-//!    controls / overlays / lists. Each lives in `sections/<name>.rs`.
-//! 5. **Global notification host** —
+//! 4. **Virtualized section list** — the toolbar / 7 sections /
+//!    footer are wired into a single top-level
+//!    [`yororen_ui::headless::virtual_list::virtual_list`] so only
+//!    rows whose layout overlaps the viewport (+ overdraw) are
+//!    actually built. The row closure delegates to the existing
+//!    `sections::xxx(app, window, ctx)` functions via
+//!    `entity.update(cx, |app, ctx| ...)` so each section sees
+//!    a proper `&mut Context<GalleryApp>` and `&mut GalleryApp`
+//!    even though the closure itself only receives `&mut App`.
+//! 5. **Modal scrim at scroll-root level** — the modal panel +
+//!    dimmed scrim are constructed here (not inside
+//!    `sections::overlays`) and added as a sibling of the
+//!    virtual list. `.absolute().inset_0()` pins to the
+//!    `.relative()` `scroll_root`, so the scrim always covers
+//!    the whole window — even when the overlays row is
+//!    virtualized off-screen.
+//! 6. **Global notification host** —
 //!    [`crate::notifications_host::deferred_host`] is the LAST child
 //!    of the root, wrapped in `gpui::deferred` at priority 3 so it
 //!    paints above the modal scrim and every other overlay. The
@@ -24,12 +38,14 @@
 //!    renders each item as a floating card in the top-right corner.
 
 use gpui::{
-    Context, Div, InteractiveElement, IntoElement, ParentElement, Render, Stateful,
-    StatefulInteractiveElement, Styled, Window, div, hsla, px,
+    AnyElement, Context, Div, InteractiveElement, IntoElement, ParentElement, Render, Styled,
+    Window, div, hsla, px,
 };
 
 use yororen_ui::headless::heading::heading;
 use yororen_ui::headless::heading::HeadingLevel;
+use yororen_ui::headless::modal::modal;
+use yororen_ui::headless::virtual_list::virtual_list;
 use yororen_ui::i18n::Translate;
 use yororen_ui::notification::center::{Notification, NotificationCenter, ToastKind};
 use yororen_ui::theme::ActiveTheme;
@@ -42,6 +58,22 @@ use yororen_ui::headless::toggle_button::toggle_button;
 use crate::sections;
 use crate::state::{GalleryApp, LocaleChoice};
 use crate::theme_switcher::{install_renderer, DarkMode, RendererKind};
+
+/// Number of rows in the top-level section virtual list.
+///
+/// Row mapping:
+/// - 0: toolbar + divider
+/// - 1: `sections::actions`
+/// - 2: `sections::display`
+/// - 3: `sections::surfaces`
+/// - 4: `sections::inputs`
+/// - 5: `sections::controls`
+/// - 6: `sections::overlays`
+/// - 7: `sections::lists`
+/// - 8: footer (live counters)
+///
+/// Used by `state.rs` to size the `VirtualListController`.
+pub const SECTION_ROW_COUNT: usize = 9;
 
 impl Render for GalleryApp {
     // The `&mut **cx` recovers a `&mut gpui::App` from the
@@ -68,43 +100,142 @@ impl Render for GalleryApp {
         // 3. Surface color for the window background.
         let surface = cx.theme().get_color("surface.base").unwrap_or_default();
 
-        // 4. Build the toolbar (renderer / dark / locale / toast triggers).
-        let toolbar = build_toolbar(self, cx);
+        // 4. Build the modal scrim/panel here (at the scroll-root
+        //    level) so it always covers the whole window. If the
+        //    overlays row is virtualized off-screen, an open modal
+        //    would otherwise vanish.
+        let modal_overlay = build_modal_overlay(self, cx);
 
-        // 5. Scrollable root. The 7 sections are vertical children;
-        //    long content overflows. `relative` provides the
-        //    containing block for the modal scrim rendered by
-        //    the overlays section AND for the global notification
-        //    host appended below.
-        let scroll_root: Stateful<Div> = div()
+        // 5. Build the virtual list that holds toolbar + 7
+        //    sections + footer. The row closure dispatches by
+        //    index to `sections::xxx(app, window, ctx)` via
+        //    `entity.update(...)` so each section sees a proper
+        //    `Context<GalleryApp>` even though the closure
+        //    receives `&mut App` from `gpui::list`'s paint path.
+        let entity = cx.entity().clone();
+        let section_vl = virtual_list("gallery-sections-vl", &self.section_list_controller, cx)
+            .row(move |ix, window, cx| section_row(ix, &entity, window, cx))
+            .render(cx)
+            .size_full()
+            // The default `VirtualListRenderer` paints a 1-px
+            // border + small radius on its outer wrapper. We want
+            // the section list to read as the page itself, not as
+            // a framed panel — flatten the border by reusing the
+            // surface color and squash the radius.
+            .border_color(surface)
+            .rounded(px(0.));
+
+        // 6. Root: relative for the modal scrim, full-window
+        //    surface bg, then virtual list + scrim +
+        //    notifications. `notifications_host::deferred_host`
+        //    is the last child so its priority-3 deferred paint
+        //    lands on top of the modal scrim (priority 2) and
+        //    every other overlay.
+        div()
             .id("gallery-scroll")
             .relative()
             .size_full()
             .bg(surface)
-            .flex()
-            .flex_col()
-            .gap(px(24.))
-            .p(px(24.))
-            .overflow_y_scroll();
-
-        scroll_root
-            .child(toolbar)
-            .child(divider("toolbar-divider", cx).apply(div()).my(px(8.)))
-            .child(sections::actions(self, window, cx))
-            .child(sections::display(self, window, cx))
-            .child(sections::surfaces(self, window, cx))
-            .child(sections::inputs(self, window, cx))
-            .child(sections::controls(self, window, cx))
-            .child(sections::overlays(self, window, cx))
-            .child(sections::lists(self, window, cx))
-            .child(footer_section(self, cx))
-            // Global notification host: always the last child so
-            // its deferred-paint (priority 3) lands on top of the
-            // modal scrim (priority 2) and popover / dropdown
-            // panels (priority 1). The host is empty when the
-            // queue is empty, so adding it always is cheap.
+            .child(section_vl)
+            .child(modal_overlay)
             .child(crate::notifications_host::deferred_host(cx))
     }
+}
+
+/// Build one virtualized row of the section list.
+///
+/// Called by `gpui::list` (via the `VirtualListRenderer`) only for
+/// rows whose layout overlaps the viewport + overdraw, so
+/// off-screen sections are never constructed. The closure receives
+/// `&mut App`; we `entity.update(...)` to recover the
+/// `&mut GalleryApp` + `&mut Context<GalleryApp>` pair that the
+/// existing `sections::xxx` functions expect.
+///
+/// Padding is reproduced per-row to match the original
+/// `scroll_root.p(px(24.))` + `.gap(px(24.))` visual: every row
+/// has 24-px horizontal padding and 24-px bottom padding (which
+/// acts as the inter-row gap), and row 0 also has 24-px top
+/// padding so the toolbar isn't flush against the window edge.
+fn section_row(
+    ix: usize,
+    entity: &gpui::Entity<GalleryApp>,
+    window: &mut Window,
+    cx: &mut gpui::App,
+) -> AnyElement {
+    let entity = entity.clone();
+    entity.update(cx, |app, ctx| {
+        let inner: AnyElement = match ix {
+            0 => {
+                // Toolbar + divider live together as row 0 so the
+                // divider doesn't pick up the 24-px row gap on
+                // both sides.
+                let tb = build_toolbar(app, ctx);
+                let div_pair = div()
+                    .flex()
+                    .flex_col()
+                    .child(tb)
+                    .child(divider("toolbar-divider", ctx).apply(div()).my(px(8.)));
+                div_pair.into_any_element()
+            }
+            1 => sections::actions(app, window, ctx).into_any_element(),
+            2 => sections::display(app, window, ctx).into_any_element(),
+            3 => sections::surfaces(app, window, ctx).into_any_element(),
+            4 => sections::inputs(app, window, ctx).into_any_element(),
+            5 => sections::controls(app, window, ctx).into_any_element(),
+            6 => sections::overlays(app, window, ctx).into_any_element(),
+            7 => sections::lists(app, window, ctx).into_any_element(),
+            8 => footer_section(app, ctx).into_any_element(),
+            _ => div().into_any_element(),
+        };
+
+        let mut wrapper = div().px(px(24.)).pb(px(24.));
+        if ix == 0 {
+            wrapper = wrapper.pt(px(24.));
+        }
+        wrapper.child(inner).into_any_element()
+    })
+}
+
+/// Build the modal scrim + centered panel. Returns the
+/// deferred-paint wrapper to be added as a child of the
+/// scroll-root, regardless of whether the modal is open
+/// (when closed, an empty deferred placeholder keeps the
+/// element-tree shape stable across frames).
+fn build_modal_overlay(
+    app: &GalleryApp,
+    cx: &mut Context<GalleryApp>,
+) -> gpui::Deferred {
+    let is_modal_open = app.modal_state.read(cx).open;
+    if !is_modal_open {
+        return gpui::deferred(div()).with_priority(2);
+    }
+
+    let modal_state_for_close = app.modal_state.clone();
+    let modal_panel = modal("ov-modal", app.modal_state.clone())
+        .render(cx)
+        .w(px(360.))
+        .child(label("ov-modal-title", cx.t("modal.title"), cx).strong(true).render(cx))
+        .child(label("ov-modal-body", cx.t("modal.body"), cx).render(cx))
+        .child(
+            button("ov-modal-close", cx)
+                .on_click(move |_, _, cx| {
+                    modal_state_for_close.update(cx, |st, _cx| st.close());
+                })
+                .render(cx)
+                .child("Close"),
+        );
+
+    gpui::deferred(
+        div()
+            .absolute()
+            .inset_0()
+            .flex()
+            .items_center()
+            .justify_center()
+            .bg(hsla(0.0, 0.0, 0.0, 0.55))
+            .child(modal_panel),
+    )
+    .with_priority(2)
 }
 
 /// Toolbar at the top of the window.

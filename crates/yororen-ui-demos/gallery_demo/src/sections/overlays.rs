@@ -2,7 +2,7 @@
 //! labelled `cell`.
 
 use gpui::{
-    Context, Div, IntoElement, ParentElement, StatefulInteractiveElement, Styled, div, hsla, px,
+    Context, Div, IntoElement, ParentElement, StatefulInteractiveElement, Styled, div, px,
 };
 
 use yororen_ui::headless::button::button;
@@ -10,7 +10,6 @@ use yororen_ui::headless::disclosure::disclosure;
 use yororen_ui::headless::dropdown_menu::dropdown_menu;
 use yororen_ui::headless::label::label;
 use yororen_ui::headless::menu::menu;
-use yororen_ui::headless::modal::modal;
 use yororen_ui::headless::overlay::overlay;
 use yororen_ui::headless::popover::popover;
 use yororen_ui::headless::tooltip::tooltip;
@@ -20,7 +19,14 @@ use crate::sections::cell;
 use crate::state::GalleryApp;
 
 pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
-    // --- modal: trigger + scrim + body ---
+    // --- modal trigger only ---
+    //
+    // The modal scrim/panel itself is rendered by
+    // `gallery_app::render` at the `scroll_root` level so that
+    // (1) when the overlays row is virtualized off-screen, the
+    // open modal stays visible, and (2) `.absolute().inset_0()`
+    // pins to the window-spanning `scroll_root` rather than the
+    // (smaller) row container.
     let modal_state_for_btn = app.modal_state.clone();
     let open_modal_btn = button("ov-modal-open", cx)
         .on_click(move |_, _, cx| {
@@ -28,54 +34,12 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         })
         .render(cx)
         .child("Open modal");
-    let modal_state = app.modal_state.clone();
-    let is_modal_open = modal_state.read(cx).open;
-    let modal_panel = modal("ov-modal", modal_state.clone())
-        .render(cx)
-        .w(px(360.))
-        .child(label("ov-modal-title", cx.t("modal.title"), cx).strong(true).render(cx))
-        .child(label("ov-modal-body", cx.t("modal.body"), cx).render(cx))
-        .child(
-            button("ov-modal-close", cx)
-                .on_click(move |_, _, cx| {
-                    modal_state.update(cx, |st, _cx| st.close());
-                })
-                .render(cx)
-                .child("Close"),
-        );
-    // The modal scrim/panel is rendered as a window-level
-    // overlay at the end of the section list (see below) so
-    // it covers the entire window.
     let modal_wrapped = cell(
         "modal (click to open)",
         div().flex().flex_col().child(open_modal_btn),
         cx,
     );
-
-    // The modal scrim is rendered as a window-level overlay at
-    // the end of the section list. `absolute().inset_0()` makes
-    // it cover the entire `scroll_root` (which is `relative`),
-    // so the dimmed scrim spans the whole window and the panel
-    // is centered within it. `gpui::deferred(...).with_priority(2)`
-    // pushes the paint to the very end of the paint pass with
-    // a higher priority than the popover / dropdown deferred
-    // panels (priority 1), so the modal sits on top of every
-    // other overlay.
-    let modal_overlay = if is_modal_open {
-        gpui::deferred(
-            div()
-                .absolute()
-                .inset_0()
-                .flex()
-                .items_center()
-                .justify_center()
-                .bg(hsla(0.0, 0.0, 0.0, 0.55))
-                .child(modal_panel),
-        )
-        .with_priority(2)
-    } else {
-        gpui::deferred(div()).with_priority(2)
-    };
+    let is_modal_open = app.modal_state.read(cx).open;
 
     // --- popover: trigger + popover body ---
     let popover_state_for_btn = app.popover_state.clone();
@@ -229,6 +193,5 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .child(dropdown_wrapped)
         .child(disc_wrapped)
         .child(overlay_wrapped)
-        .child(modal_overlay)
         .child(label("ov-summary", format!("dropdown: {} | menu: {}", app.dropdown_demo_value, app.menu_demo_value), cx).muted(true).render(cx))
 }
