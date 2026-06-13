@@ -711,6 +711,7 @@ pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::bg(&self
 pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::border(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
 pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::border_radius(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
 pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::item_hover_bg(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::min_width(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
 pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::padding(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
 pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> f32
 impl yororen_ui_core::renderer::menu::MenuRenderer for yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer
@@ -2021,6 +2022,7 @@ pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::bg(&self
 pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::border(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
 pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::border_radius(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
 pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::item_hover_bg(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::min_width(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
 pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::padding(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
 pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::shadow_alpha(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> f32
 impl yororen_ui_core::renderer::menu::MenuRenderer for yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer

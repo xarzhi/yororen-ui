@@ -6,14 +6,25 @@
 //! rows fade to `content.disabled`. Clicking a row fires
 //! `state.pick(value, …)` which writes the value and invokes
 //! the user-supplied `on_change` callback.
+//!
+//! The shell calls `track_focus(&state.focus_handle())` and
+//! wires `on_key_down` so arrow keys / `Home` / `End` /
+//! `Enter` move highlight and pick the highlighted row. The
+//! keyboard nav is opt-in: a user who clicks the listbox
+//! focuses it, then arrow keys work. A user who tabs into it
+//! (Tab focus traversal) gets the same behaviour. The same
+//! `ListNavigable` algorithm the headless layer uses drives
+//! every transition — this renderer is just the input
+//! surface.
 
 use std::sync::Arc;
 
 use gpui::{
-    App, CursorStyle, Div, ElementId, Hsla, InteractiveElement, ParentElement, Pixels, Stateful,
-    StatefulInteractiveElement, Styled, div, px,
+    App, CursorStyle, Div, ElementId, Hsla, InteractiveElement, KeyDownEvent, ParentElement,
+    Pixels, Stateful, StatefulInteractiveElement, Styled, div, px,
 };
 
+use yororen_ui_core::headless::list_navigable::ListNavigable;
 use yororen_ui_core::headless::listbox::ListboxProps;
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
@@ -95,8 +106,12 @@ impl ListboxRenderer for TokenListboxRenderer {
         let options = read.options.clone();
         // `Entity` is `Clone`; cloning releases the read borrow
         // so the closure body below can call `state.update(…)`
-        // for the click handlers.
+        // for the click handlers and the keyboard handler.
         let state_for_click = props.state.clone();
+        // Clone the focus handle out of the read borrow so the
+        // shell can `track_focus` it and the key handler can
+        // also reference it.
+        let focus_handle = read.focus_handle();
         let _ = read;
 
         let mut body: Div = div().flex().flex_col().gap(gap).bg(bg).rounded(r).p(px(2.0));
@@ -143,7 +158,77 @@ impl ListboxRenderer for TokenListboxRenderer {
             body = body.child(row);
         }
 
-        div().id(props.id.clone()).child(body)
+        // Keyboard nav — drives the same `ListNavigable` algorithm
+        // the headless layer uses, so highlight / skip-disabled
+        // semantics are identical to clicking. `track_focus` makes
+        // `on_key_down` fire when the listbox has focus (after
+        // click or Tab). `Enter` calls `select_highlighted` to
+        // commit the highlighted row.
+        //
+        // `window.refresh()` is required because `compose` runs
+        // outside a paint context: `props.state.read(cx)` during
+        // compose does NOT register a paint-time subscription, so
+        // a state-only update (no GalleryApp field changes) would
+        // otherwise never redraw. `window.refresh()` marks the
+        // window dirty so the next frame re-invokes `render`,
+        // which re-reads the state and re-paints. Mouse clicks
+        // don't need this because `on_change` mutates a
+        // GalleryApp field, which already triggers re-render via
+        // the entity observer graph.
+        let state_for_keys = state_for_click.clone();
+        div()
+            .id(props.id.clone())
+            .track_focus(&focus_handle)
+            .on_key_down(move |ev: &KeyDownEvent, window, cx| {
+                let ks = &ev.keystroke;
+                let handled = match ks.key.as_str() {
+                    "down" => {
+                        state_for_keys.update(cx, |s, _cx| s.highlight_next());
+                        true
+                    }
+                    "up" => {
+                        state_for_keys.update(cx, |s, _cx| s.highlight_prev());
+                        true
+                    }
+                    "home" => {
+                        state_for_keys.update(cx, |s, _cx| {
+                            if let Some(i) = (0..s.options.len()).find(|&i| s.is_selectable(i)) {
+                                s.set_highlighted(i);
+                            }
+                        });
+                        true
+                    }
+                    "end" => {
+                        state_for_keys.update(cx, |s, _cx| {
+                            if let Some(i) = (0..s.options.len())
+                                .rev()
+                                .find(|&i| s.is_selectable(i))
+                            {
+                                s.set_highlighted(i);
+                            }
+                        });
+                        true
+                    }
+                    "enter" => {
+                        state_for_keys.update(cx, |s, cx_inner| {
+                            s.select_highlighted(window, &mut *cx_inner);
+                        });
+                        true
+                    }
+                    _ => false,
+                };
+                if handled {
+                    // Mark the window dirty so the next paint
+                    // re-runs `render` and re-reads the state.
+                    // Without this the highlight change is
+                    // invisible: `compose` ran once during
+                    // `.render(cx)` and nothing observes
+                    // `listbox_state` at paint time, so the
+                    // window has no reason to redraw.
+                    window.refresh();
+                }
+            })
+            .child(body)
     }
 }
 

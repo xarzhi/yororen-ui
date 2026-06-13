@@ -7,7 +7,10 @@
 
 use std::sync::Arc;
 
-use gpui::{App, AppContext, Div, ElementId, Entity, InteractiveElement, SharedString, Stateful};
+use gpui::{
+    App, AppContext, Div, ElementId, Entity, FocusHandle, Focusable, InteractiveElement,
+    SharedString, Stateful,
+};
 
 use super::list_navigable::{ListNavigable, highlight_next, highlight_prev};
 
@@ -39,17 +42,34 @@ pub struct ListboxState {
     pub options: Vec<ListboxOption>,
     pub highlighted_index: Option<usize>,
     pub selected_value: Option<SharedString>,
+    /// Focus handle minted in `new`. The renderer wires
+    /// `track_focus` + `on_key_down` against this handle so
+    /// arrow keys move highlight, `Enter` selects. The handle
+    /// is private so the public `Focusable` trait impl owns
+    /// the consumer-facing name.
+    focus_handle: FocusHandle,
     on_change: Option<ListboxChangeCallback>,
 }
 
 impl ListboxState {
     pub fn new(app: &mut App) -> Entity<Self> {
+        let focus_handle = app.focus_handle();
         app.new(|_| Self {
             options: Vec::new(),
             highlighted_index: None,
             selected_value: None,
+            focus_handle,
             on_change: None,
         })
+    }
+
+    /// Public focus handle accessor. Mirrors the
+    /// `Focusable::focus_handle` impl below; duplicated here so
+    /// the renderer can grab the handle without going through
+    /// the `Focusable` trait object (which is what `track_focus`
+    /// and `is_focused(window)` want).
+    pub fn focus_handle(&self) -> FocusHandle {
+        self.focus_handle.clone()
     }
 
     pub fn set_options(&mut self, opts: Vec<ListboxOption>) {
@@ -121,6 +141,17 @@ impl ListNavigable for ListboxState {
             .get(i)
             .map(|o| !o.disabled)
             .unwrap_or(false)
+    }
+}
+
+/// `Focusable` impl so the platform's focus traversal (Tab key)
+/// and the renderer's `track_focus` can find the listbox's
+/// handle. Without this, `Window::handle_input(&focus_handle,
+/// …)` can't deliver key events to the listbox and arrow-key
+/// nav never fires.
+impl Focusable for ListboxState {
+    fn focus_handle(&self, _cx: &App) -> FocusHandle {
+        self.focus_handle.clone()
     }
 }
 

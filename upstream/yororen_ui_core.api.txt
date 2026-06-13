@@ -1901,6 +1901,7 @@ pub yororen_ui_core::headless::listbox::ListboxState::highlighted_index: core::o
 pub yororen_ui_core::headless::listbox::ListboxState::options: alloc::vec::Vec<yororen_ui_core::headless::listbox::ListboxOption>
 pub yororen_ui_core::headless::listbox::ListboxState::selected_value: core::option::Option<gpui::shared_string::SharedString>
 impl yororen_ui_core::headless::listbox::ListboxState
+pub fn yororen_ui_core::headless::listbox::ListboxState::focus_handle(&self) -> gpui::window::FocusHandle
 pub fn yororen_ui_core::headless::listbox::ListboxState::highlight_next(&mut self)
 pub fn yororen_ui_core::headless::listbox::ListboxState::highlight_prev(&mut self)
 pub fn yororen_ui_core::headless::listbox::ListboxState::new(&mut gpui::app::App) -> gpui::app::entity_map::Entity<Self>
@@ -1911,6 +1912,8 @@ pub fn yororen_ui_core::headless::listbox::ListboxState::set_options(&mut self, 
 pub fn yororen_ui_core::headless::listbox::ListboxState::set_selected(&mut self, impl core::convert::Into<gpui::shared_string::SharedString>)
 impl core::clone::Clone for yororen_ui_core::headless::listbox::ListboxState
 pub fn yororen_ui_core::headless::listbox::ListboxState::clone(&self) -> yororen_ui_core::headless::listbox::ListboxState
+impl gpui::window::Focusable for yororen_ui_core::headless::listbox::ListboxState
+pub fn yororen_ui_core::headless::listbox::ListboxState::focus_handle(&self, &gpui::app::App) -> gpui::window::FocusHandle
 impl yororen_ui_core::headless::list_navigable::ListNavigable for yororen_ui_core::headless::listbox::ListboxState
 pub fn yororen_ui_core::headless::listbox::ListboxState::highlighted_index(&self) -> core::option::Option<usize>
 pub fn yororen_ui_core::headless::listbox::ListboxState::is_selectable(&self, usize) -> bool

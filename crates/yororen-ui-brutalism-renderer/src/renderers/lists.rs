@@ -2,9 +2,11 @@
 //! `Form`, `FormField`, `Table`, `VirtualList`, `UniformVirtualList`.
 
 use gpui::{
-    App, CursorStyle, Div, ElementId, Hsla, InteractiveElement, IntoElement, ParentElement, Pixels,
-    SharedString, Stateful, StatefulInteractiveElement, Styled, Window, prelude::FluentBuilder, px,
+    App, CursorStyle, Div, ElementId, Hsla, InteractiveElement, IntoElement, KeyDownEvent,
+    ParentElement, Pixels, SharedString, Stateful, StatefulInteractiveElement, Styled, Window,
+    prelude::FluentBuilder, px,
 };
+use yororen_ui_core::headless::list_navigable::ListNavigable;
 use yororen_ui_core::renderer::spec::Edges;
 use yororen_ui_core::theme::Theme;
 
@@ -192,6 +194,7 @@ impl ListboxRenderer for BrutalListboxRenderer {
         let selected_value = read.selected_value.clone();
         let options = read.options.clone();
         let state_for_click = props.state.clone();
+        let focus_handle = read.focus_handle();
         let _ = read;
 
         let mut body: Div = gpui::div()
@@ -244,8 +247,58 @@ impl ListboxRenderer for BrutalListboxRenderer {
             body = body.child(row);
         }
 
+        let state_for_keys = state_for_click.clone();
         gpui::div()
             .id(props.id.clone())
+            .track_focus(&focus_handle)
+            .on_key_down(move |ev: &KeyDownEvent, window, cx| {
+                let ks = &ev.keystroke;
+                let handled = match ks.key.as_str() {
+                    "down" => {
+                        state_for_keys.update(cx, |s, _cx| s.highlight_next());
+                        true
+                    }
+                    "up" => {
+                        state_for_keys.update(cx, |s, _cx| s.highlight_prev());
+                        true
+                    }
+                    "home" => {
+                        state_for_keys.update(cx, |s, _cx| {
+                            if let Some(i) = (0..s.options.len()).find(|&i| s.is_selectable(i)) {
+                                s.set_highlighted(i);
+                            }
+                        });
+                        true
+                    }
+                    "end" => {
+                        state_for_keys.update(cx, |s, _cx| {
+                            if let Some(i) = (0..s.options.len())
+                                .rev()
+                                .find(|&i| s.is_selectable(i))
+                            {
+                                s.set_highlighted(i);
+                            }
+                        });
+                        true
+                    }
+                    "enter" => {
+                        state_for_keys.update(cx, |s, cx_inner| {
+                            s.select_highlighted(window, &mut *cx_inner);
+                        });
+                        true
+                    }
+                    _ => false,
+                };
+                if handled {
+                    // See the matching comment in
+                    // `TokenListboxRenderer::compose`: state-only
+                    // updates need an explicit `window.refresh()`
+                    // to schedule a repaint because `compose`
+                    // doesn't establish a paint-time entity
+                    // subscription.
+                    window.refresh();
+                }
+            })
             .border(bw)
             .border_color(border)
             .rounded(r)

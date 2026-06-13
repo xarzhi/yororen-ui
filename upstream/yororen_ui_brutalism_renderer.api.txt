@@ -856,6 +856,7 @@ pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalMenuRenderer::i
 pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalMenuRenderer::item_hover_bg(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
 pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalMenuRenderer::item_padding_x(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
 pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalMenuRenderer::item_padding_y(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalMenuRenderer::min_width(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
 pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalMenuRenderer::padding(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
 impl yororen_ui_core::renderer::menu::MenuRenderer for yororen_ui_brutalism_renderer::renderers::overlays::BrutalMenuRenderer
 pub fn yororen_ui_brutalism_renderer::renderers::overlays::BrutalMenuRenderer::compose(&self, &yororen_ui_core::headless::menu::MenuProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
