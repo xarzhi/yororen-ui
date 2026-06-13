@@ -17,11 +17,23 @@
 mod state;
 mod view;
 
-use gpui::{App, AppContext, Application, WindowBounds, WindowOptions, px, size};
+use gpui::{
+    App, AppContext, Application, InteractiveElement, IntoElement, WindowBounds, WindowOptions,
+    div, px, size,
+};
 
 use yororen_ui::assets::UiAsset;
 use yororen_ui::locale_en;
 use yororen_ui::renderer;
+
+/// A trivial custom widget used to exercise
+/// `register_xml_component!` — the user-facing extension
+/// point for adding new XML tags at runtime.
+fn render_custom_widget(id: &str, _cx: &mut gpui::App) -> gpui::AnyElement {
+    div().id(id.to_string()).into_any_element()
+}
+
+yororen_ui::register_xml_component!(CustomWidget => render_custom_widget);
 
 fn main() {
     let app = Application::new().with_assets(UiAsset);

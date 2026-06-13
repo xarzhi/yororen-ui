@@ -52,8 +52,8 @@ use quote::{ToTokens, TokenStreamExt, format_ident, quote};
 use crate::ast::{AstAttribute, AstElement, AstNode};
 use crate::error::{XmlError, XmlErrorKind};
 use crate::schema::{
-    ComponentKind, ContainerDef, ControlFlowDef, ExtraArgKind, LeafDef, PropValue, RenderMode,
-    is_known_shorthand_method, is_spacing_prefix, is_spacing_shorthand,
+    ComponentDef, ComponentKind, ContainerDef, ControlFlowDef, ExtraArgKind, LeafDef, PropValue,
+    RenderMode, is_known_shorthand_method, is_spacing_prefix, is_spacing_shorthand,
 };
 use crate::schema_generated::{BUILTINS_GENERATED, BUILTINS_OVERRIDES};
 
@@ -137,20 +137,70 @@ fn codegen_element(
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
 ) -> Result<TokenStream, XmlError> {
-    let def = lookup_component(&element.tag).ok_or_else(|| {
-        XmlError::new(
-            XmlErrorKind::UnknownTag,
-            element.span,
-            format!("unknown tag <{}>", element.tag),
-        )
-        .at(element.byte_offset)
-    })?;
+    // Unknown tags fall through to the runtime registry
+    // (see `crate::runtime` and the `register_xml_component!`
+    // declarative macro). The user gets a working
+    // render via inventory lookup — at the cost of
+    // losing compile-time attribute / event validation
+    // for that tag.
+    let def = lookup_component(&element.tag).unwrap_or(&RUNTIME_LEAF_FALLBACK);
 
     match def.kind {
         ComponentKind::Container(c) => codegen_container(element, c, cx, location),
         ComponentKind::Leaf(l) => codegen_leaf(element, l, cx, location),
         ComponentKind::ControlFlow(c) => codegen_control_flow(element, c, cx, location),
+        ComponentKind::RuntimeLeaf => codegen_runtime_leaf(element, cx),
     }
+}
+
+/// Sentinel returned by `lookup_component` when the tag
+/// is not in the built-in schema. We hand the codegen a
+/// `RuntimeLeaf` variant instead of erroring so that
+/// custom registered tags compile cleanly.
+const RUNTIME_LEAF_FALLBACK: ComponentDef = ComponentDef {
+    tag: "<runtime>",
+    kind: ComponentKind::RuntimeLeaf,
+    doc: "runtime-registered component",
+};
+
+/// Render an element whose tag wasn't found in the
+/// built-in schema. Emits a runtime lookup against
+/// the [`crate::runtime`] registry — works for any
+/// tag the user has registered via
+/// [`crate::register_xml_component!`].
+///
+/// This is the "extension hook" for the schema-less
+/// path: unknown tags compile (rather than error) and
+/// resolve at runtime. The trade-off is that
+/// attribute / event validation can't happen at
+/// compile time for these tags.
+fn codegen_runtime_leaf(
+    element: &AstElement,
+    cx: &TokenStream,
+) -> Result<TokenStream, XmlError> {
+    let tag = element.tag.clone();
+    let id_attr = element.attributes.iter().find(|a| a.name == "id").ok_or_else(|| {
+        XmlError::new(
+            XmlErrorKind::UnknownAttribute,
+            element.span,
+            format!("<{tag}> (a runtime-registered component) requires an `id` attribute"),
+        )
+        .at(element.byte_offset)
+    })?;
+    let id_expr = attr_value_tokens(id_attr)?;
+    // We deliberately ignore every other attribute;
+    // the user's renderer is responsible for parsing
+    // them. This keeps the contract minimal.
+    let _ = cx;
+    // `tag` is owned (from element.tag) and lives for
+    // the lifetime of the AST; we need a 'static
+    // reference for the runtime lookup. The XML
+    // literal is itself 'static (it's part of the
+    // macro input), so emitting the literal string
+    // yields a 'static reference.
+    Ok(quote! {
+        ::yororen_ui_xml::runtime::render_or_empty(#tag, #id_expr, #cx)
+    })
 }
 
 fn codegen_container(
@@ -1005,7 +1055,7 @@ fn codegen_match(
         })?;
         let pattern_parsed = if pattern_attr.expr.is_none() && pattern_attr.raw == "_" {
             quote! { _ }
-        } else if let Some(expr) = &pattern_attr.expr {
+        } else if let Some(_expr) = &pattern_attr.expr {
             // Brace expression — the typical case for
             // pattern-style arms (`Status::Loading`,
             // `Some(x)`, etc.).
@@ -1738,9 +1788,27 @@ mod tests {
     }
 
     #[test]
-    fn unknown_tag_is_an_error() {
+    fn unknown_tag_falls_through_to_runtime_registry() {
+        // Unknown tags used to be a hard error; with the
+        // runtime registry (`register_xml_component!`)
+        // they now compile and resolve at runtime via
+        // `runtime::render_or_empty`. The codegen must
+        // emit a call into the runtime module rather
+        // than erroring.
+        let ts = codegen(r#"<MyWidget id="x" />"#, Span::call_site(), None).expect("codegen ok");
+        let s = ts.to_string();
+        assert!(s.contains("render_or_empty"), "{s}");
+        assert!(s.contains("\"MyWidget\""), "{s}");
+    }
+
+    #[test]
+    fn unknown_tag_without_id_is_still_an_error() {
+        // The runtime registry needs an `id` to call
+        // the factory — the codegen still validates
+        // this even on the runtime path.
         let err = codegen("<MyWidget />", Span::call_site(), None).unwrap_err();
-        assert!(matches!(err.kind, crate::error::XmlErrorKind::UnknownTag), "{err:?}");
+        assert!(matches!(err.kind, crate::error::XmlErrorKind::UnknownAttribute), "{err:?}");
+        assert!(err.message.contains("runtime-registered"));
     }
 
     #[test]
@@ -1799,11 +1867,16 @@ mod tests {
 
     #[test]
     fn diagnostic_carries_byte_offset_and_snippet() {
-        // The `<UnknownTag>` is on line 3 of the XML —
-        // the rendered diagnostic should reflect that.
-        let xml = "<Column>\n  <Label id=\"a\" text=\"hi\" />\n  <UnknownTag id=\"x\" />\n</Column>";
+        // The `<UnknownTag>` on line 3 used to error,
+        // but now it falls through to the runtime
+        // registry. To still exercise the diagnostic
+        // machinery we use a bad attribute value
+        // (`variant="catastrophic"`) on a known tag —
+        // that produces an `InvalidExpression` error
+        // pointing at the offending attribute.
+        let xml = "<Column>\n  <Label id=\"a\" text=\"hi\" />\n  <Button id=\"x\" variant=\"catastrophic\" />\n</Column>";
         let err = codegen(xml, Span::call_site(), None).unwrap_err();
-        assert!(matches!(err.kind, crate::error::XmlErrorKind::UnknownTag));
+        assert!(matches!(err.kind, crate::error::XmlErrorKind::InvalidExpression), "{err:?}");
         assert!(err.offset.is_some(), "error should carry a byte offset");
 
         // Render the error with a location tracker and
@@ -1816,7 +1889,7 @@ mod tests {
         };
         let rendered = err.render_with(Some(&loc));
         assert!(rendered.contains("line 3"), "{rendered}");
-        assert!(rendered.contains("UnknownTag"), "{rendered}");
+        assert!(rendered.contains("variant"), "{rendered}");
         assert!(rendered.contains('^'), "{rendered}");
     }
 
@@ -2286,13 +2359,14 @@ mod tests {
         // maintains: that the `BUILTINS_GENERATED` static
         // contains every known built-in tag, and that
         // every component has either a valid
-        // `Container`, `Leaf`, or `ControlFlow` kind.
+        // `Container`, `Leaf`, `ControlFlow`, or `RuntimeLeaf` kind.
         let generated = crate::schema_generated::BUILTINS_GENERATED;
         for def in generated {
             match def.kind {
                 crate::schema::ComponentKind::Container(_)
                 | crate::schema::ComponentKind::Leaf(_)
-                | crate::schema::ComponentKind::ControlFlow(_) => {}
+                | crate::schema::ComponentKind::ControlFlow(_)
+                | crate::schema::ComponentKind::RuntimeLeaf => {}
             }
         }
     }

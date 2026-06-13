@@ -74,4 +74,8 @@
         </For>
     </Column>
 
+    <!-- Custom runtime-registered widget — proves the
+         `register_xml_component!` extension hook works. -->
+    <CustomWidget id="custom" />
+
 </Column>

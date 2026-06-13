@@ -6,3 +6,4 @@ edition.workspace = true
 [dependencies]
 gpui = { package = "gpui-ce", version = "0.3" }
 yororen-ui = { package = "yororen_ui", path = "../../yororen-ui", features = ["xml"] }
+yororen-ui-xml = { package = "yororen_ui_xml", path = "../../yororen-ui-xml" }

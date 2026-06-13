@@ -49,6 +49,12 @@ pub enum ComponentKind {
     /// A pseudo-tag that produces Rust control flow at
     /// codegen time. It never produces an element of its own.
     ControlFlow(ControlFlowDef),
+    /// A tag not known to the schema. The codegen emits
+    /// a runtime lookup against [`crate::runtime::lookup`]
+    /// — useful for user-registered custom components.
+    /// Compile-time validation of attributes / events is
+    /// skipped for these tags.
+    RuntimeLeaf,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

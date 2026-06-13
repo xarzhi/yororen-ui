@@ -23,7 +23,12 @@ pub mod ast;
 pub mod codegen;
 pub mod error;
 pub mod parser;
+pub mod runtime;
 pub mod schema;
+
+/// Re-exported so `register_xml_component!` (in
+/// [`runtime`]) can refer to it via `$crate`.
+pub use inventory;
 
 /// Auto-generated schema entries, populated by the
 /// `gen-schema` binary. See `yororen-ui-xml/src/bin/gen_schema.rs`

@@ -16,6 +16,7 @@ quote = "1"
 syn = { version = "2", features = ["full", "extra-traits"] }
 toml = "0.8"
 serde = { version = "1", features = ["derive"] }
+inventory = "0.3"
 
 [[bin]]
 name = "gen-schema"
