@@ -2431,6 +2431,32 @@ mod tests {
     }
 
     #[test]
+    fn utf8_chars_in_string_attrs_preserved_in_codegen() {
+        // Multi-byte UTF-8 characters in string-valued
+        // attributes must round-trip through the
+        // preprocessor + quote! unchanged, so the
+        // resulting Rust source contains the same
+        // bytes the user wrote in the XML.
+        let s = render(r#"<Label id="x" text="Type here…" />"#);
+        // The codegen emits `("Type here…").to_string()`
+        // (3 bytes 0xE2 0x80 0xA6 for `…`).
+        assert!(s.contains("Type here"), "{s}");
+        // The raw `…` byte sequence should survive
+        // unchanged. If the codegen mangles UTF-8
+        // strings, this assertion fails.
+        let ellipsis_bytes = "\u{2026}".as_bytes();
+        let s_bytes = s.as_bytes();
+        let mut found = false;
+        for window in s_bytes.windows(ellipsis_bytes.len()) {
+            if window == ellipsis_bytes {
+                found = true;
+                break;
+            }
+        }
+        assert!(found, "ellipsis bytes not preserved in: {s}");
+    }
+
+    #[test]
     fn string_interpolation_with_no_braces_uses_literal_path() {
         // `text="hello"` has no braces, so the fast path
         // emits `("hello").to_string()` — no `format!`.

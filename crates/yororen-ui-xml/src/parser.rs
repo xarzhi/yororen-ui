@@ -190,6 +190,9 @@ impl<'a> LocationTracker<'a> {
 /// lossless from the codegen's perspective: we record the
 /// original names so the codegen arm for `<For>` can rebuild
 /// `let:item` and `let:index` in the generated Rust.
+///
+/// Operates on bytes to preserve UTF-8 sequences (the
+/// preprocessor must never mangle multi-byte chars).
 pub(crate) fn rewrite_let_attrs(input: &str) -> String {
     // We need to find `let:NAME` and `let:NAME={...}` inside
     // start tags and rewrite them. The codegen reads the
@@ -198,7 +201,7 @@ pub(crate) fn rewrite_let_attrs(input: &str) -> String {
     //   let:item        → let_item
     //   let:index={i}   → let_index="{i}"
     let bytes = input.as_bytes();
-    let mut out = String::with_capacity(input.len());
+    let mut out: Vec<u8> = Vec::with_capacity(input.len());
     let mut i = 0;
     while i < bytes.len() {
         if i + 3 < bytes.len()
@@ -211,18 +214,18 @@ pub(crate) fn rewrite_let_attrs(input: &str) -> String {
             // a textual rewrite (not tag-aware) — the only
             // places we expect `let:` are inside `<For>`'s
             // start tag, so this is safe in practice.
-            out.push_str("let_");
+            out.extend_from_slice(b"let_");
             i += 4;
             while i < bytes.len() && (bytes[i].is_ascii_alphanumeric() || bytes[i] == b'_') {
-                out.push(bytes[i] as char);
+                out.push(bytes[i]);
                 i += 1;
             }
             continue;
         }
-        out.push(bytes[i] as char);
+        out.push(bytes[i]);
         i += 1;
     }
-    out
+    String::from_utf8(out).expect("rewrite_let_attrs: output is valid UTF-8")
 }
 
 /// Rewrite `<Tag bare_attr bare_attr2="v" />` →
@@ -230,16 +233,24 @@ pub(crate) fn rewrite_let_attrs(input: &str) -> String {
 /// single source string and is safe for typical XML used by
 /// `xml!` (no CDATA sections, no comments that look like
 /// attributes).
+///
+/// **UTF-8 note**: the output is a `Vec<u8>` rather than a
+/// `String` so that the preprocessor can preserve multi-byte
+/// UTF-8 sequences byte-for-byte. Pushing individual bytes
+/// to a `String` and re-encoding as `u8 as char` would
+/// convert every byte > 0x7F to a Latin-1 char, mangling
+/// the result (the classic UTF-8 ↔ Latin-1 mojibake). We
+/// only decode as UTF-8 at the very end of the pipeline.
 pub(crate) fn normalise_bool_attrs(input: &str) -> String {
     let bytes = input.as_bytes();
-    let mut out = String::with_capacity(input.len());
+    let mut out: Vec<u8> = Vec::with_capacity(input.len());
     let mut i = 0;
     while i < bytes.len() {
         // Find the next `<` (start of a tag).
         if bytes[i] == b'<' {
             // Copy `<` and detect comment / CDATA / PI / doctype
             // so we don't mangle them.
-            out.push('<');
+            out.push(b'<');
             i += 1;
             // Comments
             if i + 3 < bytes.len()
@@ -247,17 +258,17 @@ pub(crate) fn normalise_bool_attrs(input: &str) -> String {
                 && bytes[i + 1] == b'-'
                 && bytes[i + 2] == b'-'
             {
-                out.push_str("!--");
+                out.extend_from_slice(b"!--");
                 i += 3;
                 while i < bytes.len() {
-                    out.push(bytes[i] as char);
+                    out.push(bytes[i]);
                     if bytes[i] == b'-'
                         && i + 2 < bytes.len()
                         && bytes[i + 1] == b'-'
                         && bytes[i + 2] == b'>'
                     {
-                        out.push('-');
-                        out.push('>');
+                        out.push(b'-');
+                        out.push(b'>');
                         i += 3;
                         break;
                     }
@@ -269,11 +280,11 @@ pub(crate) fn normalise_bool_attrs(input: &str) -> String {
             // matching `>` (no attribute processing).
             if i < bytes.len() && (bytes[i] == b'?' || bytes[i] == b'!') {
                 while i < bytes.len() && bytes[i] != b'>' {
-                    out.push(bytes[i] as char);
+                    out.push(bytes[i]);
                     i += 1;
                 }
                 if i < bytes.len() {
-                    out.push('>');
+                    out.push(b'>');
                     i += 1;
                 }
                 continue;
@@ -281,11 +292,11 @@ pub(crate) fn normalise_bool_attrs(input: &str) -> String {
             // End tag: copy verbatim.
             if i < bytes.len() && bytes[i] == b'/' {
                 while i < bytes.len() && bytes[i] != b'>' {
-                    out.push(bytes[i] as char);
+                    out.push(bytes[i]);
                     i += 1;
                 }
                 if i < bytes.len() {
-                    out.push('>');
+                    out.push(b'>');
                     i += 1;
                 }
                 continue;
@@ -293,20 +304,20 @@ pub(crate) fn normalise_bool_attrs(input: &str) -> String {
             // Start tag: walk attributes.
             // First, the tag name.
             while i < bytes.len() && !is_tag_name_end(bytes[i]) {
-                out.push(bytes[i] as char);
+                out.push(bytes[i]);
                 i += 1;
             }
             // Now: whitespace + attributes until `>` or `/>`.
             while i < bytes.len() && bytes[i] != b'>' {
                 // Skip whitespace.
                 if bytes[i].is_ascii_whitespace() {
-                    out.push(bytes[i] as char);
+                    out.push(bytes[i]);
                     i += 1;
                     continue;
                 }
                 if bytes[i] == b'/' {
                     // self-closing
-                    out.push('/');
+                    out.push(b'/');
                     i += 1;
                     continue;
                 }
@@ -316,15 +327,15 @@ pub(crate) fn normalise_bool_attrs(input: &str) -> String {
                     i += 1;
                 }
                 let name = &input[name_start..i];
-                out.push_str(name);
+                out.extend_from_slice(name.as_bytes());
                 if i < bytes.len() && bytes[i] == b'=' {
                     // Normal `attr="value"` or `attr={...}` —
                     // copy as-is until the matching closer.
-                    out.push('=');
+                    out.push(b'=');
                     i += 1;
                     // Skip whitespace before the value.
                     while i < bytes.len() && bytes[i].is_ascii_whitespace() {
-                        out.push(bytes[i] as char);
+                        out.push(bytes[i]);
                         i += 1;
                     }
                     if i >= bytes.len() {
@@ -341,19 +352,19 @@ pub(crate) fn normalise_bool_attrs(input: &str) -> String {
                         // parse; the `strip_brace_expression`
                         // helper later unwraps the quotes
                         // and the outer braces.
-                        out.push('"');
-                        out.push('{');
+                        out.push(b'"');
+                        out.push(b'{');
                         i += 1;
                         let mut depth: usize = 1;
                         while i < bytes.len() && depth > 0 {
                             let b = bytes[i];
                             if b == b'{' {
                                 depth += 1;
-                                out.push(b as char);
+                                out.push(b);
                                 i += 1;
                             } else if b == b'}' {
                                 depth -= 1;
-                                out.push(b as char);
+                                out.push(b);
                                 i += 1;
                                 if depth == 0 {
                                     break;
@@ -364,7 +375,7 @@ pub(crate) fn normalise_bool_attrs(input: &str) -> String {
                                 // an XML tag — escape as
                                 // `&lt;` so the wrapping
                                 // attribute stays valid.
-                                out.push_str("&lt;");
+                                out.extend_from_slice(b"&lt;");
                                 i += 1;
                             } else if b == b'>' {
                                 // `>` is technically
@@ -372,7 +383,7 @@ pub(crate) fn normalise_bool_attrs(input: &str) -> String {
                                 // (no entity issue), but
                                 // we escape it for
                                 // symmetry / safety.
-                                out.push_str("&gt;");
+                                out.extend_from_slice(b"&gt;");
                                 i += 1;
                             } else if b == b'&' {
                                 // `&` is the start of an
@@ -380,7 +391,7 @@ pub(crate) fn normalise_bool_attrs(input: &str) -> String {
                                 // `&amp;` so the
                                 // wrapping attribute
                                 // stays valid.
-                                out.push_str("&amp;");
+                                out.extend_from_slice(b"&amp;");
                                 i += 1;
                             } else if b == b'"' {
                                 // Inner `"` inside a brace
@@ -392,35 +403,38 @@ pub(crate) fn normalise_bool_attrs(input: &str) -> String {
                                 // helper later converts it
                                 // back to a plain `"` for
                                 // Rust.
-                                out.push_str("&quot;");
+                                out.extend_from_slice(b"&quot;");
                                 i += 1;
                             } else if b == b'\'' {
                                 // Inner `'` — same
                                 // treatment (XML attribute
                                 // values use `&apos;`).
-                                out.push_str("&apos;");
+                                out.extend_from_slice(b"&apos;");
                                 i += 1;
                             } else {
-                                out.push(b as char);
+                                out.push(b);
                                 i += 1;
                             }
                         }
-                        out.push('"');
+                        out.push(b'"');
                     } else if opener == b'"' || opener == b'\'' {
-                        out.push(opener as char);
+                        out.push(opener);
                         i += 1;
                         while i < bytes.len() && bytes[i] != opener {
                             if bytes[i] == b'\\' && i + 1 < bytes.len() {
-                                out.push(bytes[i] as char);
-                                out.push(bytes[i + 1] as char);
+                                out.push(bytes[i]);
+                                out.push(bytes[i + 1]);
                                 i += 2;
                             } else {
-                                out.push(bytes[i] as char);
+                                // Copy the byte verbatim
+                                // so UTF-8 multi-byte
+                                // sequences pass through.
+                                out.push(bytes[i]);
                                 i += 1;
                             }
                         }
                         if i < bytes.len() {
-                            out.push(opener as char);
+                            out.push(opener);
                             i += 1;
                         }
                     } else {
@@ -431,25 +445,29 @@ pub(crate) fn normalise_bool_attrs(input: &str) -> String {
                         // the macro; treat conservatively.
                         while i < bytes.len() && !bytes[i].is_ascii_whitespace() && bytes[i] != b'>'
                         {
-                            out.push(bytes[i] as char);
+                            out.push(bytes[i]);
                             i += 1;
                         }
                     }
                 } else {
                     // Bare attribute (no `=value`) — inject `="true"`.
-                    out.push_str("=\"true\"");
+                    out.extend_from_slice(b"=\"true\"");
                 }
             }
             if i < bytes.len() {
-                out.push('>');
+                out.push(b'>');
                 i += 1;
             }
         } else {
-            out.push(bytes[i] as char);
+            out.push(bytes[i]);
             i += 1;
         }
     }
-    out
+    // The input was valid UTF-8 (Rust source), so the
+    // output Vec<u8> is also valid UTF-8 — every byte
+    // is preserved byte-for-byte and structural markers
+    // are ASCII.
+    String::from_utf8(out).expect("normalise_bool_attrs: output is valid UTF-8")
 }
 
 fn is_tag_name_end(b: u8) -> bool {
