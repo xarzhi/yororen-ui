@@ -77,13 +77,21 @@ fn lookup_component<'a>(tag: &str) -> Option<&'a crate::schema::ComponentDef> {
 
 /// Parse a string of Rust tokens into a `TokenStream`. Any
 /// error is converted into an `XmlError::InvalidExpression`.
-fn parse_ts(src: &str, span: Span, context: &str) -> Result<TokenStream, XmlError> {
+/// `byte_offset` is the position in the original XML to
+/// surface in the diagnostic; pass `0` if not meaningful.
+fn parse_ts(
+    src: &str,
+    span: Span,
+    byte_offset: usize,
+    context: &str,
+) -> Result<TokenStream, XmlError> {
     src.parse::<TokenStream>().map_err(|e| {
         XmlError::new(
             XmlErrorKind::InvalidExpression,
             span,
             format!("could not parse {context} `{src}`: {e}"),
         )
+        .at(byte_offset)
     })
 }
 
@@ -100,18 +108,17 @@ pub fn codegen(
     cx_expr: Option<TokenStream>,
 ) -> Result<TokenStream, XmlError> {
     let line_starts = crate::parser::line_starts(xml_text);
-    let element = {
-        let location = crate::parser::LocationTracker {
-            line_starts: &line_starts,
-            xml: xml_text,
-        };
-        crate::parser::parse(xml_text, outer_span, &location)?
+    let location = crate::parser::LocationTracker {
+        line_starts: &line_starts,
+        xml: xml_text,
+        outer_span,
     };
+    let element = crate::parser::parse(xml_text, outer_span, &location)?;
     let cx_tokens = match cx_expr {
         Some(expr) => quote! { (#expr) },
         None => quote! { cx },
     };
-    let body = codegen_element(&element, &cx_tokens, outer_span)?;
+    let body = codegen_element(&element, &cx_tokens, &location)?;
     // Wrap the body in a block that imports the traits the
     // generated code needs. This keeps the call site clean:
     // the user never has to remember to `use gpui::Styled;`
@@ -128,7 +135,7 @@ pub fn codegen(
 fn codegen_element(
     element: &AstElement,
     cx: &TokenStream,
-    outer_span: Span,
+    location: &crate::parser::LocationTracker<'_>,
 ) -> Result<TokenStream, XmlError> {
     let def = lookup_component(&element.tag).ok_or_else(|| {
         XmlError::new(
@@ -136,12 +143,13 @@ fn codegen_element(
             element.span,
             format!("unknown tag <{}>", element.tag),
         )
+        .at(element.byte_offset)
     })?;
 
     match def.kind {
-        ComponentKind::Container(c) => codegen_container(element, c, cx),
-        ComponentKind::Leaf(l) => codegen_leaf(element, l, cx),
-        ComponentKind::ControlFlow(c) => codegen_control_flow(element, c, cx, outer_span),
+        ComponentKind::Container(c) => codegen_container(element, c, cx, location),
+        ComponentKind::Leaf(l) => codegen_leaf(element, l, cx, location),
+        ComponentKind::ControlFlow(c) => codegen_control_flow(element, c, cx, location),
     }
 }
 
@@ -149,6 +157,7 @@ fn codegen_container(
     element: &AstElement,
     def: ContainerDef,
     cx: &TokenStream,
+    location: &crate::parser::LocationTracker<'_>,
 ) -> Result<TokenStream, XmlError> {
     let mut tokens = quote! { gpui::div() };
 
@@ -180,11 +189,11 @@ fn codegen_container(
                 }
                 j += 1;
             }
-            let chain_expr = codegen_if_chain(&element.children[i..j], cx)?;
+            let chain_expr = codegen_if_chain(&element.children[i..j], cx, location)?;
             tokens.append_all(quote! { .child(#chain_expr) });
             i = j;
         } else {
-            let child_expr = codegen_child(child, cx)?;
+            let child_expr = codegen_child(child, cx, location)?;
             tokens.append_all(quote! { .child(#child_expr) });
             i += 1;
         }
@@ -204,6 +213,7 @@ fn codegen_container(
 fn codegen_if_chain(
     branches: &[AstNode],
     cx: &TokenStream,
+    location: &crate::parser::LocationTracker<'_>,
 ) -> Result<TokenStream, XmlError> {
     if branches.is_empty() {
         return Ok(quote! { gpui::div() });
@@ -215,12 +225,17 @@ fn codegen_if_chain(
             _ => {
                 return Err(XmlError::new(
                     XmlErrorKind::Unsupported,
-                    Span::call_site(),
+                    location.span_outer(),
                     "<If>/<ElseIf>/<Else> chain cannot contain non-element nodes",
                 ));
             }
         };
-        let branch_expr = codegen_if_branch(element, element_tag_to_branch_kind(&element.tag)?, cx, element.span)?;
+        let branch_expr = codegen_if_branch(
+            element,
+            element_tag_to_branch_kind(&element.tag)?,
+            cx,
+            location,
+        )?;
         chain.append_all(branch_expr);
         // After the first branch, every subsequent one
         // must be ElseIf or Else (the Rust grammar).
@@ -229,7 +244,8 @@ fn codegen_if_chain(
                 XmlErrorKind::Unsupported,
                 element.span,
                 format!("<{}> cannot start a chain — use <If> first", element.tag),
-            ));
+            )
+            .at(element.byte_offset));
         }
     }
     Ok(quote! { { #chain } })
@@ -287,8 +303,12 @@ fn apply_container_attr(
         // `gap={pixels}` → `.gap(pixels)`
         if is_spacing_prefix(&attr.name) {
             let m = format_ident!("{}", attr.name);
-            let parsed =
-                parse_ts(expr, attr.span, &format!("expression for `{}`", attr.name))?;
+            let parsed = parse_ts(
+                expr,
+                attr.span,
+                attr.byte_offset,
+                &format!("expression for `{}`", attr.name),
+            )?;
             tokens.append_all(quote! { .#m(#parsed) });
             return Ok(());
         }
@@ -296,7 +316,12 @@ fn apply_container_attr(
         if is_known_shorthand_method(&attr.name) || is_spacing_shorthand(&attr.name) {
             let m = format_ident!("{}", attr.name);
             let parsed =
-                parse_ts(expr, attr.span, &format!("expression for `{}`", attr.name))?;
+                parse_ts(
+                    expr,
+                    attr.span,
+                    attr.byte_offset,
+                    &format!("expression for `{}`", attr.name),
+                )?;
             tokens.append_all(quote! { .#m(#parsed) });
             return Ok(());
         }
@@ -371,7 +396,9 @@ fn codegen_leaf(
     element: &AstElement,
     def: LeafDef,
     cx: &TokenStream,
+    location: &crate::parser::LocationTracker<'_>,
 ) -> Result<TokenStream, XmlError> {
+    let _ = location; // Currently unused — byte_offset lives on AST nodes.
     // 1. Resolve the id (first factory arg).
     let id_attr = element
         .attributes
@@ -383,6 +410,7 @@ fn codegen_leaf(
                 element.span,
                 format!("<{}> requires an `id` attribute", element.tag),
             )
+            .at(element.byte_offset)
         })?;
     let id_expr = attr_value_tokens(id_attr)?;
 
@@ -414,6 +442,7 @@ fn codegen_leaf(
                             element.tag, extra.attr
                         ),
                     )
+                    .at(element.byte_offset)
                 })?;
                 quote! { (#text).to_string() }
             }
@@ -423,7 +452,8 @@ fn codegen_leaf(
                     XmlErrorKind::UnknownAttribute,
                     element.span,
                     format!("<{}> requires a `{}` attribute", element.tag, extra.attr),
-                ));
+                )
+                .at(element.byte_offset));
             }
         };
         factory_args.push(extra_tokens);
@@ -436,6 +466,7 @@ fn codegen_leaf(
     let factory: TokenStream = parse_ts(
         def.factory,
         element.span,
+        element.byte_offset,
         &format!("factory path for <{}>", element.tag),
     )?;
     let mut tokens = quote! { #factory(#(#factory_args),*) };
@@ -475,6 +506,7 @@ fn codegen_leaf(
                 let parsed = parse_ts(
                     expr,
                     attr.span,
+                    attr.byte_offset,
                     "@bind requires a brace expression, e.g. `@bind={self.name}`",
                 )?;
                 tokens.append_all(emit_bind(&parsed, def));
@@ -484,7 +516,8 @@ fn codegen_leaf(
                     XmlErrorKind::InvalidExpression,
                     attr.span,
                     "@bind requires a brace expression, e.g. `@bind={self.name}`",
-                ));
+                )
+                .at(attr.byte_offset));
             }
         }
         if let Some(prop) = def.props.iter().find(|p| p.name == attr.name).copied() {
@@ -504,7 +537,8 @@ fn codegen_leaf(
                                 "attribute `{}` is a flag (no value) — drop the `={{…}}`",
                                 attr.name
                             ),
-                        ));
+                        )
+                        .at(attr.byte_offset));
                     }
                     let raw = attr.raw.as_str();
                     if raw == "true" {
@@ -535,7 +569,8 @@ fn codegen_leaf(
                 "unknown attribute `{}` on <{}>",
                 attr.name, element.tag
             ),
-        ));
+        )
+        .at(attr.byte_offset));
     }
 
     // 4. Apply render mode.
@@ -583,16 +618,16 @@ fn codegen_control_flow(
     element: &AstElement,
     def: ControlFlowDef,
     cx: &TokenStream,
-    outer_span: Span,
+    location: &crate::parser::LocationTracker<'_>,
 ) -> Result<TokenStream, XmlError> {
     match def {
         ControlFlowDef::If | ControlFlowDef::ElseIf | ControlFlowDef::Else => {
-            codegen_if_branch(element, def, cx, outer_span)
+            codegen_if_branch(element, def, cx, location)
         }
-        ControlFlowDef::For => codegen_for(element, cx),
-        ControlFlowDef::Fragment => codegen_fragment(element, cx),
-        ControlFlowDef::Include => codegen_include(element, cx, outer_span),
-        ControlFlowDef::Template => codegen_template(element, cx),
+        ControlFlowDef::For => codegen_for(element, cx, location),
+        ControlFlowDef::Fragment => codegen_fragment(element, cx, location),
+        ControlFlowDef::Include => codegen_include(element, cx, location),
+        ControlFlowDef::Template => codegen_template(element, cx, location),
         ControlFlowDef::Slot => codegen_slot(element, cx),
     }
 }
@@ -601,7 +636,7 @@ fn codegen_if_branch(
     element: &AstElement,
     kind: ControlFlowDef,
     cx: &TokenStream,
-    _outer_span: Span,
+    location: &crate::parser::LocationTracker<'_>,
 ) -> Result<TokenStream, XmlError> {
     let condition = if matches!(kind, ControlFlowDef::Else) {
         TokenStream::new()
@@ -612,6 +647,7 @@ fn codegen_if_branch(
                 element.span,
                 format!("<{:?}> requires a `condition={{...}}` attribute", kind),
             )
+            .at(element.byte_offset)
         })?;
         let expr = attr_expr_only(cond_attr)?;
         quote! { #expr }
@@ -627,15 +663,17 @@ fn codegen_if_branch(
             XmlErrorKind::Unsupported,
             element.span,
             "if/else branch must contain at least one child",
-        ));
+        )
+        .at(element.byte_offset));
     } else if element.children.len() == 1 {
-        codegen_child(&element.children[0], cx)?
+        codegen_child(&element.children[0], cx, location)?
     } else {
         return Err(XmlError::new(
             XmlErrorKind::Unsupported,
             element.span,
             format!("if/else branch has {} children; wrap in a <Column> or <Row> for now", element.children.len()),
-        ));
+        )
+        .at(element.byte_offset));
     };
 
     Ok(match kind {
@@ -647,13 +685,18 @@ fn codegen_if_branch(
     })
 }
 
-fn codegen_for(element: &AstElement, cx: &TokenStream) -> Result<TokenStream, XmlError> {
+fn codegen_for(
+    element: &AstElement,
+    cx: &TokenStream,
+    location: &crate::parser::LocationTracker<'_>,
+) -> Result<TokenStream, XmlError> {
     let each = element.attributes.iter().find(|a| a.name == "each").ok_or_else(|| {
         XmlError::new(
             XmlErrorKind::UnknownAttribute,
             element.span,
             "<For> requires an `each={...}` attribute",
         )
+        .at(element.byte_offset)
     })?;
     let each_parsed = attr_expr_only(each)?;
 
@@ -695,15 +738,17 @@ fn codegen_for(element: &AstElement, cx: &TokenStream) -> Result<TokenStream, Xm
             XmlErrorKind::Unsupported,
             element.span,
             "<For> must wrap a single child",
-        ));
+        )
+        .at(element.byte_offset));
     } else if element.children.len() == 1 {
-        codegen_child(&element.children[0], cx)?
+        codegen_child(&element.children[0], cx, location)?
     } else {
         return Err(XmlError::new(
             XmlErrorKind::Unsupported,
             element.span,
             "<For> must wrap a single child (wrap multiple in a Column / Row)",
-        ));
+        )
+        .at(element.byte_offset));
     };
 
     // `<For each={xs} let:item>` produces
@@ -756,10 +801,14 @@ fn for_each_in_each(
     };
 }
 
-fn codegen_fragment(element: &AstElement, cx: &TokenStream) -> Result<TokenStream, XmlError> {
+fn codegen_fragment(
+    element: &AstElement,
+    cx: &TokenStream,
+    location: &crate::parser::LocationTracker<'_>,
+) -> Result<TokenStream, XmlError> {
     let mut children_tokens = TokenStream::new();
     for child in &element.children {
-        let expr = codegen_child(child, cx)?;
+        let expr = codegen_child(child, cx, location)?;
         children_tokens.append_all(quote! { #expr, });
     }
     Ok(quote! { (#children_tokens) })
@@ -774,7 +823,7 @@ fn codegen_fragment(element: &AstElement, cx: &TokenStream) -> Result<TokenStrea
 fn codegen_include(
     element: &AstElement,
     cx: &TokenStream,
-    outer_span: Span,
+    location: &crate::parser::LocationTracker<'_>,
 ) -> Result<TokenStream, XmlError> {
     let src_attr = element
         .attributes
@@ -786,6 +835,7 @@ fn codegen_include(
                 element.span,
                 "<Include> requires a `src=\"...\"` attribute",
             )
+            .at(element.byte_offset)
         })?;
     // For now, the only way to get a `&str` path is via
     // a string literal in the XML. (`Include>` does not
@@ -796,14 +846,11 @@ fn codegen_include(
             XmlErrorKind::Unsupported,
             src_attr.span,
             "<Include src> requires a string literal, not a brace expression",
-        ));
+        )
+        .at(src_attr.byte_offset));
     }
     let path = src_attr.raw.as_str();
-    // Read the file relative to the call site. We use
-    // the same `cargo:rerun-if-changed` mechanism that
-    // `include_str!` provides by leaning on the proc
-    // macro entry's `Span::call_site().file()` (set up
-    // in the macro crate).
+    let outer_span = location.span_outer();
     let resolved = resolve_include_path(path, outer_span)?;
     let contents = std::fs::read_to_string(&resolved).map_err(|e| {
         XmlError::new(
@@ -813,18 +860,28 @@ fn codegen_include(
         )
     })?;
     // Parse the included file and emit its children as
-    // a comma-separated sequence of expressions.
+    // a comma-separated sequence of expressions. The
+    // included file gets its own `LocationTracker` so
+    // error offsets are local to the included XML, not
+    // the parent.
     let line_starts = crate::parser::line_starts(&contents);
     let included_root = {
-        let location = crate::parser::LocationTracker {
+        let included_location = crate::parser::LocationTracker {
             line_starts: &line_starts,
             xml: &contents,
+            outer_span,
         };
-        crate::parser::parse(&contents, outer_span, &location)?
+        crate::parser::parse(&contents, outer_span, &included_location)?
     };
     let mut inner = TokenStream::new();
     for child in &included_root.children {
-        let expr = codegen_child(child, cx)?;
+        let line_starts = crate::parser::line_starts(&contents);
+        let included_location = crate::parser::LocationTracker {
+            line_starts: &line_starts,
+            xml: &contents,
+            outer_span,
+        };
+        let expr = codegen_child(child, cx, &included_location)?;
         inner.append_all(quote! { #expr, });
     }
     Ok(quote! { (#inner) })
@@ -854,8 +911,12 @@ fn resolve_include_path(path: &str, _span: Span) -> Result<std::path::PathBuf, X
 /// simply emits its children in place (the template
 /// "name" attribute is reserved for future
 /// cross-references). Slots are no-ops.
-fn codegen_template(element: &AstElement, cx: &TokenStream) -> Result<TokenStream, XmlError> {
-    codegen_fragment(element, cx)
+fn codegen_template(
+    element: &AstElement,
+    cx: &TokenStream,
+    location: &crate::parser::LocationTracker<'_>,
+) -> Result<TokenStream, XmlError> {
+    codegen_fragment(element, cx, location)
 }
 
 /// `<Slot/>` is a no-op for the MVP. Future revisions
@@ -864,9 +925,13 @@ fn codegen_slot(_element: &AstElement, _cx: &TokenStream) -> Result<TokenStream,
     Ok(TokenStream::new())
 }
 
-fn codegen_child(node: &AstNode, cx: &TokenStream) -> Result<TokenStream, XmlError> {
+fn codegen_child(
+    node: &AstNode,
+    cx: &TokenStream,
+    location: &crate::parser::LocationTracker<'_>,
+) -> Result<TokenStream, XmlError> {
     match node {
-        AstNode::Element(e) => codegen_element(e, cx, e.span),
+        AstNode::Element(e) => codegen_element(e, cx, location),
         AstNode::Text { text, .. } => {
             // Text content inside a container is uncommon — only
             // meaningful for `<Button>Click me</Button>` (handled
@@ -881,7 +946,12 @@ fn codegen_child(node: &AstNode, cx: &TokenStream) -> Result<TokenStream, XmlErr
 
 fn attr_value_tokens(attr: &AstAttribute) -> Result<TokenStream, XmlError> {
     if let Some(expr) = &attr.expr {
-        let parsed = parse_ts(expr, attr.span, &format!("attribute `{}`", attr.name))?;
+        let parsed = parse_ts(
+            expr,
+            attr.span,
+            attr.byte_offset,
+            &format!("attribute `{}`", attr.name),
+        )?;
         Ok(quote! { #parsed })
     } else {
         let raw = attr.raw.as_str();
@@ -897,7 +967,12 @@ fn prop_value_tokens(attr: &AstAttribute, kind: PropValue) -> Result<TokenStream
         // Brace expression — use as-is, `.into()` where
         // appropriate. (For `Flag` props, the main loop
         // has already rejected the expression.)
-        let parsed = parse_ts(expr, attr.span, &format!("attribute `{}`", attr.name))?;
+        let parsed = parse_ts(
+            expr,
+            attr.span,
+            attr.byte_offset,
+            &format!("attribute `{}`", attr.name),
+        )?;
         return Ok(match kind {
             PropValue::String
             | PropValue::Variant
@@ -919,7 +994,8 @@ fn prop_value_tokens(attr: &AstAttribute, kind: PropValue) -> Result<TokenStream
                     "attribute `{}` expects `true` or `false`, got `{other}`",
                     attr.name
                 ),
-            )),
+            )
+            .at(attr.byte_offset)),
         },
         PropValue::Flag => {
             // Handled by the codegen's main loop — the
@@ -940,7 +1016,8 @@ fn prop_value_tokens(attr: &AstAttribute, kind: PropValue) -> Result<TokenStream
                         "attribute `{}` expects one of `neutral`, `primary`, `danger`, got `{other}`",
                         attr.name
                     ),
-                ));
+                )
+                .at(attr.byte_offset));
             }
         }),
         PropValue::Unknown => Ok(quote! { (#raw).to_string() }),
@@ -1027,7 +1104,12 @@ fn emit_bind(entity: &TokenStream, def: LeafDef) -> TokenStream {
 
 fn attr_expr_only(attr: &AstAttribute) -> Result<TokenStream, XmlError> {
     if let Some(expr) = &attr.expr {
-        let parsed = parse_ts(expr, attr.span, &format!("attribute `{}`", attr.name))?;
+        let parsed = parse_ts(
+            expr,
+            attr.span,
+            attr.byte_offset,
+            &format!("attribute `{}`", attr.name),
+        )?;
         Ok(parsed)
     } else {
         Err(XmlError::new(
@@ -1051,7 +1133,12 @@ fn text_attr_value(attr: &AstAttribute) -> Result<TokenStream, XmlError> {
     if let Some(expr) = &attr.expr {
         // Brace expression — wrap as a single-arg
         // `format!` call. The user has full control.
-        let parsed = parse_ts(expr, attr.span, &format!("text attribute `{}`", attr.name))?;
+        let parsed = parse_ts(
+            expr,
+            attr.span,
+            attr.byte_offset,
+            &format!("text attribute `{}`", attr.name),
+        )?;
         return Ok(quote! { (#parsed).to_string() });
     }
     // String literal: detect `{...}` interpolation.
@@ -1150,7 +1237,7 @@ fn render_string_interpolation(
             }
             InterpPart::Expr(s) => {
                 format_str.push_str("{}");
-                let parsed = match parse_ts(s, attr.span, "interpolation expression") {
+                let parsed = match parse_ts(s, attr.span, attr.byte_offset, "interpolation expression") {
                     Ok(ts) => ts,
                     Err(_) => continue,
                 };
@@ -1382,6 +1469,60 @@ mod tests {
     fn xml_parse_error_propagates() {
         let err = codegen("<Column>", Span::call_site(), None).unwrap_err();
         assert!(matches!(err.kind, crate::error::XmlErrorKind::ParseError), "{err:?}");
+    }
+
+    #[test]
+    fn diagnostic_carries_byte_offset_and_snippet() {
+        // The `<UnknownTag>` is on line 3 of the XML —
+        // the rendered diagnostic should reflect that.
+        let xml = "<Column>\n  <Label id=\"a\" text=\"hi\" />\n  <UnknownTag id=\"x\" />\n</Column>";
+        let err = codegen(xml, Span::call_site(), None).unwrap_err();
+        assert!(matches!(err.kind, crate::error::XmlErrorKind::UnknownTag));
+        assert!(err.offset.is_some(), "error should carry a byte offset");
+
+        // Render the error with a location tracker and
+        // assert the multi-line format.
+        let line_starts = crate::parser::line_starts(xml);
+        let loc = crate::parser::LocationTracker {
+            line_starts: &line_starts,
+            xml,
+            outer_span: Span::call_site(),
+        };
+        let rendered = err.render_with(Some(&loc));
+        assert!(rendered.contains("line 3"), "{rendered}");
+        assert!(rendered.contains("UnknownTag"), "{rendered}");
+        assert!(rendered.contains('^'), "{rendered}");
+    }
+
+    #[test]
+    fn diagnostic_render_without_location_falls_back() {
+        // When no LocationTracker is provided the
+        // diagnostic must still be useful.
+        let err = codegen(r#"<Label id="x" text="hi" href="bad" />"#, Span::call_site(), None)
+            .unwrap_err();
+        let rendered = err.render_with(None);
+        assert!(rendered.contains("href"), "{rendered}");
+    }
+
+    #[test]
+    fn bad_bool_value_is_a_useful_diagnostic() {
+        // Booleans must be `true` / `false`; anything else
+        // is a hard error pointing at the offending attr.
+        let err = codegen(
+            r#"<Label id="x" text="hi" strong="maybe" />"#,
+            Span::call_site(),
+            None,
+        )
+        .unwrap_err();
+        assert!(err.offset.is_some(), "bad-bool error should carry offset");
+        let line_starts = crate::parser::line_starts(r#"<Label id="x" text="hi" strong="maybe" />"#);
+        let loc = crate::parser::LocationTracker {
+            line_starts: &line_starts,
+            xml: r#"<Label id="x" text="hi" strong="maybe" />"#,
+            outer_span: Span::call_site(),
+        };
+        let rendered = err.render_with(Some(&loc));
+        assert!(rendered.contains("true") && rendered.contains("false"), "{rendered}");
     }
 
     #[test]

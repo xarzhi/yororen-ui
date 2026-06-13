@@ -13,6 +13,11 @@ use proc_macro2::Span;
 pub struct AstElement {
     pub tag: String,
     pub span: Span,
+    /// Byte offset into the original (pre-normalisation) XML
+    /// where the element's tag starts. Used by the macro entry
+    /// point to compute `line:col` diagnostics. For nested
+    /// elements this is the position of the `<Tag` opener.
+    pub byte_offset: usize,
     pub attributes: Vec<AstAttribute>,
     pub children: Vec<AstNode>,
 }
@@ -25,6 +30,9 @@ pub struct AstAttribute {
     /// The `Span` of the attribute value, or the attribute name
     /// if the value couldn't be located.
     pub span: Span,
+    /// Byte offset into the original XML where the attribute
+    /// name starts (used for `line:col` diagnostics).
+    pub byte_offset: usize,
     /// The body of the attribute — either:
     /// - `Some(expr)` for brace expressions (`{...}`), or
     /// - `None` for string literals (`"..."`) — `raw` then
@@ -41,5 +49,8 @@ pub enum AstNode {
     Text {
         text: String,
         span: Span,
+        /// Byte offset of the text content's first non-whitespace
+        /// character in the original XML.
+        byte_offset: usize,
     },
 }

@@ -45,15 +45,45 @@ pub fn parse(
     let preprocessed = rewrite_let_attrs(&un_atd);
     let normalized = normalise_bool_attrs(&preprocessed);
     let doc = roxmltree::Document::parse(&normalized).map_err(|e| {
-        XmlError::new(
-            XmlErrorKind::ParseError,
-            outer_span,
-            format!("{e}"),
-        )
+        // The error from roxmltree is a textual message
+        // without a precise position; try to extract the
+        // "at line N, column M" hint and convert to an
+        // offset. If that fails, fall back to offset 0
+        // (the whole literal).
+        let offset = parse_roxmltree_offset(&format!("{e}"), &normalized).unwrap_or(0);
+        XmlError::new(XmlErrorKind::ParseError, outer_span, format!("{e}"))
+            .at(offset)
     })?;
 
     let root = doc.root_element();
     Ok(element_from(root, outer_span, location))
+}
+
+/// Parse `error_text` looking for "at line N, column M"
+/// (the message format `roxmltree` emits) and convert it
+/// to a byte offset using the line_starts table baked
+/// into the normalised XML. Returns `None` if the error
+/// format is unexpected.
+fn parse_roxmltree_offset(error_text: &str, normalized_xml: &str) -> Option<usize> {
+    // roxmltree formats errors roughly as:
+    //   "<error message> at line N, column M"
+    let line_marker = " at line ";
+    let col_marker = ", column ";
+    let line_idx = error_text.find(line_marker)? + line_marker.len();
+    let after_line = &error_text[line_idx..];
+    let line_end = after_line.find(|c: char| !c.is_ascii_digit())?;
+    let line: usize = after_line[..line_end].parse().ok()?;
+    let col_idx = after_line.find(col_marker)? + col_marker.len();
+    let after_col = &after_line[col_idx..];
+    let col_end = after_col.find(|c: char| !c.is_ascii_digit())?;
+    let col: usize = after_col[..col_end].parse().ok()?;
+    // Build a tiny line_starts table for the normalised
+    // XML on the fly (we don't have access to the
+    // tracker's table here, but the offsets line up
+    // because the preprocessors are line-preserving).
+    let starts = LocationTracker::compute(normalized_xml);
+    let l_idx = line.saturating_sub(1).min(starts.len().saturating_sub(1));
+    Some(starts[l_idx] + col.saturating_sub(1))
 }
 
 /// Convert `@bind` to `bind` so the attribute name is
@@ -81,6 +111,12 @@ pub fn line_starts(xml: &str) -> Vec<usize> {
 pub struct LocationTracker<'a> {
     pub line_starts: &'a [usize],
     pub xml: &'a str,
+    /// The `proc_macro2::Span` that covers the entire XML
+    /// literal — the macro entry point passes its `call_site`
+    /// span here. Used as the fallback when an error has
+    /// no meaningful byte offset (e.g. an error raised by
+    /// a structural validator).
+    pub outer_span: Span,
 }
 
 impl<'a> LocationTracker<'a> {
@@ -134,6 +170,14 @@ impl<'a> LocationTracker<'a> {
         let line_text = line_text.trim_end();
         let caret = format!("\n{}^", " ".repeat(col.saturating_sub(1)));
         format!("{line_text}{caret}")
+    }
+
+    /// Convenience accessor for the proc-macro span that
+    /// covers the whole XML literal. The codegen uses this
+    /// for structural errors that have no meaningful byte
+    /// offset (e.g. "macro invariants violated").
+    pub fn span_outer(&self) -> Span {
+        self.outer_span
     }
 }
 
@@ -456,6 +500,7 @@ mod tests {
         let loc = LocationTracker {
             line_starts: &starts,
             xml,
+            outer_span: Span::call_site(),
         };
         let (line, _col) = loc.line_col(20); // inside <BadTag />
         assert_eq!(line, 2);
@@ -469,16 +514,19 @@ mod tests {
 fn element_from(node: roxmltree::Node, fallback_span: Span, location: &LocationTracker) -> AstElement {
     let tag = node.tag_name().name().to_string();
     let span = span_for_node(node, fallback_span);
+    let byte_offset = byte_offset_for_node(node, location);
 
     let mut attributes = Vec::new();
     for attr in node.attributes() {
         let value = attr.value();
         let attr_span = span_for_attr(attr, span);
+        let attr_offset = byte_offset_for_attr(attr, location);
         let (expr, raw) = strip_brace_expression(&value);
         attributes.push(AstAttribute {
             name: attr.name().to_string(),
             raw,
             span: attr_span,
+            byte_offset: attr_offset,
             expr,
         });
     }
@@ -491,9 +539,11 @@ fn element_from(node: roxmltree::Node, fallback_span: Span, location: &LocationT
             let text = child.text().unwrap_or("");
             let trimmed = text.trim();
             if !trimmed.is_empty() {
+                let text_offset = byte_offset_for_text(child, location, trimmed);
                 children.push(AstNode::Text {
                     text: trimmed.to_string(),
                     span: span_for_node(child, span),
+                    byte_offset: text_offset,
                 });
             }
         }
@@ -502,6 +552,7 @@ fn element_from(node: roxmltree::Node, fallback_span: Span, location: &LocationT
     AstElement {
         tag,
         span,
+        byte_offset,
         attributes,
         children,
     }
@@ -517,6 +568,36 @@ fn span_for_node(_node: roxmltree::Node, fallback: Span) -> Span {
 
 fn span_for_attr(_attr: roxmltree::Attribute, fallback: Span) -> Span {
     fallback
+}
+
+/// Byte offset of the `<Tag` opener for an element node.
+/// `roxmltree::Node::range()` gives the span of the entire
+/// start tag (including attributes and the closing `>`),
+/// so we need to step back over those to land on the `<`.
+fn byte_offset_for_node(node: roxmltree::Node, _location: &LocationTracker) -> usize {
+    let range = node.range();
+    let qname_len = node.tag_name().name().len();
+    // `range.start` is the position of the `<`. (Verified
+    // empirically with roxmltree 0.20 — `range_qname()`
+    // excludes the angle bracket.)
+    range.start.min(range.end.saturating_sub(qname_len))
+}
+
+/// Byte offset of the attribute name (the position of its
+/// first character). Used to anchor diagnostics.
+fn byte_offset_for_attr(attr: roxmltree::Attribute, _location: &LocationTracker) -> usize {
+    attr.range().start
+}
+
+/// Byte offset of the first non-whitespace character of a
+/// text node. Falls back to the node range start.
+fn byte_offset_for_text(node: roxmltree::Node, location: &LocationTracker, trimmed: &str) -> usize {
+    let raw = node.text().unwrap_or("");
+    if let Some(rel) = raw.find(trimmed) {
+        node.range().start + rel
+    } else {
+        byte_offset_for_node(node, location)
+    }
 }
 
 /// Detect whether `s` is a brace expression (`{...}`) — with

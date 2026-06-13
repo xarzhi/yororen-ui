@@ -51,9 +51,22 @@ pub fn xml(input: TokenStream) -> TokenStream {
     };
     let outer_span = Span::call_site();
     let cx_expr = args.cx.map(|e| quote::quote! { #e });
+    // Build the location tracker up-front so we can use it
+    // both for parsing/codegen AND for rendering the
+    // diagnostic in case either fails. The error returned
+    // by `codegen` already carries the byte offset; we
+    // just need the table to convert it back to line/col.
+    let line_starts = yororen_ui_xml::parser::line_starts(&args.xml);
+    let location = yororen_ui_xml::parser::LocationTracker {
+        line_starts: &line_starts,
+        xml: &args.xml,
+        outer_span,
+    };
     match yororen_ui_xml::codegen::codegen(&args.xml, outer_span, cx_expr) {
         Ok(ts) => ts.into(),
-        Err(e) => syn::Error::new(outer_span, e.render()).to_compile_error().into(),
+        Err(e) => syn::Error::new(outer_span, e.render_with(Some(&location)))
+            .to_compile_error()
+            .into(),
     }
 }
 
@@ -123,9 +136,22 @@ pub fn xml_file(input: TokenStream) -> TokenStream {
         }
     };
     let cx_expr = args.cx.map(|e| quote::quote! { #e });
+    // Build the location tracker from the *file's* content
+    // so error messages point to the right file. (Even
+    // though the proc-macro's outer span points at the
+    // `xml_file!(...)` call, the diagnostic line/col must
+    // match the file the user is editing.)
+    let line_starts = yororen_ui_xml::parser::line_starts(&contents);
+    let location = yororen_ui_xml::parser::LocationTracker {
+        line_starts: &line_starts,
+        xml: &contents,
+        outer_span,
+    };
     match yororen_ui_xml::codegen::codegen(&contents, outer_span, cx_expr) {
         Ok(ts) => ts.into(),
-        Err(e) => syn::Error::new(outer_span, e.render()).to_compile_error().into(),
+        Err(e) => syn::Error::new(outer_span, e.render_with(Some(&location)))
+            .to_compile_error()
+            .into(),
     }
 }
 
