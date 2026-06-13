@@ -39,7 +39,10 @@ mod controller;
 mod state;
 mod view;
 
-use gpui::{App, AppContext, Application, InteractiveElement, IntoElement, WindowBounds, WindowOptions, div, px, size};
+use gpui::{
+    App, AppContext, Application, InteractiveElement, IntoElement, WindowBounds, WindowOptions,
+    div, px, size,
+};
 
 use yororen_ui::assets::UiAsset;
 use yororen_ui::locale_en;

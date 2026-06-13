@@ -510,13 +510,8 @@ mod tests {
         // `strip_brace_expression` helper reverses
         // the encoding before handing the expression
         // to the Rust parser.
-        let s = normalise_bool_attrs(
-            r#"<Label text={format!("hi {}", name)} />"#,
-        );
-        assert_eq!(
-            s,
-            r#"<Label text="{format!(&quot;hi {}&quot;, name)}" />"#
-        );
+        let s = normalise_bool_attrs(r#"<Label text={format!("hi {}", name)} />"#);
+        assert_eq!(s, r#"<Label text="{format!(&quot;hi {}&quot;, name)}" />"#);
     }
 
     #[test]
@@ -525,13 +520,8 @@ mod tests {
         // XML elements if left unescaped inside the
         // wrapping attribute. The preprocessor
         // encodes them as `&lt;`, `&gt;`, `&amp;`.
-        let s = normalise_bool_attrs(
-            r#"<Label text={if a < b { c } else { d }} />"#,
-        );
-        assert_eq!(
-            s,
-            r#"<Label text="{if a &lt; b { c } else { d }}" />"#
-        );
+        let s = normalise_bool_attrs(r#"<Label text={if a < b { c } else { d }} />"#);
+        assert_eq!(s, r#"<Label text="{if a &lt; b { c } else { d }}" />"#);
 
         let s2 = normalise_bool_attrs(r#"<Label text={x & 0xFF} />"#);
         assert_eq!(s2, r#"<Label text="{x &amp; 0xFF}" />"#);
@@ -567,8 +557,7 @@ mod tests {
         // `&quot;` inside the wrapped attribute value
         // is decoded back to a literal `"` so the
         // expression is valid Rust source.
-        let (expr, _raw) =
-            strip_brace_expression(r#""{format!(&quot;hi {name}&quot;)}""#);
+        let (expr, _raw) = strip_brace_expression(r#""{format!(&quot;hi {name}&quot;)}""#);
         assert_eq!(expr.as_deref(), Some(r#"format!("hi {name}")"#));
 
         // `&amp;` and `&lt;` / `&gt;` also round-trip.

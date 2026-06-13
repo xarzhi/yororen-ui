@@ -517,9 +517,7 @@ fn is_mut_window_ty(ty: &syn::Type) -> bool {
     let s = ty.to_token_stream().to_string();
     // Match `&mut Window` or `&mut gpui :: Window`
     // (we don't bother with the exact path).
-    s.replace(' ', "") == "&mutWindow"
-        || s.contains("&mutgpui::Window")
-        || s.contains("&mutWindow")
+    s.replace(' ', "") == "&mutWindow" || s.contains("&mutgpui::Window") || s.contains("&mutWindow")
 }
 
 fn find_factory<'a>(ast: &'a syn::File, name: &str) -> Option<&'a ItemFn> {
@@ -556,10 +554,7 @@ fn find_impl<'a>(ast: &'a syn::File, struct_name: &str) -> Option<&'a ItemImpl> 
     for item in &ast.items {
         if let Item::Impl(imp) = item
             && let Type::Path(TypePath { qself: None, path }) = &*imp.self_ty
-            && path
-                .segments
-                .last()
-                .is_some_and(|s| s.ident == struct_name)
+            && path.segments.last().is_some_and(|s| s.ident == struct_name)
         {
             return Some(imp);
         }
@@ -597,11 +592,7 @@ fn classify_arg(ty: &Type) -> PropValue {
         // Known variant enums.
         if matches!(
             n.as_str(),
-            "ActionVariantKind"
-                | "BuiltinVariantKey"
-                | "HeadingLevel"
-                | "SliderSize"
-                | "TagKind"
+            "ActionVariantKind" | "BuiltinVariantKey" | "HeadingLevel" | "SliderSize" | "TagKind"
         ) {
             return PropValue::Variant;
         }
@@ -746,6 +737,7 @@ fn render_module(
         out.push_str(&format!("//! - `{stem}`: {reason}\n"));
     }
     out.push('\n');
+    out.push_str("#![cfg_attr(rustfmt, rustfmt::skip)]\n");
     out.push_str("#![allow(dead_code)]\n\n");
     out.push_str("use crate::schema::{ComponentDef, ComponentKind, ContainerDef, ControlFlowDef, ExtraArg, ExtraArgKind, LeafDef, PropDef, PropValue, RenderMode};\n\n");
 
