@@ -7,25 +7,26 @@
   boilerplate and zero inline business logic.
 
   Features exercised (in order of appearance):
-    - Containers: <Column>, <Row> with shorthand
-      style attrs (`flex`, `col`, `gap`, `p`, etc.)
-    - Leaves: <Label>, <Button> (with `variant` and
-      boolean props), <Switch>, <Checkbox>, <TextInput>
+    - Containers: <Column>, <Row>, <Div> with shorthand
+      style attrs (`flex`, `flex_1`, `col`, `gap`, etc.)
+    - Leaves: <Label>, <Button> (with `variant`),
+      <Switch>, <Checkbox>, <TextInput>
     - String interpolation: `text="Count: {counter}"`
     - Brace expressions: `text={item.label}`,
       `condition={notifications}`, `each={todos}`,
       `on={connection}`, `id={name_input_id}` (a
       dynamic id built at render time)
     - Two-way binding: `@bind={entity}` on every
-      toggleable leaf — note that each checkbox /
-      switch has its OWN entity, so they don't
-      sync with each other.
+      toggleable leaf — each checkbox / switch has
+      its OWN entity, so they don't sync with each
+      other. Per-row `done` lives on `TodoItem`.
     - <If> / <ElseIf> / <Else> control flow
     - <For each={...} let:item> with per-row
       `@bind={item.done}` (each row is independent)
     - <Match on={...}> with <Case pattern={...}> arms
-    - <State name="x" default="0"> for a local entity
-      mutated by a separate Row of buttons
+    - <State name="x" default={expr}> for a local
+      Entity re-minted on every render with a
+      brace-expression default.
     - <CustomWidget id="..." /> (runtime-registered)
 
   All identifiers referenced here are bound in the
