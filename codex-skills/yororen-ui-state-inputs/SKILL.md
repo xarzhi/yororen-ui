@@ -312,25 +312,37 @@ error below, required marker). Your job is the validation logic in
 
 ### Listbox
 
-A scrollable single-select list. Call `set_options` once, then the
-renderer handles highlight / click / select.
+A scrollable single-select list. The shared keyboard-nav
+algorithm lives in `ListNavigable`; `ListboxState` reuses it
+via `highlight_next` / `highlight_prev`. The renderer paints
+one row per option and wires each row's click to
+`state.pick(value, …)` which writes `selected_value` and fires
+`on_change`.
 
 ```rust
 use yororen_ui::headless::listbox::{listbox, ListboxOption, ListboxState};
 
-let entity_for_lb = entity.clone();
-let listbox_state = app.listbox_state.clone();
-listbox_state.update(cx, |s, _| {
+// `cx` here is `&mut gpui::App`. Build the entity once per
+// component instance and store it on your model.
+let listbox_state = cx.new(|_| ListboxState::new(cx));
+listbox_state.update(cx, |s, _cx| {
     s.set_options(vec![
         ListboxOption::new("a", "Apple"),
         ListboxOption::new("b", "Banana"),
     ]);
-    s.set_on_change(move |value, _w, cx| {
-        entity_for_lb.update(cx, |s, _cx| s.fruit = value.to_string());
+    s.set_on_change(|value, _window, cx| {
+        // `cx` inside this callback is `&mut App`.
+        // Update your model here. `value` is a `SharedString`.
+        let _ = value;
+        let _ = cx;
     });
 });
 
-listbox("fruit", listbox_state.clone()).render(cx)
+// `.render(cx)` looks up the registered `ListboxRenderer`
+// (default / brutalism) and returns a `Stateful<Div>` containing
+// one row per option. Caller can chain `.child(...)` to add
+// trailing elements (e.g. a footer hint).
+listbox("fruit", listbox_state).render(cx)
 ```
 
 ### Tree

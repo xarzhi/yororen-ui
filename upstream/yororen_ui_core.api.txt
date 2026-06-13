@@ -1127,26 +1127,6 @@ impl core::marker::UnsafeUnpin for yororen_ui_core::headless::checkbox::Checkbox
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::checkbox::CheckboxProps
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::checkbox::CheckboxProps
 pub fn yororen_ui_core::headless::checkbox::checkbox(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::checkbox::CheckboxProps
-pub mod yororen_ui_core::headless::clickable_surface
-pub struct yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps
-pub yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps::disabled: bool
-pub yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps::id: gpui::window::ElementId
-pub yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps::on_click: core::option::Option<yororen_ui_core::headless::clickable_surface::ClickCallback>
-impl yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps
-pub fn yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-pub fn yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps::disabled(self, bool) -> Self
-pub fn yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps::on_click<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App)
-impl core::clone::Clone for yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps
-pub fn yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps::clone(&self) -> yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps
-impl core::marker::Freeze for yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps
-impl core::marker::Send for yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps
-impl core::marker::Sync for yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps
-impl core::marker::Unpin for yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps
-impl core::marker::UnsafeUnpin for yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps
-impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps
-impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps
-pub fn yororen_ui_core::headless::clickable_surface::clickable_surface(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::clickable_surface::ClickableSurfaceProps
-pub type yororen_ui_core::headless::clickable_surface::ClickCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
 pub mod yororen_ui_core::headless::combo_box
 pub struct yororen_ui_core::headless::combo_box::ComboBoxOption
 pub yororen_ui_core::headless::combo_box::ComboBoxOption::label: gpui::shared_string::SharedString
@@ -1224,6 +1204,11 @@ pub fn yororen_ui_core::headless::combo_box::ComboBoxState::focus_handle(&self, 
 impl yororen_ui_core::animation::AnimatedPresenceState for yororen_ui_core::headless::combo_box::ComboBoxState
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::visibility(&self) -> &yororen_ui_core::animation::AnimatedVisibility
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::visibility_mut(&mut self) -> &mut yororen_ui_core::animation::AnimatedVisibility
+impl yororen_ui_core::headless::list_navigable::ListNavigable for yororen_ui_core::headless::combo_box::ComboBoxState
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::highlighted_index(&self) -> core::option::Option<usize>
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::is_selectable(&self, usize) -> bool
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::options_len(&self) -> usize
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::set_highlighted(&mut self, usize)
 impl yororen_ui_core::headless::text_input::TextInputActionHandler for yororen_ui_core::headless::combo_box::ComboBoxState
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::backspace(&mut self, &yororen_ui_core::headless::text_input::Backspace, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::combo_box::ComboBoxState::copy(&mut self, &yororen_ui_core::headless::text_input::Copy, &mut gpui::window::Window, &mut gpui::app::App)
@@ -1269,26 +1254,6 @@ impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::com
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::combo_box::ComboBoxState
 pub fn yororen_ui_core::headless::combo_box::combo_box(impl core::convert::Into<gpui::window::ElementId>, gpui::app::entity_map::Entity<yororen_ui_core::headless::combo_box::ComboBoxState>) -> yororen_ui_core::headless::combo_box::ComboBoxProps
 pub type yororen_ui_core::headless::combo_box::ComboBoxChangeCallback = alloc::sync::Arc<dyn core::ops::function::Fn(gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)>
-pub mod yororen_ui_core::headless::context_menu_trigger
-pub struct yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps
-pub yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps::disabled: bool
-pub yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps::id: gpui::window::ElementId
-pub yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps::on_show: core::option::Option<yororen_ui_core::headless::context_menu_trigger::ContextMenuCallback>
-impl yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps
-pub fn yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-pub fn yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps::disabled(self, bool) -> Self
-pub fn yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps::on_show<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&gpui::geometry::Point<gpui::geometry::Pixels>, &mut gpui::window::Window, &mut gpui::app::App)
-impl core::clone::Clone for yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps
-pub fn yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps::clone(&self) -> yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps
-impl core::marker::Freeze for yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps
-impl !core::marker::Send for yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps
-impl !core::marker::Sync for yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps
-impl core::marker::Unpin for yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps
-impl core::marker::UnsafeUnpin for yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps
-impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps
-impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps
-pub fn yororen_ui_core::headless::context_menu_trigger::context_menu_trigger(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::context_menu_trigger::ContextMenuTriggerProps
-pub type yororen_ui_core::headless::context_menu_trigger::ContextMenuCallback = alloc::sync::Arc<dyn core::ops::function::Fn(&gpui::geometry::Point<gpui::geometry::Pixels>, &mut gpui::window::Window, &mut gpui::app::App)>
 pub mod yororen_ui_core::headless::disclosure
 pub struct yororen_ui_core::headless::disclosure::DisclosureProps
 pub yororen_ui_core::headless::disclosure::DisclosureProps::disabled: bool
@@ -1333,23 +1298,6 @@ impl core::marker::UnsafeUnpin for yororen_ui_core::headless::divider::DividerPr
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::divider::DividerProps
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::divider::DividerProps
 pub fn yororen_ui_core::headless::divider::divider(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::divider::DividerProps
-pub mod yororen_ui_core::headless::drag_handle
-pub struct yororen_ui_core::headless::drag_handle::DragHandleProps
-pub yororen_ui_core::headless::drag_handle::DragHandleProps::id: gpui::window::ElementId
-pub yororen_ui_core::headless::drag_handle::DragHandleProps::value: core::option::Option<alloc::boxed::Box<(dyn core::any::Any + core::marker::Send + core::marker::Sync)>>
-impl yororen_ui_core::headless::drag_handle::DragHandleProps
-pub fn yororen_ui_core::headless::drag_handle::DragHandleProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-pub fn yororen_ui_core::headless::drag_handle::DragHandleProps::value<T: core::any::Any + core::marker::Send + core::marker::Sync>(self, T) -> Self
-impl core::clone::Clone for yororen_ui_core::headless::drag_handle::DragHandleProps
-pub fn yororen_ui_core::headless::drag_handle::DragHandleProps::clone(&self) -> Self
-impl core::marker::Freeze for yororen_ui_core::headless::drag_handle::DragHandleProps
-impl core::marker::Send for yororen_ui_core::headless::drag_handle::DragHandleProps
-impl core::marker::Sync for yororen_ui_core::headless::drag_handle::DragHandleProps
-impl core::marker::Unpin for yororen_ui_core::headless::drag_handle::DragHandleProps
-impl core::marker::UnsafeUnpin for yororen_ui_core::headless::drag_handle::DragHandleProps
-impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::drag_handle::DragHandleProps
-impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::drag_handle::DragHandleProps
-pub fn yororen_ui_core::headless::drag_handle::drag_handle(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::drag_handle::DragHandleProps
 pub mod yororen_ui_core::headless::dropdown_menu
 pub enum yororen_ui_core::headless::dropdown_menu::DropdownItem
 pub yororen_ui_core::headless::dropdown_menu::DropdownItem::Group(yororen_ui_core::headless::dropdown_menu::DropdownMenuGroup)
@@ -1886,6 +1834,34 @@ impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::lis
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::list_item::ListItemProps
 pub fn yororen_ui_core::headless::list_item::list_item(impl core::convert::Into<gpui::window::ElementId>, impl core::convert::Into<gpui::shared_string::SharedString>, &mut gpui::app::App) -> yororen_ui_core::headless::list_item::ListItemProps
 pub type yororen_ui_core::headless::list_item::ClickCallback = alloc::sync::Arc<(dyn core::ops::function::Fn(&gpui::interactive::ClickEvent, &mut gpui::window::Window, &mut gpui::app::App) + core::marker::Send + core::marker::Sync)>
+pub mod yororen_ui_core::headless::list_navigable
+pub trait yororen_ui_core::headless::list_navigable::ListNavigable
+pub fn yororen_ui_core::headless::list_navigable::ListNavigable::highlighted_index(&self) -> core::option::Option<usize>
+pub fn yororen_ui_core::headless::list_navigable::ListNavigable::is_selectable(&self, usize) -> bool
+pub fn yororen_ui_core::headless::list_navigable::ListNavigable::options_len(&self) -> usize
+pub fn yororen_ui_core::headless::list_navigable::ListNavigable::set_highlighted(&mut self, usize)
+impl yororen_ui_core::headless::list_navigable::ListNavigable for yororen_ui_core::headless::combo_box::ComboBoxState
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::highlighted_index(&self) -> core::option::Option<usize>
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::is_selectable(&self, usize) -> bool
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::options_len(&self) -> usize
+pub fn yororen_ui_core::headless::combo_box::ComboBoxState::set_highlighted(&mut self, usize)
+impl yororen_ui_core::headless::list_navigable::ListNavigable for yororen_ui_core::headless::listbox::ListboxState
+pub fn yororen_ui_core::headless::listbox::ListboxState::highlighted_index(&self) -> core::option::Option<usize>
+pub fn yororen_ui_core::headless::listbox::ListboxState::is_selectable(&self, usize) -> bool
+pub fn yororen_ui_core::headless::listbox::ListboxState::options_len(&self) -> usize
+pub fn yororen_ui_core::headless::listbox::ListboxState::set_highlighted(&mut self, usize)
+impl yororen_ui_core::headless::list_navigable::ListNavigable for yororen_ui_core::headless::menu::MenuState
+pub fn yororen_ui_core::headless::menu::MenuState::highlighted_index(&self) -> core::option::Option<usize>
+pub fn yororen_ui_core::headless::menu::MenuState::is_selectable(&self, usize) -> bool
+pub fn yororen_ui_core::headless::menu::MenuState::options_len(&self) -> usize
+pub fn yororen_ui_core::headless::menu::MenuState::set_highlighted(&mut self, usize)
+impl yororen_ui_core::headless::list_navigable::ListNavigable for yororen_ui_core::headless::select::SelectState
+pub fn yororen_ui_core::headless::select::SelectState::highlighted_index(&self) -> core::option::Option<usize>
+pub fn yororen_ui_core::headless::select::SelectState::is_selectable(&self, usize) -> bool
+pub fn yororen_ui_core::headless::select::SelectState::options_len(&self) -> usize
+pub fn yororen_ui_core::headless::select::SelectState::set_highlighted(&mut self, usize)
+pub fn yororen_ui_core::headless::list_navigable::highlight_next<N: yororen_ui_core::headless::list_navigable::ListNavigable>(&mut N)
+pub fn yororen_ui_core::headless::list_navigable::highlight_prev<N: yororen_ui_core::headless::list_navigable::ListNavigable>(&mut N)
 pub mod yororen_ui_core::headless::listbox
 pub struct yororen_ui_core::headless::listbox::ListboxOption
 pub yororen_ui_core::headless::listbox::ListboxOption::disabled: bool
@@ -1910,6 +1886,7 @@ pub yororen_ui_core::headless::listbox::ListboxProps::id: gpui::window::ElementI
 pub yororen_ui_core::headless::listbox::ListboxProps::state: gpui::app::entity_map::Entity<yororen_ui_core::headless::listbox::ListboxState>
 impl yororen_ui_core::headless::listbox::ListboxProps
 pub fn yororen_ui_core::headless::listbox::ListboxProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::listbox::ListboxProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 impl core::clone::Clone for yororen_ui_core::headless::listbox::ListboxProps
 pub fn yororen_ui_core::headless::listbox::ListboxProps::clone(&self) -> yororen_ui_core::headless::listbox::ListboxProps
 impl core::marker::Freeze for yororen_ui_core::headless::listbox::ListboxProps
@@ -1927,12 +1904,18 @@ impl yororen_ui_core::headless::listbox::ListboxState
 pub fn yororen_ui_core::headless::listbox::ListboxState::highlight_next(&mut self)
 pub fn yororen_ui_core::headless::listbox::ListboxState::highlight_prev(&mut self)
 pub fn yororen_ui_core::headless::listbox::ListboxState::new(&mut gpui::app::App) -> gpui::app::entity_map::Entity<Self>
+pub fn yororen_ui_core::headless::listbox::ListboxState::pick(&mut self, gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::listbox::ListboxState::select_highlighted(&mut self, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::listbox::ListboxState::set_on_change<F>(&mut self, F) where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::listbox::ListboxState::set_options(&mut self, alloc::vec::Vec<yororen_ui_core::headless::listbox::ListboxOption>)
 pub fn yororen_ui_core::headless::listbox::ListboxState::set_selected(&mut self, impl core::convert::Into<gpui::shared_string::SharedString>)
 impl core::clone::Clone for yororen_ui_core::headless::listbox::ListboxState
 pub fn yororen_ui_core::headless::listbox::ListboxState::clone(&self) -> yororen_ui_core::headless::listbox::ListboxState
+impl yororen_ui_core::headless::list_navigable::ListNavigable for yororen_ui_core::headless::listbox::ListboxState
+pub fn yororen_ui_core::headless::listbox::ListboxState::highlighted_index(&self) -> core::option::Option<usize>
+pub fn yororen_ui_core::headless::listbox::ListboxState::is_selectable(&self, usize) -> bool
+pub fn yororen_ui_core::headless::listbox::ListboxState::options_len(&self) -> usize
+pub fn yororen_ui_core::headless::listbox::ListboxState::set_highlighted(&mut self, usize)
 impl core::marker::Freeze for yororen_ui_core::headless::listbox::ListboxState
 impl !core::marker::Send for yororen_ui_core::headless::listbox::ListboxState
 impl !core::marker::Sync for yororen_ui_core::headless::listbox::ListboxState
@@ -2403,6 +2386,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::ListItem
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::ListItem
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::ListItem
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::ListItem
+pub struct yororen_ui_core::headless::markers::Listbox
+impl core::clone::Clone for yororen_ui_core::renderer::Listbox
+pub fn yororen_ui_core::renderer::Listbox::clone(&self) -> yororen_ui_core::renderer::Listbox
+impl core::cmp::Eq for yororen_ui_core::renderer::Listbox
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Listbox
+pub fn yororen_ui_core::renderer::Listbox::eq(&self, &yororen_ui_core::renderer::Listbox) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Listbox
+pub fn yororen_ui_core::renderer::Listbox::default() -> yororen_ui_core::renderer::Listbox
+impl core::fmt::Debug for yororen_ui_core::renderer::Listbox
+pub fn yororen_ui_core::renderer::Listbox::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Listbox
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Listbox
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Listbox
+impl core::marker::Freeze for yororen_ui_core::renderer::Listbox
+impl core::marker::Send for yororen_ui_core::renderer::Listbox
+impl core::marker::Sync for yororen_ui_core::renderer::Listbox
+impl core::marker::Unpin for yororen_ui_core::renderer::Listbox
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Listbox
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Listbox
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Listbox
 pub struct yororen_ui_core::headless::markers::Menu
 impl core::clone::Clone for yororen_ui_core::renderer::Menu
 pub fn yororen_ui_core::renderer::Menu::clone(&self) -> yororen_ui_core::renderer::Menu
@@ -3052,6 +3055,11 @@ pub fn yororen_ui_core::headless::menu::MenuState::set_items(&mut self, alloc::v
 pub fn yororen_ui_core::headless::menu::MenuState::set_on_select<F>(&mut self, F) where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(gpui::shared_string::SharedString, &mut gpui::window::Window, &mut gpui::app::App)
 impl core::clone::Clone for yororen_ui_core::headless::menu::MenuState
 pub fn yororen_ui_core::headless::menu::MenuState::clone(&self) -> yororen_ui_core::headless::menu::MenuState
+impl yororen_ui_core::headless::list_navigable::ListNavigable for yororen_ui_core::headless::menu::MenuState
+pub fn yororen_ui_core::headless::menu::MenuState::highlighted_index(&self) -> core::option::Option<usize>
+pub fn yororen_ui_core::headless::menu::MenuState::is_selectable(&self, usize) -> bool
+pub fn yororen_ui_core::headless::menu::MenuState::options_len(&self) -> usize
+pub fn yororen_ui_core::headless::menu::MenuState::set_highlighted(&mut self, usize)
 impl core::marker::Freeze for yororen_ui_core::headless::menu::MenuState
 impl !core::marker::Send for yororen_ui_core::headless::menu::MenuState
 impl !core::marker::Sync for yororen_ui_core::headless::menu::MenuState
@@ -3566,6 +3574,11 @@ pub fn yororen_ui_core::headless::select::SelectState::clone(&self) -> yororen_u
 impl yororen_ui_core::animation::AnimatedPresenceState for yororen_ui_core::headless::select::SelectState
 pub fn yororen_ui_core::headless::select::SelectState::visibility(&self) -> &yororen_ui_core::animation::AnimatedVisibility
 pub fn yororen_ui_core::headless::select::SelectState::visibility_mut(&mut self) -> &mut yororen_ui_core::animation::AnimatedVisibility
+impl yororen_ui_core::headless::list_navigable::ListNavigable for yororen_ui_core::headless::select::SelectState
+pub fn yororen_ui_core::headless::select::SelectState::highlighted_index(&self) -> core::option::Option<usize>
+pub fn yororen_ui_core::headless::select::SelectState::is_selectable(&self, usize) -> bool
+pub fn yororen_ui_core::headless::select::SelectState::options_len(&self) -> usize
+pub fn yororen_ui_core::headless::select::SelectState::set_highlighted(&mut self, usize)
 impl core::marker::Freeze for yororen_ui_core::headless::select::SelectState
 impl !core::marker::Send for yororen_ui_core::headless::select::SelectState
 impl !core::marker::Sync for yororen_ui_core::headless::select::SelectState
@@ -6890,6 +6903,25 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::list
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::list_item::ListItemRenderState
 pub trait yororen_ui_core::renderer::list_item::ListItemRenderer: core::any::Any + core::marker::Send + core::marker::Sync
 pub fn yororen_ui_core::renderer::list_item::ListItemRenderer::compose(&self, &yororen_ui_core::headless::list_item::ListItemProps, &gpui::app::App) -> gpui::elements::div::Div
+pub mod yororen_ui_core::renderer::listbox
+pub struct yororen_ui_core::renderer::listbox::ListboxRenderState
+pub yororen_ui_core::renderer::listbox::ListboxRenderState::row_count: usize
+impl core::clone::Clone for yororen_ui_core::renderer::listbox::ListboxRenderState
+pub fn yororen_ui_core::renderer::listbox::ListboxRenderState::clone(&self) -> yororen_ui_core::renderer::listbox::ListboxRenderState
+impl core::default::Default for yororen_ui_core::renderer::listbox::ListboxRenderState
+pub fn yororen_ui_core::renderer::listbox::ListboxRenderState::default() -> yororen_ui_core::renderer::listbox::ListboxRenderState
+impl core::fmt::Debug for yororen_ui_core::renderer::listbox::ListboxRenderState
+pub fn yororen_ui_core::renderer::listbox::ListboxRenderState::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::listbox::ListboxRenderState
+impl core::marker::Freeze for yororen_ui_core::renderer::listbox::ListboxRenderState
+impl core::marker::Send for yororen_ui_core::renderer::listbox::ListboxRenderState
+impl core::marker::Sync for yororen_ui_core::renderer::listbox::ListboxRenderState
+impl core::marker::Unpin for yororen_ui_core::renderer::listbox::ListboxRenderState
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::listbox::ListboxRenderState
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::listbox::ListboxRenderState
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::listbox::ListboxRenderState
+pub trait yororen_ui_core::renderer::listbox::ListboxRenderer: core::any::Any + core::marker::Send + core::marker::Sync
+pub fn yororen_ui_core::renderer::listbox::ListboxRenderer::compose(&self, &yororen_ui_core::headless::listbox::ListboxProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub mod yororen_ui_core::renderer::markers
 pub struct yororen_ui_core::renderer::markers::Avatar
 impl core::clone::Clone for yororen_ui_core::renderer::Avatar
@@ -7351,6 +7383,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::ListItem
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::ListItem
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::ListItem
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::ListItem
+pub struct yororen_ui_core::renderer::markers::Listbox
+impl core::clone::Clone for yororen_ui_core::renderer::Listbox
+pub fn yororen_ui_core::renderer::Listbox::clone(&self) -> yororen_ui_core::renderer::Listbox
+impl core::cmp::Eq for yororen_ui_core::renderer::Listbox
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Listbox
+pub fn yororen_ui_core::renderer::Listbox::eq(&self, &yororen_ui_core::renderer::Listbox) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Listbox
+pub fn yororen_ui_core::renderer::Listbox::default() -> yororen_ui_core::renderer::Listbox
+impl core::fmt::Debug for yororen_ui_core::renderer::Listbox
+pub fn yororen_ui_core::renderer::Listbox::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Listbox
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Listbox
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Listbox
+impl core::marker::Freeze for yororen_ui_core::renderer::Listbox
+impl core::marker::Send for yororen_ui_core::renderer::Listbox
+impl core::marker::Sync for yororen_ui_core::renderer::Listbox
+impl core::marker::Unpin for yororen_ui_core::renderer::Listbox
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Listbox
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Listbox
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Listbox
 pub struct yororen_ui_core::renderer::markers::Menu
 impl core::clone::Clone for yororen_ui_core::renderer::Menu
 pub fn yororen_ui_core::renderer::Menu::clone(&self) -> yororen_ui_core::renderer::Menu
@@ -9513,6 +9565,26 @@ impl core::marker::Unpin for yororen_ui_core::renderer::ListItem
 impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::ListItem
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::ListItem
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::ListItem
+pub struct yororen_ui_core::renderer::Listbox
+impl core::clone::Clone for yororen_ui_core::renderer::Listbox
+pub fn yororen_ui_core::renderer::Listbox::clone(&self) -> yororen_ui_core::renderer::Listbox
+impl core::cmp::Eq for yororen_ui_core::renderer::Listbox
+impl core::cmp::PartialEq for yororen_ui_core::renderer::Listbox
+pub fn yororen_ui_core::renderer::Listbox::eq(&self, &yororen_ui_core::renderer::Listbox) -> bool
+impl core::default::Default for yororen_ui_core::renderer::Listbox
+pub fn yororen_ui_core::renderer::Listbox::default() -> yororen_ui_core::renderer::Listbox
+impl core::fmt::Debug for yororen_ui_core::renderer::Listbox
+pub fn yororen_ui_core::renderer::Listbox::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Copy for yororen_ui_core::renderer::Listbox
+impl core::marker::StructuralPartialEq for yororen_ui_core::renderer::Listbox
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Listbox
+impl core::marker::Freeze for yororen_ui_core::renderer::Listbox
+impl core::marker::Send for yororen_ui_core::renderer::Listbox
+impl core::marker::Sync for yororen_ui_core::renderer::Listbox
+impl core::marker::Unpin for yororen_ui_core::renderer::Listbox
+impl core::marker::UnsafeUnpin for yororen_ui_core::renderer::Listbox
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::renderer::Listbox
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::renderer::Listbox
 pub struct yororen_ui_core::renderer::Menu
 impl core::clone::Clone for yororen_ui_core::renderer::Menu
 pub fn yororen_ui_core::renderer::Menu::clone(&self) -> yororen_ui_core::renderer::Menu
@@ -10285,6 +10357,7 @@ impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Ke
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::KeybindingInput
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Label
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::ListItem
+impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Listbox
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Menu
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Modal
 impl yororen_ui_core::renderer::RendererMarker for yororen_ui_core::renderer::Notification

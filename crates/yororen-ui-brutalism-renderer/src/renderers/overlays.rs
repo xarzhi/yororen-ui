@@ -484,6 +484,16 @@ impl BrutalMenuRenderer {
             .get_number("tokens.control.menu.padding")
             .unwrap_or(4.0) as f32)
     }
+    pub fn min_width(&self, _state: &MenuRenderState, theme: &Theme) -> Pixels {
+        // Floor the menu shell so an `absolute()` panel
+        // (dropdown, popover) cannot collapse below a usable
+        // width. 200 px matches the brutalism convention of
+        // giving chunky surfaces more breathing room than the
+        // default renderer.
+        px(theme
+            .get_number("tokens.control.menu.min_width")
+            .unwrap_or(200.0) as f32)
+    }
     pub fn item_padding_x(&self, _state: &MenuRenderState, theme: &Theme) -> Pixels {
         px(theme
             .get_number("tokens.control.menu.item_padding_x")
@@ -534,6 +544,7 @@ impl MenuRenderer for BrutalMenuRenderer {
         let item_hover_bg = self.item_hover_bg(&state, theme);
         let item_hl_fg = self.item_hl_fg(&state, theme);
         let group_label_fg = self.group_label_fg(&state, theme);
+        let min_w = self.min_width(&state, theme);
 
         let items = props.state.read(cx).items.clone();
         let highlighted = props.state.read(cx).highlighted_index;
@@ -559,6 +570,7 @@ impl MenuRenderer for BrutalMenuRenderer {
                     };
                     let mut row: Stateful<Div> = gpui::div()
                         .id(ElementId::Name(format!("brutal-menu-item-{}", i).into()))
+                        .w_full()
                         .px(item_px)
                         .py(item_py)
                         .rounded(px(BRUTAL_RADIUS))
@@ -580,6 +592,7 @@ impl MenuRenderer for BrutalMenuRenderer {
                     // brutalism divider thickness.
                     let sep = gpui::div()
                         .id(ElementId::Name(format!("brutal-menu-sep-{}", i).into()))
+                        .w_full()
                         .h(px(2.0))
                         .my(px(2.0))
                         .bg(border);
@@ -589,6 +602,7 @@ impl MenuRenderer for BrutalMenuRenderer {
                     let group_label = group.label.to_string();
                     let header = gpui::div()
                         .id(ElementId::Name(format!("brutal-menu-group-{}", i).into()))
+                        .w_full()
                         .px(item_px)
                         .py(px(4.0))
                         .text_color(group_label_fg)
@@ -606,6 +620,7 @@ impl MenuRenderer for BrutalMenuRenderer {
         let shadow = brutal_shadow_overlay(theme);
         gpui::div()
             .id(props.id.clone())
+            .min_w(min_w)
             .bg(bg)
             .border(bw)
             .border_color(border)

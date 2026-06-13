@@ -2,7 +2,7 @@
 //!
 //! Every `XxxRenderer` implementation in this crate reads from here
 //! for the recurring brutalism values (border color, border width,
-//! radius, font family, offset shadow) so the 54 renderers stay in
+//! radius, font family, offset shadow) so the 55 renderers stay in
 //! stylistic lockstep.
 
 use gpui::{Hsla, px};

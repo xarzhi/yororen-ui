@@ -1,4 +1,4 @@
-//! 54 component renderers grouped by visual category.
+//! 55 component renderers grouped by visual category.
 //!
 //! Each submodule implements the `XxxRenderer` traits from
 //! `yororen_ui_default_renderer::renderers` with brutalist visual
@@ -6,7 +6,7 @@
 //! monospace typography, and high-contrast solid colors.
 //!
 //! Colors are read from the theme (so light/dark variants work);
-//! geometry is hardcoded in the `style` module so the 54
+//! geometry is hardcoded in the `style` module so the 55
 //! renderers stay in stylistic lockstep.
 
 pub mod actions;

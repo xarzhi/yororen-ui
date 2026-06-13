@@ -199,6 +199,8 @@
       "uvl_item": "Uniform row #{}",
       "vl_status": "visible: {:?} | item_count: {} | auto-loaded batches: {}",
       "cell_list": "list_item (3 rows; selected via props)",
+      "cell_listbox": "listbox (single-select; ↑/↓ highlights, click selects)",
+      "listbox_selected": "selected: {}",
       "cell_table": "table (3 rows × 3 cols)",
       "cell_tree": "tree + tree_item (3-5 rows; click chevron or double-click row to expand, click row to select)",
       "cell_vl": "virtual_list (scroll_to_top/bottom + on_visible_range_change + infinite loading)",

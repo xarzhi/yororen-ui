@@ -6,6 +6,7 @@ use std::sync::Arc;
 use gpui::{App, AppContext, Div, ElementId, Entity, InteractiveElement, SharedString, Stateful};
 
 use crate::animation::{AnimatedPresenceState, AnimatedVisibility};
+use crate::headless::list_navigable::{ListNavigable, highlight_next, highlight_prev};
 
 #[derive(Clone, Debug)]
 pub struct SelectOption {
@@ -89,19 +90,10 @@ impl SelectState {
         }
     }
     pub fn highlight_next(&mut self) {
-        let next = match self.highlighted_index {
-            Some(i) if i + 1 < self.options.len() => i + 1,
-            Some(_) => 0,
-            None => 0,
-        };
-        self.highlighted_index = Some(next);
+        highlight_next(self);
     }
     pub fn highlight_prev(&mut self) {
-        let prev = match self.highlighted_index {
-            Some(0) | None => self.options.len().saturating_sub(1),
-            Some(i) => i - 1,
-        };
-        self.highlighted_index = Some(prev);
+        highlight_prev(self);
     }
     pub fn set_on_change<F>(&mut self, f: F)
     where
@@ -151,6 +143,18 @@ impl AnimatedPresenceState for SelectState {
     }
     fn visibility_mut(&mut self) -> &mut AnimatedVisibility {
         &mut self.animation
+    }
+}
+
+impl ListNavigable for SelectState {
+    fn options_len(&self) -> usize {
+        self.options.len()
+    }
+    fn highlighted_index(&self) -> Option<usize> {
+        self.highlighted_index
+    }
+    fn set_highlighted(&mut self, i: usize) {
+        self.highlighted_index = Some(i);
     }
 }
 

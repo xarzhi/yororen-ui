@@ -16,6 +16,7 @@ use gpui::Entity;
 use yororen_ui::headless::combo_box::ComboBoxState;
 use yororen_ui::headless::dropdown_menu::DropdownMenuState;
 use yororen_ui::headless::keybinding_input::KeybindingInputMode;
+use yororen_ui::headless::listbox::{ListboxOption, ListboxState};
 use yororen_ui::headless::menu::MenuState;
 use yororen_ui::headless::modal::ModalState;
 use yororen_ui::headless::popover::PopoverState;
@@ -68,6 +69,7 @@ pub struct GalleryApp {
     pub dropdown_state: Entity<DropdownMenuState>,
     pub split_dropdown_state: Entity<DropdownMenuState>,
     pub menu_state: Entity<MenuState>,
+    pub listbox_state: Entity<ListboxState>,
 
     // -------- Input values (mirrored via on_change) --------
     pub text_value: String,
@@ -84,6 +86,7 @@ pub struct GalleryApp {
     pub combo_demo_value: String,
     pub dropdown_demo_value: String,
     pub menu_demo_value: String,
+    pub listbox_demo_value: String,
 
     // -------- Controls --------
     pub checkbox_value: bool,
@@ -163,6 +166,7 @@ impl GalleryApp {
         let dropdown_state = DropdownMenuState::new(&mut **cx);
         let split_dropdown_state = DropdownMenuState::new(&mut **cx);
         let menu_state = MenuState::new(&mut **cx);
+        let listbox_state = ListboxState::new(&mut **cx);
 
         // Seed the select / combo / dropdown / menu options so
         // the renderer's first paint shows the full menu.
@@ -205,6 +209,21 @@ impl GalleryApp {
                 DropdownItem::Item(DropdownMenuItem::new("logout", "Log out")),
             ]);
         });
+        listbox_state.update(cx, |s, _cx| {
+            // Seed the listbox with a fruit list mirroring the
+            // select / combo_box demo so the three option-list
+            // surfaces are visually consistent. The third
+            // option is disabled to demonstrate that
+            // `ListNavigable::is_selectable` skips disabled rows
+            // when wrapping around.
+            s.set_options(vec![
+                ListboxOption::new("apple", "Apple"),
+                ListboxOption::new("banana", "Banana"),
+                ListboxOption::new("cherry", "Cherry").disabled(true),
+                ListboxOption::new("durian", "Durian"),
+                ListboxOption::new("elderberry", "Elderberry"),
+            ]);
+        });
 
         Self {
             // Toolbar
@@ -222,6 +241,7 @@ impl GalleryApp {
             dropdown_state,
             split_dropdown_state,
             menu_state,
+            listbox_state,
 
             // Inputs
             text_value: String::new(),
@@ -238,6 +258,7 @@ impl GalleryApp {
             combo_demo_value: String::new(),
             dropdown_demo_value: String::new(),
             menu_demo_value: String::new(),
+            listbox_demo_value: String::new(),
 
             // Controls
             checkbox_value: false,

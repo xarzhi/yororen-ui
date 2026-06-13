@@ -101,6 +101,159 @@ impl ListItemRenderer for BrutalListItemRenderer {
 }
 
 // =====================================================================
+// Listbox
+// =====================================================================
+
+pub use yororen_ui_core::renderer::listbox::{ListboxRenderState, ListboxRenderer};
+
+pub struct BrutalListboxRenderer;
+
+// Inherent helpers — *not* part of the trait surface. Brutalism
+// reuses the list_item colour tokens so listbox rows look
+// consistent with other list surfaces; the brutalist styling
+// overrides (thick borders, hard offset shadow) come from the
+// outer shell.
+impl BrutalListboxRenderer {
+    pub fn bg(&self, _: &ListboxRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("surface.base").unwrap_or(BRUTAL_BORDER)
+    }
+    pub fn hover_bg(&self, _: &ListboxRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("surface.hover").unwrap_or(BRUTAL_BORDER)
+    }
+    pub fn selected_bg(&self, _: &ListboxRenderState, theme: &Theme) -> Hsla {
+        theme
+            .get_color("border.focus")
+            .or_else(|| theme.get_color("action.primary.bg"))
+            .unwrap_or(BRUTAL_BORDER)
+    }
+    pub fn fg(&self, state: &ListboxRenderState, theme: &Theme) -> Hsla {
+        let _ = state;
+        theme.get_color("content.primary").unwrap_or(BRUTAL_BORDER)
+    }
+    pub fn selected_fg(&self, _: &ListboxRenderState, theme: &Theme) -> Hsla {
+        theme
+            .get_color("content.on_status")
+            .unwrap_or(BRUTAL_BORDER)
+    }
+    pub fn disabled_fg(&self, _: &ListboxRenderState, theme: &Theme) -> Hsla {
+        theme.get_color("content.disabled").unwrap_or(BRUTAL_BORDER)
+    }
+    pub fn padding(&self, _: &ListboxRenderState, theme: &Theme) -> Edges<Pixels> {
+        let h = theme
+            .get_number("tokens.control.list_item.padding")
+            .unwrap_or(10.0) as f32;
+        Edges::symmetric(px(h), px(h / 2.0))
+    }
+    pub fn min_height(&self, _: &ListboxRenderState, theme: &Theme) -> Pixels {
+        px(theme
+            .get_number("tokens.control.list_item.min_height")
+            .unwrap_or(36.0) as f32)
+    }
+    pub fn border_radius(&self, _: &ListboxRenderState, _: &Theme) -> Pixels {
+        px(BRUTAL_RADIUS)
+    }
+    pub fn gap(&self, _: &ListboxRenderState, theme: &Theme) -> Pixels {
+        px(theme.get_number("tokens.spacing.gap_1").unwrap_or(4.0) as f32)
+    }
+    pub fn border_color(&self, _: &ListboxRenderState, theme: &Theme) -> Hsla {
+        brutal_border_color(theme)
+    }
+    pub fn border_width(&self, _: &ListboxRenderState, _: &Theme) -> Pixels {
+        px(BRUTAL_BORDER_WIDTH)
+    }
+}
+
+impl ListboxRenderer for BrutalListboxRenderer {
+    fn compose(
+        &self,
+        props: &yororen_ui_core::headless::listbox::ListboxProps,
+        cx: &App,
+    ) -> Stateful<Div> {
+        use yororen_ui_core::theme::ActiveTheme;
+        let theme = cx.theme();
+        let read = props.state.read(cx);
+        let state = ListboxRenderState {
+            row_count: read.options.len(),
+        };
+        let bg = self.bg(&state, theme);
+        let hover_bg = self.hover_bg(&state, theme);
+        let selected_bg = self.selected_bg(&state, theme);
+        let fg = self.fg(&state, theme);
+        let selected_fg = self.selected_fg(&state, theme);
+        let disabled_fg = self.disabled_fg(&state, theme);
+        let pad = self.padding(&state, theme);
+        let h = self.min_height(&state, theme);
+        let r = self.border_radius(&state, theme);
+        let gap = self.gap(&state, theme);
+        let border = self.border_color(&state, theme);
+        let bw = self.border_width(&state, theme);
+
+        let highlighted = read.highlighted_index;
+        let selected_value = read.selected_value.clone();
+        let options = read.options.clone();
+        let state_for_click = props.state.clone();
+        let _ = read;
+
+        let mut body: Div = gpui::div()
+            .flex()
+            .flex_col()
+            .gap(gap)
+            .bg(bg)
+            .p(px(2.0))
+            .rounded(r);
+
+        for (i, opt) in options.iter().enumerate() {
+            let is_highlighted = highlighted == Some(i);
+            let is_selected = selected_value.as_ref() == Some(&opt.value);
+            let row_fg = if opt.disabled {
+                disabled_fg
+            } else if is_selected {
+                selected_fg
+            } else {
+                fg
+            };
+            let row_bg = if is_selected {
+                selected_bg
+            } else if is_highlighted {
+                hover_bg
+            } else {
+                gpui::hsla(0.0, 0.0, 0.0, 0.0)
+            };
+            let value_for_click = opt.value.clone();
+            let mut row: Stateful<Div> = gpui::div()
+                .id(ElementId::Name(format!("brutal-listbox-row-{}", i).into()))
+                .flex()
+                .items_center()
+                .bg(row_bg)
+                .text_color(row_fg)
+                .px(pad.left)
+                .py(pad.top)
+                .min_h(h)
+                .rounded(r)
+                .when(!opt.disabled, |d| d.cursor_pointer())
+                .when(opt.disabled, |d| d.opacity(0.5))
+                .child(opt.label.to_string());
+            if !opt.disabled {
+                let state_for_this_row = state_for_click.clone();
+                row = row.on_click(move |_ev, window, cx| {
+                    state_for_this_row.update(cx, |s, cx_inner| {
+                        s.pick(value_for_click.clone(), window, &mut *cx_inner);
+                    });
+                });
+            }
+            body = body.child(row);
+        }
+
+        gpui::div()
+            .id(props.id.clone())
+            .border(bw)
+            .border_color(border)
+            .rounded(r)
+            .child(body)
+    }
+}
+
+// =====================================================================
 // TreeItem
 // =====================================================================
 

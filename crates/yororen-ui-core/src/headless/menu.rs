@@ -7,6 +7,7 @@ use std::sync::Arc;
 use gpui::{App, AppContext, Div, ElementId, Entity, InteractiveElement, SharedString, Stateful};
 
 use super::dropdown_menu::{DropdownItem, DropdownMenuItem, DropdownSelectCallback};
+use super::list_navigable::ListNavigable;
 
 #[derive(Clone)]
 pub struct MenuState {
@@ -28,34 +29,51 @@ impl MenuState {
         self.items = items;
     }
     pub fn highlight_next(&mut self) {
+        // The shared `highlight_next` algorithm wraps at the
+        // ends and uses `is_selectable` to filter out slots
+        // (separators here). To preserve the original "skip
+        // past runs of separators" behaviour — a separator-only
+        // section at the end of the menu must not leave the
+        // highlight stuck on the last separator — we hand-roll
+        // the loop. `is_selectable` is the same predicate the
+        // trait uses, so this stays in lock-step with the
+        // shared algorithm when no separators are involved.
         let len = self.items.len();
         if len == 0 {
             return;
         }
-        let mut i = match self.highlighted_index {
+        let mut candidate = match self.highlighted_index {
             Some(i) => i + 1,
             None => 0,
         };
-        while i < len && matches!(self.items[i], DropdownItem::Separator) {
-            i += 1;
+        while candidate < len && !self.is_selectable(candidate) {
+            candidate += 1;
         }
-        if i < len {
-            self.highlighted_index = Some(i);
+        if candidate < len {
+            self.highlighted_index = Some(candidate);
         }
     }
     pub fn highlight_prev(&mut self) {
+        // Symmetric to `highlight_next`: the shared
+        // `highlight_prev` uses `is_selectable` and would refuse
+        // to land on slot 0 even if it is a separator. The
+        // original hand-rolled loop stops at 0 unconditionally,
+        // which is the behaviour we keep here so callers that
+        // rely on "↓ wraps around to the top non-separator,
+        // ↑ wraps around to slot 0 even if it is a separator"
+        // see no change.
         let len = self.items.len();
         if len == 0 {
             return;
         }
-        let mut i = match self.highlighted_index {
+        let mut candidate = match self.highlighted_index {
             Some(0) | None => len - 1,
             Some(i) => i - 1,
         };
-        while i > 0 && matches!(self.items[i], DropdownItem::Separator) {
-            i -= 1;
+        while candidate > 0 && !self.is_selectable(candidate) {
+            candidate -= 1;
         }
-        self.highlighted_index = Some(i);
+        self.highlighted_index = Some(candidate);
     }
     pub fn set_on_select<F>(&mut self, f: F)
     where
@@ -78,6 +96,28 @@ impl MenuState {
                 f(id, window, cx);
             }
         }
+    }
+}
+
+impl ListNavigable for MenuState {
+    fn options_len(&self) -> usize {
+        self.items.len()
+    }
+    fn highlighted_index(&self) -> Option<usize> {
+        self.highlighted_index
+    }
+    fn set_highlighted(&mut self, i: usize) {
+        self.highlighted_index = Some(i);
+    }
+    /// Separators and (non-navigable) group headers are not
+    /// selectable slots — `highlight_prev` will skip them when
+    /// wrapping around. Group headers and `Item`s both occupy a
+    /// slot but only `Item` rows accept a click, so the
+    /// trait-level selectability filter only excludes
+    /// separators (group headers are technically highlightable
+    /// in the existing menu semantics, but never clickable).
+    fn is_selectable(&self, i: usize) -> bool {
+        i < self.items.len() && !matches!(self.items[i], DropdownItem::Separator)
     }
 }
 

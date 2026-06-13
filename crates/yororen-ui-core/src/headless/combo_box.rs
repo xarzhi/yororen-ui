@@ -11,6 +11,7 @@ use gpui::{
 };
 
 use crate::animation::{AnimatedPresenceState, AnimatedVisibility};
+use crate::headless::list_navigable::{ListNavigable, highlight_next, highlight_prev};
 use crate::headless::text_input::{
     Backspace, Copy, Cut, Delete, End, Enter, Escape, Home, Left, Paste, Right, SelectAll,
     SelectLeft, SelectRight, ShowCharacterPalette, TextInputActionHandler,
@@ -111,25 +112,10 @@ impl ComboBoxState {
         }
     }
     pub fn highlight_next(&mut self) {
-        let n = self.options.len();
-        if n == 0 {
-            return;
-        }
-        self.highlighted_index = Some(match self.highlighted_index {
-            Some(i) if i + 1 < n => i + 1,
-            Some(_) => 0,
-            None => 0,
-        });
+        highlight_next(self);
     }
     pub fn highlight_prev(&mut self) {
-        let n = self.options.len();
-        if n == 0 {
-            return;
-        }
-        self.highlighted_index = Some(match self.highlighted_index {
-            Some(0) | None => n - 1,
-            Some(i) => i - 1,
-        });
+        highlight_prev(self);
     }
     pub fn set_on_change<F>(&mut self, f: F)
     where
@@ -180,6 +166,18 @@ impl AnimatedPresenceState for ComboBoxState {
     }
     fn visibility_mut(&mut self) -> &mut AnimatedVisibility {
         &mut self.animation
+    }
+}
+
+impl ListNavigable for ComboBoxState {
+    fn options_len(&self) -> usize {
+        self.options.len()
+    }
+    fn highlighted_index(&self) -> Option<usize> {
+        self.highlighted_index
+    }
+    fn set_highlighted(&mut self, i: usize) {
+        self.highlighted_index = Some(i);
     }
 }
 

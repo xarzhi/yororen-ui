@@ -7,26 +7,26 @@
 //! keyed by the component's `XxxRenderState` type. Each
 //! `with_<x>(r: Arc<dyn XxxRenderer>)` setter inserts `r` under
 //! `TypeId::of::<XxxRenderState>()`; each `get_<x>() -> Option<&Arc<dyn XxxRenderer>>`
-//! looks it up. The `54 XxxRenderer` traits themselves stay public and
+//! looks it up. The `55 XxxRenderer` traits themselves stay public and
 //! unchanged — they are the **type-level** contract a theme implements,
 //! the HashMap is the **storage** layer.
 //!
-//! ## Why not 54 named fields?
+//! ## Why not 55 named fields?
 //!
-//! The 54-trait design (one trait per component) is the right level of
+//! The 55-trait design (one trait per component) is the right level of
 //! granularity for the *type system*: each `XxxRenderer` is callable
 //! with the component-specific `XxxRenderState` and returns the
 //! component-specific property shape. Trying to collapse them into a
 //! single `ComponentRenderer<S: RenderState>` trait would force a
-//! 200+-method union (because the 54 method sets are largely disjoint
+//! 200+-method union (because the 55 method sets are largely disjoint
 //! — `Switch` has `track_w/track_h/knob_size` while `Avatar` has
 //! `status_dot_size/status_inset`).
 //!
-//! What the 54-field `RendererRegistry` *didn't* need was the named
+//! What the 55-field `RendererRegistry` *didn't* need was the named
 //! fields themselves: there is no code that reads `theme.renderers.button`
 //! directly (all call sites go through `with_button` setters and
 //! `get_button` accessors). So the fields are private storage, the
-//! public surface is the 54 `with_<x>` / 54 `get_<x>` method pairs.
+//! public surface is the 55 `with_<x>` / 55 `get_<x>` method pairs.
 
 use std::any::{Any, TypeId};
 use std::collections::HashMap;
@@ -55,6 +55,7 @@ use super::keybinding_display::TokenKeybindingDisplayRenderer;
 use super::keybinding_input::TokenKeybindingInputRenderer;
 use super::label::TokenLabelRenderer;
 use super::list_item::TokenListItemRenderer;
+use super::listbox::TokenListboxRenderer;
 use super::menu::TokenMenuRenderer;
 use super::modal::TokenModalRenderer;
 use super::notification::TokenNotificationRenderer;
@@ -109,6 +110,7 @@ use yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderer;
 use yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderer;
 use yororen_ui_core::renderer::label::LabelRenderer;
 use yororen_ui_core::renderer::list_item::ListItemRenderer;
+use yororen_ui_core::renderer::listbox::ListboxRenderer;
 use yororen_ui_core::renderer::menu::MenuRenderer;
 use yororen_ui_core::renderer::modal::ModalRenderer;
 use yororen_ui_core::renderer::notification::NotificationRenderer;
@@ -164,6 +166,7 @@ use yororen_ui_core::renderer::keybinding_display::KeybindingDisplayRenderState;
 use yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderState;
 use yororen_ui_core::renderer::label::LabelRenderState;
 use yororen_ui_core::renderer::list_item::ListItemRenderState;
+use yororen_ui_core::renderer::listbox::ListboxRenderState;
 use yororen_ui_core::renderer::menu::MenuRenderState;
 use yororen_ui_core::renderer::modal::ModalRenderState;
 use yororen_ui_core::renderer::notification::NotificationRenderState;
@@ -199,7 +202,7 @@ use yororen_ui_core::renderer::virtual_list::VirtualListRenderState;
 /// Collection of component renderers. Looked up at render time by
 /// `XxxRenderState` `TypeId`.
 ///
-/// Public surface: 54 `with_<x>(Arc<dyn XxxRenderer>)` setters + 54
+/// Public surface: 55 `with_<x>(Arc<dyn XxxRenderer>)` setters + 55
 /// `get_<x>() -> Option<&Arc<dyn XxxRenderer>>` accessors. The
 /// underlying HashMap is private.
 #[derive(Clone)]
@@ -258,11 +261,11 @@ impl RendererRegistry {
     /// `with_<x>(...)` line here but forgets to mirror it in `REQUIRED`,
     /// `token_based()` panics with the full list of missing entries
     /// the first time it is called. This is the single coupling point
-    /// between the 54 setters and the 54 `REQUIRED` entries.
+    /// between the 55 setters and the 55 `REQUIRED` entries.
     pub fn token_based() -> Self {
         // Cannot use `Self::default()` here — `default` is implemented
         // as `token_based`, so that would recurse forever. Construct
-        // the empty registry directly and chain the 54 setters.
+        // the empty registry directly and chain the 55 setters.
         let registry = Self {
             map: HashMap::new(),
         }
@@ -304,6 +307,7 @@ impl RendererRegistry {
         .with_form(Arc::new(TokenFormRenderer))
         .with_form_field(Arc::new(TokenFormFieldRenderer))
         .with_list_item(Arc::new(TokenListItemRenderer))
+        .with_listbox(Arc::new(TokenListboxRenderer))
         .with_menu(Arc::new(TokenMenuRenderer))
         .with_overlay(Arc::new(TokenOverlayRenderer))
         .with_radio_group(Arc::new(TokenRadioGroupRenderer))
@@ -327,7 +331,7 @@ impl RendererRegistry {
         registry
     }
 
-    // -- 54 setters (one per component) ---------------------------------
+    // -- 55 setters (one per component) ---------------------------------
     // Each setter preserves the original `with_<x>(Arc<dyn XxxRenderer>)`
     // signature exactly — theme packages and downstream apps call them
     // unchanged. The renderer is stored under
@@ -383,6 +387,7 @@ impl RendererRegistry {
     renderer_setter!(with_form, FormRenderState, FormRenderer);
     renderer_setter!(with_form_field, FormFieldRenderState, FormFieldRenderer);
     renderer_setter!(with_list_item, ListItemRenderState, ListItemRenderer);
+    renderer_setter!(with_listbox, ListboxRenderState, ListboxRenderer);
     renderer_setter!(with_menu, MenuRenderState, MenuRenderer);
     renderer_setter!(with_overlay, OverlayRenderState, OverlayRenderer);
     renderer_setter!(with_radio_group, RadioGroupRenderState, RadioGroupRenderer);
@@ -463,7 +468,7 @@ impl RendererRegistry {
             .and_then(|arc| arc.downcast_ref::<Arc<R>>())
     }
 
-    // -- 54 typed accessors (one per component) -------------------------
+    // -- 55 typed accessors (one per component) -------------------------
     // Each returns `Option<&Arc<dyn XxxRenderer>>`. Components call
     // these in their `RenderOnce::render` body; theme packages and
     // downstream code do not need them (the setter is enough to
@@ -519,6 +524,7 @@ impl RendererRegistry {
     renderer_getter!(get_form, FormRenderState, FormRenderer);
     renderer_getter!(get_form_field, FormFieldRenderState, FormFieldRenderer);
     renderer_getter!(get_list_item, ListItemRenderState, ListItemRenderer);
+    renderer_getter!(get_listbox, ListboxRenderState, ListboxRenderer);
     renderer_getter!(get_menu, MenuRenderState, MenuRenderer);
     renderer_getter!(get_overlay, OverlayRenderState, OverlayRenderer);
     renderer_getter!(get_radio_group, RadioGroupRenderState, RadioGroupRenderer);
@@ -584,7 +590,7 @@ impl RendererRegistry {
         ShortcutHintRenderer
     );
 
-    /// All 54 `(TypeId, "name")` pairs that a complete registry must
+    /// All 55 `(TypeId, "name")` pairs that a complete registry must
     /// contain. Single source of truth for `validate()` and for the
     /// self-check at the end of `token_based()`.
     ///
@@ -631,6 +637,7 @@ impl RendererRegistry {
         (TypeId::of::<FormRenderState>(), "form"),
         (TypeId::of::<FormFieldRenderState>(), "form_field"),
         (TypeId::of::<ListItemRenderState>(), "list_item"),
+        (TypeId::of::<ListboxRenderState>(), "listbox"),
         (TypeId::of::<MenuRenderState>(), "menu"),
         (TypeId::of::<OverlayRenderState>(), "overlay"),
         (TypeId::of::<RadioGroupRenderState>(), "radio_group"),
@@ -658,7 +665,7 @@ impl RendererRegistry {
         (TypeId::of::<ShortcutHintRenderState>(), "shortcut_hint"),
     ];
 
-    /// Verify that this registry contains a renderer for **all** 54
+    /// Verify that this registry contains a renderer for **all** 55
     /// `XxxRenderState` types. Returns `Ok(())` if complete, or
     /// `Err(missing)` listing the names of every absent renderer.
     ///
@@ -713,7 +720,7 @@ fn panic_missing_renderers(registry: &RendererRegistry) -> ! {
         Ok(()) => unreachable!("panic_missing_renderers called on a valid registry"),
         Err(missing) => panic!(
             "RendererRegistry::token_based() is missing {} renderer(s): {}. \
-             This is an internal bug: token_based() must register all 54 components. \
+             This is an internal bug: token_based() must register all 55 components. \
              Please report this as a yororen-ui bug.",
             missing.len(),
             missing.join(", "),
@@ -733,7 +740,7 @@ mod tests {
     use std::any::TypeId;
 
     /// Build a registry that has *only* `ButtonRenderState`
-    /// registered. Used to assert validate() reports the other 53
+    /// registered. Used to assert validate() reports the other 54
     /// as missing.
     fn only_button() -> RendererRegistry {
         let mut map: HashMap<TypeId, Arc<dyn Any + Send + Sync>> = HashMap::new();
@@ -753,8 +760,8 @@ mod tests {
         let err = r.validate().unwrap_err();
         assert_eq!(
             err.len(),
-            54,
-            "expected 54 missing entries, got {}: {:?}",
+            55,
+            "expected 55 missing entries, got {}: {:?}",
             err.len(),
             err
         );
@@ -768,6 +775,7 @@ mod tests {
         assert!(err.contains(&"keybinding_display"));
         assert!(err.contains(&"shortcut_hint"));
         assert!(err.contains(&"uniform_virtual_list"));
+        assert!(err.contains(&"listbox"));
     }
 
     #[test]
@@ -776,8 +784,8 @@ mod tests {
         let err = r.validate().unwrap_err();
         assert_eq!(
             err.len(),
-            53,
-            "expected 53 missing entries, got {}: {:?}",
+            54,
+            "expected 54 missing entries, got {}: {:?}",
             err.len(),
             err
         );
@@ -786,6 +794,7 @@ mod tests {
             "button was registered, must not appear in missing"
         );
         assert!(err.contains(&"text_input"));
+        assert!(err.contains(&"listbox"));
     }
 
     #[test]
@@ -846,7 +855,7 @@ mod tests {
         //
         // The realistic mirror is: rebuild the registry from a
         // `token_based()` snapshot but skip one setter. We do that
-        // by constructing an almost-complete registry (53 of 54) and
+        // by constructing an almost-complete registry (54 of 55) and
         // asking the same code path to validate. Since we can't
         // reuse the production self-check without code duplication,
         // we rely on the `panic_missing_renderers` helper directly

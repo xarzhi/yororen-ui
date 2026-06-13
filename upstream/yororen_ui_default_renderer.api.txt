@@ -137,6 +137,8 @@ pub use yororen_ui_default_renderer::renderers::LabelRenderState
 pub use yororen_ui_default_renderer::renderers::LabelRenderer
 pub use yororen_ui_default_renderer::renderers::ListItemRenderState
 pub use yororen_ui_default_renderer::renderers::ListItemRenderer
+pub use yororen_ui_default_renderer::renderers::ListboxRenderState
+pub use yororen_ui_default_renderer::renderers::ListboxRenderer
 pub use yororen_ui_default_renderer::renderers::MenuRenderState
 pub use yororen_ui_default_renderer::renderers::MenuRenderer
 pub use yororen_ui_default_renderer::renderers::ModalRenderState
@@ -675,6 +677,31 @@ impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::list_
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::list_item::TokenListItemRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::list_item::TokenListItemRenderer
 pub fn yororen_ui_default_renderer::renderers::list_item::arc_list_item<T: yororen_ui_core::renderer::list_item::ListItemRenderer + 'static>(T) -> alloc::sync::Arc<dyn yororen_ui_core::renderer::list_item::ListItemRenderer>
+pub mod yororen_ui_default_renderer::renderers::listbox
+pub use yororen_ui_default_renderer::renderers::listbox::ListboxRenderState
+pub use yororen_ui_default_renderer::renderers::listbox::ListboxRenderer
+pub struct yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+impl yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::bg(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::border_radius(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::disabled_fg(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::fg(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::gap(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::hover_bg(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::min_height(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::padding(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::selected_bg(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::selected_fg(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::listbox::ListboxRenderer for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::compose(&self, &yororen_ui_core::headless::listbox::ListboxProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl core::marker::Freeze for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+impl core::marker::Send for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+impl core::marker::Sync for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+impl core::marker::Unpin for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+pub fn yororen_ui_default_renderer::renderers::listbox::arc_listbox<T: yororen_ui_core::renderer::listbox::ListboxRenderer + 'static>(T) -> alloc::sync::Arc<dyn yororen_ui_core::renderer::listbox::ListboxRenderer>
 pub mod yororen_ui_default_renderer::renderers::menu
 pub use yororen_ui_default_renderer::renderers::menu::MenuRenderState
 pub use yororen_ui_default_renderer::renderers::menu::MenuRenderer
@@ -921,6 +948,7 @@ pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_k
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_keybinding_input(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_label(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::label::LabelRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_list_item(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::list_item::ListItemRenderer>>
+pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_listbox(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::listbox::ListboxRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_menu(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::menu::MenuRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_modal(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::modal::ModalRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_notification(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::notification::NotificationRenderer>>
@@ -977,6 +1005,7 @@ pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_keybinding_input(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_label(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::label::LabelRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_list_item(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::list_item::ListItemRenderer>) -> Self
+pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_listbox(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::listbox::ListboxRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_menu(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::menu::MenuRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_modal(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::modal::ModalRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_notification(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::notification::NotificationRenderer>) -> Self
@@ -1482,6 +1511,7 @@ pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_k
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_keybinding_input(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_label(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::label::LabelRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_list_item(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::list_item::ListItemRenderer>>
+pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_listbox(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::listbox::ListboxRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_menu(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::menu::MenuRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_modal(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::modal::ModalRenderer>>
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::get_notification(&self) -> core::option::Option<&alloc::sync::Arc<dyn yororen_ui_core::renderer::notification::NotificationRenderer>>
@@ -1538,6 +1568,7 @@ pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_keybinding_input(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::keybinding_input::KeybindingInputRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_label(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::label::LabelRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_list_item(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::list_item::ListItemRenderer>) -> Self
+pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_listbox(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::listbox::ListboxRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_menu(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::menu::MenuRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_modal(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::modal::ModalRenderer>) -> Self
 pub fn yororen_ui_default_renderer::renderers::registry::RendererRegistry::with_notification(self, alloc::sync::Arc<dyn yororen_ui_core::renderer::notification::NotificationRenderer>) -> Self
@@ -1963,6 +1994,27 @@ impl core::marker::Unpin for yororen_ui_default_renderer::renderers::list_item::
 impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::list_item::TokenListItemRenderer
 impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::list_item::TokenListItemRenderer
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::list_item::TokenListItemRenderer
+pub struct yororen_ui_default_renderer::renderers::TokenListboxRenderer
+impl yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::bg(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::border_radius(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::disabled_fg(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::fg(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::gap(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::hover_bg(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::min_height(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::geometry::Pixels
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::padding(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> yororen_ui_core::renderer::spec::Edges<gpui::geometry::Pixels>
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::selected_bg(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::selected_fg(&self, &yororen_ui_core::renderer::listbox::ListboxRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla
+impl yororen_ui_core::renderer::listbox::ListboxRenderer for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+pub fn yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer::compose(&self, &yororen_ui_core::headless::listbox::ListboxProps, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl core::marker::Freeze for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+impl core::marker::Send for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+impl core::marker::Sync for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+impl core::marker::Unpin for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+impl core::marker::UnsafeUnpin for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_default_renderer::renderers::listbox::TokenListboxRenderer
 pub struct yororen_ui_default_renderer::renderers::TokenMenuRenderer
 impl yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer
 pub fn yororen_ui_default_renderer::renderers::menu::TokenMenuRenderer::bg(&self, &yororen_ui_core::renderer::menu::MenuRenderState, &yororen_ui_core::theme::Theme) -> gpui::color::Hsla

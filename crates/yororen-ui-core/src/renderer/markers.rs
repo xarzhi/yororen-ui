@@ -8,11 +8,11 @@
 //! `cx.renderer_arc::<markers::Button, dyn ButtonRenderer>()`
 //! to fetch the registered renderer.
 //!
-//! Centralising the 54 markers here (rather than scattering
-//! them across 54 headless modules) keeps the registry API
+//! Centralising the 55 markers here (rather than scattering
+//! them across 55 headless modules) keeps the registry API
 //! in one place and makes "is this component wired up?" a
 //! single-file grep. Third-party components can add their own
-//! marker types next to their headless module — these 54 are
+//! marker types next to their headless module — these 55 are
 //! the built-in set.
 
 use super::registry::RendererMarker;
@@ -65,6 +65,7 @@ marker!(
     Card,
     Form,
     ListItem,
+    Listbox,
     TreeItem,
     KeybindingInput,
     SplitButton,

@@ -11,6 +11,7 @@ use yororen_ui::headless::form::form;
 use yororen_ui::headless::form_field::form_field;
 use yororen_ui::headless::label::label;
 use yororen_ui::headless::list_item::list_item;
+use yororen_ui::headless::listbox::listbox;
 use yororen_ui::headless::radio_group::radio_group;
 use yororen_ui::headless::spacer::spacer;
 use yororen_ui::headless::table::TableColumn;
@@ -72,6 +73,50 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
         );
     }
     let list_wrapped = cell(cx.t("demo.lists.cell_list"), list_col, cx);
+
+    // --- listbox: scrollable single-select with keyboard nav ---
+    // The listbox owns its own `Entity<ListboxState>`; the
+    // shared `ListNavigable` algorithm drives `highlight_next`
+    // / `highlight_prev` (Arrow Down/Up) and the renderer paints
+    // one row per option, marking the highlighted and selected
+    // rows. Click fires `state.pick(value, …)` which writes
+    // `selected_value` itself and then invokes `on_change` — the
+    // callback here ONLY updates the demo's mirror string; we
+    // must NOT touch `listbox_state` again because we're still
+    // inside the `update` that fired `on_change` (gpui panics
+    // with "cannot update … while it is already being updated").
+    let entity_for_lb = cx.entity().clone();
+    app.listbox_state.update(cx, |s, _cx| {
+        s.set_on_change(move |value, _w, cx| {
+            let v = value.to_string();
+            entity_for_lb.update(cx, |s, _cx| {
+                s.listbox_demo_value = v;
+            });
+        });
+    });
+    let lb_label_template = cx.t("demo.lists.listbox_selected").to_string();
+    let lb_selected_text = lb_label_template.replacen(
+        "{}",
+        if app.listbox_demo_value.is_empty() {
+            "—"
+        } else {
+            app.listbox_demo_value.as_str()
+        },
+        1,
+    );
+    let lb_el = listbox("lists-listbox", app.listbox_state.clone()).render(cx);
+    let lb_col = div()
+        .flex()
+        .flex_col()
+        .gap(px(6.))
+        .w(px(240.))
+        .child(lb_el)
+        .child(
+            label("lists-listbox-status", lb_selected_text, cx)
+                .muted(true)
+                .render(cx),
+        );
+    let listbox_wrapped = cell(cx.t("demo.lists.cell_listbox"), lb_col, cx);
 
     // --- form + form_field (with a real text_input + submit button) ---
     let entity_form = cx.entity().clone();
@@ -436,6 +481,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
         .flex_col()
         .gap(px(12.))
         .child(list_wrapped)
+        .child(listbox_wrapped)
         .child(form_wrapped)
         .child(table_wrapped)
         .child(tree_wrapped)

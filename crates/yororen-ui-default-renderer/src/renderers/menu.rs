@@ -34,6 +34,17 @@ impl TokenMenuRenderer {
     pub fn padding(&self, _state: &MenuRenderState, theme: &Theme) -> Pixels {
         px(theme.get_number("tokens.spacing.inset_sm").unwrap_or(4.0) as f32)
     }
+    pub fn min_width(&self, _state: &MenuRenderState, theme: &Theme) -> Pixels {
+        // Floor the menu shell so an `absolute()` panel
+        // (dropdown, popover) cannot collapse below a usable
+        // width. Without this, a flex-col body whose items
+        // don't `.w_full()` shrinks to the widest label, which
+        // can become 1-character-wide if any item happens to be
+        // shorter in the layout context the dropdown panel
+        // inherits. 180 px is the conventional menu width and
+        // matches the brutalism renderer.
+        px(theme.get_number("tokens.control.menu.min_width").unwrap_or(180.0) as f32)
+    }
     pub fn shadow_alpha(&self, _state: &MenuRenderState, _theme: &Theme) -> f32 {
         0.12
     }
@@ -53,6 +64,7 @@ impl MenuRenderer for TokenMenuRenderer {
         let pad = self.padding(&state, theme);
         let alpha = self.shadow_alpha(&state, theme);
         let item_hover = self.item_hover_bg(&state, theme);
+        let min_w = self.min_width(&state, theme);
 
         let items = props.state.read(cx).items.clone();
         let highlighted = props.state.read(cx).highlighted_index;
@@ -74,6 +86,7 @@ impl MenuRenderer for TokenMenuRenderer {
                     };
                     let mut row: Stateful<Div> = div()
                         .id(ElementId::Name(format!("menu-item-{}", i).into()))
+                        .w_full()
                         .px(px(8.0))
                         .py(px(6.0))
                         .rounded(px(4.0))
@@ -96,6 +109,7 @@ impl MenuRenderer for TokenMenuRenderer {
                 DropdownItem::Separator => {
                     let sep = div()
                         .id(ElementId::Name(format!("menu-sep-{}", i).into()))
+                        .w_full()
                         .h(px(1.0))
                         .my(px(2.0))
                         .bg(border);
@@ -105,6 +119,7 @@ impl MenuRenderer for TokenMenuRenderer {
                     let group_label = group.label.to_string();
                     let header = div()
                         .id(ElementId::Name(format!("menu-group-{}", i).into()))
+                        .w_full()
                         .px(px(8.0))
                         .py(px(4.0))
                         .text_color(theme.get_color("content.tertiary").unwrap_or_default())
@@ -117,6 +132,7 @@ impl MenuRenderer for TokenMenuRenderer {
 
         div()
             .id(props.id.clone())
+            .min_w(min_w)
             .bg(bg)
             .border_1()
             .border_color(border)

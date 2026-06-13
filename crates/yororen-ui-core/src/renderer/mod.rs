@@ -44,6 +44,7 @@ pub mod keybinding_display;
 pub mod keybinding_input;
 pub mod label;
 pub mod list_item;
+pub mod listbox;
 pub mod menu;
 pub mod modal;
 pub mod notification;
