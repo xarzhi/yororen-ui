@@ -288,7 +288,7 @@ A custom renderer only needs to implement the 54 `XxxRenderer` traits — it doe
 | **Overlays** | Tooltip, Popover, Modal, Toast, DropdownMenu, Menu, Disclosure, Overlay |
 | **Surfaces** | Panel, Card, Tooltip, Avatar, Image |
 | **Lists / Tables** | ListItem, TreeItem, Tree, Table, Form, FormField, VirtualList, UniformVirtualList |
-| **Interaction** | ToggleButton, SplitButton, ButtonGroup, ShortcutHint, KeybindingDisplay, DragHandle |
+| **Interaction** | ToggleButton, SplitButton, ButtonGroup, ShortcutHint, KeybindingDisplay |
 
 ### Icons
 

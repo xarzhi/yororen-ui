@@ -288,7 +288,7 @@ headless 组件  ──▶  主题（JSON）  ──▶  渲染器（视觉）
 | **浮层** | Tooltip, Popover, Modal, Toast, DropdownMenu, Menu, Disclosure, Overlay |
 | **表面** | Panel, Card, Tooltip, Avatar, Image |
 | **列表 / 表格** | ListItem, TreeItem, Tree, Table, Form, FormField, VirtualList, UniformVirtualList |
-| **交互** | ToggleButton, SplitButton, ButtonGroup, ShortcutHint, KeybindingDisplay, DragHandle |
+| **交互** | ToggleButton, SplitButton, ButtonGroup, ShortcutHint, KeybindingDisplay |
 
 ### 图标
 
