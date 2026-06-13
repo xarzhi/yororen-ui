@@ -84,6 +84,14 @@ struct Extracted {
     factory: String,
     extra_args: Vec<ExtraArgInfo>,
     needs_app: bool,
+    /// Whether the leaf's `render` method needs a
+    /// `&mut Window` argument. Detected by inspecting
+    /// the headless source: a render signature of
+    /// `fn render(self, ..., &mut Window)` sets this
+    /// to `true`. The schema codegen uses it to decide
+    /// whether to thread `&mut *window` into the
+    /// emitted `.render(...)` call.
+    needs_window: bool,
     render: RenderKind,
     props: Vec<PropInfo>,
     events: Vec<(String, String)>,
@@ -316,6 +324,7 @@ fn override_to_extracted(o: &OverrideEntry) -> Option<Extracted> {
                 factory: String::new(),
                 extra_args: vec![],
                 needs_app: false,
+                needs_window: false,
                 render: RenderKind::Compose,
                 props: vec![],
                 events: vec![],
@@ -355,6 +364,7 @@ fn extract(ast: &syn::File, module_name: &str) -> Result<Option<Extracted>, Stri
     let mut props = Vec::new();
     let mut events = Vec::new();
     let mut render = RenderKind::Compose;
+    let mut needs_window = false;
     let mut supports_text_child = false;
     let mut notes = Vec::new();
 
@@ -369,6 +379,19 @@ fn extract(ast: &syn::File, module_name: &str) -> Result<Option<Extracted>, Stri
                 // handled separately or are public-internal.
                 if name == "render" {
                     render = RenderKind::Default;
+                    // Inspect the render signature for a
+                    // `&mut Window` arg. The signature
+                    // shape is one of:
+                    //   fn render(self, cx: &App) -> ...
+                    //   fn render(self, cx: &mut App) -> ...
+                    //   fn render(self, cx: &mut App,
+                    //             window: &mut Window) -> ...
+                    // We treat the presence of any
+                    // `&mut Window` arg (in the last 1
+                    // or 2 positions) as a signal.
+                    if render_takes_window(&method.sig) {
+                        needs_window = true;
+                    }
                     continue;
                 }
                 if name == "apply" {
@@ -456,12 +479,47 @@ fn extract(ast: &syn::File, module_name: &str) -> Result<Option<Extracted>, Stri
         factory: format!("::yororen_ui::headless::{}::{}", module_name, module_name),
         extra_args,
         needs_app,
+        needs_window,
         render,
         props,
         events,
         supports_text_child,
         notes,
     }))
+}
+
+/// Inspect a render signature for the presence of a
+/// `&mut Window` argument. We only need a rough
+/// heuristic — the standard shapes are
+/// `fn render(self, cx: &App)`,
+/// `fn render(self, cx: &mut App)`, and
+/// `fn render(self, cx: &mut App, window: &mut Window)`.
+/// The 4-arg `on_toggle` callback shape is not
+/// relevant here (it's an event, not the render fn).
+///
+/// We treat any `&mut Window` arg in the last 1-2
+/// positions as a signal — false positives are
+/// caught by the rustc compile, so an overly broad
+/// heuristic is acceptable.
+fn render_takes_window(sig: &Signature) -> bool {
+    sig.inputs
+        .iter()
+        .filter_map(|arg| match arg {
+            syn::FnArg::Typed(t) => Some(&*t.ty),
+            syn::FnArg::Receiver(_) => None,
+        })
+        .rev()
+        .take(2)
+        .any(|ty| is_mut_window_ty(ty))
+}
+
+fn is_mut_window_ty(ty: &syn::Type) -> bool {
+    let s = ty.to_token_stream().to_string();
+    // Match `&mut Window` or `&mut gpui :: Window`
+    // (we don't bother with the exact path).
+    s.replace(' ', "") == "&mutWindow"
+        || s.contains("&mutgpui::Window")
+        || s.contains("&mutWindow")
 }
 
 fn find_factory<'a>(ast: &'a syn::File, name: &str) -> Option<&'a ItemFn> {
@@ -818,6 +876,7 @@ fn render_kind(e: &Extracted) -> String {
          \x20\x20\x20\x20        extra_args: &[{}],\n\
          \x20\x20\x20\x20        render: {},\n\
          \x20\x20\x20\x20        needs_app: {},\n\
+         \x20\x20\x20\x20        needs_window: {},\n\
          \x20\x20\x20\x20        props: &[{}],\n\
          \x20\x20\x20\x20        events: &[{}],\n\
          \x20\x20\x20\x20        supports_text_child: {},\n\
@@ -826,6 +885,7 @@ fn render_kind(e: &Extracted) -> String {
         render_extra_args(&e.extra_args),
         mode,
         e.needs_app,
+        e.needs_window,
         render_props(&e.props),
         render_events(&e.events),
         e.supports_text_child,

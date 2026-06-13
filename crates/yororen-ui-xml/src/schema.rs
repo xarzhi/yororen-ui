@@ -93,6 +93,15 @@ pub struct LeafDef {
     /// for factories that don't need an app context (e.g. the
     /// newer text_input that mints state internally).
     pub needs_app: bool,
+    /// Whether the leaf's `render` method needs a
+    /// `&mut Window` argument. The macro passes
+    /// `&mut *window` from the enclosing scope when
+    /// this is set; otherwise it omits the second
+    /// arg. Set to `true` for `TextInput` (and any
+    /// future headless component whose render
+    /// signature is `fn render(self, cx: &mut App,
+    /// window: &mut Window)`).
+    pub needs_window: bool,
     /// Prop vocabulary: (xml_attr, builder_method, value_transform).
     pub props: &'static [PropDef],
     /// Event vocabulary: (xml_attr like `"on_click"`, builder_method).
@@ -252,6 +261,7 @@ pub static BUILTINS: &[ComponentDef] = &[
             extra_args: &[],
             render: RenderMode::Default,
             needs_app: true,
+            needs_window: false,
             props: &[
                 PropDef {
                     name: "caption",
@@ -375,6 +385,7 @@ pub static BUILTINS: &[ComponentDef] = &[
             }],
             render: RenderMode::Default,
             needs_app: true,
+            needs_window: false,
             props: &[
                 PropDef {
                     name: "strong",

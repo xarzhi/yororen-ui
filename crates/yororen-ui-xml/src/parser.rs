@@ -736,8 +736,3 @@ fn strip_brace_expression(s: &str) -> (Option<String>, String) {
         (None, s.to_string())
     }
 }
-
-// Avoid the dead-code lint while keeping the helper for later
-// use (it can later learn to parse the attribute *position*).
-#[allow(dead_code)]
-fn _mark_used(_: fn(roxmltree::Attribute, Span) -> Span) {}

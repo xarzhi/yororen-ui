@@ -47,7 +47,7 @@
 //! `.read(cx)` etc. afterwards.
 
 use proc_macro2::{Span, TokenStream};
-use quote::{ToTokens, TokenStreamExt, format_ident, quote};
+use quote::{TokenStreamExt, format_ident, quote};
 
 use crate::ast::{AstAttribute, AstElement, AstNode};
 use crate::error::{XmlError, XmlErrorKind};
@@ -647,17 +647,14 @@ fn codegen_leaf(
     // 4. Apply render mode.
     match def.render {
         RenderMode::Default => {
-            // The render method typically takes `(&App)`;
-            // a few components (e.g. `TextInput`) also
-            // need a `&mut Window`. We detect the latter
-            // by the factory path — a hardcoded but
-            // small list. A future revision can move
-            // this to a schema flag.
-            let needs_window = def.factory.contains("text_input");
-            if needs_window {
-                // Both `cx` and `window` are expected as
-                // `&mut App` / `&mut Window` by the
-                // TextInput render signature.
+            // The render method typically takes `(&App)`; a
+            // few components (e.g. `TextInput`) also
+            // need a `&mut Window`. The schema's
+            // `needs_window` flag tells us which.
+            if def.needs_window {
+                // Both `cx` and `window` are expected
+                // as `&mut App` / `&mut Window` by the
+                // renderer's `render` signature.
                 tokens.append_all(quote! { .render(&mut *#cx, &mut *window) });
             } else {
                 let app_ref = quote! { &*#cx };
@@ -1782,18 +1779,6 @@ fn wrap_event_with_modifiers(
     Ok(wrapped)
 }
 
-/// Map a shorthand attribute name (e.g. `gap_3`, `p_4`,
-/// `flex`, `col`) to the corresponding gpui `Styled` method
-/// name. Returns `None` if the name isn't a known shorthand.
-#[allow(dead_code)]
-fn expand_shorthand_method(name: &str) -> Option<String> {
-    if is_known_shorthand_method(name) || is_spacing_shorthand(name) {
-        Some(name.to_string())
-    } else {
-        None
-    }
-}
-
 #[cfg(test)]
 mod tests {
     //! End-to-end tests for the codegen. Each test runs the
@@ -2678,19 +2663,5 @@ mod tests {
                 "tag {tag:?} should be in BUILTINS_OVERRIDES"
             );
         }
-    }
-}
-
-#[allow(dead_code)]
-fn _reserved_marker(name: &str) -> bool {
-    crate::schema::RESERVED_ATTRS.contains(&name)
-}
-
-// Keep `Element` from going unused (it's handy for future
-// validation of `let:`-style attrs).
-impl ToTokens for AstElement {
-    fn to_tokens(&self, _tokens: &mut TokenStream) {
-        // Intentionally left blank — `AstElement` is consumed
-        // directly by the codegen arms, not via `quote!`.
     }
 }
