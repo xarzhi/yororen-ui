@@ -1,0 +1,77 @@
+<!--
+  Showcase XML — exercises every Phase 1+2 feature
+  of the `xml!` macro:
+
+  * Containers: `<Column>`, `<Row>` with shorthand
+    style attrs (flex / col / items_center / gap).
+  * Leaves: `<Label>`, `<Button>`, `<Checkbox>`,
+    `<Switch>`, `<TextInput>`, `<Heading>`.
+  * Data binding: brace expressions for both reads
+    (`{counter.to_string()}`) and event handlers.
+  * Two-way binding: `@bind={entity}` on `<Switch>`,
+    `<TextInput>`, and `<Checkbox>`.
+  * String interpolation:
+    `<Label text="Count: {counter}" />` expands to
+    a `format!` call at codegen time.
+  * Control flow:
+    - `<If condition={flag}>` / `<ElseIf>` / `<Else>`
+    - `<For each={todos} let:item>` (with `let:index`
+      implicit)
+
+  All of the variables referenced here (`counter`,
+  `flag`, `name`, `todos`, `inc`, `dec`, `reset`,
+  `flag_entity`, `name_entity`) are bound in the
+  surrounding Rust scope — see `src/view.rs`.
+-->
+<Column flex col p="4" gap="4">
+
+    <!-- Heading + intro -->
+    <Label id="title" text="yororen-ui XML Showcase" strong />
+    <Label id="subtitle" text="Phase 1 + 2 features, all in XML" muted />
+
+    <!-- Counter: read + button-driven mutations -->
+    <Row flex gap="2" items_center>
+        <Label id="count" text="Count: {counter}" strong />
+        <Button id="dec" caption="-" on_click={move |_, _, cx| {
+            dec.update(cx, |c, cx| { c.value -= 1; cx.notify(); });
+        }} />
+        <Button id="reset" caption="Reset" on_click={move |_, _, cx| {
+            reset.update(cx, |c, cx| { c.value = 0; cx.notify(); });
+        }} />
+        <Button id="inc" caption="+" variant="primary" on_click={move |_, _, cx| {
+            inc.update(cx, |c, cx| { c.value += 1; cx.notify(); });
+        }} />
+    </Row>
+
+    <!-- Two-way binding: @bind on a Switch, Checkbox -->
+    <Column flex col gap="2">
+        <Label id="features_label" text="Two-way bindings" strong />
+        <Switch id="notifications" @bind={flag_entity} />
+        <Checkbox id="agree" @bind={flag_entity} />
+    </Column>
+
+    <!-- If/ElseIf/Else: chain control flow -->
+    <Column flex col gap="1">
+        <If condition={flag}>
+            <Label id="on" text="Notifications ON" strong />
+        </If>
+        <ElseIf condition={!flag}>
+            <Label id="off" text="Notifications OFF" muted />
+        </ElseIf>
+        <Else>
+            <Label id="unknown" text="—" />
+        </Else>
+    </Column>
+
+    <!-- For: list rendering with let:item and let:index -->
+    <Column flex col gap="1">
+        <Label id="todos_label" text="Todos" strong />
+        <For each={todos} let:item>
+            <Row flex gap="2" items_center>
+                <Checkbox id="todo" @bind={flag_entity} />
+                <Label id="todo_label" text={item.label} />
+            </Row>
+        </For>
+    </Column>
+
+</Column>

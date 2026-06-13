@@ -31,6 +31,11 @@ pub use yororen_ui_default_renderer::renderers::button::ActionVariantKind;
 #[cfg(feature = "brutalism")]
 pub use yororen_ui_brutalism_renderer as brutalism_renderer;
 
+#[cfg(feature = "xml")]
+pub use yororen_ui_xml as xml;
+#[cfg(feature = "xml")]
+pub use yororen_ui_xml_macro::{xml, xml_file};
+
 pub use yororen_ui_locale_ar as locale_ar;
 pub use yororen_ui_locale_en as locale_en;
 pub use yororen_ui_locale_zh_cn as locale_zh_cn;

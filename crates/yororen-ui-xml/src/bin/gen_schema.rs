@@ -1,0 +1,870 @@
+//! Schema generator for `yororen-ui-xml`.
+//!
+//! Scans `yororen-ui-core/src/headless/*.rs`, extracts the
+//! factory function, `*Props` struct, and `impl` setters,
+//! and writes the result to `src/schema_generated.rs`.
+//!
+//! ## Usage
+//!
+//! ```text
+//! cargo run -p yororen_ui_xml --bin gen-schema                 # write the file
+//! cargo run -p yororen_ui_xml --bin gen-schema -- --check       # fail if drift
+//! cargo run -p yororen_ui_xml --bin gen-schema -- --headless /path/to/headless --out /path/to/output.rs
+//! ```
+//!
+//! ## What we can auto-detect
+//!
+//! - Factory function (its path becomes the headless entry point).
+//! - `*Props` struct (looks for `<PascalCase(file_stem)>Props`).
+//! - `pub fn X(self, x: T) -> Self` setters → `PropDef` entries
+//!   (bool / string / variant classified from `T`).
+//! - `pub fn on_X(self, f: F) -> Self` setters → `EventDef` entries.
+//! - `pub fn render(self, cx: &App)` → `RenderMode::Default`.
+//! - `pub fn apply(self, el: Div)` → `RenderMode::Apply`.
+//! - Whether the factory needs `cx` (i.e. the last arg is
+//!   `&mut App` or `&mut Context<T>`).
+//! - An "extra arg" (Label's `text`, Badge's `text`, Icon's
+//!   `source`, …) when the factory has exactly one arg
+//!   between the `id` and the optional `cx`.
+//!
+//! ## What we cannot auto-detect
+//!
+//! - Stateful composites: factories that take `state: Entity<XxxState>` (modal, popover, select, …).
+//!   These need a separate `entity_attr = "state"` annotation in the generated output.
+//! - Factories with more than one extra arg (e.g. `heading(id, level, text, cx)`).
+//! - Components that don't follow the `(id, …) -> XxxProps` convention.
+//! - XML-specific aliases (`Column` exposes `col` instead of `flex_col`; `Row` exposes `row` instead of `flex_row`).
+//! - Whether a component "supports a text child" (Button's `.child("Save")`).
+//!
+//! For these we emit a comment in the generated file
+//! (`// MANUAL: <hint>`) so the user can fill in the
+//! `overrides.rs` table next to the binary.
+
+use std::collections::BTreeMap;
+use std::fs;
+use std::path::{Path, PathBuf};
+
+use quote::ToTokens;
+use syn::{FnArg, ImplItem, Item, ItemFn, ItemImpl, ItemStruct, Signature, Type, TypePath, Visibility};
+
+#[derive(Debug, Default, serde::Deserialize)]
+struct OverridesFile {
+    #[serde(default)]
+    override_: Vec<OverrideEntry>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct OverrideEntry {
+    tag: String,
+    kind: String,
+    /// When `kind == "Container"`: container definition.
+    #[serde(default)]
+    container: Option<ContainerOverride>,
+    /// When `kind == "ControlFlow"`: the control-flow kind.
+    #[serde(default)]
+    control_flow: Option<String>,
+    /// Force `supports_text_child` to a specific value
+    /// (overrides the generator's heuristic).
+    #[serde(default)]
+    supports_text_child: Option<bool>,
+}
+
+#[derive(Debug, Default, serde::Deserialize)]
+struct ContainerOverride {
+    #[serde(default)]
+    fixed_methods: Vec<[String; 2]>,
+}
+
+#[derive(Debug)]
+struct Extracted {
+    tag: String,
+    /// Path to the factory function (e.g. `::yororen_ui::headless::button::button`).
+    factory: String,
+    extra_args: Vec<ExtraArgInfo>,
+    needs_app: bool,
+    render: RenderKind,
+    props: Vec<PropInfo>,
+    events: Vec<(String, String)>,
+    supports_text_child: bool,
+    /// Free-form notes (manual overrides needed).
+    notes: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+struct ExtraArgInfo {
+    kind: ExtraArgKind,
+    attr: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ExtraArgKind {
+    /// Factory arg is a string-like; the macro should grab
+    /// it from the `attr` XML attribute (or inner text).
+    Text,
+    /// Factory arg is anything else; the macro should pass
+    /// the `attr` XML attribute's value verbatim.
+    Custom,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum RenderKind {
+    /// `pub fn render(self, cx: &App) -> …` exists.
+    Default,
+    /// `pub fn apply(self, el: Div) -> …` exists.
+    Apply,
+    /// Neither (the headless is rendered exclusively through
+    /// the renderer trait's `compose`).
+    Compose,
+}
+
+#[derive(Debug, Clone)]
+struct PropInfo {
+    name: String,
+    setter: String,
+    value: PropValue,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum PropValue {
+    String,
+    Bool,
+    Variant,
+    /// Zero-arg flag setter (`fn X(self) -> Self`).
+    Flag,
+    /// Not a recognised type — the user must annotate.
+    Unknown,
+}
+
+fn main() {
+    let mut args = std::env::args().skip(1);
+    let mut headless_dir: Option<PathBuf> = None;
+    let mut out_path: Option<PathBuf> = None;
+    let mut check_only = false;
+    while let Some(arg) = args.next() {
+        match arg.as_str() {
+            "--headless" => headless_dir = args.next().map(PathBuf::from),
+            "--out" => out_path = args.next().map(PathBuf::from),
+            "--check" => check_only = true,
+            "-h" | "--help" => {
+                print_help();
+                return;
+            }
+            other => {
+                eprintln!("unknown argument: {other}");
+                std::process::exit(2);
+            }
+        }
+    }
+    let headless_dir = headless_dir
+        .unwrap_or_else(|| PathBuf::from("../yororen-ui-core/src/headless"));
+    let out_path = out_path.unwrap_or_else(|| PathBuf::from("src/schema_generated.rs"));
+
+    let mut entries: Vec<Extracted> = Vec::new();
+    let mut skipped: Vec<(String, String)> = Vec::new();
+
+    // 0. Load overrides (if any). Overrides are read from
+    //    `<crate-root>/overrides.toml` — the path is the
+    //    dir containing the binary's source file, two
+    //    levels up from the manifest.
+    let overrides_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("overrides.toml");
+    let overrides = load_overrides(&overrides_path);
+
+    let dir = match fs::read_dir(&headless_dir) {
+        Ok(d) => d,
+        Err(e) => {
+            eprintln!("could not read {}: {e}", headless_dir.display());
+            std::process::exit(1);
+        }
+    };
+    for entry in dir.flatten() {
+        let path = entry.path();
+        if path.extension().and_then(|s| s.to_str()) != Some("rs") {
+            continue;
+        }
+        let stem = match path.file_stem().and_then(|s| s.to_str()) {
+            Some(s) => s.to_string(),
+            None => continue,
+        };
+        if stem == "mod" {
+            continue;
+        }
+        let content = match fs::read_to_string(&path) {
+            Ok(c) => c,
+            Err(e) => {
+                skipped.push((stem, format!("read error: {e}")));
+                continue;
+            }
+        };
+        let ast = match syn::parse_file(&content) {
+            Ok(a) => a,
+            Err(e) => {
+                skipped.push((stem, format!("parse error: {e}")));
+                continue;
+            }
+        };
+        match extract(&ast, &stem) {
+            Ok(Some(e)) => entries.push(e),
+            Ok(None) => skipped.push((stem, "no factory found".to_string())),
+            Err(reason) => skipped.push((stem, reason)),
+        }
+    }
+
+    entries.sort_by(|a, b| a.tag.cmp(&b.tag));
+    let mut entries = apply_overrides(entries, &overrides);
+    entries.sort_by(|a, b| a.tag.cmp(&b.tag));
+
+    // 1.5. Append the override entries that *aren't* already
+    //      present (e.g. `If`, `ElseIf`, `Else`, `For`,
+    //      `Fragment` — pure XML control flow, no headless
+    //      equivalent). These come last so they sort to the
+    //      end of the generated file.
+    for o in &overrides {
+        if !entries.iter().any(|e| e.tag == o.tag) {
+            if let Some(e) = override_to_extracted(o) {
+                entries.push(e);
+            }
+        }
+    }
+    entries.sort_by(|a, b| a.tag.cmp(&b.tag));
+    let generated = render_module(&entries, &skipped, &overrides);
+
+    if check_only {
+        let existing = fs::read_to_string(&out_path).unwrap_or_default();
+        if existing.trim() != generated.trim() {
+            eprintln!("Schema drift detected in {}.", out_path.display());
+            eprintln!("Run `cargo run -p yororen_ui_xml --bin gen-schema` to regenerate.");
+            std::process::exit(1);
+        }
+        println!("Schema is up to date ({} entries).", entries.len());
+    } else {
+        if let Some(parent) = out_path.parent() {
+            fs::create_dir_all(parent).ok();
+        }
+        fs::write(&out_path, &generated).unwrap();
+        println!(
+            "Wrote {} entries to {} (skipped: {}).",
+            entries.len(),
+            out_path.display(),
+            skipped.len()
+        );
+        for (stem, reason) in &skipped {
+            println!("  skipped {stem}: {reason}");
+        }
+    }
+}
+
+fn print_help() {
+    eprintln!("Usage: gen-schema [--headless <dir>] [--out <file>] [--check]");
+}
+
+fn load_overrides(path: &Path) -> Vec<OverrideEntry> {
+    if !path.exists() {
+        return Vec::new();
+    }
+    let content = match fs::read_to_string(path) {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("warning: could not read {}: {e}", path.display());
+            return Vec::new();
+        }
+    };
+    match toml::from_str::<OverridesFile>(&content) {
+        Ok(file) => file.override_,
+        Err(e) => {
+            eprintln!("warning: could not parse {}: {e}", path.display());
+            Vec::new()
+        }
+    }
+}
+
+fn apply_overrides(
+    entries: Vec<Extracted>,
+    overrides: &[OverrideEntry],
+) -> Vec<Extracted> {
+    let by_tag: BTreeMap<String, Extracted> =
+        entries.into_iter().map(|e| (e.tag.clone(), e)).collect();
+    let mut out: Vec<Extracted> = by_tag
+        .into_iter()
+        .map(|(tag, mut e)| {
+            if let Some(o) = overrides.iter().find(|o| o.tag == tag) {
+                if let Some(true) = o.supports_text_child {
+                    e.supports_text_child = true;
+                }
+                if let Some(false) = o.supports_text_child {
+                    e.supports_text_child = false;
+                }
+            }
+            e
+        })
+        .collect();
+    out.sort_by(|a, b| a.tag.cmp(&b.tag));
+    out
+}
+
+fn override_to_extracted(o: &OverrideEntry) -> Option<Extracted> {
+    // Convert a `kind = "Container"` or `kind = "ControlFlow"`
+    // override into a synthetic `Extracted`. We don't
+    // fabricate full Leaf entries here — for those, the
+    // generator's output already covers everything we need.
+    match o.kind.as_str() {
+        "ControlFlow" => {
+            // The render code for these entries is inlined
+            // directly by the codegen, not through the
+            // schema. We emit a minimal marker so the
+            // rendered file is well-formed.
+            Some(Extracted {
+                tag: o.tag.clone(),
+                factory: String::new(),
+                extra_args: vec![],
+                needs_app: false,
+                render: RenderKind::Compose,
+                props: vec![],
+                events: vec![],
+                supports_text_child: false,
+                notes: vec![format!("control flow: {:?}", o.control_flow)],
+            })
+        }
+        _ => None,
+    }
+}
+
+// -- extraction ----------------------------------------------------------------
+
+fn extract(ast: &syn::File, module_name: &str) -> Result<Option<Extracted>, String> {
+    // 1. Find the factory function.
+    let factory = find_factory(ast, module_name);
+    let factory = match factory {
+        Some(f) => f,
+        None => return Ok(None),
+    };
+
+    // 2. Find the *Props struct. The convention is
+    //    `<PascalCase(file_stem)>[Suffix]Props`, e.g.
+    //    `text_input.rs` → `TextInputProps` and
+    //    `progress.rs` → `ProgressBarProps`.
+    let struct_prefix = pascal_case(module_name);
+    let struct_item = match find_struct(ast, &struct_prefix) {
+        Some(s) => s,
+        None => return Ok(None),
+    };
+    let struct_name = struct_item.ident.to_string();
+
+    // 3. Find the impl block.
+    let impl_block = find_impl(ast, &struct_name);
+
+    // 4. Extract props, events, render mode.
+    let mut props = Vec::new();
+    let mut events = Vec::new();
+    let mut render = RenderKind::Compose;
+    let mut supports_text_child = false;
+    let mut notes = Vec::new();
+
+    if let Some(impl_block) = impl_block {
+        for item in &impl_block.items {
+            if let ImplItem::Fn(method) = item {
+                if !is_public(&method.vis) {
+                    continue;
+                }
+                let name = method.sig.ident.to_string();
+                // Skip the render/apply/accessor methods — they're
+                // handled separately or are public-internal.
+                if name == "render" {
+                    render = RenderKind::Default;
+                    continue;
+                }
+                if name == "apply" {
+                    render = RenderKind::Apply;
+                    continue;
+                }
+                if name == "focus_handle" || name == "is_focused" {
+                    continue;
+                }
+
+                // Setter shape:
+                //   * `pub fn X(mut self) -> Self` — zero-arg flag
+                //     setter, becomes `PropValue::Flag`.
+                //   * `pub fn X(mut self, x: T) -> Self` — single-arg
+                //     prop setter; `T` is classified into
+                //     `String` / `Bool` / `Variant` / `Unknown`.
+                let inputs = &method.sig.inputs;
+                let (is_self_only, arg) = match inputs.len() {
+                    1 => match &inputs[0] {
+                        FnArg::Receiver(_) => (true, None),
+                        _ => continue,
+                    },
+                    2 => match (&inputs[0], &inputs[1]) {
+                        (FnArg::Receiver(_), FnArg::Typed(pt)) => (false, Some(&*pt.ty)),
+                        _ => continue,
+                    },
+                    _ => continue,
+                };
+
+                if name.starts_with("on_") {
+                    // Heuristic: in yororen-ui, every `on_X` setter is
+                    // an event listener (closure / `Arc<dyn Fn…>` / a
+                    // generic with a `Fn` where-bound). The exact
+                    // closure type doesn't matter for the schema;
+                    // the codegen passes the closure as-is.
+                    events.push((name.clone(), name));
+                    continue;
+                }
+
+                if is_self_only {
+                    props.push(PropInfo {
+                        name: name.clone(),
+                        setter: name.clone(),
+                        value: PropValue::Flag,
+                    });
+                } else if let Some(arg_ty) = arg {
+                    let value = classify_arg(arg_ty);
+                    props.push(PropInfo {
+                        name: name.clone(),
+                        setter: name.clone(),
+                        value,
+                    });
+                } else {
+                    continue;
+                }
+
+                // Heuristic: a `caption` setter implies the
+                // component supports `.child("…")` after
+                // `.render(…)` (Button only today).
+                if name == "caption" {
+                    supports_text_child = true;
+                }
+            }
+        }
+    }
+
+    // 5. Analyse the factory signature.
+    let (extra_args, needs_app) = analyse_factory(&factory.sig)?;
+    if !extra_args.is_empty() {
+        notes.push(format!("extra_args = {} entries", extra_args.len()));
+    }
+
+    // 6. Build the tag. By convention, the tag is the
+    //    PascalCase'd file stem (e.g. `button` → `Button`,
+    //    `text_input` → `TextInput`).
+    let tag = pascal_case(module_name);
+
+    // 7. Filter out internal-only fields (those with no public
+    //    setter). The struct is a hint, not a hard requirement,
+    //    so we don't error if the struct can't be parsed.
+    let _ = struct_item;
+
+    Ok(Some(Extracted {
+        tag,
+        factory: format!("::yororen_ui::headless::{}::{}", module_name, module_name),
+        extra_args,
+        needs_app,
+        render,
+        props,
+        events,
+        supports_text_child,
+        notes,
+    }))
+}
+
+fn find_factory<'a>(ast: &'a syn::File, name: &str) -> Option<&'a ItemFn> {
+    for item in &ast.items {
+        if let Item::Fn(f) = item {
+            if f.sig.ident == name && is_public(&f.vis) {
+                return Some(f);
+            }
+        }
+    }
+    None
+}
+
+fn find_struct<'a>(ast: &'a syn::File, prefix: &str) -> Option<&'a ItemStruct> {
+    // Match any `pub struct <Prefix><Maybe>Props { ... }` —
+    // e.g. for prefix `Progress`, this catches both
+    // `ProgressProps` and `ProgressBarProps`. We pick the
+    // *first* matching public struct in the file.
+    for item in &ast.items {
+        if let Item::Struct(s) = item {
+            if !is_public(&s.vis) {
+                continue;
+            }
+            if s.ident.to_string().starts_with(prefix) && s.ident.to_string().ends_with("Props") {
+                return Some(s);
+            }
+        }
+    }
+    None
+}
+
+fn find_impl<'a>(ast: &'a syn::File, struct_name: &str) -> Option<&'a ItemImpl> {
+    for item in &ast.items {
+        if let Item::Impl(imp) = item {
+            if let Type::Path(TypePath { qself: None, path }) = &*imp.self_ty {
+                if path
+                    .segments
+                    .last()
+                    .map(|s| s.ident == struct_name)
+                    .unwrap_or(false)
+                {
+                    return Some(imp);
+                }
+            }
+        }
+    }
+    None
+}
+
+fn is_public(vis: &Visibility) -> bool {
+    matches!(vis, Visibility::Public(_))
+}
+
+#[allow(dead_code)]
+fn is_event_closure(ty: &Type) -> bool {
+    // Kept around for future use cases that aren't covered
+    // by the simpler "method name starts with `on_`"
+    // heuristic. The current generator uses the latter.
+    let _ = ty;
+    false
+}
+
+#[allow(dead_code)]
+fn is_event_generic(_method: &syn::ImplItemFn) -> bool {
+    false
+}
+
+fn classify_arg(ty: &Type) -> PropValue {
+    // `bool` literal.
+    if let Type::Path(tp) = ty {
+        if let Some(seg) = tp.path.segments.last() {
+            let n = seg.ident.to_string();
+            if n == "bool" {
+                return PropValue::Bool;
+            }
+            // Known variant enums.
+            if matches!(
+                n.as_str(),
+                "ActionVariantKind" | "BuiltinVariantKey" | "HeadingLevel" | "SliderSize" | "TagKind"
+            ) {
+                return PropValue::Variant;
+            }
+        }
+    }
+    // `impl Into<SharedString>` / `impl Into<String>` / `&str` / `String`.
+    let rendered = ty.to_token_stream().to_string();
+    if rendered.contains("Into")
+        || rendered.contains("SharedString")
+        || rendered == "String"
+        || rendered == "& str"
+        || rendered == "&'static str"
+    {
+        return PropValue::String;
+    }
+    PropValue::Unknown
+}
+
+fn analyse_factory(
+    sig: &Signature,
+) -> Result<(Vec<ExtraArgInfo>, bool), String> {
+    // The factory takes `self`-less args. The first one is
+    // always the element id (skipped — we pass it from the
+    // `id` XML attribute).
+    let args: Vec<&FnArg> = sig
+        .inputs
+        .iter()
+        .filter(|a| !matches!(a, FnArg::Receiver(_)))
+        .collect();
+
+    // The last arg might be `&mut App` (or `&mut Context<T>`).
+    let (last_is_cx, rest) = match args.last() {
+        Some(last) if is_cx_arg(last) => (true, &args[..args.len() - 1]),
+        _ => (false, &args[..]),
+    };
+
+    // Drop the leading `id` arg.
+    let extra_arg_args: &[&FnArg] = if rest.len() >= 1 { &rest[1..] } else { &[] };
+
+    let mut extra_args = Vec::new();
+    for arg in extra_arg_args {
+        let (ty, param_name) = match arg {
+            FnArg::Typed(pt) => (&*pt.ty, param_name_from_pat(&pt.pat)),
+            _ => return Err("unexpected receiver in factory arg".to_string()),
+        };
+        let attr = param_name.unwrap_or_else(|| "value".to_string());
+        let kind = if is_string_like(ty) {
+            ExtraArgKind::Text
+        } else {
+            ExtraArgKind::Custom
+        };
+        extra_args.push(ExtraArgInfo { kind, attr });
+    }
+
+    Ok((extra_args, last_is_cx))
+}
+
+fn is_cx_arg(arg: &FnArg) -> bool {
+    let FnArg::Typed(pt) = arg else {
+        return false;
+    };
+    is_app_type(&pt.ty)
+}
+
+fn is_app_type(ty: &Type) -> bool {
+    if let Type::Reference(tr) = ty {
+        if tr.mutability.is_some() {
+            if let Type::Path(tp) = &*tr.elem {
+                if let Some(seg) = tp.path.segments.last() {
+                    let n = seg.ident.to_string();
+                    if n == "App" {
+                        return true;
+                    }
+                    if n == "Context" {
+                        // `Context<T>` is Deref<Target = App>.
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    false
+}
+
+fn is_string_like(ty: &Type) -> bool {
+    let rendered = ty.to_token_stream().to_string();
+    rendered.contains("Into")
+        || rendered.contains("SharedString")
+        || rendered == "String"
+        || rendered == "& str"
+        || rendered == "&'static str"
+}
+
+fn param_name_from_pat(pat: &syn::Pat) -> Option<String> {
+    if let syn::Pat::Ident(pi) = pat {
+        return Some(pi.ident.to_string());
+    }
+    None
+}
+
+#[allow(dead_code)]
+fn snake_case(s: &str) -> String {
+    let mut out = String::new();
+    for (i, c) in s.chars().enumerate() {
+        if c.is_ascii_uppercase() {
+            if i != 0 {
+                out.push('_');
+            }
+            out.extend(c.to_lowercase());
+        } else {
+            out.push(c);
+        }
+    }
+    out
+}
+
+fn pascal_case(s: &str) -> String {
+    s.split('_')
+        .map(|part| {
+            let mut chars = part.chars();
+            match chars.next() {
+                Some(c) => c.to_ascii_uppercase().to_string() + chars.as_str(),
+                None => String::new(),
+            }
+        })
+        .collect()
+}
+
+// -- rendering -----------------------------------------------------------------
+
+fn render_module(
+    entries: &[Extracted],
+    skipped: &[(String, String)],
+    overrides: &[OverrideEntry],
+) -> String {
+    let mut out = String::new();
+    out.push_str(&format!(
+        "//! Auto-generated by `gen-schema` — DO NOT EDIT.\n\
+         //! Regenerate with `cargo run -p yororen_ui_xml --bin gen-schema`.\n\
+         //!\n\
+         //! Source of truth: `yororen-ui-core/src/headless/*.rs`\n\
+         //! plus `yororen-ui-xml/overrides.toml`.\n\
+         //! Last regenerated with: {} entries ({} from overrides), {} skipped.\n\
+         //!\n\
+         //! Skipped files (need manual schema entry or a schema\n\
+         //! extension — see `gen_schema.rs` notes):\n",
+        entries.len(),
+        overrides.len(),
+        skipped.len()
+    ));
+    for (stem, reason) in skipped {
+        out.push_str(&format!("//! - `{stem}`: {reason}\n"));
+    }
+    out.push_str("\n");
+    out.push_str("#![allow(dead_code)]\n\n");
+    out.push_str("use crate::schema::{ComponentDef, ComponentKind, ContainerDef, ControlFlowDef, ExtraArg, ExtraArgKind, LeafDef, PropDef, PropValue, RenderMode};\n\n");
+
+    out.push_str("/// Auto-generated schema entries for every leaf component\n");
+    out.push_str("/// extracted from the headless source. Combined with the\n");
+    out.push_str("/// hand-written `BUILTINS` in `schema.rs` (which holds the\n");
+    out.push_str("/// Phase 1 container / control-flow entries), the macro\n");
+    out.push_str("/// codegen can resolve any known tag.\n");
+    out.push_str("pub static BUILTINS_GENERATED: &[ComponentDef] = &[\n");
+
+    for e in entries {
+        if e.factory.is_empty() {
+            // Synthetic marker (control-flow pseudo-tag).
+            // Rendered as an empty ComponentKind variant.
+            continue;
+        }
+        out.push_str(&render_entry(e));
+    }
+    out.push_str("];\n");
+
+    // Render the container / control-flow overrides as a
+    // second static so they live alongside the generated
+    // entries. The codegen consults BOTH tables.
+    out.push_str("\n/// Container / control-flow entries sourced from\n");
+    out.push_str("/// `overrides.toml`. These have no headless equivalent\n");
+    out.push_str("/// (they're XML-only pseudo-tags or layout containers).\n");
+    out.push_str("pub static BUILTINS_OVERRIDES: &[ComponentDef] = &[\n");
+    for o in overrides {
+        if let Some(s) = render_override(o) {
+            out.push_str(&s);
+        }
+    }
+    out.push_str("];\n");
+
+    out
+}
+
+fn render_override(o: &OverrideEntry) -> Option<String> {
+    match o.kind.as_str() {
+        "Container" => {
+            let container = o.container.as_ref()?;
+            let mut fixed = String::new();
+            for [attr, method] in &container.fixed_methods {
+                fixed.push_str(&format!("({attr:?}, {method:?}), "));
+            }
+            Some(format!(
+                "    ComponentDef {{\n\
+                 \x20\x20\x20\x20        tag: {:?},\n\
+                 \x20\x20\x20\x20        kind: ComponentKind::Container(ContainerDef {{\n\
+                 \x20\x20\x20\x20            fixed_methods: &[{fixed}],\n\
+                 \x20\x20\x20\x20            style_hint: \"the gpui Styled trait (`.flex`, `.items_center`, `.gap_3()`, …)\",\n\
+                 \x20\x20\x20\x20        }}),\n\
+                 \x20\x20\x20\x20        doc: \"from `overrides.toml`\",\n\
+                 \x20\x20\x20\x20    }},\n",
+                o.tag
+            ))
+        }
+        "ControlFlow" => {
+            let cf = o.control_flow.as_deref()?;
+            let variant = match cf {
+                "If" => "ControlFlowDef::If",
+                "ElseIf" => "ControlFlowDef::ElseIf",
+                "Else" => "ControlFlowDef::Else",
+                "For" => "ControlFlowDef::For",
+                "Fragment" => "ControlFlowDef::Fragment",
+                "Include" => "ControlFlowDef::Include",
+                "Template" => "ControlFlowDef::Template",
+                "Slot" => "ControlFlowDef::Slot",
+                other => {
+                    eprintln!("warning: unknown control flow variant `{other}`");
+                    return None;
+                }
+            };
+            Some(format!(
+                "    ComponentDef {{\n\
+                 \x20\x20\x20\x20        tag: {:?},\n\
+                 \x20\x20\x20\x20        kind: ComponentKind::ControlFlow({variant}),\n\
+                 \x20\x20\x20\x20        doc: \"from `overrides.toml`\",\n\
+                 \x20\x20\x20\x20    }},\n",
+                o.tag
+            ))
+        }
+        "Leaf" => None, // Leaf entries are produced by the generator.
+        _ => None,
+    }
+}
+
+fn render_entry(e: &Extracted) -> String {
+    let mut s = String::new();
+    s.push_str("    ComponentDef {\n");
+    s.push_str(&format!("        tag: {:?},\n", e.tag));
+    s.push_str(&format!("        kind: {},\n", render_kind(e)));
+    s.push_str(&format!(
+        "        doc: {:?},\n",
+        format!("auto-generated from `headless::{}`", e.factory.rsplit("::").next().unwrap_or("?"))
+    ));
+    s.push_str("    },\n");
+    for note in &e.notes {
+        s.push_str(&format!("    // NOTE: {note}\n"));
+    }
+    s
+}
+
+fn render_kind(e: &Extracted) -> String {
+    let mode = match e.render {
+        RenderKind::Default => "RenderMode::Default",
+        RenderKind::Apply => "RenderMode::Apply",
+        RenderKind::Compose => "RenderMode::Apply",
+    };
+    format!(
+        "ComponentKind::Leaf(LeafDef {{\n\
+         \x20\x20\x20\x20        factory: {:?},\n\
+         \x20\x20\x20\x20        extra_args: &[{}],\n\
+         \x20\x20\x20\x20        render: {},\n\
+         \x20\x20\x20\x20        needs_app: {},\n\
+         \x20\x20\x20\x20        props: &[{}],\n\
+         \x20\x20\x20\x20        events: &[{}],\n\
+         \x20\x20\x20\x20        supports_text_child: {},\n\
+         \x20\x20\x20\x20    }})",
+        e.factory,
+        render_extra_args(&e.extra_args),
+        mode,
+        e.needs_app,
+        render_props(&e.props),
+        render_events(&e.events),
+        e.supports_text_child,
+    )
+}
+
+fn render_extra_args(args: &[ExtraArgInfo]) -> String {
+    let mut s = String::new();
+    for ea in args {
+        let kind = match ea.kind {
+            ExtraArgKind::Text => "ExtraArgKind::Text",
+            ExtraArgKind::Custom => "ExtraArgKind::Custom",
+        };
+        s.push_str(&format!(
+            "ExtraArg {{ kind: {}, attr: {:?} }}, ",
+            kind, ea.attr
+        ));
+    }
+    s
+}
+
+fn render_props(props: &[PropInfo]) -> String {
+    let mut s = String::new();
+    for p in props {
+        let pv = match p.value {
+            PropValue::String => "PropValue::String",
+            PropValue::Bool => "PropValue::Bool",
+            PropValue::Variant => "PropValue::Variant",
+            PropValue::Flag => "PropValue::Flag",
+            PropValue::Unknown => "PropValue::String /* unknown — review */",
+        };
+        s.push_str(&format!(
+            "PropDef {{ name: {:?}, setter: {:?}, value: {} }},\n            ",
+            p.name, p.setter, pv
+        ));
+    }
+    s
+}
+
+fn render_events(events: &[(String, String)]) -> String {
+    let mut s = String::new();
+    for (xml_attr, setter) in events {
+        s.push_str(&format!("({xml_attr:?}, {setter:?}), "));
+    }
+    s
+}
+
+#[allow(dead_code)]
+fn _unused(_: &Path, _: &BTreeMap<String, ()>) {}

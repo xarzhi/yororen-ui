@@ -1,0 +1,98 @@
+# Schema overrides for the `xml!` macro.
+#
+# This file is read by `yororen-ui-xml/src/bin/gen_schema.rs`
+# and merged into the auto-generated `BUILTINS_GENERATED`
+# static. It exists for cases the generator can't infer
+# from the headless source alone:
+#
+#   * XML-specific tag aliases (e.g. the user writes `col`
+#     but the gpui method is `flex_col`).
+#   * Container definitions (`<Column>`, `<Row>`, `<Stack>`,
+#     `<Div>`) — gpui uses these for layout and they
+#     don't have a one-to-one headless equivalent.
+#   * Control-flow tags (`<If>`, `<ElseIf>`, `<Else>`,
+#     `<For>`, `<Fragment>`) — these are XML-only
+#     pseudo-tags, not headless components.
+#   * Convention flags like `supports_text_child`.
+#
+# Override entries win over the auto-generated ones.
+#
+# Note: `override` is a reserved word in TOML, so we use
+# `[[override_]]` and the deserialiser maps it to
+# `override_` in Rust.
+
+# ----- Containers (XML-only; not derived from headless) -----
+
+[[override_]]
+tag = "Column"
+kind = "Container"
+container = { fixed_methods = [["col", "flex_col"]] }
+
+[[override_]]
+tag = "Row"
+kind = "Container"
+container = { fixed_methods = [["row", "flex_row"]] }
+
+[[override_]]
+tag = "Div"
+kind = "Container"
+container = { fixed_methods = [] }
+
+[[override_]]
+tag = "Stack"
+kind = "Container"
+container = { fixed_methods = [] }
+
+# ----- Control flow (XML-only pseudo-tags) -----
+
+[[override_]]
+tag = "If"
+kind = "ControlFlow"
+control_flow = "If"
+
+[[override_]]
+tag = "ElseIf"
+kind = "ControlFlow"
+control_flow = "ElseIf"
+
+[[override_]]
+tag = "Else"
+kind = "ControlFlow"
+control_flow = "Else"
+
+[[override_]]
+tag = "For"
+kind = "ControlFlow"
+control_flow = "For"
+
+[[override_]]
+tag = "Fragment"
+kind = "ControlFlow"
+control_flow = "Fragment"
+
+[[override_]]
+tag = "Include"
+kind = "ControlFlow"
+control_flow = "Include"
+
+[[override_]]
+tag = "Template"
+kind = "ControlFlow"
+control_flow = "Template"
+
+[[override_]]
+tag = "Slot"
+kind = "ControlFlow"
+control_flow = "Slot"
+
+# ----- Custom modifications -----
+
+# `Button` has a `caption` setter that the generator uses
+# to infer `supports_text_child`. Keep this here as a
+# safety net: if the generator ever loses that heuristic,
+# this override restores it without needing a code change.
+[[override_]]
+tag = "Button"
+kind = "Leaf"
+supports_text_child = true
+
