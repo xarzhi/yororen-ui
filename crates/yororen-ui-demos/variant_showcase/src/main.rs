@@ -4,11 +4,10 @@
 //! same `headless::button` + `default_render` can pull a
 //! different `action.<variant>.*` slot from the theme JSON.
 //!
-//! The v0.3 headless API exposes the variant through the
-//! renderer's `ButtonRenderState` (built per-render inside
-//! `default_render`). To exercise a non-default variant the
-//! demo calls the renderer directly via the new core
-//! registry:
+//! The headless API exposes the variant through the renderer's
+//! `ButtonRenderState` (built per-render inside `default_render`).
+//! To exercise a non-default variant the demo calls the
+//! renderer directly via the core registry:
 //!
 //! 1. `cx.renderer_arc::<markers::Button, dyn ButtonRenderer>()`
 //! 2. Build a `ButtonRenderState` with the desired variant

@@ -57,8 +57,7 @@ pub struct TreeItemProps {
     /// expand without aiming at the small chevron target.
     pub on_toggle: Option<ClickCallback>,
     /// Optional double-click callback. When unset the renderer
-    /// falls back to firing `on_toggle` on double-click (which
-    /// matches v0.2 behaviour: double-click toggles).
+    /// falls back to firing `on_toggle` on double-click.
     pub on_double_click: Option<ClickCallback>,
 }
 

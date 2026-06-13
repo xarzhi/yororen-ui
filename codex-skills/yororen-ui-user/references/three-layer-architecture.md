@@ -18,17 +18,17 @@ The rest of the docs assume you have internalized it.
                               ▼   (cx.theme().get_color / get_typed)
 ┌──────────────────────────────────────────────────────────────────┐
 │ renderer crate (yororen-ui-default-renderer or -brutalism-)       │
-│   • 40 `XxxRenderer` traits defined in core                       │
-│   • 40 `TokenXxxRenderer` impls (default) or `BrutalXxxRenderer`  │
+│   • 54 `XxxRenderer` traits defined in core                       │
+│   • 54 `TokenXxxRenderer` impls (default) or `BrutalXxxRenderer`  │
 │   • Each trait is one `compose(&self, &props, cx) -> Stateful<Div>`│
 │   • Theme reads only — no I/O, no global state                   │
-│   • install() registers all 40 impls via RendererRegistry         │
+│   • install() registers all 54 impls via RendererRegistry         │
 └──────────────────────────────────────────────────────────────────┘
                               │
                               ▼   (cx.renderer_arc::<Marker, dyn Trait>())
 ┌──────────────────────────────────────────────────────────────────┐
 │ headless (yororen-ui-core/src/headless)                           │
-│   • 40 factory functions: button(id, cx) -> ButtonProps           │
+│   • 54 factory functions: button(id, cx) -> ButtonProps           │
 │   • Each props: builder methods + .apply(div) + .render(cx)      │
 │   • .apply(div) is purely a11y (id + focus + click)               │
 │   • .render(cx) looks up the registered renderer and composes     │

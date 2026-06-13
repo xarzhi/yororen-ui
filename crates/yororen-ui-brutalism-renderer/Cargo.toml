@@ -3,7 +3,7 @@ name = "yororen_ui_brutalism_renderer"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Neo-brutalism style renderer for yororen-ui. Sharp corners, thick black borders, hard offset shadows, monospace typography, high-contrast solid colors. Implements all 38 XxxRenderer traits as a complete alternative to the default renderer."
+description = "Neo-brutalism style renderer for yororen-ui. Sharp corners, thick black borders, hard offset shadows, monospace typography, high-contrast solid colors. Implements all 54 XxxRenderer traits as a complete alternative to the default renderer."
 readme = "../../README.md"
 repository.workspace = true
 

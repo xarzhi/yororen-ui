@@ -14,12 +14,14 @@
 //!
 //! Note: `install` only sets the *i18n* global. To also flip the global
 //! theme's text direction to RTL, do it in your own app bootstrap
-//! (typically after the theme package's `install`):
+//! (typically after the renderer package's `install`):
 //!
 //! ```ignore
-//! theme_system::install(cx, cx.window_appearance());
+//! use yororen_ui::renderer;
+//! renderer::install(cx, cx.window_appearance());
 //! locale_ar::install(cx);
-//! theme_system::with_text_direction(cx, TextDirection::Rtl);
+//! // then flip text direction in your own code:
+//! // cx.set_global(yororen_ui_core::i18n::I18n::with_text_direction(..., TextDirection::Rtl));
 //! ```
 
 use yororen_ui_core::i18n::{I18n, Locale, TextDirection, TranslationMap, parse_translation_value};

@@ -22,24 +22,6 @@ members = [
     "crates/yororen-ui-demos/theme_showcase",
     "crates/yororen-ui-demos/variant_showcase",
 ]
-# Demos other than `counter` are still on the v0.2 component
-# shape and don't compile against the v0.3 headless API. They
-# stay excluded until each is ported.
-exclude = [
-    "crates/yororen-ui-demos/flavor_gallery",
-    "crates/yororen-ui-demos/theme_compare",
-    "crates/yororen-ui-demos/theme_showcase",
-    "crates/yororen-ui-demos/variant_showcase",
-    "crates/yororen-ui-demos/todolist",
-    "crates/yororen-ui-demos/file_browser",
-    "crates/yororen-ui-demos/popover_placement",
-    "crates/yororen-ui-demos/tree_expanded",
-    "crates/yororen-ui-demos/toast_notification",
-    "crates/yororen-ui-demos/headless demo",
-    "crates/yororen-ui-demos/i18n_showcase",
-    "crates/yororen-ui-demos/modal_a11y",
-    "crates/yororen-ui-demos/meta",
-]
 
 [workspace.package]
 version = "0.3.0"

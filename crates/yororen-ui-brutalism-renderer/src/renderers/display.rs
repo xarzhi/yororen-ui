@@ -655,7 +655,6 @@ impl SkeletonRenderer for BrutalSkeletonRenderer {
         let state = SkeletonRenderState {
             block: props.block,
             block_sharp: props.block_sharp,
-            rounded: props.rounded,
         };
         let bg = self.bg(&state, theme);
         let min_h = self.min_height(&state, theme);

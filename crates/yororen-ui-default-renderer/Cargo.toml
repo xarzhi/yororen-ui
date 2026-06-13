@@ -3,7 +3,7 @@ name = "yororen_ui_default_renderer"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Default renderer for yororen-ui headless primitives. Ships the 38 XxxRenderer traits + TokenXxxRenderer defaults, the bundled system-light/system-dark JSON themes, and a one-call install helper. Pure headless apps depend on yororen-ui-core only."
+description = "Default renderer for yororen-ui headless primitives. Ships the 54 XxxRenderer traits + TokenXxxRenderer defaults, the bundled system-light/system-dark JSON themes, and a one-call install helper. Pure headless apps depend on yororen-ui-core only."
 readme = "../../README.md"
 repository.workspace = true
 

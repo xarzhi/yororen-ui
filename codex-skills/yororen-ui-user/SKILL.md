@@ -24,7 +24,7 @@ theme JSON  ─▶  renderer (TokenXxxRenderer)  ─▶  headless (XxxProps)  �
 | Layer | Crate | Role |
 |---|---|---|
 | **headless** | `yororen-ui-core` | data + state machine + a11y. No visual decisions. |
-| **renderer** | `yororen-ui-default-renderer` (or `-brutalism-`) | turns props into a styled `Div`. 40 trait impls. |
+| **renderer** | `yororen-ui-default-renderer` (or `-brutalism-`) | turns props into a styled `Div`. 54 trait impls. |
 | **theme** | a JSON file | palette + tokens the renderer reads by path. |
 
 The headless layer is the source of truth. The renderer is swappable.
@@ -85,7 +85,7 @@ the app will either not compile or quietly misbehave.
 1. **One-call bootstrap.** Always start the app with
    `yororen_ui::renderer::install(cx, cx.window_appearance())` (or
    `default_renderer::install_with(cx, my_theme)` for a custom JSON theme).
-   This single call sets the global `Theme` and registers all 40 default
+   This single call sets the global `Theme` and registers all 54 default
    renderers.
 
 2. **The `Theme` global is read-only from app code.** You read it via

@@ -257,14 +257,13 @@ pub struct GlobalVariantRegistry(pub std::sync::Arc<VariantRegistry>);
 
 impl gpui::Global for GlobalVariantRegistry {}
 
-/// Variant-aware button variant tag. The 3 built-in keys keep the
-/// same visual behaviour as v0.3 / v0.4 (the `TokenButtonRenderer`
-/// handles them). Custom keys route through the global
-/// `VariantRegistry` to a third-party `VariantStyle`.
+/// Variant-aware button variant tag. Built-in variants (Neutral /
+/// Primary / Danger) are handled directly by `TokenButtonRenderer`.
+/// Custom variants route through the global `VariantRegistry` to
+/// a third-party `VariantStyle`.
 #[derive(Clone, Debug)]
 pub enum ButtonVariant {
-    /// Legacy v0.3 / v0.4 builtin. Kept so existing call sites continue
-    /// to work without changes.
+    /// Built-in variant handled by the default renderer.
     Builtin(ActionVariantKind),
     /// Custom variant resolved through the global `VariantRegistry`.
     Custom(VariantKey),

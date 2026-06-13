@@ -213,7 +213,7 @@ impl SplitButtonRenderer for TokenSplitButtonRenderer {
                     blur_radius: px(12.),
                     spread_radius: px(0.),
                 }])
-                // v0.2 popover pattern: occlude (the
+                // popover pattern: occlude (the
                 // `InteractiveElement` trait method) blocks
                 // events from reaching elements painted behind
                 // the menu (stops a click on an option from

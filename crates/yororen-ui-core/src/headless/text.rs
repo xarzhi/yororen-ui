@@ -1,9 +1,7 @@
 //! Headless `text` — a typed text span. No state.
 
 use crate::renderer::RendererContext;
-use gpui::{
-    App, Div, ElementId, InteractiveElement, ParentElement, SharedString, Stateful, Styled,
-};
+use gpui::{App, Div, ElementId, InteractiveElement, SharedString, Stateful};
 
 #[derive(Clone, Debug)]
 pub struct TextProps {
@@ -39,15 +37,5 @@ impl TextProps {
             .renderer_arc::<crate::renderer::markers::Text, dyn crate::renderer::text::TextRenderer>()
             .expect("TextRenderer registered");
         r.compose(&self, cx)
-    }
-
-    /// Legacy no-context render. Uses hard-coded defaults.
-    #[deprecated(note = "use `.render(cx)` so themes can supply defaults")]
-    pub fn render_legacy(self) -> Stateful<Div> {
-        let mut el = gpui::div().id(self.id).child(self.text.clone());
-        if let Some(size) = self.size {
-            el = el.text_size(size);
-        }
-        el
     }
 }

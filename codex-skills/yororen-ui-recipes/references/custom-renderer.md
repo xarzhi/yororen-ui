@@ -1,7 +1,7 @@
 # Writing a custom renderer
 
 The renderer is the swappable visual layer. A renderer crate
-implements the 40 `XxxRenderer` traits defined in
+implements the 54 `XxxRenderer` traits defined in
 `yororen-ui-core/src/renderer/`, one impl per trait. The brutalism
 renderer (`yororen-ui-brutalism-renderer`) is the canonical
 "complete custom renderer" example — start by reading its source.
@@ -33,7 +33,7 @@ my_renderer/
 
 The grouping follows the `yororen-ui-brutalism-renderer` convention
 but is not enforced. The actual constraint is that you implement the
-40 traits — one `impl XxxRenderer for MyXxxRenderer` per file.
+54 traits — one `impl XxxRenderer for MyXxxRenderer` per file.
 
 ## 2. Cargo.toml
 
@@ -57,7 +57,7 @@ use std::sync::Arc;
 use gpui::App;
 use yororen_ui_core::renderer::markers as m;
 use yororen_ui_core::renderer::{
-    ButtonRenderer, IconButtonRenderer, /* … all 40 traits … */
+    ButtonRenderer, IconButtonRenderer, /* … all 54 traits … */
 };
 use yororen_ui_core::theme::{Theme, install as install_theme};
 
@@ -78,11 +78,11 @@ pub fn install(cx: &mut App) {
     install_with(cx, theme);
 }
 
-/// Register all 40 trait impls against the core registry.
+/// Register all 54 trait impls against the core registry.
 pub fn register_renderers(cx: &mut App) {
     cx.register_renderer_arc::<m::Button,     dyn ButtonRenderer>     (Arc::new(MyButtonRenderer));
     cx.register_renderer_arc::<m::IconButton, dyn IconButtonRenderer> (Arc::new(MyIconButtonRenderer));
-    // … 38 more …
+    // … 52 more …
 }
 ```
 
@@ -220,7 +220,7 @@ let radius = theme.get_number("tokens.control.button.radius").unwrap_or(6.0);
 
 If you want a strict theme, document the required keys in your
 readme. The framework's `RendererRegistry::validate()` checks that
-all 40 markers are registered, not that the theme has all keys.
+all 54 markers are registered, not that the theme has all keys.
 
 ## 8. Register at boot, not in render
 
@@ -233,7 +233,7 @@ function that calls `install_theme`.
 fn main() {
     let app = Application::new().with_assets(UiAsset);
     app.run(|cx: &mut App| {
-        my_renderer::install(cx);    // sets theme + registers all 40
+        my_renderer::install(cx);    // sets theme + registers all 54
         // … open windows …
     });
 }
@@ -252,12 +252,12 @@ components, and `cx.theme()` to verify the visual output.
 ## 10. Reference implementations
 
 - **`yororen-ui-brutalism-renderer/`** — the canonical full custom
-  renderer. 40 trait impls, two bundled themes, per-component geometry
+  renderer. 54 trait impls, two bundled themes, per-component geometry
   tokens, sharp corners + hard shadows + monospace. Read its
   `lib.rs` first to see the install shape, then pick one renderer
   (e.g. `renderers/actions.rs::BrutalButtonRenderer`) to see the
   compose pattern.
-- **`yororen-ui-default-renderer/`** — the same 40 trait impls with a
+- **`yororen-ui-default-renderer/`** — the same 54 trait impls with a
   modern rounded-corner look. Useful as a "what does a complete
   renderer look like" reference; the code is heavier because it
   handles every variant of every component.

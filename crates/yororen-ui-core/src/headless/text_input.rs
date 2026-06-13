@@ -291,9 +291,9 @@ impl TextInputState {
         }
     }
 
-    /// Public focus handle accessor (mirrors the v0.2 pattern; the
-    /// `focus_handle` field is private because we implement the
-    /// `Focusable` trait which exposes the same name).
+    /// Public focus handle accessor (the `focus_handle` field is
+    /// private because we implement the `Focusable` trait which
+    /// exposes the same name).
     pub fn focus_handle(&self) -> FocusHandle {
         self.core.focus_handle()
     }
@@ -422,9 +422,8 @@ impl TextInputState {
     /// with `new_text` and records the marked range as the
     /// **span of the just-inserted text** (not the IME's
     /// `new_selected_range`, which is the cursor selection
-    /// *within* the marked text). This matches v0.2's
-    /// `TextEdit::replace_and_mark_text_in_range` semantics:
-    /// after a `setMarkedText("ni", …, replacementRange)` call,
+    /// *within* the marked text). After a
+    /// `setMarkedText("ni", …, replacementRange)` call,
     /// the marked range is `replacementRange.start..start +
     /// new_text.len()`. The eventual commit
     /// (`insertText(text, replacementRange)`) sends
@@ -835,9 +834,9 @@ pub struct TextInputProps {
     pub custom_text_color: Option<Hsla>,
 }
 
-/// Build a fresh `TextInputProps`. Unlike v0.2's `text_input(id)`,
-/// the v0.3 factory takes only the `id` — the focus handle and
-/// state are minted by the renderer in `default_render`.
+/// Build a fresh `TextInputProps`. The factory takes only the
+/// `id` — the focus handle and state are minted by the
+/// renderer in `default_render`.
 ///
 /// (The headless crate is now purely declarative; visual side
 /// effects like `cx.focus_handle()` belong in the renderer.)

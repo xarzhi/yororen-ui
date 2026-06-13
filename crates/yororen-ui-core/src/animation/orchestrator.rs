@@ -213,13 +213,11 @@ fn track_progress_from_elapsed(elapsed: Duration, start: Duration, duration: Dur
 }
 
 // ============================================================================
-// Backwards-compatible API
+// Sequence and parallel builders
 // ============================================================================
 
-/// A builder for sequencing animations by duration.
-///
-/// This is retained for compatibility with earlier docs, but prefer [`Orchestration`]
-/// when integrating with gpui.
+/// Builder for sequencing animations by duration. Constructed by
+/// [`sequence`].
 #[derive(Debug, Default, Clone)]
 pub struct AnimationSequence {
     durations: Vec<Duration>,
@@ -259,10 +257,8 @@ impl AnimationSequence {
     }
 }
 
-/// A builder for parallel animations by duration.
-///
-/// This is retained for compatibility with earlier docs, but prefer [`Orchestration`]
-/// when integrating with gpui.
+/// Builder for parallel animations by duration. Constructed by
+/// [`parallel`].
 #[derive(Debug, Default, Clone)]
 pub struct AnimationParallel {
     durations: Vec<Duration>,

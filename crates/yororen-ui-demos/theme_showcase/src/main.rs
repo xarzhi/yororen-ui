@@ -26,7 +26,7 @@ fn main() {
     let app = Application::new().with_assets(UiAsset);
 
     app.run(|cx: &mut App| {
-        // Register the 38 default `TokenXxxRenderer` impls. We
+        // Register the 54 default `TokenXxxRenderer` impls. We
         // do *not* install a theme here — the demo installs a
         // theme on every `Render::render` from `theme_app`, so
         // that clicking "Next theme" can swap the active JSON

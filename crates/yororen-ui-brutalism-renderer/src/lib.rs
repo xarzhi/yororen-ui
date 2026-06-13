@@ -1,6 +1,6 @@
 //! Neo-Brutalism style renderer for yororen-ui.
 //!
-//! Implements all 38 `XxxRenderer` traits with sharp corners, thick
+//! Implements all 54 `XxxRenderer` traits with sharp corners, thick
 //! black borders, hard offset shadows, and monospace typography.
 //!
 //! Two bundled themes: `brutalism-light.json` and
@@ -111,7 +111,7 @@ fn brutal_theme_for(appearance: WindowAppearance) -> Theme {
     Theme::from_json(json).expect("brutalism theme json is valid")
 }
 
-/// Register all 38 brutalist `XxxRenderer` impls against the core
+/// Register all 54 brutalist `XxxRenderer` impls against the core
 /// `RendererRegistry`. Public so a caller who already installed
 /// the theme (e.g. for tests) can still wire up the brutalist
 /// look without re-installing the theme.
@@ -157,7 +157,7 @@ pub fn register_brutal_renderers(cx: &mut App) {
     cx.register_renderer_arc::<m::Text, dyn TextRenderer>(Arc::new(BrutalTextRenderer));
     cx.register_renderer_arc::<m::Spacer, dyn SpacerRenderer>(Arc::new(BrutalSpacerRenderer));
 
-    // Surfaces (4)
+    // Surfaces (5)
     cx.register_renderer_arc::<m::Tooltip, dyn TooltipRenderer>(Arc::new(BrutalTooltipRenderer));
     cx.register_renderer_arc::<m::Avatar, dyn AvatarRenderer>(Arc::new(BrutalAvatarRenderer));
     cx.register_renderer_arc::<m::Panel, dyn PanelRenderer>(Arc::new(BrutalPanelRenderer));

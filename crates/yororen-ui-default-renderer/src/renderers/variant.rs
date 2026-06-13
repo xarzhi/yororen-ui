@@ -8,7 +8,7 @@
 //!
 //! All types in this module are re-exported from
 //! `yororen_ui_core::renderer`; the default-renderer keeps thin
-//! wrappers for backward-compat with v0.2 import paths.
+//! wrappers for backward-compat with older import paths.
 
 pub use yororen_ui_core::renderer::{
     BuiltinVariantKey, ButtonVariant, GlobalVariantRegistry, TokenVariantStyle, VariantKey,

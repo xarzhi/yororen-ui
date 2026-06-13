@@ -212,7 +212,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
         .w(px(240.));
     // Use the `TreeData::flatten` helper to walk only the
     // currently-visible (expanded) nodes, in depth-first
-    // pre-order — mirrors v0.2's `flatten_tree` output.
+    // pre-order — see `TreeData::flatten`.
     let visible = tree_data_for_iter.flatten(&tree_expanded);
     for (id, depth) in visible {
         let has_children = !tree_data_for_iter.children_of(&id).is_empty();

@@ -14,7 +14,6 @@ use crate::headless::skeleton::SkeletonProps;
 pub struct SkeletonRenderState {
     pub block: bool,
     pub block_sharp: bool,
-    pub rounded: bool,
 }
 
 pub trait SkeletonRenderer: Any + Send + Sync {

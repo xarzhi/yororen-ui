@@ -17,16 +17,6 @@
 //!   restores the previous state.
 //!
 //! This is the same shape React Aria / Radix use.
-//!
-//! # gpui-ce 0.3.3 limitations
-//!
-//! The current gpui version does not expose a public API to
-//! imperatively disable page scrolling. The `ScrollLock` struct
-//! therefore tracks state and fires a callback when the lock state
-//! changes; an app that wants the side-effect (e.g. add a CSS
-//! `overflow: hidden` to the body) can wire that callback up in
-//! `main`. For now, the counter is enough: callers can read
-//! [`is_locked`] to gate logic.
 
 use std::sync::atomic::{AtomicUsize, Ordering};
 

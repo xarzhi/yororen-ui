@@ -41,9 +41,6 @@ use super::easing::{
 };
 
 /// Preset animation durations.
-///
-/// Note: to avoid confusion with `crate::animation::duration` (global constants),
-/// this module is intended for preset-only usage.
 pub mod preset_duration {
     use super::Duration;
 
@@ -321,8 +318,7 @@ pub fn fade_slide_in_down(distance: Pixels) -> impl Fn(gpui::Div, f32) -> gpui::
 // Scale Animations
 // ============================================================================
 
-/// Scale in animation (scale 0 -> 1 with fade).
-/// Note: Uses opacity and scale emulation via transform since gpui doesn't support transform().
+/// Scale in animation (scale 0 → 1 with fade).
 pub struct ScaleIn;
 
 impl ScaleIn {
@@ -559,7 +555,6 @@ pub fn bounce_out_to(
 // ============================================================================
 
 /// Elastic in animation (elastic bounce into view).
-/// Note: Uses opacity and position since gpui doesn't support CSS transform.
 pub struct ElasticIn;
 
 impl ElasticIn {

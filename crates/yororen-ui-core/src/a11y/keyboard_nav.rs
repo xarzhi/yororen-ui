@@ -4,12 +4,7 @@
 //! container of focusable elements when the user presses Tab or
 //! Shift+Tab.
 //!
-//! # gpui-ce 0.3.3 limitation
-//!
-//! gpui-ce 0.3.3 does not expose a public API to enumerate the
-//! children of an element at the time Tab is pressed, so a fully
-//! automatic "next/prev focusable element" walker is not yet
-//! possible. The helpers in this module provide:
+//! The helpers in this module:
 //!
 //! - [`FocusableList`]: a manually-maintained ordered list of
 //!   focusable element IDs. The caller appends elements as they

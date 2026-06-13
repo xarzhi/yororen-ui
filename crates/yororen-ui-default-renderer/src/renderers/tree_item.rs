@@ -14,7 +14,6 @@
 //! - **single click on the chevron**  → `props.on_toggle`
 //! - **double click on the row body** → `props.on_double_click`
 //!   if set, else falls back to `props.on_toggle`
-//!   (matches v0.2 behaviour)
 //!
 //! The double-click detector uses `window.use_keyed_state` keyed
 //! by the row's `id`; the second click within
@@ -230,7 +229,7 @@ impl TreeItemRenderer for TokenTreeItemRenderer {
                     if let Some(cb) = on_double_click_cb.as_ref() {
                         cb(ev, window, cx);
                     } else if let Some(cb) = on_toggle_cb.as_ref() {
-                        // v0.2 default: double-click toggles.
+                        // Default: double-click toggles.
                         cb(ev, window, cx);
                     }
                 } else if let Some(cb) = on_click_cb.as_ref() {

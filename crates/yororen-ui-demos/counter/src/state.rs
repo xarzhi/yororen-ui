@@ -7,8 +7,8 @@
 //! - When an entity is mutated, `cx.notify()` can invalidate the window efficiently.
 //! - No manual `EntityId` plumbing is needed for basic state updates.
 //!
-//! Note: In `gpui-ce 0.3`, `Entity::update(...)` does not implicitly call `notify()`.
-//! You must call `cx.notify()` (on the entity context) after mutation.
+//! `Entity::update(...)` does not implicitly notify the window —
+//! call `cx.notify()` (on the entity context) after mutation.
 
 use gpui::{App, AppContext, Entity, Global};
 

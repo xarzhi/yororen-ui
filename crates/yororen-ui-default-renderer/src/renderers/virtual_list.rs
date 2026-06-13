@@ -82,9 +82,9 @@ impl VirtualListRenderer for TokenVirtualListRenderer {
         // call `stop_propagation()`. Without an explicit stop
         // here, the wheel event continues to bubble up to the
         // page / outer scrollable container and scrolls *that*
-        // in addition to the list — the v0.3 wrapping div
-        // introduced this regression (v0.2.0's `VirtualList`
-        // was the styled list element itself, so there was no
+        // in addition to the list — the wrapping div
+        // introduced this regression (the inner styled list was
+        // itself the element previously, so there was no
         // outer hitbox to bubble past). Register a bubble-phase
         // scroll handler on the outer div that stops the event
         // after the list has handled it, and `occlude()` the

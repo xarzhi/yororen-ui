@@ -1,7 +1,7 @@
 //! yororen-ui Layers Demo
 //!
-//! Three side-by-side panels showing the v0.3 three-layer
-//! architecture in action:
+//! Three side-by-side panels showing the three-layer architecture
+//! in action:
 //!
 //! 1. **Headless only** — every visual decision is the
 //!    caller's; the `headless::button` returns a `ButtonProps`

@@ -112,7 +112,7 @@ impl TextInputCore {
         }
     }
 
-    /// Public focus-handle accessor (mirrors the v0.2 pattern).
+    /// Public focus-handle accessor.
     pub fn focus_handle(&self) -> FocusHandle {
         self.focus_handle.clone()
     }

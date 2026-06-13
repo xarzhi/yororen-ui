@@ -1660,7 +1660,6 @@ impl yororen_ui_core::headless::icon::IconProps
 pub fn yororen_ui_core::headless::icon::IconProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::icon::IconProps::color(self, impl core::convert::Into<gpui::color::Hsla>) -> Self
 pub fn yororen_ui_core::headless::icon::IconProps::render(self, &gpui::app::App) -> gpui::element::AnyElement
-pub fn yororen_ui_core::headless::icon::IconProps::render_legacy(self) -> gpui::element::AnyElement
 pub fn yororen_ui_core::headless::icon::IconProps::size(self, impl core::convert::Into<gpui::geometry::Pixels>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::icon::IconProps
 pub fn yororen_ui_core::headless::icon::IconProps::clone(&self) -> yororen_ui_core::headless::icon::IconProps
@@ -3601,13 +3600,11 @@ pub struct yororen_ui_core::headless::skeleton::SkeletonProps
 pub yororen_ui_core::headless::skeleton::SkeletonProps::block: bool
 pub yororen_ui_core::headless::skeleton::SkeletonProps::block_sharp: bool
 pub yororen_ui_core::headless::skeleton::SkeletonProps::id: gpui::window::ElementId
-pub yororen_ui_core::headless::skeleton::SkeletonProps::rounded: bool
 impl yororen_ui_core::headless::skeleton::SkeletonProps
 pub fn yororen_ui_core::headless::skeleton::SkeletonProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::skeleton::SkeletonProps::block(self, bool) -> Self
 pub fn yororen_ui_core::headless::skeleton::SkeletonProps::block_sharp(self, bool) -> Self
 pub fn yororen_ui_core::headless::skeleton::SkeletonProps::render(self, &gpui::app::App) -> gpui::elements::div::Div
-pub fn yororen_ui_core::headless::skeleton::SkeletonProps::rounded(self, bool) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::skeleton::SkeletonProps
 pub fn yororen_ui_core::headless::skeleton::SkeletonProps::clone(&self) -> yororen_ui_core::headless::skeleton::SkeletonProps
 impl core::fmt::Debug for yororen_ui_core::headless::skeleton::SkeletonProps
@@ -3810,7 +3807,6 @@ pub yororen_ui_core::headless::text::TextProps::text: gpui::shared_string::Share
 impl yororen_ui_core::headless::text::TextProps
 pub fn yororen_ui_core::headless::text::TextProps::apply(self, gpui::elements::div::Div) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::text::TextProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-pub fn yororen_ui_core::headless::text::TextProps::render_legacy(self) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
 pub fn yororen_ui_core::headless::text::TextProps::size(self, impl core::convert::Into<gpui::geometry::Pixels>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::text::TextProps
 pub fn yororen_ui_core::headless::text::TextProps::clone(&self) -> yororen_ui_core::headless::text::TextProps
@@ -8274,7 +8270,6 @@ pub mod yororen_ui_core::renderer::skeleton
 pub struct yororen_ui_core::renderer::skeleton::SkeletonRenderState
 pub yororen_ui_core::renderer::skeleton::SkeletonRenderState::block: bool
 pub yororen_ui_core::renderer::skeleton::SkeletonRenderState::block_sharp: bool
-pub yororen_ui_core::renderer::skeleton::SkeletonRenderState::rounded: bool
 impl core::clone::Clone for yororen_ui_core::renderer::skeleton::SkeletonRenderState
 pub fn yororen_ui_core::renderer::skeleton::SkeletonRenderState::clone(&self) -> yororen_ui_core::renderer::skeleton::SkeletonRenderState
 impl core::default::Default for yororen_ui_core::renderer::skeleton::SkeletonRenderState

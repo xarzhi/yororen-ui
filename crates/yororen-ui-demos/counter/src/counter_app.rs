@@ -1,16 +1,14 @@
 //! yororen-ui Counter Component
 //!
-//! Demonstrates the v0.3 split using the **default-render
-//! sugar** path: each `headless::button` is built with
-//! `DefaultButton::default_render(cx)` which returns a
-//! pre-styled `Stateful<Div>`. The renderer paints the
+//! Demonstrates the headless + default-renderer split: each
+//! `headless::button` is built with `DefaultButton::default_render(cx)`
+//! which returns a pre-styled `Stateful<Div>`. The renderer paints the
 //! container (background, padding, radius, min-height, etc.)
 //! from the registered `ButtonRenderer`; the caller chains
 //! `.child("...")` on the result to add the button's text
 //! content.
 //!
-//! For full visual control (custom `div()` composition), the
-//! v0.3 API is:
+//! For full visual control (custom `div()` composition):
 //!
 //! ```ignore
 //! button("id", cx).on_click(...).apply(div().bg(red).child("Save"))

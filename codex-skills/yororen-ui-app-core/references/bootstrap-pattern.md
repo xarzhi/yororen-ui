@@ -28,7 +28,7 @@ fn main() {
     let app = Application::new().with_assets(UiAsset);
 
     app.run(|cx: &mut App| {
-        // 1. Theme + 40 default renderers (one call; reads OS appearance).
+        // 1. Theme + 54 default renderers (one call; reads OS appearance).
         renderer::install(cx, cx.window_appearance());
 
         // 2. Bind the text-input keymap. Idempotent — see

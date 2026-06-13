@@ -1,7 +1,7 @@
 # `upstream/` — public-API baselines
 
 This directory contains `cargo public-api` baselines for the
-5 published crates in the workspace. They are the source of
+4 published crates in the workspace. They are the source of
 truth for what the public surface of each crate looks like.
 
 ## Format
@@ -11,9 +11,8 @@ One `.api.txt` per published crate:
 | File | Crate |
 | --- | --- |
 | `yororen_ui_core.api.txt` | `yororen_ui_core` (`yororen-ui-core`) |
-| `yororen_ui_theme_system.api.txt` | `yororen_ui_theme_system` (`yororen-ui-theme-system`) |
-| `yororen_ui_theme_catppuccin.api.txt` | `yororen_ui_theme_catppuccin` (`yororen-ui-theme-catppuccin`) |
-| `yororen_ui_theme_material.api.txt` | `yororen_ui_theme_material` (`yororen-ui-theme-material`) |
+| `yororen_ui_default_renderer.api.txt` | `yororen_ui_default_renderer` (`yororen-ui-default-renderer`) |
+| `yororen_ui_brutalism_renderer.api.txt` | `yororen_ui_brutalism_renderer` (`yororen-ui-brutalism-renderer`) |
 | `yororen_ui.api.txt` | `yororen_ui` (`yororen-ui` meta-crate) |
 
 Each file is the `--simplified` output of `cargo public-api` —
@@ -40,24 +39,18 @@ change to the public surface. Concretely:
 ## Local baseline generation
 
 ```bash
-# All 5 published crates
+# All 4 published crates
 for pair in \
     "yororen_ui_core:yororen-ui-core" \
-    "yororen_ui_theme_system:yororen-ui-theme-system" \
-    "yororen_ui_theme_catppuccin:yororen-ui-theme-catppuccin" \
-    "yororen_ui_theme_material:yororen-ui-theme-material" \
+    "yororen_ui_default_renderer:yororen-ui-default-renderer" \
+    "yororen_ui_brutalism_renderer:yororen-ui-brutalism-renderer" \
     "yororen_ui:yororen-ui"; do
   crate="${pair%%:*}"
-  # The filename uses underscores (`yororen_ui_*.api.txt`) to
-  # match the crate's `cargo` name; the crate *directory* uses
-  # dashes (`yororen-ui-*.api.txt`). The script below writes to
-  # the underscored filename, which is the committed convention.
   case "$crate" in
-    yororen_ui_core)              fn="upstream/yororen_ui_core.api.txt" ;;
-    yororen_ui_theme_system)      fn="upstream/yororen_ui_theme_system.api.txt" ;;
-    yororen_ui_theme_catppuccin)  fn="upstream/yororen_ui_theme_catppuccin.api.txt" ;;
-    yororen_ui_theme_material)    fn="upstream/yororen_ui_theme_material.api.txt" ;;
-    yororen_ui)                   fn="upstream/yororen_ui.api.txt" ;;
+    yororen_ui_core)                    fn="upstream/yororen_ui_core.api.txt" ;;
+    yororen_ui_default_renderer)        fn="upstream/yororen_ui_default_renderer.api.txt" ;;
+    yororen_ui_brutalism_renderer)      fn="upstream/yororen_ui_brutalism_renderer.api.txt" ;;
+    yororen_ui)                         fn="upstream/yororen_ui.api.txt" ;;
   esac
   cargo public-api -p "${crate}" --simplified >| "$fn"
 done

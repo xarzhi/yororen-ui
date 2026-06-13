@@ -710,7 +710,7 @@ impl SplitButtonRenderer for BrutalSplitButtonRenderer {
                     blur_radius: shadow_spec.blur,
                     spread_radius: px(0.0),
                 }])
-                // v0.2 popover pattern: occlude_mouse blocks
+                // popover pattern: occlude_mouse blocks
                 // events from reaching elements painted behind
                 // the menu, and on_mouse_down_out fires when the
                 // user clicks *anywhere* outside the menu (other

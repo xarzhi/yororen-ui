@@ -249,7 +249,7 @@ impl TreeItemRenderer for BrutalTreeItemRenderer {
         // renderer: stamp `now` on every click; if the prior
         // stamp is within the threshold, treat as a
         // double-click and fire `on_double_click` (or
-        // `on_toggle` as a v0.2-compatible fallback).
+        // `on_toggle` as the fallback).
         let last_click = window.use_keyed_state(props.id.clone(), cx, |_, _| LastClick::default());
         let on_click_cb = props.on_click.clone();
         let on_toggle_cb = props.on_toggle.clone();
@@ -413,9 +413,9 @@ impl VirtualListRenderer for BrutalVirtualListRenderer {
         // `stop_propagation()`, so without this the wheel event
         // bubbles up to the page / outer scrollable container
         // and scrolls *that* in addition to the list — a
-        // regression the v0.3 wrapping div introduced (v0.2.0's
-        // `VirtualList` was the styled list itself, no outer
-        // hitbox to bubble past). `occlude()` ensures hitboxes
+        // regression the wrapping div introduced (the
+        // `VirtualList` was the styled list itself previously, no
+        // outer hitbox to bubble past). `occlude()` ensures hitboxes
         // behind the list are not considered for scroll handling.
         gpui::div()
             .id(props.id)

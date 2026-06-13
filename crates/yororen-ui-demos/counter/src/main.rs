@@ -23,9 +23,8 @@ fn main() {
     let app = Application::new().with_assets(UiAsset);
 
     app.run(|cx: &mut App| {
-        // Install the default theme + 38 default renderers in
-        // one call. Replaces the old `theme_system::install` +
-        // `component::init` pair.
+        // Install the default theme + 54 default renderers in
+        // one call.
         renderer::install(cx, cx.window_appearance());
 
         // Set up i18n with English translations.

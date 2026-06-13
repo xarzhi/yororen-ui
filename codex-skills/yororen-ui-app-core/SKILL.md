@@ -23,7 +23,7 @@ fn main() {
     let app = Application::new().with_assets(UiAsset);
 
     app.run(|cx: &mut App| {
-        // 1. Theme + 40 default renderers, in one call.
+        // 1. Theme + 54 default renderers, in one call.
         renderer::install(cx, cx.window_appearance());
 
         // 2. Bind the text-input keymap (idempotent — see §9).
@@ -320,10 +320,6 @@ need.
 | `ClickOutsideGuard` | popovers / dropdowns / context menus | `el.apply(div()).child(content)` then guard close |
 | `ScrollLockGuard` | nested modals (prevent body scroll) | `let _lock = ScrollLockGuard::acquire();` in the open path |
 | `FocusableList` / `cycle_focus` | keyboard nav between focusable items | `list.push(id); ring.cycle(current_id, Next)` |
-
-Note: **screen-reader / ARIA bridge is not yet implemented.** gpui-ce
-0.3 lacks public AccessKit integration. Focus + keyboard nav + visual
-indicators all work; semantic announcement does not.
 
 ## 9. The text-input keymap
 

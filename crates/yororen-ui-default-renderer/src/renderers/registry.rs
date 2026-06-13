@@ -7,26 +7,26 @@
 //! keyed by the component's `XxxRenderState` type. Each
 //! `with_<x>(r: Arc<dyn XxxRenderer>)` setter inserts `r` under
 //! `TypeId::of::<XxxRenderState>()`; each `get_<x>() -> Option<&Arc<dyn XxxRenderer>>`
-//! looks it up. The `38 XxxRenderer` traits themselves stay public and
+//! looks it up. The `54 XxxRenderer` traits themselves stay public and
 //! unchanged — they are the **type-level** contract a theme implements,
 //! the HashMap is the **storage** layer.
 //!
-//! ## Why not 38 named fields?
+//! ## Why not 54 named fields?
 //!
-//! The 38-trait design (one trait per component) is the right level of
+//! The 54-trait design (one trait per component) is the right level of
 //! granularity for the *type system*: each `XxxRenderer` is callable
 //! with the component-specific `XxxRenderState` and returns the
 //! component-specific property shape. Trying to collapse them into a
 //! single `ComponentRenderer<S: RenderState>` trait would force a
-//! 200+-method union (because the 38 method sets are largely disjoint
+//! 200+-method union (because the 54 method sets are largely disjoint
 //! — `Switch` has `track_w/track_h/knob_size` while `Avatar` has
 //! `status_dot_size/status_inset`).
 //!
-//! What the 38-field `RendererRegistry` *didn't* need was the named
+//! What the 54-field `RendererRegistry` *didn't* need was the named
 //! fields themselves: there is no code that reads `theme.renderers.button`
 //! directly (all call sites go through `with_button` setters and
 //! `get_button` accessors). So the fields are private storage, the
-//! public surface is the 38 `with_<x>` / 38 `get_<x>` method pairs.
+//! public surface is the 54 `with_<x>` / 54 `get_<x>` method pairs.
 
 use std::any::{Any, TypeId};
 use std::collections::HashMap;
@@ -199,7 +199,7 @@ use yororen_ui_core::renderer::virtual_list::VirtualListRenderState;
 /// Collection of component renderers. Looked up at render time by
 /// `XxxRenderState` `TypeId`.
 ///
-/// Public surface: 38 `with_<x>(Arc<dyn XxxRenderer>)` setters + 38
+/// Public surface: 54 `with_<x>(Arc<dyn XxxRenderer>)` setters + 54
 /// `get_<x>() -> Option<&Arc<dyn XxxRenderer>>` accessors. The
 /// underlying HashMap is private.
 #[derive(Clone)]
@@ -258,11 +258,11 @@ impl RendererRegistry {
     /// `with_<x>(...)` line here but forgets to mirror it in `REQUIRED`,
     /// `token_based()` panics with the full list of missing entries
     /// the first time it is called. This is the single coupling point
-    /// between the 38 setters and the 38 `REQUIRED` entries.
+    /// between the 54 setters and the 54 `REQUIRED` entries.
     pub fn token_based() -> Self {
         // Cannot use `Self::default()` here — `default` is implemented
         // as `token_based`, so that would recurse forever. Construct
-        // the empty registry directly and chain the 38 setters.
+        // the empty registry directly and chain the 54 setters.
         let registry = Self {
             map: HashMap::new(),
         }
@@ -327,7 +327,7 @@ impl RendererRegistry {
         registry
     }
 
-    // -- 38 setters (one per component) ---------------------------------
+    // -- 54 setters (one per component) ---------------------------------
     // Each setter preserves the original `with_<x>(Arc<dyn XxxRenderer>)`
     // signature exactly — theme packages and downstream apps call them
     // unchanged. The renderer is stored under
@@ -463,7 +463,7 @@ impl RendererRegistry {
             .and_then(|arc| arc.downcast_ref::<Arc<R>>())
     }
 
-    // -- 38 typed accessors (one per component) -------------------------
+    // -- 54 typed accessors (one per component) -------------------------
     // Each returns `Option<&Arc<dyn XxxRenderer>>`. Components call
     // these in their `RenderOnce::render` body; theme packages and
     // downstream code do not need them (the setter is enough to
@@ -584,7 +584,7 @@ impl RendererRegistry {
         ShortcutHintRenderer
     );
 
-    /// All 38 `(TypeId, "name")` pairs that a complete registry must
+    /// All 54 `(TypeId, "name")` pairs that a complete registry must
     /// contain. Single source of truth for `validate()` and for the
     /// self-check at the end of `token_based()`.
     ///
@@ -658,7 +658,7 @@ impl RendererRegistry {
         (TypeId::of::<ShortcutHintRenderState>(), "shortcut_hint"),
     ];
 
-    /// Verify that this registry contains a renderer for **all** 38
+    /// Verify that this registry contains a renderer for **all** 54
     /// `XxxRenderState` types. Returns `Ok(())` if complete, or
     /// `Err(missing)` listing the names of every absent renderer.
     ///
@@ -667,7 +667,7 @@ impl RendererRegistry {
     /// Component render paths look up their renderer via
     /// `get_<x>().expect("XxxRenderer registered")`. That `expect`
     /// is the *last line of defense*; if it ever fires in production
-    /// it means a theme package was constructed without all 38
+    /// it means a theme package was constructed without all 54
     /// renderers registered. This is a *configuration* bug, not a
     /// runtime condition, and the fix is "add `with_<x>(...)` to your
     /// theme's registry builder".
@@ -713,7 +713,7 @@ fn panic_missing_renderers(registry: &RendererRegistry) -> ! {
         Ok(()) => unreachable!("panic_missing_renderers called on a valid registry"),
         Err(missing) => panic!(
             "RendererRegistry::token_based() is missing {} renderer(s): {}. \
-             This is an internal bug: token_based() must register all 38 components. \
+             This is an internal bug: token_based() must register all 54 components. \
              Please report this as a yororen-ui bug.",
             missing.len(),
             missing.join(", "),
@@ -733,7 +733,7 @@ mod tests {
     use std::any::TypeId;
 
     /// Build a registry that has *only* `ButtonRenderState`
-    /// registered. Used to assert validate() reports the other 38
+    /// registered. Used to assert validate() reports the other 53
     /// as missing.
     fn only_button() -> RendererRegistry {
         let mut map: HashMap<TypeId, Arc<dyn Any + Send + Sync>> = HashMap::new();
@@ -810,7 +810,7 @@ mod tests {
     fn override_after_token_based_still_passes() {
         // The realistic theme-package pattern: take `token_based()`
         // and override one renderer. The override path must not
-        // accidentally drop the other 38.
+        // accidentally drop the other 53.
         let r = RendererRegistry::token_based()
             .with_button(Arc::new(super::super::button::TokenButtonRenderer));
         r.validate()
@@ -846,7 +846,7 @@ mod tests {
         //
         // The realistic mirror is: rebuild the registry from a
         // `token_based()` snapshot but skip one setter. We do that
-        // by constructing an almost-complete registry (38 of 39) and
+        // by constructing an almost-complete registry (53 of 54) and
         // asking the same code path to validate. Since we can't
         // reuse the production self-check without code duplication,
         // we rely on the `panic_missing_renderers` helper directly

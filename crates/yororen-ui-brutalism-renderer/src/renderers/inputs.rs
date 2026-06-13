@@ -1215,7 +1215,7 @@ impl SelectRenderer for BrutalSelectRenderer {
                 // presses the mouse *outside* the dropdown's
                 // bounds (including clicks in the next cell,
                 // the toolbar, anywhere in the window) and is
-                // the v0.2 way of wiring "click outside
+                // the conventional way of wiring "click outside
                 // dismisses".
                 .on_mouse_down_out(move |_ev, _window, cx| {
                     state_for_close.update(cx, |s, _cx| s.close());

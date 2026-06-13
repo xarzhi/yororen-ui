@@ -4,15 +4,6 @@
 //! props via the factory; the renderer produces a `gpui::List`
 //! element driven by the closure.
 //!
-//! ## Compared to v0.2.0
-//!
-//! v0.2.0 had a `VirtualListHandle { state, controller }` and a
-//! `VirtualList` element that wrapped `gpui::list(state, render_row)`.
-//! v0.3 keeps the same shape: the caller stores the controller on
-//! their view, gets the per-frame state via `controller.state()`,
-//! and supplies a `FnMut(usize, &mut Window, &mut App) -> AnyElement`
-//! closure that the renderer hands to `gpui::list`.
-//!
 //! ## Why a controller and not raw `gpui::ListState`?
 //!
 //! `gpui::ListState::new(count, alignment, overdraw)` is the only
