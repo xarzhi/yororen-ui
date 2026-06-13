@@ -12,7 +12,7 @@
 //! - `text_area_element`: no factory found
 //! - `text_input_core`: no factory found
 
-#![rustfmt::skip]
+#![cfg_attr(rustfmt, rustfmt::skip)]
 #![allow(dead_code)]
 
 use crate::schema::{ComponentDef, ComponentKind, ContainerDef, ControlFlowDef, ExtraArg, ExtraArgKind, LeafDef, PropDef, PropValue, RenderMode};
