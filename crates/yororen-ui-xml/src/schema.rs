@@ -198,6 +198,22 @@ pub enum ControlFlowDef {
     /// are inlined as-is. A future revision will wire
     /// named slots and caller-side slot-filling.
     Slot,
+    /// `<Match on={expr}>` followed by `<Case pattern={...}>…</Case>`
+    /// siblings — emits a Rust `match` expression. The
+    /// last `<Case _>` (with literal `_` as the pattern
+    /// attribute) becomes the wildcard arm.
+    Match,
+    /// `<Case pattern={...}>…</Case>` — a single arm of
+    /// a `<Match>`. `pattern` is the Rust pattern (e.g.
+    /// `Status::Loading` or `_` for wildcard).
+    Case,
+    /// `<State name="count" default="0">…</State>` — declare a
+    /// local `Entity<T>` inside the `Render::render` closure.
+    /// `default` is a stringified literal that becomes the
+    /// initial value via `cx.new(|_| …)`. Children are emitted
+    /// in the closure scope where `name` resolves to the
+    /// entity.
+    State,
 }
 
 impl ComponentDef {
@@ -247,6 +263,21 @@ pub static BUILTINS: &[ComponentDef] = &[
             supports_text_child: true,
         }),
         doc: "Headless `Button` — see `yororen_ui_core::headless::button`.",
+    },
+    ComponentDef {
+        tag: "Case",
+        kind: ComponentKind::ControlFlow(ControlFlowDef::Case),
+        doc: "Match arm — `<Case pattern={expr}>…</Case>`.",
+    },
+    ComponentDef {
+        tag: "Match",
+        kind: ComponentKind::ControlFlow(ControlFlowDef::Match),
+        doc: "Pattern match — `<Match on={expr}><Case>…</Case></Match>`.",
+    },
+    ComponentDef {
+        tag: "State",
+        kind: ComponentKind::ControlFlow(ControlFlowDef::State),
+        doc: "Declare a local `Entity<T>` — `<State name=\"count\" default=\"0\">…</State>`.",
     },
     ComponentDef {
         tag: "Column",

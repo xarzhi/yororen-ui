@@ -647,6 +647,14 @@ fn codegen_control_flow(
         ControlFlowDef::Include => codegen_include(element, cx, location),
         ControlFlowDef::Template => codegen_template(element, cx, location),
         ControlFlowDef::Slot => codegen_slot(element, cx),
+        ControlFlowDef::Match => codegen_match(element, cx, location),
+        ControlFlowDef::Case => Err(XmlError::new(
+            XmlErrorKind::Unsupported,
+            element.span,
+            "<Case> must appear directly inside a <Match>",
+        )
+        .at(element.byte_offset)),
+        ControlFlowDef::State => codegen_state(element, cx, location),
     }
 }
 
@@ -941,6 +949,217 @@ fn codegen_template(
 /// will wire caller-side slot-filling.
 fn codegen_slot(_element: &AstElement, _cx: &TokenStream) -> Result<TokenStream, XmlError> {
     Ok(TokenStream::new())
+}
+
+/// `<Match on={expr}>` expands to a Rust `match`
+/// expression. The children must be `<Case>` arms
+/// (the macro walks them in order); `<Case pattern="_">`
+/// becomes the wildcard arm.
+///
+/// The arm body is the single child of each `<Case>`
+/// (multi-child arms are not supported — wrap in a
+/// container for now, same limitation as `<If>`).
+fn codegen_match(
+    element: &AstElement,
+    cx: &TokenStream,
+    location: &crate::parser::LocationTracker<'_>,
+) -> Result<TokenStream, XmlError> {
+    let on_attr = element.attributes.iter().find(|a| a.name == "on").ok_or_else(|| {
+        XmlError::new(
+            XmlErrorKind::UnknownAttribute,
+            element.span,
+            "<Match> requires an `on={...}` attribute (the value being matched)",
+        )
+        .at(element.byte_offset)
+    })?;
+    let on_parsed = attr_expr_only(on_attr)?;
+
+    let mut arms = TokenStream::new();
+    let mut arm_count = 0usize;
+    for child in &element.children {
+        let arm = match child {
+            AstNode::Element(e) if e.tag == "Case" => e,
+            AstNode::Element(e) => {
+                return Err(XmlError::new(
+                    XmlErrorKind::Unsupported,
+                    e.span,
+                    format!("<{}> is not a valid arm of <Match> — use <Case>", e.tag),
+                )
+                .at(e.byte_offset));
+            }
+            AstNode::Text { .. } => {
+                return Err(XmlError::new(
+                    XmlErrorKind::Unsupported,
+                    location.span_outer(),
+                    "<Match> arms must be <Case> elements",
+                ));
+            }
+        };
+        let pattern_attr = arm.attributes.iter().find(|a| a.name == "pattern").ok_or_else(|| {
+            XmlError::new(
+                XmlErrorKind::UnknownAttribute,
+                arm.span,
+                "<Case> requires a `pattern={...}` attribute",
+            )
+            .at(arm.byte_offset)
+        })?;
+        let pattern_parsed = if pattern_attr.expr.is_none() && pattern_attr.raw == "_" {
+            quote! { _ }
+        } else if let Some(expr) = &pattern_attr.expr {
+            // Brace expression — the typical case for
+            // pattern-style arms (`Status::Loading`,
+            // `Some(x)`, etc.).
+            attr_expr_only(pattern_attr)?
+        } else {
+            // Bare literal pattern: `pattern="0"`,
+            // `pattern='"hi"'`, `pattern="true"`. The
+            // user provides a Rust-syntax literal as
+            // the attribute value; we emit it verbatim.
+            let raw = pattern_attr.raw.as_str();
+            quote! { #raw }
+        };
+        let body = if arm.children.is_empty() {
+            return Err(XmlError::new(
+                XmlErrorKind::Unsupported,
+                arm.span,
+                "<Case> must contain at least one child",
+            )
+            .at(arm.byte_offset));
+        } else if arm.children.len() == 1 {
+            codegen_child(&arm.children[0], cx, location)?
+        } else {
+            return Err(XmlError::new(
+                XmlErrorKind::Unsupported,
+                arm.span,
+                format!(
+                    "<Case> has {} children; wrap in a <Column> or <Row> for now",
+                    arm.children.len()
+                ),
+            )
+            .at(arm.byte_offset));
+        };
+        arms.append_all(quote! { #pattern_parsed => { #body }, });
+        arm_count += 1;
+    }
+    if arm_count == 0 {
+        return Err(XmlError::new(
+            XmlErrorKind::Unsupported,
+            element.span,
+            "<Match> must contain at least one <Case>",
+        )
+        .at(element.byte_offset));
+    }
+    Ok(quote! { match (#on_parsed) { #arms } })
+}
+
+/// `<State name="x" default="0" />` declares a local
+/// `Entity<T>` for the duration of the surrounding
+/// `Render::render` closure. `name` is the identifier
+/// the children can refer to; `default` is a stringified
+/// Rust literal that becomes the initial value.
+///
+/// The macro emits a `let name = cx.new(|_| …);` at the
+/// *start* of the surrounding XML body and then inlines
+/// the children unchanged. The catch: the codegen for
+/// a State element is a tuple `(let_decl, child_body)`,
+/// which the caller must be able to splice. To keep the
+/// shape simple, we emit a small block:
+///
+/// ```text
+/// {
+///     let name = cx.new(|_| <default_expr>);
+///     <child>
+/// }
+/// ```
+fn codegen_state(
+    element: &AstElement,
+    cx: &TokenStream,
+    location: &crate::parser::LocationTracker<'_>,
+) -> Result<TokenStream, XmlError> {
+    let name_attr = element.attributes.iter().find(|a| a.name == "name").ok_or_else(|| {
+        XmlError::new(
+            XmlErrorKind::UnknownAttribute,
+            element.span,
+            "<State> requires a `name=\"...\"` attribute",
+        )
+        .at(element.byte_offset)
+    })?;
+    if name_attr.expr.is_some() {
+        return Err(XmlError::new(
+            XmlErrorKind::Unsupported,
+            name_attr.span,
+            "<State name> requires a literal identifier, not a brace expression",
+        )
+        .at(name_attr.byte_offset));
+    }
+    let name_ident = format_ident!("{}", name_attr.raw);
+
+    let default_attr = element
+        .attributes
+        .iter()
+        .find(|a| a.name == "default")
+        .ok_or_else(|| {
+            XmlError::new(
+                XmlErrorKind::UnknownAttribute,
+                element.span,
+                "<State> requires a `default=\"...\"` attribute (initial value)",
+            )
+            .at(element.byte_offset)
+        })?;
+    let default_expr: TokenStream = if let Some(expr) = &default_attr.expr {
+        parse_ts(
+            expr,
+            default_attr.span,
+            default_attr.byte_offset,
+            "<State default>",
+        )?
+    } else {
+        let raw = default_attr.raw.as_str();
+        // Wrap a stringified number / bool in its
+        // matching Rust literal form. The convention:
+        //   default="0"   → 0
+        //   default="0.0" → 0.0
+        //   default="true"/"false" → bool
+        //   default='"hi"' → "hi"
+        // Otherwise we emit the literal as-is, which
+        // works for `String::from("…")` etc.
+        if raw == "true" {
+            quote! { true }
+        } else if raw == "false" {
+            quote! { false }
+        } else if raw.contains('.') && raw.parse::<f64>().is_ok() {
+            // Float literal (contains a `.`): emit as f64.
+            let lit = raw.parse::<f64>().unwrap();
+            quote! { #lit }
+        } else if raw.parse::<i64>().is_ok() {
+            // Integer literal (no `.`).
+            let lit = raw.parse::<i64>().unwrap();
+            quote! { #lit }
+        } else {
+            // Treat as a string — wrap in `String::from`.
+            quote! { String::from(#raw) }
+        }
+    };
+
+    let body = if element.children.is_empty() {
+        quote! { gpui::div() }
+    } else if element.children.len() == 1 {
+        codegen_child(&element.children[0], cx, location)?
+    } else {
+        return Err(XmlError::new(
+            XmlErrorKind::Unsupported,
+            element.span,
+            "<State> must wrap a single child",
+        )
+        .at(element.byte_offset));
+    };
+
+    Ok(quote! {
+        {
+            let #name_ident = (#cx).new(|_| #default_expr);
+            #body
+        }
+    })
 }
 
 fn codegen_child(
@@ -1690,6 +1909,103 @@ mod tests {
         let err = codegen(xml, Span::call_site(), None).unwrap_err();
         assert!(matches!(err.kind, crate::error::XmlErrorKind::UnknownAttribute));
         assert!(err.message.contains("on_key_down.enter"));
+    }
+
+    #[test]
+    fn match_emits_rust_match_with_cases() {
+        // `<Match on={status}>` with two `<Case>` arms
+        // becomes `match status { A => { … }, B => { … } }`.
+        let xml = r#"
+            <Match on={status}>
+                <Case pattern={Status::Loading}>
+                    <Label id="l" text="Loading..." />
+                </Case>
+                <Case pattern={Status::Ready}>
+                    <Label id="r" text="Ready" />
+                </Case>
+            </Match>
+        "#;
+        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let s = ts.to_string();
+        assert!(s.contains("match"), "{s}");
+        assert!(s.contains("Status :: Loading"), "{s}");
+        assert!(s.contains("Status :: Ready"), "{s}");
+    }
+
+    #[test]
+    fn match_supports_wildcard_via_underscore_literal() {
+        // `pattern="_"` is the conventional wildcard;
+        // the macro turns it into a Rust `_` pattern.
+        // For literal patterns like `pattern={0}` the
+        // user uses a brace expression so the integer
+        // literal isn't mistaken for a string.
+        let xml = r#"
+            <Match on={n}>
+                <Case pattern={0}>
+                    <Label id="z" text="zero" />
+                </Case>
+                <Case pattern="_">
+                    <Label id="o" text="other" />
+                </Case>
+            </Match>
+        "#;
+        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let s = ts.to_string();
+        assert!(s.contains("0 =>"), "{s}");
+        assert!(s.contains("_ =>"), "{s}");
+    }
+
+    #[test]
+    fn match_without_cases_is_an_error() {
+        let xml = r#"<Match on={x} />"#;
+        let err = codegen(xml, Span::call_site(), None).unwrap_err();
+        assert!(matches!(err.kind, crate::error::XmlErrorKind::Unsupported), "{err:?}");
+        assert!(err.message.contains("at least one"));
+    }
+
+    #[test]
+    fn case_outside_match_is_an_error() {
+        let xml = r#"<Column><Case pattern={A}><Label id="x" text="hi" /></Case></Column>"#;
+        let err = codegen(xml, Span::call_site(), None).unwrap_err();
+        assert!(matches!(err.kind, crate::error::XmlErrorKind::Unsupported), "{err:?}");
+    }
+
+    #[test]
+    fn state_emits_cx_new_with_default() {
+        // `<State name="count" default="0">` becomes
+        // `let count = (cx).new(|_| 0); <child>`.
+        let xml = r#"
+            <State name="count" default="0">
+                <Label id="l" text={count.read(cx).to_string()} />
+            </State>
+        "#;
+        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let s = ts.to_string();
+        assert!(s.contains("let count"), "{s}");
+        assert!(s.contains(". new"), "{s}");
+        assert!(s.contains("count . read"), "{s}");
+    }
+
+    #[test]
+    fn state_default_handles_bool_and_string() {
+        // Bool literal.
+        let xml = r#"<State name="on" default="true"><Label id="l" text="x" /></State>"#;
+        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let s = ts.to_string();
+        assert!(s.contains("true"), "{s}");
+        // String literal.
+        let xml = r#"<State name="name" default="anonymous"><Label id="l" text="x" /></State>"#;
+        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let s = ts.to_string();
+        assert!(s.contains("String :: from"), "{s}");
+        assert!(s.contains("anonymous"), "{s}");
+    }
+
+    #[test]
+    fn state_without_default_is_an_error() {
+        let xml = r#"<State name="x"><Label id="l" text="hi" /></State>"#;
+        let err = codegen(xml, Span::call_site(), None).unwrap_err();
+        assert!(matches!(err.kind, crate::error::XmlErrorKind::UnknownAttribute), "{err:?}");
     }
 
     #[test]

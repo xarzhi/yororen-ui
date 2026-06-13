@@ -764,6 +764,9 @@ fn render_override(o: &OverrideEntry) -> Option<String> {
                 "Include" => "ControlFlowDef::Include",
                 "Template" => "ControlFlowDef::Template",
                 "Slot" => "ControlFlowDef::Slot",
+                "Match" => "ControlFlowDef::Match",
+                "Case" => "ControlFlowDef::Case",
+                "State" => "ControlFlowDef::State",
                 other => {
                     eprintln!("warning: unknown control flow variant `{other}`");
                     return None;
