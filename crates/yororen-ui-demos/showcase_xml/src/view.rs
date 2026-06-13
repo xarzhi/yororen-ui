@@ -3,7 +3,7 @@
 //! state, wires it into the XML, and exposes
 //! `Render::render`.
 
-use gpui::{Context, IntoElement, Render, Window};
+use gpui::{AppContext, Context, IntoElement, Render, Window};
 
 use crate::state::ShowcaseState;
 use yororen_ui::xml_file;
@@ -20,11 +20,13 @@ impl Render for ShowcaseApp {
         let flag = *state.flag.read(cx);
         let name = state.name.read(cx).clone();
         let todos = state.todos.clone();
+        let connection = *state.connection.read(cx);
         let inc = state.counter.clone();
         let dec = state.counter.clone();
         let reset = state.counter.clone();
         let flag_entity = state.flag.clone();
         let name_entity = state.name.clone();
+        let connect_entity = state.connection.clone();
 
         xml_file!(cx = &mut **cx, "ui/showcase.xml")
     }

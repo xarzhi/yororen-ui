@@ -13,6 +13,21 @@ pub struct Counter {
 /// or `String` entity).
 pub type Flag = bool;
 
+/// Connection status — used to drive the `<Match>` demo.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConnectionStatus {
+    Disconnected,
+    Connecting,
+    Connected,
+    Failed,
+}
+
+impl Default for ConnectionStatus {
+    fn default() -> Self {
+        Self::Disconnected
+    }
+}
+
 /// A todo item.
 #[derive(Debug, Clone)]
 pub struct TodoItem {
@@ -28,6 +43,7 @@ pub struct ShowcaseState {
     pub flag: Entity<Flag>,
     pub name: Entity<String>,
     pub todos: Vec<TodoItem>,
+    pub connection: Entity<ConnectionStatus>,
 }
 
 impl ShowcaseState {
@@ -37,7 +53,8 @@ impl ShowcaseState {
             ("Wire up the XML macro", true),
             ("Build a counter demo", true),
             ("Add a checkbox + switch", false),
-            ("Write a Phase 2 README", false),
+            ("Add Match / State / event modifiers", false),
+            ("Write a Phase 3 README", false),
         ] {
             todos.push(TodoItem { label: label.to_string(), done });
         }
@@ -46,6 +63,7 @@ impl ShowcaseState {
             flag: cx.new(|_| false),
             name: cx.new(|_| String::from("")),
             todos,
+            connection: cx.new(|_| ConnectionStatus::Disconnected),
         }
     }
 }

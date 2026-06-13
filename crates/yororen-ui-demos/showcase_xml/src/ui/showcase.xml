@@ -1,5 +1,5 @@
 <!--
-  Showcase XML — exercises every Phase 1+2 feature
+  Showcase XML — exercises every Phase 1+2+3 feature
   of the `xml!` macro:
 
   * Containers: `<Column>`, `<Row>` with shorthand
@@ -17,17 +17,23 @@
     - `<If condition={flag}>` / `<ElseIf>` / `<Else>`
     - `<For each={todos} let:item>` (with `let:index`
       implicit)
+    - `<Match on={...}><Case pattern={...}>...</Case></Match>`
+  * Local state declaration:
+    `<State name="x" default="0">…</State>`
+  * Custom runtime component: `<CustomWidget id="…" />`
+    via `register_xml_component!`.
 
   All of the variables referenced here (`counter`,
-  `flag`, `name`, `todos`, `inc`, `dec`, `reset`,
-  `flag_entity`, `name_entity`) are bound in the
-  surrounding Rust scope — see `src/view.rs`.
+  `flag`, `name`, `todos`, `connection`, `inc`,
+  `dec`, `reset`, `flag_entity`, `name_entity`,
+  `connect_entity`) are bound in the surrounding
+  Rust scope — see `src/view.rs`.
 -->
 <Column flex col p="4" gap="4">
 
     <!-- Heading + intro -->
     <Label id="title" text="yororen-ui XML Showcase" strong />
-    <Label id="subtitle" text="Phase 1 + 2 features, all in XML" muted />
+    <Label id="subtitle" text="Phase 1 + 2 + 3 features, all in XML" muted />
 
     <!-- Counter: read + button-driven mutations -->
     <Row flex gap="2" items_center>
@@ -63,6 +69,36 @@
         </Else>
     </Column>
 
+    <!-- Match/Case: pattern-match on a status enum -->
+    <Column flex col gap="1">
+        <Label id="match_label" text="Match / Case" strong />
+        <Match on={connection}>
+            <Case pattern={crate::state::ConnectionStatus::Disconnected}>
+                <Label id="conn_off" text="Status: disconnected" muted />
+            </Case>
+            <Case pattern={crate::state::ConnectionStatus::Connecting}>
+                <Label id="conn_link" text="Status: connecting..." strong />
+            </Case>
+            <Case pattern={crate::state::ConnectionStatus::Connected}>
+                <Label id="conn_ok" text="Status: connected" strong />
+            </Case>
+            <Case pattern={crate::state::ConnectionStatus::Failed}>
+                <Label id="conn_err" text="Status: failed" muted />
+            </Case>
+        </Match>
+        <Button id="conn_toggle" caption="Toggle connection" on_click={move |_, _, cx| {
+            connect_entity.update(cx, |c, cx| {
+                *c = match *c {
+                    crate::state::ConnectionStatus::Disconnected => crate::state::ConnectionStatus::Connecting,
+                    crate::state::ConnectionStatus::Connecting => crate::state::ConnectionStatus::Connected,
+                    crate::state::ConnectionStatus::Connected => crate::state::ConnectionStatus::Failed,
+                    crate::state::ConnectionStatus::Failed => crate::state::ConnectionStatus::Disconnected,
+                };
+                cx.notify();
+            });
+        }} />
+    </Column>
+
     <!-- For: list rendering with let:item and let:index -->
     <Column flex col gap="1">
         <Label id="todos_label" text="Todos" strong />
@@ -72,6 +108,16 @@
                 <Label id="todo_label" text={item.label} />
             </Row>
         </For>
+    </Column>
+
+    <!-- State: declare a local Entity<T> inside the closure.
+         `count` shadows the surrounding counter — local
+         scope is independent of the outer state. -->
+    <Column flex col gap="1">
+        <Label id="state_label" text="State: local entity" strong />
+        <State name="count" default="42">
+            <Label id="state_value" text={count.read(cx).to_string()} />
+        </State>
     </Column>
 
     <!-- Custom runtime-registered widget — proves the
