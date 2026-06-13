@@ -1,62 +1,59 @@
 <!--
-  Showcase XML — exercises every Phase 1+2+3 feature
-  of the `xml!` macro:
+  Showcase XML — the SINGLE source of truth for the
+  interface. Every event handler here is a method
+  reference on `controller` (see src/controller.rs);
+  the codegen auto-wraps bare paths into closures so
+  this file contains zero `move |_, _, cx| { ... }`
+  boilerplate and zero inline business logic.
 
-  * Containers: `<Column>`, `<Row>` with shorthand
-    style attrs (flex / col / items_center / gap).
-  * Leaves: `<Label>`, `<Button>`, `<Checkbox>`,
-    `<Switch>`, `<TextInput>`, `<Heading>`.
-  * Data binding: brace expressions for both reads
-    (`{counter.to_string()}`) and event handlers.
-  * Two-way binding: `@bind={entity}` on `<Switch>`,
-    `<TextInput>`, and `<Checkbox>`.
-  * String interpolation:
-    `<Label text="Count: {counter}" />` expands to
-    a `format!` call at codegen time.
-  * Control flow:
-    - `<If condition={flag}>` / `<ElseIf>` / `<Else>`
-    - `<For each={todos} let:item>` (with `let:index`
-      implicit)
-    - `<Match on={...}><Case pattern={...}>...</Case></Match>`
-  * Local state declaration:
-    `<State name="x" default="0">…</State>`
-  * Custom runtime component: `<CustomWidget id="…" />`
-    via `register_xml_component!`.
+  Features exercised (in order of appearance):
+    - Containers: <Column>, <Row> with shorthand
+      style attrs (`flex`, `col`, `gap`, `p`, etc.)
+    - Leaves: <Label>, <Button> (with `variant` and
+      boolean props), <Switch>, <Checkbox>, <TextInput>
+    - String interpolation: `text="Count: {counter}"`
+    - Brace expressions: `text={item.label}`,
+      `condition={flag}`, `each={todos}`, `on={connection}`
+    - Two-way binding: `@bind={flag_entity}` on
+      <Switch>, <Checkbox>, and `@bind={name_entity}` on
+      <TextInput>
+    - <If> / <ElseIf> / <Else> control flow
+    - <For each={...} let:item> with optional let:index
+    - <Match on={...}> with <Case pattern={...}> arms
+    - <State name="x" default="0"> for local entities
+    - <CustomWidget id="..." /> (runtime-registered)
 
-  All of the variables referenced here (`counter`,
-  `flag`, `name`, `todos`, `connection`, `inc`,
-  `dec`, `reset`, `flag_entity`, `name_entity`,
-  `connect_entity`) are bound in the surrounding
-  Rust scope — see `src/view.rs`.
+  All identifiers referenced here are bound in the
+  surrounding Rust scope — see `src/view.rs`.
 -->
 <Column flex col p="4" gap="4">
 
     <!-- Heading + intro -->
-    <Label id="title" text="yororen-ui XML Showcase" strong />
-    <Label id="subtitle" text="Phase 1 + 2 + 3 features, all in XML" muted />
+    <Label id="title"    text="yororen-ui XML Showcase" strong />
+    <Label id="subtitle" text="Logic in Rust, layout in XML — pure declarative" muted />
 
-    <!-- Counter: read + button-driven mutations -->
+    <!-- ─── Containers & leaves ───────────────────────────────────── -->
     <Row flex gap="2" items_center>
         <Label id="count" text="Count: {counter}" strong />
-        <Button id="dec" caption="-" on_click={move |_, _, cx| {
-            dec.update(cx, |c, cx| { c.value -= 1; cx.notify(); });
-        }} />
-        <Button id="reset" caption="Reset" on_click={move |_, _, cx| {
-            reset.update(cx, |c, cx| { c.value = 0; cx.notify(); });
-        }} />
-        <Button id="inc" caption="+" variant="primary" on_click={move |_, _, cx| {
-            inc.update(cx, |c, cx| { c.value += 1; cx.notify(); });
-        }} />
+        <Button id="dec"    caption="-"     on_click={controller.decrement} />
+        <Button id="reset"  caption="Reset" on_click={controller.reset_counter} />
+        <Button id="inc"    caption="+"     variant="primary"
+                on_click={controller.increment} />
     </Row>
 
-    <!-- Two-way binding: @bind on a Switch, Checkbox -->
+    <!-- ─── Two-way binding: @bind on Switch, Checkbox, TextInput ── -->
     <Column flex col gap="2">
-        <Label id="features_label" text="Two-way bindings" strong />
-        <Switch id="notifications" @bind={flag_entity} />
-        <Checkbox id="agree" @bind={flag_entity} />
+        <Label id="bindings_label" text="Two-way bindings (@bind)" strong />
+        <Switch    id="notifications" @bind={flag_entity} />
+        <Checkbox  id="agree"         @bind={flag_entity} />
+        <Row flex gap="2" items_center>
+            <Label id="name_label" text="Name:" />
+            <TextInput id="name_input" placeholder="Type here…" @bind={name_entity} />
+            <Button    id="name_clear" caption="Clear" on_click={controller.clear_name} />
+        </Row>
     </Column>
 
-    <!-- If/ElseIf/Else: chain control flow -->
+    <!-- ─── If / ElseIf / Else ───────────────────────────────────── -->
     <Column flex col gap="1">
         <If condition={flag}>
             <Label id="on" text="Notifications ON" strong />
@@ -69,15 +66,15 @@
         </Else>
     </Column>
 
-    <!-- Match/Case: pattern-match on a status enum -->
+    <!-- ─── Match / Case over a Rust enum ────────────────────────── -->
     <Column flex col gap="1">
-        <Label id="match_label" text="Match / Case" strong />
+        <Label id="match_label" text="Match / Case (status enum)" strong />
         <Match on={connection}>
             <Case pattern={crate::state::ConnectionStatus::Disconnected}>
                 <Label id="conn_off" text="Status: disconnected" muted />
             </Case>
             <Case pattern={crate::state::ConnectionStatus::Connecting}>
-                <Label id="conn_link" text="Status: connecting..." strong />
+                <Label id="conn_link" text="Status: connecting…" strong />
             </Case>
             <Case pattern={crate::state::ConnectionStatus::Connected}>
                 <Label id="conn_ok" text="Status: connected" strong />
@@ -86,42 +83,33 @@
                 <Label id="conn_err" text="Status: failed" muted />
             </Case>
         </Match>
-        <Button id="conn_toggle" caption="Toggle connection" on_click={move |_, _, cx| {
-            connect_entity.update(cx, |c, cx| {
-                *c = match *c {
-                    crate::state::ConnectionStatus::Disconnected => crate::state::ConnectionStatus::Connecting,
-                    crate::state::ConnectionStatus::Connecting => crate::state::ConnectionStatus::Connected,
-                    crate::state::ConnectionStatus::Connected => crate::state::ConnectionStatus::Failed,
-                    crate::state::ConnectionStatus::Failed => crate::state::ConnectionStatus::Disconnected,
-                };
-                cx.notify();
-            });
-        }} />
+        <Button id="conn_toggle" caption="Advance status"
+                on_click={controller.advance_connection} />
     </Column>
 
-    <!-- For: list rendering with let:item and let:index -->
+    <!-- ─── For / let:item ───────────────────────────────────────── -->
     <Column flex col gap="1">
-        <Label id="todos_label" text="Todos" strong />
+        <Label id="todos_label" text="For (list rendering with let:item)" strong />
         <For each={todos} let:item>
             <Row flex gap="2" items_center>
                 <Checkbox id="todo" @bind={flag_entity} />
-                <Label id="todo_label" text={item.label} />
+                <Label    id="todo_label" text={item.label} />
             </Row>
         </For>
     </Column>
 
-    <!-- State: declare a local Entity<T> inside the closure.
-         `count` shadows the surrounding counter — local
-         scope is independent of the outer state. -->
+    <!-- ─── State: local Entity inside the closure ───────────────── -->
     <Column flex col gap="1">
-        <Label id="state_label" text="State: local entity" strong />
+        <Label id="state_label" text="State (local Entity)" strong />
         <State name="count" default="42">
             <Label id="state_value" text={count.read(cx).to_string()} />
         </State>
     </Column>
 
-    <!-- Custom runtime-registered widget — proves the
-         `register_xml_component!` extension hook works. -->
-    <CustomWidget id="custom" />
+    <!-- ─── Custom runtime-registered tag ────────────────────────── -->
+    <Column flex col gap="1">
+        <Label id="custom_label" text="Custom (register_xml_component!)" strong />
+        <CustomWidget id="custom" />
+    </Column>
 
 </Column>

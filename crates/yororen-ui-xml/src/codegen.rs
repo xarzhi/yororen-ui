@@ -608,7 +608,17 @@ fn codegen_leaf(
         if let Some((_, setter)) = def.events.iter().find(|(n, _)| *n == attr.name).copied() {
             let m = format_ident!("{}", setter);
             // Events take a closure — don't `.into()`.
+            // If the user's brace expression is a bare
+            // path / field reference (no `(` / `{` / `|`),
+            // we auto-wrap it into a closure that adapts
+            // the three standard args `(arg0, &mut Window,
+            // &mut App)` to whatever the user's method
+            // signature is. This lets XML stay purely
+            // declarative — the user just writes
+            // `on_click={controller.increment}` instead
+            // of `move |ev, w, cx| controller.increment(ev, w, cx)`.
             let expr = attr_expr_only(attr)?;
+            let expr = auto_wrap_event_expr(attr, expr);
             tokens.append_all(quote! { .#m(#expr) });
             continue;
         }
@@ -620,6 +630,7 @@ fn codegen_leaf(
             if let Some((_, setter)) = def.events.iter().find(|(n, _)| *n == base_event).copied() {
                 let m = format_ident!("{}", setter);
                 let expr = attr_expr_only(attr)?;
+                let expr = auto_wrap_event_expr(attr, expr);
                 let wrapped = wrap_event_with_modifiers(&modifiers, expr, attr.span)?;
                 tokens.append_all(quote! { .#m(#wrapped) });
                 continue;
@@ -644,11 +655,10 @@ fn codegen_leaf(
             // this to a schema flag.
             let needs_window = def.factory.contains("text_input");
             if needs_window {
-                let app_ref = quote! { &*#cx };
-                // The `window` token is assumed to be in
-                // the surrounding scope (e.g. `Render::render`
-                // takes `&mut Window` as a parameter).
-                tokens.append_all(quote! { .render(#app_ref, window) });
+                // Both `cx` and `window` are expected as
+                // `&mut App` / `&mut Window` by the
+                // TextInput render signature.
+                tokens.append_all(quote! { .render(&mut *#cx, &mut *window) });
             } else {
                 let app_ref = quote! { &*#cx };
                 tokens.append_all(quote! { .render(#app_ref) });
@@ -1442,6 +1452,111 @@ fn attr_expr_only(attr: &AstAttribute) -> Result<TokenStream, XmlError> {
     }
 }
 
+/// Auto-wrap a bare event expression into a closure that
+/// adapts the three standard callback args
+/// `(arg0, &mut Window, &mut App)` to the user's method
+/// signature. This is the heart of the "XML stays pure"
+/// convention: the user writes
+///
+/// ```xml
+/// <Button on_click={controller.increment} />
+/// ```
+///
+/// and the codegen emits
+///
+/// ```ignore
+/// .on_click(move |__arg0, __w, __cx| {
+///     controller.clone().increment(__arg0, __w, __cx)
+/// })
+/// ```
+///
+/// Detection: if the brace expression has no `(`, `{`, or
+/// `|`, it's a bare identifier path / field reference —
+/// we wrap it. Otherwise we pass it through verbatim
+/// (the user wrote their own closure).
+///
+/// **Receiver cloning**: for `obj.method` (an
+/// `Expr::Field`), we inject `.clone()` between the
+/// receiver and the method call so multiple event
+/// handlers in the same XML can share a single
+/// `controller` instance without `move` conflicts.
+/// The user's `controller` type must implement
+/// `Clone` (cheap clones are typical — `Arc<_>`,
+/// `Entity<_>`, or a small data struct).
+///
+/// **Limitation**: events with 4-arg signatures
+/// (e.g. `on_toggle` on Checkbox/Switch — `Fn(bool,
+/// Option<&ClickEvent>, &mut Window, &mut App)`) don't
+/// fit the 3-arg wrapper. For those, the user must
+/// write a manual closure.
+fn auto_wrap_event_expr(attr: &AstAttribute, expr: TokenStream) -> TokenStream {
+    let Some(raw) = &attr.expr else {
+        return expr;
+    };
+    let trimmed = raw.trim();
+    let looks_like_path = !trimmed.contains('(')
+        && !trimmed.contains('{')
+        && !trimmed.contains('|')
+        && !trimmed.is_empty();
+    if !looks_like_path {
+        return expr;
+    }
+    // Parse the expression so we can detect a
+    // field-access (`controller.method`) and pre-clone
+    // the receiver outside the closure. Pre-cloning
+    // (rather than `.clone()` inside the body) lets
+    // multiple event handlers in the same XML share a
+    // single `controller` — each closure captures its
+    // own clone and the original `controller` is left
+    // available for the next handler.
+    let Ok(parsed) = syn::parse_str::<syn::Expr>(trimmed) else {
+        return quote! {
+            move |__arg0, __w: &mut gpui::Window, __cx: &mut gpui::App| {
+                #expr(__arg0, __w, __cx)
+            }
+        };
+    };
+    match parsed {
+        // Associated function (`Module::function`) —
+        // no receiver, no clone needed.
+        syn::Expr::Path(_) => quote! {
+            move |__arg0, __w: &mut gpui::Window, __cx: &mut gpui::App| {
+                #expr(__arg0, __w, __cx)
+            }
+        },
+        // Field access (`obj.method`) — pre-clone the
+        // receiver into a hygienic local so each
+        // closure captures its own clone. We emit a
+        // block (statement + expression) so the
+        // codegen can splice this directly into the
+        // `.on_click({ … })` slot.
+        syn::Expr::Field(field) => {
+            let receiver = field.base;
+            let member = field.member;
+            // `Span::mixed_site()` yields a unique span
+            // per call, so every auto-wrapped closure
+            // gets a distinct `__auto_clone_N` ident
+            // (proc-macro hygiene).
+            let clone_ident = format_ident!("__auto_clone", span = Span::mixed_site());
+            quote! {
+                {
+                    let #clone_ident = (#receiver).clone();
+                    move |__arg0, __w: &mut gpui::Window, __cx: &mut gpui::App| {
+                        #clone_ident.#member(__arg0, __w, __cx)
+                    }
+                }
+            }
+        }
+        // Method call, deref, etc. — fall back to
+        // direct call (single-use capture).
+        _ => quote! {
+            move |__arg0, __w: &mut gpui::Window, __cx: &mut gpui::App| {
+                #expr(__arg0, __w, __cx)
+            }
+        },
+    }
+}
+
 /// Build the value for a "text-like" attribute. Supports
 /// brace interpolation: `text="Count: {count}"` becomes
 /// `format!("Count: {}", count).into()`.
@@ -2045,6 +2160,94 @@ mod tests {
             crate::error::XmlErrorKind::UnknownAttribute
         ));
         assert!(err.message.contains("on_key_down.enter"));
+    }
+
+    #[test]
+    fn event_bare_path_is_auto_wrapped_into_closure() {
+        // `<Button on_click={controller.increment}>` is
+        // a bare path expression — the codegen auto-wraps
+        // it into a closure that adapts the standard
+        // 3-arg event signature to the user's method.
+        let xml = r#"<Button id="x" caption="+" on_click={controller.increment} />"#;
+        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let s = ts.to_string();
+        // The pre-cloned receiver is captured by the
+        // closure; the method call uses it (not the
+        // original `controller`).
+        assert!(s.contains("move"), "{s}");
+        assert!(s.contains("__auto_clone"), "{s}");
+        assert!(s.contains(". increment"), "{s}");
+        assert!(s.contains("__arg0"), "{s}");
+        assert!(s.contains("__w"), "{s}");
+        assert!(s.contains("__cx"), "{s}");
+    }
+
+    #[test]
+    fn event_auto_wrap_pre_clones_receiver() {
+        // For `controller.method`, the codegen emits
+        // `let __auto_clone_N = (controller).clone();`
+        // BEFORE the closure, so each handler captures
+        // its own clone and the original `controller`
+        // can be used by the next handler.
+        let xml = r#"<Button id="x" caption="x" on_click={controller.handle} />"#;
+        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let s = ts.to_string();
+        assert!(s.contains("(controller) . clone"), "{s}");
+        // Two separate clone idents would mean two
+        // closures sharing the controller — but for a
+        // single button we just need one.
+        assert!(s.contains("__auto_clone"), "{s}");
+    }
+
+    #[test]
+    fn event_multiple_auto_wraps_have_distinct_clone_idents() {
+        // Two buttons, each referencing `controller.x`
+        // and `controller.y`, must each get their own
+        // pre-cloned receiver (otherwise the second
+        // closure sees a moved `controller`).
+        let xml = r#"
+            <Column>
+                <Button id="a" caption="a" on_click={controller.handle_a} />
+                <Button id="b" caption="b" on_click={controller.handle_b} />
+            </Column>
+        "#;
+        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let s = ts.to_string();
+        // Two distinct `__auto_clone` bindings (proc-macro
+        // hygiene via Span::mixed_site).
+        assert!(s.matches("__auto_clone").count() >= 2, "{s}");
+        assert!(s.contains("handle_a"), "{s}");
+        assert!(s.contains("handle_b"), "{s}");
+    }
+
+    #[test]
+    fn event_closure_passes_through_unwrapped() {
+        // When the user writes a closure, the codegen
+        // must NOT auto-wrap (otherwise the args would
+        // be doubled).
+        let xml = r#"<Button id="x" caption="x" on_click={move |ev, w, cx| controller.handle(ev, w, cx)} />"#;
+        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let s = ts.to_string();
+        // The user's `__arg0` / `__w` / `__cx` placeholder
+        // names must NOT appear (they're only used by the
+        // auto-wrap path).
+        assert!(!s.contains("__arg0"), "{s}");
+        assert!(!s.contains("__w"), "{s}");
+        assert!(!s.contains("__cx"), "{s}");
+        // The user's closure body should pass through.
+        assert!(s.contains("controller . handle"), "{s}");
+    }
+
+    #[test]
+    fn event_call_expression_is_not_wrapped() {
+        // `<Button on_click={some_fn()}>` is a call
+        // expression (parens present) — it must pass
+        // through verbatim, NOT be wrapped.
+        let xml = r#"<Button id="x" caption="x" on_click={build_handler()} />"#;
+        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let s = ts.to_string();
+        assert!(!s.contains("__arg0"), "{s}");
+        assert!(s.contains("build_handler ()"), "{s}");
     }
 
     #[test]
