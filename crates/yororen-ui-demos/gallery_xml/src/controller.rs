@@ -173,6 +173,10 @@ impl Controller {
         self.state.read(cx).selected_list_item
     }
 
+    pub fn list_items(&self, cx: &App) -> Vec<gpui::SharedString> {
+        self.state.read(cx).list_items.clone()
+    }
+
     pub fn vl_status(&self, cx: &App) -> (String, usize, usize) {
         let s = self.state.read(cx);
         let visible = format!("{:?}", s.vl_visible_range);

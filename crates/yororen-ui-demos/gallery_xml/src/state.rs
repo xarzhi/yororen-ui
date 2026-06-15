@@ -10,8 +10,9 @@
 
 use std::collections::BTreeSet;
 
-use gpui::{App, AppContext, Entity, Global};
+use gpui::{App, AppContext, Entity, Global, SharedString};
 
+use yororen_ui::t;
 use yororen_ui::headless::combo_box::ComboBoxState;
 use yororen_ui::headless::dropdown_menu::DropdownMenuState;
 use yororen_ui::headless::keybinding_input::KeybindingInputMode;
@@ -118,6 +119,7 @@ pub struct GalleryState {
     // -------- Lists --------
     pub selected_list_item: Option<usize>,
     pub selected_table_row: Option<usize>,
+    pub list_items: Vec<SharedString>,
     pub form_submit_count: usize,
     pub form_email_value: Entity<String>,
     pub form_email_error: Option<String>,
@@ -237,6 +239,11 @@ impl GalleryState {
 
             selected_list_item: Some(0),
             selected_table_row: Some(1),
+            list_items: vec![
+                t!(cx, "demo.lists.first_item"),
+                t!(cx, "demo.lists.second_item"),
+                t!(cx, "demo.lists.third_item"),
+            ],
             form_submit_count: 0,
             form_email_value: cx.new(|_| String::new()),
             form_email_error: None,

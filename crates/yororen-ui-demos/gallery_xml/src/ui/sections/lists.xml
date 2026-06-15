@@ -5,11 +5,7 @@
     <Cell>
         <Slot name="label"><Label id="lbl-list-items" text={t!(cx, "demo.lists.cell_list")} muted /></Slot>
         <Column flex col gap="2" w={gpui::px(220.)}>
-            <For each={vec![
-                t!(cx, "demo.lists.first_item"),
-                t!(cx, "demo.lists.second_item"),
-                t!(cx, "demo.lists.third_item"),
-            ]} let:item let:index={i} key={i}>
+            <For each={controller.list_items(cx)} let:item let:index={i} key={i}>
                 <ListItem id={format!("li-{}", i + 1)} title={item.clone()}
                           selected={controller.selected_list_item(cx) == Some(i)}
                           on_click={controller.select_list_item_handler(i)} />
