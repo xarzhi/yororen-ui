@@ -41,7 +41,11 @@
         <Disclosure id="ovl-disc" title={t!(cx, "demo.disclosure.title")}
                     open={controller.disclosure_open(cx)}
                     on_toggle={controller.toggle_disclosure}>
-            {controller.disclosure_body(cx)}
+            <Div pl={gpui::px(16.)}>
+                <If condition={controller.disclosure_open(cx)}>
+                    <Label id="ovl-disc-body" text={t!(cx, "demo.disclosure.body")} muted />
+                </If>
+            </Div>
         </Disclosure>
     </Cell>
 

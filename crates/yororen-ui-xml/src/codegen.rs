@@ -626,6 +626,21 @@ fn codegen_if_chain(
             .at(element.byte_offset));
         }
     }
+    // If the chain ends without an <Else>, append a fallback
+    // `else { gpui::div() }` so the whole expression always yields
+    // an element. This lets `<If condition={...}>...</If>` be used
+    // as a child of leaves and containers alike.
+    if branches
+        .last()
+        .and_then(|b| match b {
+            AstNode::Element(e) => Some(e.tag.as_str()),
+            _ => None,
+        })
+        != Some("Else")
+    {
+        chain.append_all(quote! { else { ::gpui::IntoElement::into_any_element(gpui::div()) } });
+    }
+
     Ok(quote! { { #chain } })
 }
 
@@ -1363,36 +1378,60 @@ fn codegen_leaf(
         let text_opt = extract_text_content(&remaining_children);
         let mut text_added = false;
         let mut child_stmts: Vec<TokenStream> = Vec::new();
-        for child in &remaining_children {
-            match child {
-                AstNode::Text { .. } => {
-                    if def.supports_text_child {
-                        if let Some(text) = &text_opt {
-                            if !text_added {
-                                text_added = true;
-                                child_stmts.push(quote! {
-                                    let __el = ::gpui::ParentElement::child(__el, #text);
-                                });
+        let is_if_element = |node: &AstNode| -> bool {
+            matches!(
+                node,
+                AstNode::Element(e) if matches!(e.tag.as_str(), "If" | "ElseIf" | "Else")
+            )
+        };
+        let mut i = 0;
+        while i < remaining_children.len() {
+            if is_if_element(&remaining_children[i]) {
+                // Merge consecutive If/ElseIf/Else siblings into a
+                // single Rust if/else chain, just like containers do.
+                let mut j = i;
+                while j < remaining_children.len() && is_if_element(&remaining_children[j]) {
+                    j += 1;
+                }
+                let chain_expr =
+                    codegen_if_chain(&remaining_children[i..j], cx, location, source_file)?;
+                child_stmts.push(quote! {
+                    let __el = ::gpui::ParentElement::child(__el, #chain_expr);
+                });
+                i = j;
+            } else {
+                let child = &remaining_children[i];
+                match child {
+                    AstNode::Text { .. } => {
+                        if def.supports_text_child {
+                            if let Some(text) = &text_opt {
+                                if !text_added {
+                                    text_added = true;
+                                    child_stmts.push(quote! {
+                                        let __el = ::gpui::ParentElement::child(__el, #text);
+                                    });
+                                }
                             }
+                        } else {
+                            return Err(XmlError::new(
+                                XmlErrorKind::Unsupported,
+                                element.span,
+                                format!(
+                                    "<{tag}> does not support text content; wrap text in a <Label>",
+                                    tag = element.tag
+                                ),
+                            )
+                            .at(element.byte_offset));
                         }
-                    } else {
-                        return Err(XmlError::new(
-                            XmlErrorKind::Unsupported,
-                            element.span,
-                            format!(
-                                "<{tag}> does not support text content; wrap text in a <Label>",
-                                tag = element.tag
-                            ),
-                        )
-                        .at(element.byte_offset));
+                    }
+                    AstNode::Expr { .. } | AstNode::Element(_) => {
+                        let child_expr = codegen_child(child, cx, location, source_file)?;
+                        child_stmts.push(quote! {
+                            let __el = ::gpui::ParentElement::child(__el, #child_expr);
+                        });
                     }
                 }
-                AstNode::Expr { .. } | AstNode::Element(_) => {
-                    let child_expr = codegen_child(child, cx, location, source_file)?;
-                    child_stmts.push(quote! {
-                        let __el = ::gpui::ParentElement::child(__el, #child_expr);
-                    });
-                }
+                i += 1;
             }
         }
         stmts.extend(child_stmts);
@@ -1502,10 +1541,14 @@ fn codegen_if_branch(
     }
     let child_expr = codegen_children_as_element(&element.children, cx, location, source_file)?;
 
+    // Wrap the branch body so every arm has the same concrete
+    // element type (`AnyElement`). This keeps if/else chains
+    // usable as children of leaves and containers.
+    let branch_body = quote! { ::gpui::IntoElement::into_any_element(#child_expr) };
     Ok(match kind {
-        ControlFlowDef::If => quote! { if #condition { #child_expr } },
-        ControlFlowDef::ElseIf => quote! { else if #condition { #child_expr } },
-        ControlFlowDef::Else => quote! { else { #child_expr } },
+        ControlFlowDef::If => quote! { if #condition { #branch_body } },
+        ControlFlowDef::ElseIf => quote! { else if #condition { #branch_body } },
+        ControlFlowDef::Else => quote! { else { #branch_body } },
         // Unreachable
         _ => unreachable!("non-branch kind {:?}", kind),
     })

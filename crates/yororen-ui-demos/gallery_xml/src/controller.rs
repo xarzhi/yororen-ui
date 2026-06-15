@@ -625,25 +625,6 @@ impl Controller {
         });
     }
 
-    pub fn disclosure_body(&self, cx: &mut App) -> AnyElement {
-        if !self.disclosure_open(cx) {
-            return div().into_any_element();
-        }
-        div()
-            .flex()
-            .flex_col()
-            .pl(px(16.0))
-            .child(
-                yororen_ui::headless::label::label(
-                    "ov-disc-body",
-                    cx.t("demo.disclosure.body"),
-                    cx,
-                )
-                .render(cx),
-            )
-            .into_any_element()
-    }
-
     // -------- Lists section --------
 
     pub fn submit_form(&self, _vals: HashMap<SharedString, String>, _w: &mut Window, cx: &mut App) {
