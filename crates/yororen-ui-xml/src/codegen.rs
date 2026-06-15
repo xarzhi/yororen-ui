@@ -2584,6 +2584,13 @@ fn codegen_virtual_list_kind(
 ///     <child>
 /// }
 /// ```
+///
+/// Note: `<State default>` may be an arbitrary brace
+/// expression, but it must not retain an `&mut` borrow of
+/// `cx` — the borrow from `(cx).new(...)` must end before
+/// the children run. For example `default={cx.t(...)}` is
+/// fine, but `default={let v = &mut *cx; v.foo()}` would
+/// conflict with later uses of `cx` in the body.
 fn codegen_state(
     element: &AstElement,
     cx: &TokenStream,
