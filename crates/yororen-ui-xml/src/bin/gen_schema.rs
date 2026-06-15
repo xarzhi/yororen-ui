@@ -200,6 +200,8 @@ enum PropValue {
     ImageSource,
     /// `KeybindingInputMode` setter (e.g. `KeybindingInput::mode`).
     KeybindingInputMode,
+    /// A gpui color (`Hsla` / `Rgba`).
+    Color,
     /// Zero-arg flag setter (`fn X(self) -> Self`).
     Flag,
     /// Not a recognised type — the user must annotate.
@@ -713,10 +715,9 @@ fn classify_arg(ty: &Type) -> PropValue {
     if rendered.contains("Pixels") {
         return PropValue::Float32;
     }
-    // `Hsla` / `impl Into<Hsla>` — requires a Rust brace expression;
-    // no useful literal form at the XML level.
-    if rendered.contains("Hsla") {
-        return PropValue::Unknown;
+    // `Hsla` / `Rgba` / `impl Into<Hsla>` — colour values.
+    if rendered.contains("Hsla") || rendered.contains("Rgba") {
+        return PropValue::Color;
     }
     if rendered.contains("IconSource") {
         return PropValue::IconSource;
@@ -1096,6 +1097,7 @@ fn render_props(props: &[PropInfo]) -> String {
             PropValue::IconSource => "PropValue::IconSource",
             PropValue::ImageSource => "PropValue::ImageSource",
             PropValue::KeybindingInputMode => "PropValue::KeybindingInputMode",
+            PropValue::Color => "PropValue::Color",
         };
         s.push_str(&format!(
             "PropDef {{ name: {:?}, setter: {:?}, value: {} }},\n            ",

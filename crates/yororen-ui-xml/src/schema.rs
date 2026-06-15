@@ -176,6 +176,10 @@ pub enum PropValue {
     ImageSource,
     /// `yororen_ui::headless::keybinding_input::KeybindingInputMode`.
     KeybindingInputMode,
+    /// A gpui color (`Hsla` / `Rgba`). String literals may be
+    /// hex (`#rrggbb` / `#rrggbbaa`); brace expressions are
+    /// passed through verbatim.
+    Color,
     /// A zero-arg setter (`fn wrap(self) -> Self`). The
     /// codegen emits `.setter()` when the attribute is
     /// present (regardless of value). Used for flag-style
@@ -233,6 +237,8 @@ pub enum ExtraArgKind {
     /// A `KeybindingInputMode` positional argument. Raw string
     /// values are mapped to the enum variants.
     KeybindingInputMode,
+    /// A gpui colour positional argument (`Hsla` / `Rgba`).
+    Color,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -564,7 +570,7 @@ pub const RESERVED_ATTRS: &[&str] = &[
     "each",      // <For each={...}>
     "let",       // <For let:item>
     "model",     // alias for the surrounding ViewModel
-    "key",       // reserved for Phase 2 keyed For
+    "key",       // <For key={...}>
     "if",        // reserved for future inline-if
 ];
 

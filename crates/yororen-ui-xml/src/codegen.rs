@@ -296,9 +296,9 @@ fn instantiate_template(
     }
 
     // The template's body must be a single child (or a
-    // Fragment-like sequence). For Phase 2 we wrap multiple
-    // top-level template children in a synthetic `<Fragment>`
-    // so the result composes uniformly.
+    // Fragment-like sequence). Multiple top-level children are
+    // wrapped in a synthetic `<Fragment>` so the result composes
+    // uniformly.
     let mut body = template.children.clone();
     // If the template body is empty, treat it as a single
     // empty Fragment.
@@ -456,10 +456,18 @@ fn codegen_runtime_leaf(element: &AstElement, cx: &TokenStream) -> Result<TokenS
         .iter()
         .find(|a| a.name == "id")
         .ok_or_else(|| {
+            let builtins = crate::schema::builtin_tags();
+            let suggestion = did_you_mean(&tag, &builtins.iter().map(|s| *s).collect::<Vec<_>>());
+            let hint = suggestion.map_or_else(
+                String::new,
+                |s| format!(" — did you mean `<{s}>`?"),
+            );
             XmlError::new(
                 XmlErrorKind::UnknownAttribute,
                 element.span,
-                format!("<{tag}> (a runtime-registered component) requires an `id` attribute"),
+                format!(
+                    "<{tag}> is not a built-in tag and (as a runtime-registered component) requires an `id` attribute{hint}"
+                ),
             )
             .at(element.byte_offset)
         })?;
@@ -724,12 +732,26 @@ fn apply_container_attr(
         return Ok(());
     }
 
+    let accepted = accepted_container_attrs(&def);
+    let suggestion = did_you_mean(
+        &attr.name,
+        &accepted
+            .split(", ")
+            .map(|s| s.trim())
+            .filter(|s| !s.is_empty())
+            .collect::<Vec<_>>(),
+    );
+    let hint = if let Some(s) = suggestion {
+        format!(" — did you mean `{}`?", s)
+    } else {
+        String::new()
+    };
     Err(XmlError::new(
         XmlErrorKind::UnknownAttribute,
         attr.span,
         format!(
-            "unknown attribute `{}` on <{}>; containers only accept shorthand style attributes (gap_3, p_4, w_full, flex, col, …) — see {}",
-            attr.name, element.tag, def.style_hint,
+            "unknown attribute `{}` on <{}>; containers only accept shorthand style attributes ({accepted}){hint}",
+            attr.name, element.tag,
         ),
     ))
 }
@@ -947,6 +969,21 @@ fn codegen_leaf(
                 )
                 .at(element.byte_offset));
             }
+            (ExtraArgKind::Color, Some(a)) => {
+                if let Some(expr) = &a.expr {
+                    parse_ts(expr, a.span, a.byte_offset, &format!("attribute `{}`", a.name))?
+                } else {
+                    parse_hex_color(a.raw.as_str(), a)?
+                }
+            }
+            (ExtraArgKind::Color, None) => {
+                return Err(XmlError::new(
+                    XmlErrorKind::UnknownAttribute,
+                    element.span,
+                    format!("<{}> requires a `{}` attribute", element.tag, extra.attr),
+                )
+                .at(element.byte_offset));
+            }
         };
         factory_args.push(extra_tokens);
     }
@@ -1111,10 +1148,24 @@ fn codegen_leaf(
             });
             continue;
         }
+        let mut accepted = accepted_leaf_attrs(&def);
+        if let Some(suggestion) = did_you_mean(
+            &attr.name,
+            &accepted
+                .split(", ")
+                .map(|s| s.trim())
+                .filter(|s| !s.is_empty())
+                .collect::<Vec<_>>(),
+        ) {
+            accepted.push_str(&format!(" — did you mean `{}`?", suggestion));
+        }
         return Err(XmlError::new(
             XmlErrorKind::UnknownAttribute,
             attr.span,
-            format!("unknown attribute `{}` on <{}>", attr.name, element.tag),
+            format!(
+                "unknown attribute `{}` on <{}>; accepted: {accepted}",
+                attr.name, element.tag
+            ),
         )
         .at(attr.byte_offset));
     }
@@ -1208,8 +1259,7 @@ fn codegen_leaf(
         }
         RenderMode::Apply => {
             // Caller is responsible for `.apply(div())` — for
-            // now, do nothing. (Phase 2 will wire `<Button
-            // custom>{...}</Button>` to `.apply(div()).child(...)`.)
+            // now, do nothing.
         }
     }
 
@@ -1339,31 +1389,18 @@ fn codegen_if_branch(
         quote! { #expr }
     };
 
-    // Build the body — a list of children turned into a
-    // tuple of expressions (in the form `(expr1, expr2, …)`)
-    // so the whole branch yields an `impl IntoElement`.
-    //
-    // For now we only support a single child per branch.
-    let child_expr = if element.children.is_empty() {
+    // Build the body. Multiple children are automatically
+    // wrapped in a plain `gpui::div()` so the branch always
+    // yields a single `impl IntoElement`.
+    if element.children.is_empty() {
         return Err(XmlError::new(
             XmlErrorKind::Unsupported,
             element.span,
             "if/else branch must contain at least one child",
         )
         .at(element.byte_offset));
-    } else if element.children.len() == 1 {
-        codegen_child(&element.children[0], cx, location, source_file)?
-    } else {
-        return Err(XmlError::new(
-            XmlErrorKind::Unsupported,
-            element.span,
-            format!(
-                "if/else branch has {} children; wrap in a <Column> or <Row> for now",
-                element.children.len()
-            ),
-        )
-        .at(element.byte_offset));
-    };
+    }
+    let child_expr = codegen_children_as_element(&element.children, cx, location, source_file)?;
 
     Ok(match kind {
         ControlFlowDef::If => quote! { if #condition { #child_expr } },
@@ -1458,23 +1495,15 @@ fn codegen_for(
         None => None,
     };
 
-    let child_expr = if element.children.is_empty() {
+    if element.children.is_empty() {
         return Err(XmlError::new(
             XmlErrorKind::Unsupported,
             element.span,
-            "<For> must wrap a single child",
+            "<For> must contain at least one child",
         )
         .at(element.byte_offset));
-    } else if element.children.len() == 1 {
-        codegen_child(&element.children[0], cx, location, source_file)?
-    } else {
-        return Err(XmlError::new(
-            XmlErrorKind::Unsupported,
-            element.span,
-            "<For> must wrap a single child (wrap multiple in a Column / Row)",
-        )
-        .at(element.byte_offset));
-    };
+    }
+    let child_expr = codegen_children_as_element(&element.children, cx, location, source_file)?;
 
     // The `<For>` body becomes a Rust `for` loop that appends
     // each row as a `.child(...)`. When a `key` is present the
@@ -1592,12 +1621,11 @@ fn codegen_fragment(
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
-    let mut children_tokens = TokenStream::new();
-    for child in &element.children {
-        let expr = codegen_child(child, cx, location, source_file)?;
-        children_tokens.append_all(quote! { #expr, });
-    }
-    Ok(quote! { (#children_tokens) })
+    // A Fragment is just a transparent group of children.
+    // When it has multiple children we wrap them in a plain
+    // `gpui::div()` so the result is always a single
+    // `impl IntoElement`.
+    codegen_children_as_element(&element.children, cx, location, source_file)
 }
 
 /// Compile-time file inclusion. The `src` attribute is
@@ -1673,19 +1701,18 @@ fn codegen_include(
         };
         crate::parser::parse(&contents, outer_span, &included_location)?
     };
-    let mut inner = TokenStream::new();
-    for child in &included_root.children {
-        let line_starts = crate::parser::line_starts(&contents);
-        let included_location = crate::parser::LocationTracker {
-            line_starts: &line_starts,
-            xml: &contents,
-            outer_span,
-        };
-        let resolved_path_str = resolved.to_str();
-        let expr = codegen_child(child, cx, &included_location, resolved_path_str)?;
-        inner.append_all(quote! { #expr, });
-    }
-    Ok(quote! { (#inner) })
+    let resolved_path_str = resolved.to_str();
+    let included_location = crate::parser::LocationTracker {
+        line_starts: &line_starts,
+        xml: &contents,
+        outer_span,
+    };
+    codegen_children_as_element(
+        &included_root.children,
+        cx,
+        &included_location,
+        resolved_path_str,
+    )
 }
 
 /// Try to resolve a relative `path` against the
@@ -1749,9 +1776,8 @@ fn codegen_slot(_element: &AstElement, _cx: &TokenStream) -> Result<TokenStream,
 /// (the macro walks them in order); `<Case pattern="_">`
 /// becomes the wildcard arm.
 ///
-/// The arm body is the single child of each `<Case>`
-/// (multi-child arms are not supported — wrap in a
-/// container for now, same limitation as `<If>`).
+/// The arm body supports multiple children; they are
+/// automatically wrapped in a plain `gpui::div()`.
 fn codegen_match(
     element: &AstElement,
     cx: &TokenStream,
@@ -1820,26 +1846,15 @@ fn codegen_match(
             let raw = pattern_attr.raw.as_str();
             quote! { #raw }
         };
-        let body = if arm.children.is_empty() {
+        if arm.children.is_empty() {
             return Err(XmlError::new(
                 XmlErrorKind::Unsupported,
                 arm.span,
                 "<Case> must contain at least one child",
             )
             .at(arm.byte_offset));
-        } else if arm.children.len() == 1 {
-            codegen_child(&arm.children[0], cx, location, source_file)?
-        } else {
-            return Err(XmlError::new(
-                XmlErrorKind::Unsupported,
-                arm.span,
-                format!(
-                    "<Case> has {} children; wrap in a <Column> or <Row> for now",
-                    arm.children.len()
-                ),
-            )
-            .at(arm.byte_offset));
-        };
+        }
+        let body = codegen_children_as_element(&arm.children, cx, location, source_file)?;
         arms.append_all(quote! { #pattern_parsed => { #body }, });
         arm_count += 1;
     }
@@ -1948,18 +1963,7 @@ fn codegen_state(
         }
     };
 
-    let body = if element.children.is_empty() {
-        quote! { gpui::div() }
-    } else if element.children.len() == 1 {
-        codegen_child(&element.children[0], cx, location, source_file)?
-    } else {
-        return Err(XmlError::new(
-            XmlErrorKind::Unsupported,
-            element.span,
-            "<State> must wrap a single child",
-        )
-        .at(element.byte_offset));
-    };
+    let body = codegen_children_as_element(&element.children, cx, location, source_file)?;
 
     Ok(quote! {
         {
@@ -1987,6 +1991,45 @@ fn codegen_child(
             // For all other parents, surface an error.
             Ok(quote! { #text })
         }
+    }
+}
+
+/// Turn a list of XML children into a single `impl IntoElement`
+/// expression.
+///
+/// - A single child is emitted directly.
+/// - Multiple children are wrapped in a plain `gpui::div()` and
+///   appended via `.child(...)`, so the result always composes
+///   into a parent container.
+/// - An empty list yields an empty `gpui::div()`.
+///
+/// This is the workhorse behind multi-child `<If>`, `<For>` rows,
+/// `<Match>` arms, `<State>`, `<Fragment>`, and `<Include>`.
+fn codegen_children_as_element(
+    children: &[AstNode],
+    cx: &TokenStream,
+    location: &crate::parser::LocationTracker<'_>,
+    source_file: Option<&str>,
+) -> Result<TokenStream, XmlError> {
+    if children.is_empty() {
+        Ok(quote! { gpui::div() })
+    } else if children.len() == 1 {
+        codegen_child(&children[0], cx, location, source_file)
+    } else {
+        let mut stmts: Vec<TokenStream> = Vec::new();
+        stmts.push(quote! { let __el = gpui::div(); });
+        for child in children {
+            let child_expr = codegen_child(child, cx, location, source_file)?;
+            stmts.push(quote! {
+                let __el = ::gpui::ParentElement::child(__el, #child_expr);
+            });
+        }
+        Ok(quote! {
+            {
+                #(#stmts)*
+                __el
+            }
+        })
     }
 }
 
@@ -2053,6 +2096,7 @@ fn prop_value_tokens(attr: &AstAttribute, kind: PropValue) -> Result<TokenStream
             | PropValue::IconSource
             | PropValue::ImageSource
             | PropValue::KeybindingInputMode
+            | PropValue::Color
             | PropValue::Bool
             | PropValue::UInt
             | PropValue::Float32
@@ -2164,6 +2208,13 @@ fn prop_value_tokens(attr: &AstAttribute, kind: PropValue) -> Result<TokenStream
             };
             let variant = format_ident!("{variant}");
             Ok(quote! { ::yororen_ui::headless::keybinding_input::KeybindingInputMode::#variant })
+        }
+        PropValue::Color => {
+            // Brace expressions are passed through verbatim above;
+            // this arm only handles literal strings. Hex colours are
+            // converted to `gpui::rgb` / `gpui::rgba` calls; anything
+            // else is rejected with a helpful note.
+            parse_hex_color(raw, attr)
         }
         PropValue::Unknown => Ok(quote! { (#raw).to_string() }),
         PropValue::Float64 => {
@@ -2865,6 +2916,151 @@ fn is_known_key_filter(name: &str) -> bool {
         | "f1" | "f2" | "f3" | "f4" | "f5" | "f6"
         | "f7" | "f8" | "f9" | "f10" | "f11" | "f12"
     )
+}
+
+/// Parse a hex colour literal (`#rrggbb` or `#rrggbbaa`) and
+/// emit the corresponding gpui constructor. Rejects other
+/// literal forms and points the user toward a brace expression.
+fn parse_hex_color(raw: &str, attr: &AstAttribute) -> Result<TokenStream, XmlError> {
+    let hex = raw.strip_prefix('#').ok_or_else(|| {
+        XmlError::new(
+            XmlErrorKind::InvalidExpression,
+            attr.span,
+            format!(
+                "attribute `{}` expects a hex colour (`#rrggbb` or `#rrggbbaa`) or a brace expression like `{{gpui::hsla(...)}}`; got `{raw}`",
+                attr.name
+            ),
+        )
+        .at(attr.byte_offset)
+    })?;
+    if hex.len() == 6 {
+        let value = u32::from_str_radix(hex, 16).map_err(|_| {
+            XmlError::new(
+                XmlErrorKind::InvalidExpression,
+                attr.span,
+                format!(
+                    "attribute `{}` expects a valid hex colour, got `{raw}`",
+                    attr.name
+                ),
+            )
+            .at(attr.byte_offset)
+        })?;
+        Ok(quote! { ::gpui::rgb(#value) })
+    } else if hex.len() == 8 {
+        let value = u32::from_str_radix(hex, 16).map_err(|_| {
+            XmlError::new(
+                XmlErrorKind::InvalidExpression,
+                attr.span,
+                format!(
+                    "attribute `{}` expects a valid hex colour, got `{raw}`",
+                    attr.name
+                ),
+            )
+            .at(attr.byte_offset)
+        })?;
+        Ok(quote! { ::gpui::rgba(#value) })
+    } else {
+        Err(XmlError::new(
+            XmlErrorKind::InvalidExpression,
+            attr.span,
+            format!(
+                "attribute `{}` expects `#rrggbb` or `#rrggbbaa`, got `{raw}`",
+                attr.name
+            ),
+        )
+        .at(attr.byte_offset))
+    }
+}
+
+// --- error-message helpers --------------------------------------------------
+
+/// Compute a simple string-similarity score: number of
+/// character insertions / deletions / substitutions needed
+/// to turn `a` into `b` (Damerau-Levenshtein distance,
+/// capped to avoid quadratic blow-up on long names).
+fn edit_distance(a: &str, b: &str) -> usize {
+    let a = a.chars().collect::<Vec<_>>();
+    let b = b.chars().collect::<Vec<_>>();
+    let n = a.len();
+    let m = b.len();
+    if n == 0 {
+        return m;
+    }
+    if m == 0 {
+        return n;
+    }
+    let mut prev: Vec<usize> = (0..=m).collect();
+    let mut curr = vec![0usize; m + 1];
+    for i in 1..=n {
+        curr[0] = i;
+        for j in 1..=m {
+            let cost = if a[i - 1] == b[j - 1] { 0 } else { 1 };
+            curr[j] = (prev[j] + 1)
+                .min(curr[j - 1] + 1)
+                .min(prev[j - 1] + cost);
+            if i > 1
+                && j > 1
+                && a[i - 1] == b[j - 2]
+                && a[i - 2] == b[j - 1]
+            {
+                curr[j] = curr[j].min(prev[j - 2] + cost);
+            }
+        }
+        std::mem::swap(&mut prev, &mut curr);
+    }
+    prev[m]
+}
+
+/// Pick the candidate most likely to be what the user
+/// meant. Returns `None` when nothing is close enough.
+fn did_you_mean<'a>(name: &str, candidates: &[&'a str]) -> Option<&'a str> {
+    let name = name.to_ascii_lowercase();
+    let mut best: Option<(&'a str, usize)> = None;
+    for c in candidates {
+        // Exact prefix match beats edit distance.
+        let lower = c.to_ascii_lowercase();
+        let dist = if lower.starts_with(&name) || name.starts_with(&lower) {
+            1
+        } else {
+            edit_distance(&name, &lower)
+        };
+        let threshold = (name.len() / 2).max(2);
+        if dist <= threshold && best.map_or(true, |(_, d)| dist < d) {
+            best = Some((*c, dist));
+        }
+    }
+    best.map(|(c, _)| c)
+}
+
+/// Build a human-readable list of accepted XML attributes
+/// for a leaf component (id + extra args + props + events + slots).
+fn accepted_leaf_attrs(def: &LeafDef) -> String {
+    let mut parts = vec!["id".to_string()];
+    for e in def.extra_args {
+        parts.push(e.attr.to_string());
+    }
+    for p in def.props {
+        parts.push(p.name.to_string());
+    }
+    for (name, _) in def.events {
+        parts.push(name.to_string());
+    }
+    for s in def.slots {
+        parts.push(format!("slot=\"{}\"", s.name));
+    }
+    parts.join(", ")
+}
+
+/// Build a human-readable list of accepted XML attributes
+/// for a container (id + shorthand style methods).
+fn accepted_container_attrs(def: &ContainerDef) -> String {
+    let mut parts = vec!["id".to_string()];
+    parts.push("flex".to_string());
+    for (attr, _) in def.fixed_methods {
+        parts.push(attr.to_string());
+    }
+    parts.push("shorthand style methods (gap_3, p_4, w_full, ...)".to_string());
+    parts.join(", ")
 }
 
 #[cfg(test)]
@@ -3608,8 +3804,8 @@ mod tests {
         // The generated schema (`BUILTINS_GENERATED`) is
         // included by `lib.rs` and the codegen falls back to
         // it for any tag not in the hand-written BUILTINS.
-        // We assert that a handful of Phase 2 components are
-        // reachable through the lookup.
+        // We assert that a handful of high-frequency components
+        // are reachable through the lookup.
         for tag in [
             "Checkbox",
             "Switch",
@@ -3766,21 +3962,14 @@ mod tests {
     }
 
     #[test]
-    fn bind_on_text_input_now_emits_value_setter() {
-        // The headline change of Phase 2 @bind: TextInput
-        // now exposes a `value(impl Into<String>)` setter
-        // (the renderer uses it to seed the initial text
-        // content of the input). With this setter in the
-        // schema, `@bind={self.name}` on `<TextInput>`
-        // emits both:
+    fn bind_on_text_input_emits_value_setter() {
+        // `@bind={self.name}` on `<TextInput>` emits both:
         //   1. `.value(XmlBinding::xml_read(&entity, cx))`
         //      — read the current value of the bound
         //      entity and pass it to the setter.
         //   2. `.on_change({ … XmlBinding::xml_write(&entity, …) })`
         //      — write the new value back when the user
         //      edits the input.
-        // Before Phase 2 the read side was silently
-        // skipped because TextInput had no `value` setter.
         let s = render(r#"<TextInput id="x" @bind={self.name} />"#);
         let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
         // The read side: `XmlBinding::xml_read` is called
@@ -4095,5 +4284,178 @@ mod tests {
                 "tag {tag:?} should be in BUILTINS_OVERRIDES"
             );
         }
+    }
+
+    #[test]
+    fn if_branch_supports_multiple_children() {
+        let s = render(
+            r#"<Column>
+    <If condition={show}>
+        <Label id="a" text="A" />
+        <Label id="b" text="B" />
+    </If>
+</Column>"#,
+        );
+        let normalised: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+        // The branch body should be wrapped in a div that has
+        // both labels as children.
+        assert!(normalised.contains("ifshow"), "condition must be emitted; got {normalised}");
+        assert!(
+            normalised.matches("child").count() >= 2,
+            "multiple children should be wired; got {normalised}"
+        );
+    }
+
+    #[test]
+    fn for_loop_supports_multiple_children_per_row() {
+        let s = render(
+            r#"<Column>
+    <For each={items} let:item>
+        <Label id="a" text={item.a} />
+        <Label id="b" text={item.b} />
+    </For>
+</Column>"#,
+        );
+        let normalised: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+        assert!(
+            normalised.contains("foritemin"),
+            "loop must be emitted; got {normalised}"
+        );
+        assert!(
+            normalised.matches("child").count() >= 2,
+            "multiple children per row should be wired; got {normalised}"
+        );
+    }
+
+    #[test]
+    fn state_supports_multiple_children() {
+        let s = render(
+            r#"<Column>
+    <State name="count" default="0">
+        <Label id="a" text="A" />
+        <Label id="b" text="B" />
+    </State>
+</Column>"#,
+        );
+        let normalised: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+        assert!(
+            normalised.contains("new(|_|0i64)"),
+            "state entity must be created; got {normalised}"
+        );
+        assert!(
+            normalised.matches("child").count() >= 2,
+            "multiple state children should be wired; got {normalised}"
+        );
+    }
+
+    #[test]
+    fn match_case_supports_multiple_children() {
+        let s = render(
+            r#"<Column>
+    <Match on={status}>
+        <Case pattern={Status::Ok}>
+            <Label id="a" text="A" />
+            <Label id="b" text="B" />
+        </Case>
+    </Match>
+</Column>"#,
+        );
+        let normalised: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+        assert!(normalised.contains("match"), "match must be emitted; got {normalised}");
+        assert!(
+            normalised.matches("child").count() >= 2,
+            "multiple case children should be wired; got {normalised}"
+        );
+    }
+
+    #[test]
+    fn color_prop_hex_rgb() {
+        let s = render(r##"<Switch id="s" custom_tone="#ff00ff" />"##);
+        assert!(
+            s.contains("gpui :: rgb (16711935u32)"),
+            "hex #ff00ff should become gpui::rgb(0xff00ff); got {s}"
+        );
+    }
+
+    #[test]
+    fn color_prop_hex_rgba() {
+        let s = render(r##"<Switch id="s" custom_tone="#ff00ff80" />"##);
+        assert!(
+            s.contains("gpui :: rgba (4278255488u32)"),
+            "hex #ff00ff80 should become gpui::rgba; got {s}"
+        );
+    }
+
+    #[test]
+    fn color_prop_brace_expression_passes_through() {
+        let s = render(r#"<Switch id="s" custom_tone={gpui::hsla(0.5, 1.0, 0.5, 1.0)} />"#);
+        assert!(
+            s.contains("hsla (0.5 , 1.0 , 0.5 , 1.0)"),
+            "brace colour expression should pass through; got {s}"
+        );
+    }
+
+    #[test]
+    fn unknown_leaf_attribute_lists_accepted_attrs() {
+        let err = codegen(
+            r#"<Button id="b" href="https://example.com" />"#,
+            Span::call_site(),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert!(err.message.contains("unknown attribute `href`"), "{}", err.message);
+        assert!(
+            err.message.contains("accepted:"),
+            "error should list accepted attrs; got {}",
+            err.message
+        );
+        assert!(
+            err.message.contains("on_click"),
+            "accepted list should mention on_click; got {}",
+            err.message
+        );
+    }
+
+    #[test]
+    fn unknown_leaf_attribute_suggests_did_you_mean() {
+        let err = codegen(
+            r#"<Button id="b" on_clik={|| {}} />"#,
+            Span::call_site(),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert!(
+            err.message.contains("did you mean `on_click`"),
+            "error should suggest on_click for on_clik; got {}",
+            err.message
+        );
+    }
+
+    #[test]
+    fn unknown_container_attribute_suggests_did_you_mean() {
+        let err = codegen(
+            r#"<Column flx col />"#,
+            Span::call_site(),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert!(
+            err.message.contains("did you mean `flex`"),
+            "error should suggest flex for flx; got {}",
+            err.message
+        );
+    }
+
+    #[test]
+    fn unknown_tag_without_id_suggests_did_you_mean() {
+        let err = codegen(r#"<Buton />"#, Span::call_site(), None, None).unwrap_err();
+        assert!(
+            err.message.contains("did you mean `<Button>`"),
+            "error should suggest Button for Buton; got {}",
+            err.message
+        );
     }
 }
