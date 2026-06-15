@@ -713,7 +713,7 @@ fn split_text_content(text: &str) -> Vec<(bool, String, usize)> {
             let start = i;
             let mut depth = 1usize;
             let mut end = i + 1;
-            while let Some((j, d)) = chars.next() {
+            for (j, d) in chars.by_ref() {
                 end = j + d.len_utf8();
                 if d == '{' {
                     depth += 1;

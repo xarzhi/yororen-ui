@@ -69,7 +69,7 @@ std::thread_local! {
 fn lookup_with_user_schema(tag: &str) -> Option<ComponentDef> {
     USER_SCHEMA.with(|s| {
         let borrowed = s.borrow();
-        crate::schema::lookup_component_owned(tag, &*borrowed)
+        crate::schema::lookup_component_owned(tag, &borrowed)
     })
 }
 
@@ -486,7 +486,7 @@ fn codegen_runtime_leaf(element: &AstElement, cx: &TokenStream) -> Result<TokenS
         .find(|a| a.name == "id")
         .ok_or_else(|| {
             let builtins = crate::schema::builtin_tags();
-            let suggestion = did_you_mean(&tag, &builtins.iter().map(|s| *s).collect::<Vec<_>>());
+            let suggestion = did_you_mean(&tag, builtins);
             let hint = suggestion.map_or_else(
                 String::new,
                 |s| format!(" — did you mean `<{s}>`?"),
@@ -1261,16 +1261,15 @@ fn codegen_leaf(
     let mut slotted_children: Vec<(&str, AstElement)> = Vec::new();
     let mut remaining_children: Vec<AstNode> = Vec::new();
     for child in &element.children {
-        if let AstNode::Element(child_el) = child {
-            if let Some(slot_attr) = child_el.attributes.iter().find(|a| a.name == "slot") {
-                let slot_name = slot_attr.raw.as_str();
-                if let Some(slot_def) = def.slots.iter().find(|s| s.name == slot_name) {
-                    let mut stripped = child_el.clone();
-                    stripped.attributes.retain(|a| a.name != "slot");
-                    slotted_children.push((slot_def.setter, stripped));
-                    continue;
-                }
-            }
+        if let AstNode::Element(child_el) = child
+            && let Some(slot_attr) = child_el.attributes.iter().find(|a| a.name == "slot")
+            && let Some(slot_def) =
+                def.slots.iter().find(|s| s.name == slot_attr.raw.as_str())
+        {
+            let mut stripped = child_el.clone();
+            stripped.attributes.retain(|a| a.name != "slot");
+            slotted_children.push((slot_def.setter, stripped));
+            continue;
         }
         remaining_children.push(child.clone());
     }
@@ -1404,13 +1403,11 @@ fn codegen_leaf(
                 match child {
                     AstNode::Text { .. } => {
                         if def.supports_text_child {
-                            if let Some(text) = &text_opt {
-                                if !text_added {
-                                    text_added = true;
-                                    child_stmts.push(quote! {
-                                        let __el = ::gpui::ParentElement::child(__el, #text);
-                                    });
-                                }
+                            if let Some(text) = &text_opt && !text_added {
+                                text_added = true;
+                                child_stmts.push(quote! {
+                                    let __el = ::gpui::ParentElement::child(__el, #text);
+                                });
                             }
                         } else {
                             return Err(XmlError::new(
@@ -3745,7 +3742,7 @@ fn did_you_mean<'a>(name: &str, candidates: &[&'a str]) -> Option<&'a str> {
             edit_distance(&name, &lower)
         };
         let threshold = (name.len() / 2).max(2);
-        if dist <= threshold && best.map_or(true, |(_, d)| dist < d) {
+        if dist <= threshold && best.is_none_or(|(_, d)| dist < d) {
             best = Some((*c, dist));
         }
     }
