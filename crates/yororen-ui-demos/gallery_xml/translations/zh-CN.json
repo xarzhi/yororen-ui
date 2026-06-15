@@ -20,15 +20,9 @@
     "section_lists": "7. 列表、表格、树、表单",
     "footer": {
       "live_counters": "实时状态计数器",
-      "form_submit_count": "form_submit_count:",
-      "email": "email:",
-      "error": "error:",
-      "checkbox": "checkbox:",
-      "switch": "switch:",
-      "radio": "radio:",
-      "slider": "slider:",
-      "toast_count": "toast_count:",
-      "locale": "locale:"
+      "form_summary": "form_submit_count: {count}  |  email: {email}  |  error: {error}",
+      "controls_summary": "checkbox: {checkbox}  |  switch: {switch}  |  radio: {radio}  |  slider: {slider}",
+      "toast_summary": "toast_count: {count}  |  locale: {locale}"
     },
     "common": {
       "top": "顶部",
@@ -59,8 +53,9 @@
       "cell": "form + form_field (邮箱校验)"
     },
     "input": {
-      "value": "值：",
+      "value": "值：{value}",
       "mode": "模式：",
+      "keybinding_status": "值：{value}  模式：{mode}",
       "file_path_hint": "文件路径输入 (点击右侧图标打开对话框)",
       "keybinding_hint": "按键绑定输入 (点击开始捕获)",
       "text_area_hint": "多行文本 (multi-line)",
@@ -106,7 +101,7 @@
       "badge_info": "信息",
       "tag_toggle": "点击切换",
       "tag_closable": "可关闭",
-      "tag_close_events": "tag 关闭事件：{}",
+      "tag_close_events": "tag 关闭事件：{count}",
       "loading": "加载中…",
       "plain_text": "通过 `text` 显示的纯文本",
       "cell_label_default": "label / 默认",
@@ -155,8 +150,8 @@
       "cell_shortcut_hint": "shortcut_hint"
     },
     "controls": {
-      "selected": "已选择：",
-      "slider_value": "滑块：{}",
+      "selected": "已选择：{value}",
+      "slider_value": "滑块：{value}",
       "radio_group_empty_label": "独立 radio_group (无子项)",
       "cell_checkbox": "checkbox",
       "cell_switch": "switch",

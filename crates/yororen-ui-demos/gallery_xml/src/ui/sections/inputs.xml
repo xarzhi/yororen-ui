@@ -6,7 +6,7 @@
         <Slot name="name"><Label id="lbl-text" text={t!(cx, "input.text")} muted /></Slot>
         <TextInput id="input-text" placeholder={t!(cx, "demo.input.placeholder_type_here")}
                    @bind={controller.text_value_entity(cx)} />
-        <Slot name="status"><Label id="status-text" text={format!("{} {:?}", t!(cx, "demo.input.value"), controller.text_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="status-text" text={t_named!(cx, "demo.input.value", value => controller.text_value(cx))} muted /></Slot>
     </InputCell>
 
     <InputCell>
@@ -14,7 +14,7 @@
         <PasswordInput id="input-password" placeholder={t!(cx, "demo.input.placeholder_password")}
                        mask_char={'•'}
                        @bind={controller.password_value_entity(cx)} />
-        <Slot name="status"><Label id="status-password" text={format!("{} {:?}", t!(cx, "demo.input.value"), controller.password_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="status-password" text={t_named!(cx, "demo.input.value", value => controller.password_value(cx))} muted /></Slot>
     </InputCell>
 
     <InputCell>
@@ -23,7 +23,7 @@
                      @bind={controller.number_value_entity(cx)}
                      on_increment={controller.set_number_value}
                      on_decrement={controller.set_number_value} />
-        <Slot name="status"><Label id="status-number" text={format!("{} {}", t!(cx, "demo.input.value"), controller.number_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="status-number" text={t_named!(cx, "demo.input.value", value => controller.number_value(cx))} muted /></Slot>
     </InputCell>
 
     <InputCell>
@@ -31,7 +31,7 @@
         <SearchInput id="input-search" placeholder={t!(cx, "demo.input.placeholder_search")}
                      @bind={controller.search_value_entity(cx)}
                      on_clear={controller.clear_search} />
-        <Slot name="status"><Label id="status-search" text={format!("{} {:?}", t!(cx, "demo.input.value"), controller.search_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="status-search" text={t_named!(cx, "demo.input.value", value => controller.search_value(cx))} muted /></Slot>
     </InputCell>
 
     <InputCell>
@@ -39,7 +39,7 @@
         <FilePathInput id="input-file-path" placeholder={t!(cx, "demo.input.placeholder_path")}
                        @bind={controller.file_path_value_entity(cx)}
                        on_browse={controller.browse_file_path} />
-        <Slot name="status"><Label id="status-file" text={format!("{} {:?}", t!(cx, "demo.input.value"), controller.file_path_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="status-file" text={t_named!(cx, "demo.input.value", value => controller.file_path_value(cx))} muted /></Slot>
     </InputCell>
 
     <InputCell>
@@ -48,25 +48,25 @@
                          on_change={controller.set_keybinding_value}
                          on_start_capture={{ let c = controller.clone(); move |_w, cx| c.start_keybinding_capture(_w, cx) }}
                          on_cancel_capture={{ let c = controller.clone(); move |_w, cx| c.cancel_keybinding_capture(_w, cx) }} />
-        <Slot name="status"><Label id="status-keybinding" text={format!("{} {:?}  {} {:?}", t!(cx, "demo.input.value"), controller.keybinding_value(cx), t!(cx, "demo.input.mode"), controller.keybinding_mode(cx))} muted /></Slot>
+        <Slot name="status"><Label id="status-keybinding" text={t_named!(cx, "demo.input.keybinding_status", value => controller.keybinding_value(cx), mode => format!("{:?}", controller.keybinding_mode(cx)))} muted /></Slot>
     </InputCell>
 
     <InputCell>
         <Slot name="name"><Label id="lbl-text-area" text={t!(cx, "demo.input.text_area_hint")} muted /></Slot>
         <TextArea id="input-text-area" placeholder={t!(cx, "demo.input.placeholder_text_area")}
                   @bind={controller.text_area_value_entity(cx)} />
-        <Slot name="status"><Label id="status-text-area" text={format!("{} {:?}", t!(cx, "demo.input.value"), controller.text_area_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="status-text-area" text={t_named!(cx, "demo.input.value", value => controller.text_area_value(cx))} muted /></Slot>
     </InputCell>
 
     <InputCell>
         <Slot name="name"><Label id="lbl-select" text={t!(cx, "input.select")} muted /></Slot>
         <Select id="input-select" state={controller.select_state(cx)} />
-        <Slot name="status"><Label id="status-select" text={format!("{} {}", t!(cx, "demo.input.value"), controller.select_demo_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="status-select" text={t_named!(cx, "demo.input.value", value => controller.select_demo_value(cx))} muted /></Slot>
     </InputCell>
 
     <InputCell>
         <Slot name="name"><Label id="lbl-combo" text={t!(cx, "input.combo")} muted /></Slot>
         <ComboBox id="input-combo" state={controller.combo_state(cx)} />
-        <Slot name="status"><Label id="status-combo" text={format!("{} {}", t!(cx, "demo.input.value"), controller.combo_demo_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="status-combo" text={t_named!(cx, "demo.input.value", value => controller.combo_demo_value(cx))} muted /></Slot>
     </InputCell>
 </Column>

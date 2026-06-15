@@ -20,15 +20,9 @@
     "section_lists": "7. القوائم والجداول والأشجار والنماذج",
     "footer": {
       "live_counters": "عدادات الحالة المباشرة",
-      "form_submit_count": "form_submit_count:",
-      "email": "email:",
-      "error": "error:",
-      "checkbox": "checkbox:",
-      "switch": "switch:",
-      "radio": "radio:",
-      "slider": "slider:",
-      "toast_count": "toast_count:",
-      "locale": "locale:"
+      "form_summary": "form_submit_count: {count}  |  email: {email}  |  error: {error}",
+      "controls_summary": "checkbox: {checkbox}  |  switch: {switch}  |  radio: {radio}  |  slider: {slider}",
+      "toast_summary": "toast_count: {count}  |  locale: {locale}"
     },
     "common": {
       "top": "أعلى",
@@ -59,8 +53,9 @@
       "cell": "form + form_field (تحقق من البريد)"
     },
     "input": {
-      "value": "القيمة:",
+      "value": "القيمة: {value}",
       "mode": "الوضع:",
+      "keybinding_status": "القيمة: {value}  الوضع: {mode}",
       "file_path_hint": "إدخال مسار ملف (انقر على الأيقونة اليمنى لفتح مربع الحوار)",
       "keybinding_hint": "إدخال ربط مفتاح (انقر لبدء الالتقاط)",
       "text_area_hint": "منطقة نص (متعدد الأسطر)",
@@ -106,7 +101,7 @@
       "badge_info": "معلومات",
       "tag_toggle": "انقر للتبديل",
       "tag_closable": "قابل للإغلاق",
-      "tag_close_events": "أحداث إغلاق tag: {}",
+      "tag_close_events": "أحداث إغلاق tag: {count}",
       "loading": "جارٍ التحميل…",
       "plain_text": "نص عادي عبر `text`",
       "cell_label_default": "label / افتراضي",
@@ -155,8 +150,8 @@
       "cell_shortcut_hint": "shortcut_hint"
     },
     "controls": {
-      "selected": "المحدد:",
-      "slider_value": "شريط: {}",
+      "selected": "المحدد: {value}",
+      "slider_value": "شريط: {value}",
       "radio_group_empty_label": "radio_group مستقل (بدون فروع)",
       "cell_checkbox": "checkbox",
       "cell_switch": "switch",

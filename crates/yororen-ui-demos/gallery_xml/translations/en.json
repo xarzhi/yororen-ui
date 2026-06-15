@@ -20,15 +20,9 @@
     "section_lists": "7. Lists, Tables, Trees, Forms",
     "footer": {
       "live_counters": "Live state counters",
-      "form_submit_count": "form_submit_count:",
-      "email": "email:",
-      "error": "error:",
-      "checkbox": "checkbox:",
-      "switch": "switch:",
-      "radio": "radio:",
-      "slider": "slider:",
-      "toast_count": "toast_count:",
-      "locale": "locale:"
+      "form_summary": "form_submit_count: {count}  |  email: {email}  |  error: {error}",
+      "controls_summary": "checkbox: {checkbox}  |  switch: {switch}  |  radio: {radio}  |  slider: {slider}",
+      "toast_summary": "toast_count: {count}  |  locale: {locale}"
     },
     "common": {
       "top": "Top",
@@ -59,8 +53,9 @@
       "cell": "form + form_field (email validation)"
     },
     "input": {
-      "value": "value:",
+      "value": "value: {value}",
       "mode": "mode:",
+      "keybinding_status": "value: {value}  mode: {mode}",
       "file_path_hint": "File path input (click right icon to open dialog)",
       "keybinding_hint": "Keybinding input (click to start capture)",
       "text_area_hint": "Text area (multi-line)",
@@ -106,7 +101,7 @@
       "badge_info": "Info",
       "tag_toggle": "Tap to toggle",
       "tag_closable": "Closable",
-      "tag_close_events": "tag close events: {}",
+      "tag_close_events": "tag close events: {count}",
       "loading": "Loading…",
       "plain_text": "Plain text via `text`",
       "cell_label_default": "label / default",
@@ -155,8 +150,8 @@
       "cell_shortcut_hint": "shortcut_hint"
     },
     "controls": {
-      "selected": "selected:",
-      "slider_value": "slider: {}",
+      "selected": "selected: {value}",
+      "slider_value": "slider: {value}",
       "radio_group_empty_label": "Standalone radio_group (no children)",
       "cell_checkbox": "checkbox",
       "cell_switch": "switch",

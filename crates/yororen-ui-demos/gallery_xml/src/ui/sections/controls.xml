@@ -6,13 +6,13 @@
         <InputCell>
             <Slot name="name"><Label id="lbl-cb" text={t!(cx, "demo.controls.cell_checkbox")} muted /></Slot>
             <Checkbox id="ctrl-cb" @bind={controller.checkbox_value_entity(cx)} />
-            <Slot name="status"><Label id="status-cb" text={format!("{} {}", t!(cx, "demo.input.value"), controller.checkbox_value(cx))} muted /></Slot>
+            <Slot name="status"><Label id="status-cb" text={t_named!(cx, "demo.input.value", value => controller.checkbox_value(cx))} muted /></Slot>
         </InputCell>
 
         <InputCell>
             <Slot name="name"><Label id="lbl-sw" text={t!(cx, "demo.controls.cell_switch")} muted /></Slot>
             <Switch id="ctrl-sw" @bind={controller.switch_value_entity(cx)} />
-            <Slot name="status"><Label id="status-sw" text={format!("{} {}", t!(cx, "demo.input.value"), controller.switch_value(cx))} muted /></Slot>
+            <Slot name="status"><Label id="status-sw" text={t_named!(cx, "demo.input.value", value => controller.switch_value(cx))} muted /></Slot>
         </InputCell>
     </Row>
 
@@ -27,12 +27,12 @@
                    on_toggle={{ let c = controller.clone(); move |_v,_ev,w,cx| c.set_radio(2, w, cx) }} />
         </RadioGroup>
     </InputCell>
-    <Label id="rg-current" text={format!("{} {}", t!(cx, "demo.controls.selected"), controller.radio_value(cx))} muted />
+    <Label id="rg-current" text={t_named!(cx, "demo.controls.selected", value => controller.radio_value(cx))} muted />
 
     <InputCell>
         <Slot name="name"><Label id="lbl-slider" text={t!(cx, "demo.controls.cell_slider")} muted /></Slot>
         <Slider id="ctrl-slider" min={0.0} max={100.0} step={1.0}
                 @bind={controller.slider_value_entity(cx)} />
     </InputCell>
-    <Label id="slider-lbl" text={t!(cx, "demo.controls.slider_value").replace("{}", &format!("{:.1}", controller.slider_value(cx)))} muted />
+    <Label id="slider-lbl" text={t_named!(cx, "demo.controls.slider_value", value => format!("{:.1}", controller.slider_value(cx)))} muted />
 </Column>

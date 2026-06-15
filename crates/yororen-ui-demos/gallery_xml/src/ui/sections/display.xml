@@ -92,7 +92,7 @@
                  closable on_close={controller.close_tag} />
         </Cell>
         <Label id="tg-closable-count"
-               text={format!("{} {}", t!(cx, "demo.display.tag_close_events"), controller.tag_close_count(cx))}
+               text={t_named!(cx, "demo.display.tag_close_events", count => controller.tag_close_count(cx))}
                muted />
     </Row>
 
