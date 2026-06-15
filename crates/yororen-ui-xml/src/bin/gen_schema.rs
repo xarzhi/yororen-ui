@@ -144,6 +144,10 @@ enum ExtraArgKind {
     /// Factory arg is anything else; the macro should pass
     /// the `attr` XML attribute's value verbatim.
     Custom,
+    /// Factory arg is a closure (`impl Fn(...)`, `Arc<dyn Fn...>`,
+    /// etc.); bare path expressions are auto-wrapped into a
+    /// closure by the XML macro.
+    Callback,
     /// Factory arg is `usize`; raw string literals are parsed
     /// as decimal integers.
     UInt,
@@ -814,6 +818,8 @@ fn analyse_factory(sig: &Signature) -> Result<(Vec<ExtraArgInfo>, bool), String>
             ExtraArgKind::KeybindingInputMode
         } else if is_string_like(ty) {
             ExtraArgKind::Text
+        } else if is_callback(ty) {
+            ExtraArgKind::Callback
         } else {
             ExtraArgKind::Custom
         };
@@ -881,6 +887,15 @@ fn is_image_source(ty: &Type) -> bool {
 fn is_keybinding_mode(ty: &Type) -> bool {
     let rendered = ty.to_token_stream().to_string();
     rendered.contains("KeybindingInputMode")
+}
+
+fn is_callback(ty: &Type) -> bool {
+    let rendered = ty.to_token_stream().to_string();
+    // Match `impl Fn(...)`, `Arc<dyn Fn(...)>`, `Box<dyn Fn(...)>`
+    // and plain function-pointer-like types. `to_token_stream()`
+    // can insert spaces (e.g. `Fn ( ... )`), so normalize before
+    // checking.
+    rendered.replace(' ', "").contains("Fn(")
 }
 
 fn param_name_from_pat(pat: &syn::Pat) -> Option<String> {
@@ -1102,6 +1117,7 @@ fn render_extra_args(args: &[ExtraArgInfo]) -> String {
         let kind = match ea.kind {
             ExtraArgKind::Text => "ExtraArgKind::Text",
             ExtraArgKind::Custom => "ExtraArgKind::Custom",
+            ExtraArgKind::Callback => "ExtraArgKind::Callback",
             ExtraArgKind::UInt => "ExtraArgKind::UInt",
             ExtraArgKind::HeadingLevel => "ExtraArgKind::HeadingLevel",
             ExtraArgKind::IconSource => "ExtraArgKind::IconSource",

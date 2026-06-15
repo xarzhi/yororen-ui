@@ -30,6 +30,43 @@ pub struct Controller {
     state: Entity<GalleryState>,
 }
 
+// Thin 4-arg event adapters for the toolbar toggle buttons so the
+// XML can use bare method references instead of inline closures.
+macro_rules! toggle_selectors {
+    ($($name:ident => $method:ident($value:expr)),* $(,)?) => {
+        $(
+            pub fn $name(
+                &self,
+                _checked: bool,
+                _ev: Option<&ClickEvent>,
+                _w: &mut Window,
+                cx: &mut App,
+            ) {
+                self.$method($value, _w, cx);
+            }
+        )*
+    };
+}
+
+// Thin 4-arg event adapters so the XML can use bare method
+// references (`on_toggle={controller.select_radio_0}`) instead
+// of inline Rust closures.
+macro_rules! radio_selectors {
+    ($($name:ident => $value:expr),* $(,)?) => {
+        $(
+            pub fn $name(
+                &self,
+                _checked: bool,
+                _ev: Option<&ClickEvent>,
+                _w: &mut Window,
+                cx: &mut App,
+            ) {
+                self.set_radio($value, _w, cx);
+            }
+        )*
+    };
+}
+
 impl Controller {
     pub fn new(state: Entity<GalleryState>, cx: &mut App) -> Self {
         Self::wire_composite_state(&state, cx);
@@ -333,6 +370,16 @@ impl Controller {
         crate::i18n::install_for_locale(cx, choice);
     }
 
+    toggle_selectors! {
+        select_default_renderer => set_renderer(RendererKind::Default),
+        select_brutalism_renderer => set_renderer(RendererKind::Brutalism),
+        select_light_theme => set_dark_mode(DarkMode::Light),
+        select_dark_theme => set_dark_mode(DarkMode::Dark),
+        select_english_locale => set_locale(LocaleChoice::En),
+        select_chinese_locale => set_locale(LocaleChoice::ZhCn),
+        select_arabic_locale => set_locale(LocaleChoice::Ar),
+    }
+
     pub fn show_toast(&self, _ev: &ClickEvent, _w: &mut Window, cx: &mut App) {
         let id = self.state.update(cx, |s, _cx| {
             s.toast_count.value += 1;
@@ -409,6 +456,19 @@ impl Controller {
         });
     }
 
+    /// Adapter for `<ToggleButton on_toggle={controller.press_toggle_from_event}>`.
+    /// The XML macro auto-wraps this 4-arg event signature into the
+    /// 2-arg business-logic method.
+    pub fn press_toggle_from_event(
+        &self,
+        selected: bool,
+        _ev: Option<&ClickEvent>,
+        _w: &mut Window,
+        cx: &mut App,
+    ) {
+        self.press_toggle_from_bool(selected, cx);
+    }
+
     pub fn bump_progress(&self, _ev: &ClickEvent, _w: &mut Window, cx: &mut App) {
         self.state.update(cx, |s, _cx| {
             s.progress_value = (s.progress_value + 0.1).min(1.0);
@@ -439,6 +499,12 @@ impl Controller {
         self.state.update(cx, |s, _cx| {
             s.radio_value = value;
         });
+    }
+
+    radio_selectors! {
+        select_radio_0 => 0,
+        select_radio_1 => 1,
+        select_radio_2 => 2,
     }
 
     pub fn set_checkbox(

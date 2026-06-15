@@ -861,6 +861,18 @@ fn codegen_leaf(
                 )
                 .at(element.byte_offset));
             }
+            (ExtraArgKind::Callback, Some(a)) => {
+                let expr = attr_value_tokens(a)?;
+                auto_wrap_callback_expr(a, expr)
+            }
+            (ExtraArgKind::Callback, None) => {
+                return Err(XmlError::new(
+                    XmlErrorKind::UnknownAttribute,
+                    element.span,
+                    format!("<{}> requires a `{}` attribute", element.tag, extra.attr),
+                )
+                .at(element.byte_offset));
+            }
             (ExtraArgKind::UInt, Some(a)) => {
                 if let Some(expr) = &a.expr {
                     parse_ts(
@@ -2989,6 +3001,51 @@ fn auto_wrap_event_expr(
     event_name: &str,
     tag: &str,
 ) -> TokenStream {
+    // Closure shape depends on the event and component tag.
+    let (params, call_args): (TokenStream, TokenStream) = match event_name {
+        "on_toggle" if matches!(tag, "Checkbox" | "Switch" | "Radio" | "ToggleButton") => (
+            quote! { __arg0: bool, __ev: Option<&gpui::ClickEvent>, __w: &mut gpui::Window, __cx: &mut gpui::App },
+            quote! { __arg0, __ev, __w, __cx },
+        ),
+        "on_toggle" => (
+            quote! { __ev: &gpui::ClickEvent, __w: &mut gpui::Window, __cx: &mut gpui::App },
+            quote! { __ev, __w, __cx },
+        ),
+        "on_clear" | "on_start_capture" | "on_cancel_capture" => (
+            quote! { __w: &mut gpui::Window, __cx: &mut gpui::App },
+            quote! { __w, __cx },
+        ),
+        "on_visible_range_change" => (
+            quote! { __range: std::ops::Range<usize>, __total: usize, __w: &mut gpui::Window, __cx: &mut gpui::App },
+            quote! { __range, __total, __w, __cx },
+        ),
+        _ => (
+            quote! { __arg0, __w: &mut gpui::Window, __cx: &mut gpui::App },
+            quote! { __arg0, __w, __cx },
+        ),
+    };
+    auto_wrap_closure_expr(attr, expr, params, call_args)
+}
+
+/// Auto-wrap a bare callback expression (used for
+/// closure-type positional factory arguments such as
+/// `SplitButton`'s `primary`).
+fn auto_wrap_callback_expr(attr: &AstAttribute, expr: TokenStream) -> TokenStream {
+    let params = quote! { __arg0, __w: &mut gpui::Window, __cx: &mut gpui::App };
+    let call_args = quote! { __arg0, __w, __cx };
+    auto_wrap_closure_expr(attr, expr, params, call_args)
+}
+
+/// Shared implementation for auto-wrapping a bare path / field
+/// reference into a `move` closure, pre-cloning the receiver
+/// outside the closure so multiple handlers can share the same
+/// controller binding.
+fn auto_wrap_closure_expr(
+    attr: &AstAttribute,
+    expr: TokenStream,
+    params: TokenStream,
+    call_args: TokenStream,
+) -> TokenStream {
     let Some(raw) = &attr.expr else {
         return expr;
     };
@@ -3018,29 +3075,6 @@ fn auto_wrap_event_expr(
     if !looks_like_path {
         return expr;
     }
-    // Closure shape depends on the event and component tag.
-    let (params, call_args): (TokenStream, TokenStream) = match event_name {
-        "on_toggle" if matches!(tag, "Checkbox" | "Switch" | "Radio" | "ToggleButton") => (
-            quote! { __arg0: bool, __ev: Option<&gpui::ClickEvent>, __w: &mut gpui::Window, __cx: &mut gpui::App },
-            quote! { __arg0, __ev, __w, __cx },
-        ),
-        "on_toggle" => (
-            quote! { __ev: &gpui::ClickEvent, __w: &mut gpui::Window, __cx: &mut gpui::App },
-            quote! { __ev, __w, __cx },
-        ),
-        "on_clear" => (
-            quote! { __w: &mut gpui::Window, __cx: &mut gpui::App },
-            quote! { __w, __cx },
-        ),
-        "on_visible_range_change" => (
-            quote! { __range: std::ops::Range<usize>, __total: usize, __w: &mut gpui::Window, __cx: &mut gpui::App },
-            quote! { __range, __total, __w, __cx },
-        ),
-        _ => (
-            quote! { __arg0, __w: &mut gpui::Window, __cx: &mut gpui::App },
-            quote! { __arg0, __w, __cx },
-        ),
-    };
     // Parse the expression so we can detect a
     // field-access (`controller.method`) and pre-clone
     // the receiver outside the closure. Pre-cloning

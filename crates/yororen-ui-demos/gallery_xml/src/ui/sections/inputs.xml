@@ -46,8 +46,8 @@
         <Slot name="name"><Label id="lbl-keybinding" text={t!(cx, "demo.input.keybinding_hint")} muted /></Slot>
         <KeybindingInput id="input-keybinding" mode={controller.keybinding_mode(cx)}
                          on_change={controller.set_keybinding_value}
-                         on_start_capture={{ let c = controller.clone(); move |_w, cx| c.start_keybinding_capture(_w, cx) }}
-                         on_cancel_capture={{ let c = controller.clone(); move |_w, cx| c.cancel_keybinding_capture(_w, cx) }} />
+                         on_start_capture={controller.start_keybinding_capture}
+                         on_cancel_capture={controller.cancel_keybinding_capture} />
         <Slot name="status"><Label id="status-keybinding" text={t_named!(cx, "demo.input.keybinding_status", value => controller.keybinding_value(cx), mode => format!("{:?}", controller.keybinding_mode(cx)))} muted /></Slot>
     </InputCell>
 

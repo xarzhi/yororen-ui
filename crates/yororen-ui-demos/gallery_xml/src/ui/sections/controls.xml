@@ -20,11 +20,11 @@
         <Slot name="name"><Label id="lbl-rg" text={t!(cx, "demo.controls.cell_radio_group")} muted /></Slot>
         <RadioGroup id="ctrl-rg" name="choice" selected={controller.radio_value(cx)}>
             <Radio id="ctrl-radio-0" checked={controller.radio_value(cx) == 0}
-                   on_toggle={{ let c = controller.clone(); move |_v,_ev,w,cx| c.set_radio(0, w, cx) }} />
+                   on_toggle={controller.select_radio_0} />
             <Radio id="ctrl-radio-1" checked={controller.radio_value(cx) == 1}
-                   on_toggle={{ let c = controller.clone(); move |_v,_ev,w,cx| c.set_radio(1, w, cx) }} />
+                   on_toggle={controller.select_radio_1} />
             <Radio id="ctrl-radio-2" checked={controller.radio_value(cx) == 2}
-                   on_toggle={{ let c = controller.clone(); move |_v,_ev,w,cx| c.set_radio(2, w, cx) }} />
+                   on_toggle={controller.select_radio_2} />
         </RadioGroup>
     </InputCell>
     <Label id="rg-current" text={t_named!(cx, "demo.controls.selected", value => controller.radio_value(cx))} muted />

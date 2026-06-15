@@ -43,14 +43,14 @@
             <Slot name="label"><Label id="lbl-toggle" text={t!(cx, "demo.actions.cell_toggle_button")} muted /></Slot>
             <ToggleButton id="toggle-1" caption={t!(cx, "demo.actions.press_me")}
                           selected={controller.toggle_btn_selected(cx)}
-                          on_toggle={{ let c = controller.clone(); move |selected, _ev, _w, cx| c.press_toggle_from_bool(selected, cx) }} />
+                          on_toggle={controller.press_toggle_from_event} />
         </Cell>
     </Row>
 
     <Row flex row flex_wrap items_center gap="3">
         <Cell>
             <Slot name="label"><Label id="lbl-split" text={t!(cx, "demo.actions.cell_split_button")} muted /></Slot>
-            <SplitButton id="split-1" primary={{ let c = controller.clone(); move |ev, w, cx| c.split_button_primary(ev, w, cx) }}
+            <SplitButton id="split-1" primary={controller.split_button_primary}
                          caption={t!(cx, "demo.actions.save")}
                          state={controller.split_button_state(cx)}
                          items={controller.split_button_items(cx)}

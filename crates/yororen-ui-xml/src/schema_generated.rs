@@ -868,7 +868,7 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
         tag: "SplitButton",
         kind: ComponentKind::Leaf(LeafDef {
             factory: "::yororen_ui::headless::split_button::split_button",
-            extra_args: &[ExtraArg { kind: ExtraArgKind::Custom, attr: "primary" }, ],
+            extra_args: &[ExtraArg { kind: ExtraArgKind::Callback, attr: "primary" }, ],
             render: RenderMode::Default,
             needs_app: true,
             needs_window: false,

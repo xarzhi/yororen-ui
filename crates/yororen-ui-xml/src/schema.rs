@@ -214,6 +214,13 @@ pub enum ExtraArgKind {
     /// attribute, wrapped in `.into()` to coerce to the
     /// factory's expected string type.
     Custom,
+    /// A closure-type positional factory argument (e.g.
+    /// `SplitButton`'s `primary` callback). Bare path
+    /// expressions (`controller.method`) are auto-wrapped
+    /// into a `(arg0, &mut Window, &mut App)` closure, just
+    /// like component events; other expressions pass through
+    /// verbatim.
+    Callback,
     /// The label's text: prefer the `text` XML attribute,
     /// fall back to the element's inner text content.
     Text,
