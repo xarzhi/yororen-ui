@@ -189,6 +189,11 @@ pub enum PropValue {
     /// should review. The codegen treats it as `String`
     /// (i.e. `(#raw).to_string()`).
     Unknown,
+    /// A fully custom value: the XML attribute expression is
+    /// passed through verbatim (no `.to_string()` / `.into()`
+    /// wrapper). Literal values are wrapped in `.into()` so
+    /// they can satisfy `impl Into<…>` setters.
+    Custom,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -919,6 +924,7 @@ fn parse_prop_value(raw: &str) -> Result<PropValue, String> {
         "Color" => Ok(PropValue::Color),
         "Flag" => Ok(PropValue::Flag),
         "Unknown" => Ok(PropValue::Unknown),
+        "Custom" => Ok(PropValue::Custom),
         other => Err(format!("unknown PropValue `{other}`")),
     }
 }

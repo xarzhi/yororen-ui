@@ -25,7 +25,22 @@
         </Column>
     </Cell>
 
-    {controller.form_element(cx, window)}
+    <Cell>
+        <Slot name="label"><Label id="lbl-form" text={t!(cx, "demo.form.cell")} muted /></Slot>
+        <Form id="frm-email" submit={t!(cx, "demo.form.email_label")}
+              on_submit={controller.submit_form} w={gpui::px(300.)}>
+            <FormField id="ff-email" name="email"
+                       label={t!(cx, "demo.form.email_label")}
+                       required
+                       error={controller.form_email_error_text(cx)}>
+                <TextInput id="txi-email"
+                           placeholder={t!(cx, "demo.form.email_placeholder")}
+                           @bind={controller.form_email_value_entity(cx)} />
+            </FormField>
+            <Label id="frm-status" text={controller.form_status_text(cx)} muted />
+        </Form>
+    </Cell>
+
     <Cell>
         <Slot name="label"><Label id="lbl-table" text={t!(cx, "demo.lists.cell_table")} muted /></Slot>
         <Table id="lists-table" columns={controller.table_columns(cx)} rows={controller.table_rows(cx)}
@@ -33,10 +48,61 @@
                on_select={controller.table_row_handler()} />
     </Cell>
 
-    {controller.tree_element(cx, window)}
-    {controller.virtual_list_element(cx, window)}
-    {controller.uniform_list_element(cx, window)}
-    {controller.spacer_element(cx)}
+    <Cell>
+        <Slot name="label"><Label id="lbl-tree" text={t!(cx, "demo.lists.cell_tree")} muted /></Slot>
+        <Tree id="lists-tree" data={controller.tree_data(cx)}
+              selected={controller.tree_selected(cx).clone()} w={gpui::px(240.)}>
+            <For each={controller.tree_data(cx).flatten(&controller.tree_expanded(cx))}
+                 let:item="entry" key={entry.0.to_string()}>
+                <TreeItem id={format!("lst-tre-row-{}", entry.0)}
+                          node_id={entry.0.clone()}
+                          label={controller.tree_label(&entry.0, cx)}
+                          depth={entry.1}
+                          has_children={controller.tree_has_children(&entry.0, cx)}
+                          expanded={controller.tree_expanded(cx).contains(&entry.0)}
+                          selected={controller.tree_selected(cx) == Some(entry.0.clone())}
+                          on_toggle={controller.toggle_tree_node_for(entry.0.clone())}
+                          on_click={controller.select_tree_node_for(entry.0.clone())}
+                          on_double_click={controller.toggle_tree_node_for(entry.0.clone())} />
+            </For>
+        </Tree>
+    </Cell>
+
+    <Cell>
+        <Slot name="label"><Label id="lbl-vl" text={t!(cx, "demo.lists.cell_vl")} muted /></Slot>
+        <VirtualList id="lists-vl"
+                     item_count={controller.vl_item_count(cx)}
+                     controller={controller.list_controller_entity(cx)}
+                     on_visible_range_change={controller.on_visible_range_change}
+                     row={controller.virtual_list_row(cx)}
+                     w={gpui::px(240.)} h={gpui::px(180.)} />
+        <Row flex row gap="2">
+            <Button id="btn-vl-top" caption={t!(cx, "demo.common.top")}
+                    on_click={controller.virtual_list_scroll_top} />
+            <Button id="btn-vl-bottom" caption={t!(cx, "demo.common.bottom")}
+                    on_click={controller.virtual_list_scroll_bottom} />
+        </Row>
+        <Label id="lbl-vl-status" text={controller.vl_status_text(cx)} muted />
+    </Cell>
+
+    <Cell>
+        <Slot name="label"><Label id="lbl-uvl" text={t!(cx, "demo.lists.cell_uvl")} muted /></Slot>
+        <UniformVirtualList id="lists-uvl" item_count={1000}
+                            controller={controller.uniform_list_controller_entity(cx)}
+                            row={controller.uniform_list_row(cx)}
+                            w={gpui::px(240.)} h={gpui::px(180.)} />
+        <Row flex row gap="2">
+            <Button id="btn-uvl-top" caption={t!(cx, "demo.common.top")}
+                    on_click={controller.uniform_list_scroll_top} />
+            <Button id="btn-uvl-bottom" caption={t!(cx, "demo.common.bottom")}
+                    on_click={controller.uniform_list_scroll_bottom} />
+        </Row>
+    </Cell>
+
+    <Cell>
+        <Slot name="label"><Label id="lbl-spacer" text={t!(cx, "demo.lists.cell_spacer")} muted /></Slot>
+        <Spacer id="lists-spacer" w_full h={gpui::px(16.)} />
+    </Cell>
 
     <Cell>
         <Slot name="label"><Label id="lbl-rg-empty" text={t!(cx, "demo.controls.cell_radio_group_empty")} muted /></Slot>

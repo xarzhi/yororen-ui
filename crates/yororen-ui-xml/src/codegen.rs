@@ -1211,6 +1211,14 @@ fn codegen_leaf(
             });
             continue;
         }
+        // Leaf style pass-through: attributes that look like gpui
+        // `Styled` methods (`w_full`, `h={px(16)}`, `border_1`, …)
+        // are deferred and applied to the rendered element, so callers
+        // can size leaves the same way they size `<Div>` containers.
+        if is_leaf_style_attr(&attr.name, &def) {
+            continue;
+        }
+
         let mut accepted = accepted_leaf_attrs(&def);
         if let Some(suggestion) = did_you_mean(
             &attr.name,
@@ -1326,7 +1334,23 @@ fn codegen_leaf(
         }
     }
 
-    // 8. Children added after render (the default path).
+    // 8. Style pass-through for known `Styled` attributes.
+    //    These are applied after `.render(cx)` so they affect
+    //    the final rendered element (e.g. `<Spacer w_full h={px(16)}/>`).
+    if def.render == RenderMode::Default {
+        let style_container_def = crate::schema::ContainerDef {
+            fixed_methods: &[],
+            style_hint: "the gpui Styled trait (`.w(...)`, `.h(...)`, `.border_1()`, …)",
+        };
+        for attr in &element.attributes {
+            if !is_leaf_style_attr(&attr.name, &def) {
+                continue;
+            }
+            apply_container_attr(&mut stmts, attr, style_container_def, element)?;
+        }
+    }
+
+    // 9. Children added after render (the default path).
     // For Default-rendered leaves, the rendered element is
     // typically a `Stateful<Div>` that accepts `.child(...)`.
     // Text children are only allowed for components that explicitly
@@ -2176,6 +2200,8 @@ fn codegen_virtual_list_kind(
         "on_visible_range_change",
         "let_item",
         "let_index",
+        "controller",
+        "row",
     ];
 
     // --- required attributes ---------------------------------------
@@ -2193,9 +2219,34 @@ fn codegen_virtual_list_kind(
     };
 
     // --- detect row mode -------------------------------------------
+    // Three modes:
+    //   1. Explicit `row={closure}` + `item_count` — the caller
+    //      supplies a ready-made row closure (useful when the row
+    //      body needs controller state that must not be captured
+    //      from the surrounding scope).
+    //   2. `item_count` + children — the children become the row
+    //      template, re-invoked per visible index.
+    //   3. Children only — each direct child is one row.
     let count_attr = element.attributes.iter().find(|a| a.name == "item_count");
-    let (count_expr, child_body, item_bind, index_ident) = match count_attr {
-        Some(count_attr) => {
+    let row_attr = element.attributes.iter().find(|a| a.name == "row");
+    let (count_expr, row_closure, _item_bind, _index_ident) = match (row_attr, count_attr) {
+        (Some(row_attr), Some(count_attr)) => {
+            let count_expr = attr_expr_only(count_attr)?;
+            let row_expr = attr_expr_only(row_attr)?;
+            (count_expr, quote! { #row_expr }, quote! {}, format_ident!("index"))
+        }
+        (Some(_), None) => {
+            return Err(XmlError::new(
+                XmlErrorKind::Unsupported,
+                element.span,
+                format!(
+                    "<{}> `row={{...}}` requires an `item_count={{...}}` attribute",
+                    element.tag
+                ),
+            )
+            .at(element.byte_offset));
+        }
+        (None, Some(count_attr)) => {
             // Explicit mode: row template re-invoked per index.
             let count_expr = attr_expr_only(count_attr)?;
             if element.children.is_empty() {
@@ -2218,9 +2269,15 @@ fn codegen_virtual_list_kind(
             let item_bind = item_ident
                 .map(|it| quote! { let #it: usize = #index_ident; })
                 .unwrap_or_default();
-            (count_expr, child_body, item_bind, index_ident)
+            let row_closure = quote! {
+                move |#index_ident: usize, window: &mut ::gpui::Window, cx: &mut ::gpui::App| -> ::gpui::AnyElement {
+                    #item_bind
+                    ::gpui::IntoElement::into_any_element(#child_body)
+                }
+            };
+            (count_expr, row_closure, quote! {}, index_ident)
         }
-        None => {
+        (None, None) => {
             // Children-as-rows mode: each direct child is one row.
             if element.children.is_empty() {
                 return Err(XmlError::new(
@@ -2255,7 +2312,12 @@ fn codegen_virtual_list_kind(
                     _ => ::gpui::div(),
                 }
             };
-            (count_expr, child_body, quote! {}, index_ident)
+            let row_closure = quote! {
+                move |#index_ident: usize, window: &mut ::gpui::Window, cx: &mut ::gpui::App| -> ::gpui::AnyElement {
+                    ::gpui::IntoElement::into_any_element(#child_body)
+                }
+            };
+            (count_expr, row_closure, quote! {}, index_ident)
         }
     };
 
@@ -2300,11 +2362,23 @@ fn codegen_virtual_list_kind(
             .iter()
             .find(|a| a.name == "on_visible_range_change")
         {
-            Some(a) => Some(attr_expr_only(a)?),
+            Some(a) => {
+                let expr = attr_expr_only(a)?;
+                Some(auto_wrap_event_expr(a, expr, "on_visible_range_change", "VirtualList"))
+            }
             None => None,
         }
     } else {
         None
+    };
+
+    let controller_attr = element
+        .attributes
+        .iter()
+        .find(|a| a.name == "controller");
+    let controller_expr = match controller_attr {
+        Some(a) => Some(attr_expr_only(a)?),
+        None => None,
     };
 
     // --- style pass-through ----------------------------------------
@@ -2368,9 +2442,18 @@ fn codegen_virtual_list_kind(
         VirtualListKind::Heterogeneous => (
             quote! { #factory(#id_expr, &__snap, #cx) },
             quote! {
+                // Evaluate the target count *outside* `update` so the
+                // closure does not immutably borrow `cx` while the
+                // `Entity::update` call already holds a mutable borrow.
+                let __target_count = (#count_expr as usize);
                 __entity.update(#cx, |__c: &mut #controller_ty, _| {
-                    if __c.state().item_count() != (#count_expr as usize) {
-                        __c.reset(#count_expr as usize);
+                    let __current = __c.state().item_count();
+                    if __target_count > __current {
+                        // Grow via append so the scroll position is
+                        // preserved (infinite-loading behaviour).
+                        __c.append(__target_count - __current);
+                    } else if __target_count < __current {
+                        __c.reset(__target_count);
                     }
                 });
             },
@@ -2379,13 +2462,6 @@ fn codegen_virtual_list_kind(
             quote! { #factory(#id_expr, #count_expr as usize, &__snap, #cx) },
             quote! {},
         ),
-    };
-
-    let row_closure = quote! {
-        move |#index_ident: usize, window: &mut ::gpui::Window, cx: &mut ::gpui::App| -> ::gpui::AnyElement {
-            #item_bind
-            ::gpui::IntoElement::into_any_element(#child_body)
-        }
     };
 
     let on_range_chain = match on_range_tokens {
@@ -2399,13 +2475,25 @@ fn codegen_virtual_list_kind(
     // mutations (so a `.reset()` / `.scroll_to_*` triggers a
     // re-render of the owning view). We clone the controller
     // out of the entity for the per-frame factory call.
-    Ok(quote! {
-        {
+    //
+    // Alternatively, the caller can supply an external entity via
+    // `controller={...}` — useful when buttons outside the list need
+    // to drive scroll position or when the controller is shared with
+    // business state.
+    let entity_init = match &controller_expr {
+        Some(expr) => quote! { let __entity = (#expr).clone(); },
+        None => quote! {
             let __entity = window.use_keyed_state(
                 #id_expr,
                 #cx,
                 |_window, _cx| #entity_state_init,
             );
+        },
+    };
+
+    Ok(quote! {
+        {
+            #entity_init
             #count_sync
             let __snap = __entity.read(#cx).clone();
             let mut __props = #factory_call;
@@ -2654,7 +2742,8 @@ fn prop_value_tokens(attr: &AstAttribute, kind: PropValue) -> Result<TokenStream
             | PropValue::UInt
             | PropValue::Float32
             | PropValue::Float64
-            | PropValue::Unknown => {
+            | PropValue::Unknown
+            | PropValue::Custom => {
                 quote! { #parsed }
             }
             PropValue::Flag => quote! { #parsed /* unreachable */ },
@@ -2770,6 +2859,13 @@ fn prop_value_tokens(attr: &AstAttribute, kind: PropValue) -> Result<TokenStream
             parse_hex_color(raw, attr)
         }
         PropValue::Unknown => Ok(quote! { (#raw).to_string() }),
+        PropValue::Custom => {
+            if attr.expr.is_some() {
+                unreachable!("brace expressions are handled at the top of prop_value_tokens")
+            } else {
+                Ok(quote! { (#raw).into() })
+            }
+        }
         PropValue::Float64 => {
             let value = raw.parse::<f64>().map_err(|_| {
                 XmlError::new(
@@ -3580,6 +3676,33 @@ fn edit_distance(a: &str, b: &str) -> usize {
         std::mem::swap(&mut prev, &mut curr);
     }
     prev[m]
+}
+
+/// Whether an attribute on a leaf should be treated as a
+/// gpui `Styled` pass-through instead of a component prop.
+/// We only allow the same vocabulary that containers accept,
+/// and we skip attributes that are already part of the
+/// component's schema (e.g. `w`/`h` on `Skeleton`).
+fn is_leaf_style_attr(name: &str, def: &LeafDef) -> bool {
+    let is_style = is_known_shorthand_method(name)
+        || is_spacing_prefix(name)
+        || is_spacing_shorthand(name);
+    if !is_style {
+        return false;
+    }
+    if name == "id" {
+        return false;
+    }
+    if def.extra_args.iter().any(|e| e.attr == name) {
+        return false;
+    }
+    if def.props.iter().any(|p| p.name == name) {
+        return false;
+    }
+    if def.events.iter().any(|e| e.0 == name) {
+        return false;
+    }
+    true
 }
 
 /// Pick the candidate most likely to be what the user
@@ -5238,7 +5361,7 @@ mod tests {
 </VirtualList>"#,
         );
         assert!(s.contains("on_visible_range_change"), "{s}");
-        assert!(s.contains("controller . on_range"), "{s}");
+        assert!(s.contains("__auto_clone . on_range"), "{s}");
     }
 
     // ===================== UniformVirtualList =====================

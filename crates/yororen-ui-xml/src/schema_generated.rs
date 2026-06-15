@@ -3,7 +3,7 @@
 //!
 //! Source of truth: `yororen-ui-core/src/headless/*.rs`
 //! plus `yororen-ui-xml/overrides.toml`.
-//! Last regenerated with: 61 entries (27 from overrides), 4 skipped.
+//! Last regenerated with: 61 entries (29 from overrides), 4 skipped.
 //!
 //! Skipped files (need manual schema entry or a schema
 //! extension — see `gen_schema.rs` notes):
@@ -329,7 +329,7 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
             supports_text_child: false,
             children_before_render: false,
             unwrap_children: false,
-            slots: &[],
+            slots: &[SlotDef { name: "input", setter: "input" }],
         }),
         doc: "auto-generated from `headless::form_field`",
     },
@@ -1078,9 +1078,8 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
             render: RenderMode::Default,
             needs_app: true,
             needs_window: false,
-            props: &[PropDef { name: "data", setter: "data", value: PropValue::String /* unknown — review */ },
-            PropDef { name: "expanded", setter: "expanded", value: PropValue::String },
-            PropDef { name: "selected", setter: "selected", value: PropValue::String },
+            props: &[PropDef { name: "data", setter: "data", value: PropValue::Custom },
+            PropDef { name: "selected", setter: "selected", value: PropValue::Custom },
             ],
             events: &[],
             supports_text_child: false,

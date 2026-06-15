@@ -90,6 +90,15 @@ struct OverrideEntry {
     /// (XML slot name, builder method name).
     #[serde(default)]
     slots: Option<Vec<[String; 2]>>,
+    /// Override / replace the auto-detected prop vocabulary for
+    /// this leaf. Each entry is `["xml_name", "setter", "kind"]`
+    /// where `kind` is one of the `PropValue` variant names.
+    #[serde(default)]
+    props: Option<Vec<[String; 3]>>,
+    /// Override / replace the auto-detected event vocabulary for
+    /// this leaf. Each entry is `["xml_name", "setter"]`.
+    #[serde(default)]
+    events: Option<Vec<[String; 2]>>,
 }
 
 #[derive(Debug, Default, serde::Deserialize)]
@@ -211,6 +220,8 @@ enum PropValue {
     Flag,
     /// Not a recognised type — the user must annotate.
     Unknown,
+    /// Pass the XML expression through verbatim (no wrapping).
+    Custom,
 }
 
 fn main() {
@@ -417,6 +428,29 @@ fn apply_overrides(entries: Vec<Extracted>, overrides: &[OverrideEntry]) -> Vec<
                             name: s[0].clone(),
                             setter: s[1].clone(),
                         })
+                        .collect();
+                }
+                if let Some(props) = &o.props {
+                    e.props = props
+                        .iter()
+                        .filter_map(|p| {
+                            if p.len() != 3 {
+                                return None;
+                            }
+                            let value = parse_prop_value(&p[2])?;
+                            Some(PropInfo {
+                                name: p[0].clone(),
+                                setter: p[1].clone(),
+                                value,
+                            })
+                        })
+                        .collect();
+                }
+                if let Some(events) = &o.events {
+                    e.events = events
+                        .iter()
+                        .filter(|e| e.len() == 2)
+                        .map(|e| (e[0].clone(), e[1].clone()))
                         .collect();
                 }
             }
@@ -933,6 +967,27 @@ fn pascal_case(s: &str) -> String {
         .collect()
 }
 
+fn parse_prop_value(raw: &str) -> Option<PropValue> {
+    match raw {
+        "String" => Some(PropValue::String),
+        "Bool" => Some(PropValue::Bool),
+        "Variant" => Some(PropValue::Variant),
+        "Flag" => Some(PropValue::Flag),
+        "Unknown" => Some(PropValue::Unknown),
+        "Float64" => Some(PropValue::Float64),
+        "Float32" => Some(PropValue::Float32),
+        "UInt" => Some(PropValue::UInt),
+        "BadgeVariant" => Some(PropValue::BadgeVariant),
+        "HeadingLevel" => Some(PropValue::HeadingLevel),
+        "IconSource" => Some(PropValue::IconSource),
+        "ImageSource" => Some(PropValue::ImageSource),
+        "KeybindingInputMode" => Some(PropValue::KeybindingInputMode),
+        "Color" => Some(PropValue::Color),
+        "Custom" => Some(PropValue::Custom),
+        _ => None,
+    }
+}
+
 // -- rendering -----------------------------------------------------------------
 
 fn render_module(
@@ -1150,6 +1205,7 @@ fn render_props(props: &[PropInfo]) -> String {
             PropValue::ImageSource => "PropValue::ImageSource",
             PropValue::KeybindingInputMode => "PropValue::KeybindingInputMode",
             PropValue::Color => "PropValue::Color",
+            PropValue::Custom => "PropValue::Custom",
         };
         s.push_str(&format!(
             "PropDef {{ name: {:?}, setter: {:?}, value: {} }},\n            ",

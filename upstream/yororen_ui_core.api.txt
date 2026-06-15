@@ -4895,7 +4895,7 @@ pub fn yororen_ui_core::headless::tree::TreeProps::apply(self, gpui::elements::d
 pub fn yororen_ui_core::headless::tree::TreeProps::data(self, yororen_ui_core::headless::tree::TreeData) -> Self
 pub fn yororen_ui_core::headless::tree::TreeProps::expanded(self, impl core::convert::Into<yororen_ui_core::headless::tree_item::TreeNodeId>) -> Self
 pub fn yororen_ui_core::headless::tree::TreeProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-pub fn yororen_ui_core::headless::tree::TreeProps::selected(self, impl core::convert::Into<yororen_ui_core::headless::tree_item::TreeNodeId>) -> Self
+pub fn yororen_ui_core::headless::tree::TreeProps::selected(self, impl core::convert::Into<core::option::Option<yororen_ui_core::headless::tree_item::TreeNodeId>>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::tree::TreeProps
 pub fn yororen_ui_core::headless::tree::TreeProps::clone(&self) -> yororen_ui_core::headless::tree::TreeProps
 impl core::marker::Freeze for yororen_ui_core::headless::tree::TreeProps
@@ -4922,6 +4922,8 @@ pub fn yororen_ui_core::headless::tree_item::TreeNodeId::from(&'static str) -> S
 impl core::convert::From<alloc::string::String> for yororen_ui_core::headless::tree_item::TreeNodeId
 pub fn yororen_ui_core::headless::tree_item::TreeNodeId::from(alloc::string::String) -> Self
 impl core::fmt::Debug for yororen_ui_core::headless::tree_item::TreeNodeId
+pub fn yororen_ui_core::headless::tree_item::TreeNodeId::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::fmt::Display for yororen_ui_core::headless::tree_item::TreeNodeId
 pub fn yororen_ui_core::headless::tree_item::TreeNodeId::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
 impl core::hash::Hash for yororen_ui_core::headless::tree_item::TreeNodeId
 pub fn yororen_ui_core::headless::tree_item::TreeNodeId::hash<__H: core::hash::Hasher>(&self, &mut __H)
@@ -5001,6 +5003,8 @@ pub fn yororen_ui_core::headless::tree_item::TreeNodeId::from(&'static str) -> S
 impl core::convert::From<alloc::string::String> for yororen_ui_core::headless::tree_item::TreeNodeId
 pub fn yororen_ui_core::headless::tree_item::TreeNodeId::from(alloc::string::String) -> Self
 impl core::fmt::Debug for yororen_ui_core::headless::tree_item::TreeNodeId
+pub fn yororen_ui_core::headless::tree_item::TreeNodeId::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::fmt::Display for yororen_ui_core::headless::tree_item::TreeNodeId
 pub fn yororen_ui_core::headless::tree_item::TreeNodeId::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
 impl core::hash::Hash for yororen_ui_core::headless::tree_item::TreeNodeId
 pub fn yororen_ui_core::headless::tree_item::TreeNodeId::hash<__H: core::hash::Hasher>(&self, &mut __H)

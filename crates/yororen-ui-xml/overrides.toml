@@ -185,3 +185,21 @@ tag = "Tooltip"
 kind = "Leaf"
 slots = [["trigger", "trigger"]]
 
+# `FormField` stashes its input child via `.input(...)` before
+# rendering the label/error stack.
+[[override_]]
+tag = "FormField"
+kind = "Leaf"
+slots = [["input", "input"]]
+
+# `Tree` props that the generator can't infer:
+# `data` is a `TreeData` struct and `selected` is a `TreeNodeId`;
+# both must pass through as raw expressions.
+[[override_]]
+tag = "Tree"
+kind = "Leaf"
+props = [
+    ["data", "data", "Custom"],
+    ["selected", "selected", "Custom"],
+]
+

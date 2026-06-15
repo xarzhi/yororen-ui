@@ -12,8 +12,8 @@ use std::collections::{BTreeSet, HashMap};
 use std::ops::Range;
 
 use gpui::{
-    AnyElement, App, ClickEvent, ElementId, Entity, IntoElement, ParentElement, SharedString,
-    Styled, Window, div, hsla, px,
+    AnyElement, App, ClickEvent, Entity, IntoElement, ParentElement, SharedString, Styled, Window,
+    div, hsla, px,
 };
 
 use yororen_ui::headless::dropdown_menu::{DropdownItem, DropdownMenuItem};
@@ -341,18 +341,22 @@ impl Controller {
         self.state.read(cx).tooltip_state.clone()
     }
 
-    pub fn list_controller(
+    pub fn list_controller_entity(
         &self,
         cx: &App,
-    ) -> yororen_ui::headless::virtual_list::VirtualListController {
+    ) -> Entity<yororen_ui::headless::virtual_list::VirtualListController> {
         self.state.read(cx).list_controller.clone()
     }
 
-    pub fn uniform_list_controller(
+    pub fn uniform_list_controller_entity(
         &self,
         cx: &App,
-    ) -> yororen_ui::headless::virtual_list::UniformVirtualListController {
+    ) -> Entity<yororen_ui::headless::virtual_list::UniformVirtualListController> {
         self.state.read(cx).uniform_list_controller.clone()
+    }
+
+    pub fn vl_item_count(&self, cx: &App) -> usize {
+        self.state.read(cx).vl_item_count
     }
 
     // -------- Toolbar actions --------
@@ -642,17 +646,16 @@ impl Controller {
 
     // -------- Lists section --------
 
-    pub fn submit_form(&self, vals: HashMap<SharedString, String>, _w: &mut Window, cx: &mut App) {
+    pub fn submit_form(&self, _vals: HashMap<SharedString, String>, _w: &mut Window, cx: &mut App) {
+        let email = self.form_email_value(cx);
         let must_contain = cx.t("demo.form.must_contain_at");
         self.state.update(cx, |s, _cx| {
             s.form_submit_count += 1;
-            if let Some(e) = vals.get("email") {
-                s.form_email_error = if e.contains('@') {
-                    None
-                } else {
-                    Some(must_contain.to_string())
-                };
-            }
+            s.form_email_error = if email.contains('@') {
+                None
+            } else {
+                Some(must_contain.to_string())
+            };
         });
     }
 
@@ -718,23 +721,23 @@ impl Controller {
     }
 
     pub fn virtual_list_scroll_top(&self, _ev: &ClickEvent, _w: &mut Window, cx: &mut App) {
-        self.state
-            .update(cx, |s, _| s.list_controller.scroll_to_top());
+        self.list_controller_entity(cx)
+            .update(cx, |c, _| c.scroll_to_top());
     }
 
     pub fn virtual_list_scroll_bottom(&self, _ev: &ClickEvent, _w: &mut Window, cx: &mut App) {
-        self.state
-            .update(cx, |s, _| s.list_controller.scroll_to_bottom());
+        self.list_controller_entity(cx)
+            .update(cx, |c, _| c.scroll_to_bottom());
     }
 
     pub fn uniform_list_scroll_top(&self, _ev: &ClickEvent, _w: &mut Window, cx: &mut App) {
-        self.state
-            .update(cx, |s, _| s.uniform_list_controller.scroll_to_top());
+        self.uniform_list_controller_entity(cx)
+            .update(cx, |c, _| c.scroll_to_top());
     }
 
     pub fn uniform_list_scroll_bottom(&self, _ev: &ClickEvent, _w: &mut Window, cx: &mut App) {
-        self.state
-            .update(cx, |s, _| s.uniform_list_controller.scroll_to_bottom());
+        self.uniform_list_controller_entity(cx)
+            .update(cx, |c, _| c.scroll_to_bottom());
     }
 
     pub fn on_visible_range_change(
@@ -745,48 +748,26 @@ impl Controller {
         cx: &mut App,
     ) {
         self.state.update(cx, |s, _cx| {
-            s.vl_visible_range = Some(range);
-            if total + 50 >= s.vl_item_count && s.vl_item_count < 5_000 {
+            s.vl_visible_range = Some(range.clone());
+            // Only load the next batch when the visible end is
+            // within 50 items of the total (matches gallery_demo).
+            if range.end + 50 >= total && s.vl_item_count < 5_000 {
                 s.vl_item_count += 100;
                 s.vl_load_count += 1;
             }
         });
     }
 
-    pub fn virtual_list_row(&self, ix: usize, _w: &mut Window, cx: &mut App) -> gpui::AnyElement {
-        let selected = self.state.read(cx).selected_list_item == Some(ix);
-        let label = format!("Item {}", ix);
-        yororen_ui::headless::list_item::list_item(format!("vl-row-{ix}"), label, cx)
-            .selected(selected)
-            .on_click({
-                let state = self.state.clone();
-                let ix = ix;
-                move |_ev, _w, cx| {
-                    state.update(cx, |s, _cx| {
-                        s.selected_list_item = Some(ix);
-                    });
-                }
-            })
-            .render(cx)
-            .into_any_element()
-    }
-
-    pub fn uniform_list_row(&self, ix: usize, _w: &mut Window, cx: &mut App) -> gpui::AnyElement {
-        let label = format!("Uniform {}", ix);
-        yororen_ui::headless::list_item::list_item(format!("uvl-row-{ix}"), label, cx)
-            .render(cx)
-            .into_any_element()
-    }
-
     // -------- Complex layout helpers (used by lists.xml) --------
 
     pub fn sync_virtual_list(&self, cx: &mut App) {
-        self.state.update(cx, |s, _| {
-            let current = s.list_controller.state().item_count();
-            if current < s.vl_item_count {
-                s.list_controller.append(s.vl_item_count - current);
-            } else if current > s.vl_item_count {
-                s.list_controller.reset(s.vl_item_count);
+        let target = self.state.read(cx).vl_item_count;
+        self.list_controller_entity(cx).update(cx, |c, _| {
+            let current = c.state().item_count();
+            if current < target {
+                c.append(target - current);
+            } else if current > target {
+                c.reset(target);
             }
         });
     }
@@ -802,276 +783,125 @@ impl Controller {
             .replacen("{}", &status, 1)
     }
 
-    pub fn email_input_element(&self, cx: &mut App, window: &mut Window) -> AnyElement {
-        let entity = self.state.read(cx).form_email_value.clone();
-        let value = entity.read(cx).clone();
-        yororen_ui::headless::text_input::text_input("lists-ff-email-input")
-            .placeholder(cx.t("demo.form.email_placeholder"))
-            .value(value)
-            .on_change(move |new: &str, _w, cx| {
-                entity.update(cx, |s, _cx| *s = new.to_string());
-            })
-            .render(cx, window)
-            .into_any_element()
+    pub fn form_email_error_text(&self, cx: &App) -> String {
+        self.form_email_error(cx).unwrap_or_default()
     }
 
-    pub fn form_element(&self, cx: &mut App, window: &mut Window) -> AnyElement {
-        let email_input = self.email_input_element(cx, window);
-        let form_field =
-            yororen_ui::headless::form_field::form_field("lists-ff-email", "email", cx)
-                .label(cx.t("demo.form.email_label"))
-                .required(true)
-                .input(email_input)
-                .render(cx);
-
-        let form_props = yororen_ui::headless::form::form("lists-form", cx)
-            .value(
-                "email",
-                self.state.read(cx).form_email_value.read(cx).clone(),
-            )
-            .on_submit({
-                let controller = self.clone();
-                move |vals, _w, cx| controller.submit_form(vals, _w, cx)
-            })
-            .submit(cx.t("demo.form.email_label"));
-
-        let submit_btn = form_props.submit_button(cx).expect("submit_label set");
+    pub fn form_status_text(&self, cx: &App) -> String {
         let submit_count = self.state.read(cx).form_submit_count;
         let email_error = self.state.read(cx).form_email_error.clone();
-
-        let el = form_props
-            .render(cx)
-            .w(px(300.))
-            .child(form_field)
-            .child(submit_btn)
-            .child(
-                yororen_ui::headless::label::label(
-                    "form-submit-count",
-                    format!(
-                        "{} {} | {} {:?}",
-                        cx.t("demo.form.submitted"),
-                        submit_count,
-                        cx.t("demo.form.last_error"),
-                        email_error
-                    ),
-                    cx,
-                )
-                .muted(true)
-                .render(cx),
-            )
-            .into_any_element();
-        self.cell(cx.t("demo.form.cell"), el, cx)
+        format!(
+            "{} {} | {} {:?}",
+            cx.t("demo.form.submitted"),
+            submit_count,
+            cx.t("demo.form.last_error"),
+            email_error
+        )
     }
 
-    pub fn tree_element(&self, cx: &mut App, window: &mut Window) -> AnyElement {
+    pub fn tree_label(&self, id: &TreeNodeId, cx: &App) -> String {
+        self.tree_data(cx)
+            .label_of(id)
+            .unwrap_or("")
+            .to_string()
+    }
+
+    pub fn tree_has_children(&self, id: &TreeNodeId, cx: &App) -> bool {
+        !self.tree_data(cx).children_of(id).is_empty()
+    }
+
+    pub fn toggle_tree_node_for(
+        &self,
+        id: TreeNodeId,
+    ) -> impl Fn(&ClickEvent, &mut Window, &mut App) + Clone + 'static {
         let state = self.state.clone();
-        let data = self.tree_data(cx);
-        let expanded = self.tree_expanded(cx);
-        let selected = self.tree_selected(cx);
-        let visible = data.flatten(&expanded);
-
-        let mut tree = yororen_ui::headless::tree::tree("lists-tree", cx)
-            .data(data.clone())
-            .render(cx)
-            .w(px(240.));
-
-        for (id, depth) in visible {
-            let has_children = !data.children_of(&id).is_empty();
-            let label = data.label_of(&id).unwrap_or("").to_string();
-            let is_expanded = expanded.contains(&id);
-            let is_selected = selected.as_ref() == Some(&id);
-            let row_id: ElementId = format!("lists-tree-row-{}", id.0).into();
-
-            let state_toggle = state.clone();
-            let state_select = state.clone();
-            let state_double = state.clone();
-            let toggle_id = id.clone();
-            let select_id = id.clone();
-            let double_id = id.clone();
-
-            tree = tree.child(
-                yororen_ui::headless::tree_item::tree_item(row_id, id, label, cx)
-                    .depth(depth)
-                    .has_children(has_children)
-                    .expanded(is_expanded)
-                    .selected(is_selected)
-                    .on_toggle(move |_ev, _w, cx| {
-                        let tid = toggle_id.clone();
-                        state_toggle.update(cx, |s, _cx| {
-                            if !s.tree_expanded.remove(&tid) {
-                                s.tree_expanded.insert(tid);
-                            }
-                        });
-                    })
-                    .on_click(move |_ev, _w, cx| {
-                        state_select.update(cx, |s, _cx| {
-                            s.tree_selected = Some(select_id.clone());
-                        });
-                    })
-                    .on_double_click(move |_ev, _w, cx| {
-                        let did = double_id.clone();
-                        state_double.update(cx, |s, _cx| {
-                            if !s.tree_expanded.remove(&did) {
-                                s.tree_expanded.insert(did);
-                            }
-                        });
-                    })
-                    .render(cx, window),
-            );
+        move |_ev, _w, cx| {
+            state.update(cx, |s, _cx| {
+                if !s.tree_expanded.remove(&id) {
+                    s.tree_expanded.insert(id.clone());
+                }
+            });
         }
-
-        self.cell(
-            cx.t("demo.lists.cell_tree"),
-            tree.into_any_element(),
-            cx,
-        )
     }
 
-    pub fn virtual_list_element(&self, cx: &mut App, _window: &mut Window) -> AnyElement {
-        self.sync_virtual_list(cx);
-        let state_for_row = self.state.clone();
-        let state_for_range = self.state.clone();
-        let vl_item_template = cx.t("demo.lists.vl_item");
-        let vl = yororen_ui::headless::virtual_list::virtual_list(
-            "lists-vl",
-            &self.list_controller(cx),
-            cx,
-        )
-        .row(move |ix, _window, cx| {
-            let app_entity = state_for_row.clone();
-            let selected = app_entity.read(cx).selected_list_item == Some(ix);
-            let row_id: ElementId = format!("vl-row-{ix}").into();
-            let row_label = vl_item_template.replacen("{}", &ix.to_string(), 1);
+    pub fn select_tree_node_for(
+        &self,
+        id: TreeNodeId,
+    ) -> impl Fn(&ClickEvent, &mut Window, &mut App) + Clone + 'static {
+        let state = self.state.clone();
+        move |_ev, _w, cx| {
+            state.update(cx, |s, _cx| {
+                s.tree_selected = Some(id.clone());
+            });
+        }
+    }
+
+    pub fn select_virtual_list_item(
+        &self,
+        index: usize,
+    ) -> impl Fn(&ClickEvent, &mut Window, &mut App) + Clone + 'static {
+        let state = self.state.clone();
+        move |_ev, _w, cx| {
+            state.update(cx, |s, _cx| {
+                s.selected_list_item = Some(index);
+            });
+        }
+    }
+
+    pub fn vl_row_label(&self, index: usize, cx: &App) -> String {
+        cx.t("demo.lists.vl_item")
+            .replacen("{}", &index.to_string(), 1)
+    }
+
+    pub fn uvl_row_label(&self, index: usize, cx: &App) -> String {
+        cx.t("demo.lists.uvl_item")
+            .replacen("{}", &index.to_string(), 1)
+    }
+
+    pub fn vl_status_text(&self, cx: &App) -> String {
+        let s = self.state.read(cx);
+        let visible = format!("{:?}", s.vl_visible_range);
+        cx.t("demo.lists.vl_status")
+            .replacen("{:?}", &visible, 1)
+            .replacen("{}", &s.vl_item_count.to_string(), 1)
+            .replacen("{}", &s.vl_load_count.to_string(), 1)
+    }
+
+    pub fn virtual_list_row(
+        &self,
+        cx: &App,
+    ) -> impl FnMut(usize, &mut Window, &mut App) -> gpui::AnyElement + 'static {
+        let state = self.state.clone();
+        let item_template = cx.t("demo.lists.vl_item");
+        move |ix, _w, cx| {
+            let selected = state.read(cx).selected_list_item == Some(ix);
+            let row_id: gpui::ElementId = format!("vl-row-{ix}").into();
+            let row_label = item_template.replacen("{}", &ix.to_string(), 1);
+            let state_for_click = state.clone();
             yororen_ui::headless::list_item::list_item(row_id, row_label, cx)
                 .selected(selected)
-                .on_click({
-                    let app_entity = app_entity.clone();
-                    move |_ev, _w, cx| {
-                        app_entity.update(cx, |s, _cx| {
-                            s.selected_list_item = Some(ix);
-                        });
-                    }
+                .on_click(move |_ev, _w, cx| {
+                    state_for_click.update(cx, |s, _cx| {
+                        s.selected_list_item = Some(ix);
+                    });
                 })
                 .render(cx)
                 .into_any_element()
-        })
-        .on_visible_range_change({
-            move |range, total, _window, cx| {
-                state_for_range.update(cx, |s, _cx| {
-                    s.vl_visible_range = Some(range.clone());
-                    if range.end + 50 >= total && s.vl_item_count < 5_000 {
-                        s.vl_item_count += 100;
-                        s.vl_load_count += 1;
-                    }
-                });
-            }
-        })
-        .render(cx)
-        .w(px(240.))
-        .h(px(180.));
-
-        let top_state = self.state.clone();
-        let bottom_state = self.state.clone();
-        let top_btn = yororen_ui::headless::button::button("vl-top", cx)
-            .on_click(move |_, _, cx| {
-                top_state.update(cx, |s, _| s.list_controller.scroll_to_top());
-            })
-            .render(cx)
-            .child(cx.t("demo.common.top"));
-        let bottom_btn = yororen_ui::headless::button::button("vl-bottom", cx)
-            .on_click(move |_, _, cx| {
-                bottom_state.update(cx, |s, _| s.list_controller.scroll_to_bottom());
-            })
-            .render(cx)
-            .child(cx.t("demo.common.bottom"));
-        let controls = div()
-            .flex()
-            .flex_row()
-            .gap(px(6.))
-            .child(top_btn)
-            .child(bottom_btn);
-
-        let visible = format!("{:?}", self.state.read(cx).vl_visible_range);
-        let item_count = self.state.read(cx).vl_item_count;
-        let load_count = self.state.read(cx).vl_load_count;
-        let status = cx
-            .t("demo.lists.vl_status")
-            .replacen("{:?}", &visible, 1)
-            .replacen("{}", &item_count.to_string(), 1)
-            .replacen("{}", &load_count.to_string(), 1);
-        let status_label = yororen_ui::headless::label::label("vl-status", status, cx)
-            .muted(true)
-            .render(cx);
-
-        let el = div()
-            .flex()
-            .flex_col()
-            .gap(px(6.))
-            .child(vl)
-            .child(controls)
-            .child(status_label)
-            .into_any_element();
-        self.cell(cx.t("demo.lists.cell_vl"), el, cx)
+        }
     }
 
-    pub fn uniform_list_element(&self, cx: &mut App, _window: &mut Window) -> AnyElement {
-        let _state = self.state.clone();
-        let uvl_item_template = cx.t("demo.lists.uvl_item");
-        let uvl = yororen_ui::headless::virtual_list::uniform_virtual_list(
-            "lists-uvl",
-            1_000,
-            &self.uniform_list_controller(cx),
-            cx,
-        )
-        .row(move |ix, _w, cx| {
-            let row_id: ElementId = format!("uvl-row-{ix}").into();
-            let row_label = uvl_item_template.replacen("{}", &ix.to_string(), 1);
+    pub fn uniform_list_row(
+        &self,
+        cx: &App,
+    ) -> impl FnMut(usize, &mut Window, &mut App) -> gpui::AnyElement + 'static {
+        let item_template = cx.t("demo.lists.uvl_item");
+        move |ix, _w, cx| {
+            let row_id: gpui::ElementId = format!("uvl-row-{ix}").into();
+            let row_label = item_template.replacen("{}", &ix.to_string(), 1);
             yororen_ui::headless::list_item::list_item(row_id, row_label, cx)
                 .render(cx)
                 .into_any_element()
-        })
-        .render(cx)
-        .w(px(240.))
-        .h(px(180.));
-
-        let top_state = self.state.clone();
-        let bottom_state = self.state.clone();
-        let top_btn = yororen_ui::headless::button::button("uvl-top", cx)
-            .on_click(move |_, _, cx| {
-                top_state.update(cx, |s, _| s.uniform_list_controller.scroll_to_top());
-            })
-            .render(cx)
-            .child(cx.t("demo.common.top"));
-        let bottom_btn = yororen_ui::headless::button::button("uvl-bottom", cx)
-            .on_click(move |_, _, cx| {
-                bottom_state.update(cx, |s, _| s.uniform_list_controller.scroll_to_bottom());
-            })
-            .render(cx)
-            .child(cx.t("demo.common.bottom"));
-        let controls = div()
-            .flex()
-            .flex_row()
-            .gap(px(6.))
-            .child(top_btn)
-            .child(bottom_btn);
-
-        let el = div()
-            .flex()
-            .flex_col()
-            .gap(px(6.))
-            .child(uvl)
-            .child(controls)
-            .into_any_element();
-        self.cell(cx.t("demo.lists.cell_uvl"), el, cx)
-    }
-
-    pub fn spacer_element(&self, cx: &mut App) -> AnyElement {
-        let el = yororen_ui::headless::spacer::spacer("lists-spacer", cx)
-            .render(cx)
-            .h(px(16.))
-            .w_full()
-            .into_any_element();
-        self.cell(cx.t("demo.lists.cell_spacer"), el, cx)
+        }
     }
 
     // -------- Data helpers used by XML --------

@@ -95,8 +95,8 @@ impl TreeProps {
         self.expanded.insert(id.into());
         self
     }
-    pub fn selected(mut self, id: impl Into<TreeNodeId>) -> Self {
-        self.selected = Some(id.into());
+    pub fn selected(mut self, id: impl Into<Option<TreeNodeId>>) -> Self {
+        self.selected = id.into();
         self
     }
     pub fn apply(self, el: Div) -> Stateful<Div> {

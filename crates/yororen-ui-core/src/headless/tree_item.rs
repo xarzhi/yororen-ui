@@ -31,6 +31,12 @@ impl From<String> for TreeNodeId {
     }
 }
 
+impl std::fmt::Display for TreeNodeId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.as_ref().fmt(f)
+    }
+}
+
 /// Maximum delay between two clicks to be considered a
 /// double-click. Mirrors the platform's `GetDoubleClickTime`
 /// on Windows / `NSWindow.doubleClickInterval` on macOS; 300ms

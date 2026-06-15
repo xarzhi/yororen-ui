@@ -123,11 +123,11 @@ pub struct GalleryState {
     pub form_email_error: Option<String>,
     pub tree_expanded: BTreeSet<TreeNodeId>,
     pub tree_selected: Option<TreeNodeId>,
-    pub list_controller: VirtualListController,
+    pub list_controller: Entity<VirtualListController>,
     pub vl_visible_range: Option<std::ops::Range<usize>>,
     pub vl_item_count: usize,
     pub vl_load_count: usize,
-    pub uniform_list_controller: UniformVirtualListController,
+    pub uniform_list_controller: Entity<UniformVirtualListController>,
 }
 
 impl GalleryState {
@@ -242,15 +242,13 @@ impl GalleryState {
             form_email_error: None,
             tree_expanded: BTreeSet::new(),
             tree_selected: None,
-            list_controller: VirtualListController::new(
-                100,
-                gpui::ListAlignment::Top,
-                gpui::px(20.),
-            ),
+            list_controller: cx.new(|_| {
+                VirtualListController::new(100, gpui::ListAlignment::Top, gpui::px(20.))
+            }),
             vl_visible_range: None,
             vl_item_count: 100,
             vl_load_count: 0,
-            uniform_list_controller: UniformVirtualListController::new(),
+            uniform_list_controller: cx.new(|_| UniformVirtualListController::new()),
         }
     }
 }
