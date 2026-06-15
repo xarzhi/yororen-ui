@@ -120,7 +120,7 @@ fn section_row(
 
 fn build_modal_overlay(
     app: &GalleryApp,
-    _window: &mut Window,
+    window: &mut Window,
     cx: &mut Context<GalleryApp>,
 ) -> gpui::Deferred {
     if !app.controller.is_modal_open(cx) {

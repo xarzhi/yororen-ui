@@ -1,7 +1,7 @@
 <!-- Section 2 — Display. -->
 <Column flex col gap="4">
     <Template name="Cell">
-        <Div flex flex_col gap="1" p="2" rounded_md border_1
+        <Div flex flex_col items_start gap="1" p="2" rounded_md border_1
              border_color={gpui::hsla(0.0, 0.0, 0.5, 0.15)}>
             <Slot name="label" />
             <Slot />
