@@ -479,14 +479,14 @@ const RUNTIME_LEAF_FALLBACK: ComponentDef = ComponentDef {
 /// attribute / event validation can't happen at
 /// compile time for these tags.
 fn codegen_runtime_leaf(element: &AstElement, cx: &TokenStream) -> Result<TokenStream, XmlError> {
-    let tag = element.tag.clone();
+    let tag = element.tag.as_str();
     let id_attr = element
         .attributes
         .iter()
         .find(|a| a.name == "id")
         .ok_or_else(|| {
             let builtins = crate::schema::builtin_tags();
-            let suggestion = did_you_mean(&tag, &builtins);
+            let suggestion = did_you_mean(tag, &builtins);
             let hint = suggestion.map_or_else(
                 String::new,
                 |s| format!(" — did you mean `<{s}>`?"),
@@ -505,10 +505,9 @@ fn codegen_runtime_leaf(element: &AstElement, cx: &TokenStream) -> Result<TokenS
     // the user's renderer is responsible for parsing
     // them. This keeps the contract minimal.
     let _ = cx;
-    // `tag` is owned (from element.tag) and lives for
-    // the lifetime of the AST. `render_or_empty` accepts
-    // a borrowed `&str`, so emitting the literal string
-    // is sufficient and no leak is required.
+    // `render_or_empty` accepts a borrowed `&str`, so
+    // emitting the literal tag string is sufficient and
+    // no clone or leak is required.
     Ok(quote! {
         ::yororen_ui_xml::runtime::render_or_empty(#tag, #id_expr, #cx)
     })
@@ -3842,7 +3841,7 @@ mod tests {
     //! that), but we make sure the tokens are well-formed
     //! and contain the expected fragments.
     use super::*;
-    use crate::schema_generated::{BUILTINS_GENERATED, BUILTINS_OVERRIDES};
+    use crate::schema_generated::BUILTINS_OVERRIDES;
     use proc_macro2::Span;
 
     fn render(xml: &str) -> String {
