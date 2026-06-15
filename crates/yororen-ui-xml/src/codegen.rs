@@ -865,6 +865,21 @@ fn codegen_leaf(
                 })?;
                 quote! { (#text).to_string() }
             }
+            (ExtraArgKind::Borrow, Some(a)) => {
+                // Borrowed positional arg (e.g. `FocusRing`'s
+                // `handle: &FocusHandle`). Pass the expression
+                // verbatim; the user is expected to supply a
+                // reference such as `handle={&cx.focus_handle()}`.
+                attr_value_tokens(a)?
+            }
+            (ExtraArgKind::Borrow, None) => {
+                return Err(XmlError::new(
+                    XmlErrorKind::UnknownAttribute,
+                    element.span,
+                    format!("<{}> requires a `{}` attribute", element.tag, extra.attr),
+                )
+                .at(element.byte_offset));
+            }
             (ExtraArgKind::Custom, Some(a)) => attr_value_tokens(a)?,
             (ExtraArgKind::Custom, None) => {
                 return Err(XmlError::new(

@@ -170,6 +170,8 @@ enum ExtraArgKind {
     KeybindingInputMode,
     /// Factory arg is `impl IntoIterator<Item = impl Into<String>>`.
     StringList,
+    /// Factory arg is a borrowed reference (e.g. `&FocusHandle`).
+    Borrow,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -854,6 +856,8 @@ fn analyse_factory(sig: &Signature) -> Result<(Vec<ExtraArgInfo>, bool), String>
             ExtraArgKind::KeybindingInputMode
         } else if is_string_list(ty) {
             ExtraArgKind::StringList
+        } else if is_borrow(ty) {
+            ExtraArgKind::Borrow
         } else if is_string_like(ty) {
             ExtraArgKind::Text
         } else if is_callback(ty) {
@@ -900,6 +904,10 @@ fn is_string_like(ty: &Type) -> bool {
 fn is_string_list(ty: &Type) -> bool {
     let rendered = ty.to_token_stream().to_string().replace(' ', "");
     rendered.contains("IntoIterator") && rendered.contains("Into<String>")
+}
+
+fn is_borrow(ty: &Type) -> bool {
+    matches!(ty, Type::Reference(_))
 }
 
 fn is_usize(ty: &Type) -> bool {
@@ -1188,6 +1196,7 @@ fn render_extra_args(args: &[ExtraArgInfo]) -> String {
             ExtraArgKind::ImageSource => "ExtraArgKind::ImageSource",
             ExtraArgKind::KeybindingInputMode => "ExtraArgKind::KeybindingInputMode",
             ExtraArgKind::StringList => "ExtraArgKind::StringList",
+            ExtraArgKind::Borrow => "ExtraArgKind::Borrow",
         };
         s.push_str(&format!(
             "ExtraArg {{ kind: {}, attr: {:?} }}, ",

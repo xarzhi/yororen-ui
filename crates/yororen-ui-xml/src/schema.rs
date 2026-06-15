@@ -256,6 +256,11 @@ pub enum ExtraArgKind {
     /// Literal XML attribute values are rejected; brace
     /// expressions pass through verbatim.
     StringList,
+    /// A borrowed reference positional argument (e.g.
+    /// `FocusRing`'s `handle: &FocusHandle`). The XML
+    /// expression should evaluate to a reference; the
+    /// factory clones the referenced value internally.
+    Borrow,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

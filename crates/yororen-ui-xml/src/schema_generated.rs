@@ -277,7 +277,7 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
         tag: "FocusRing",
         kind: ComponentKind::Leaf(LeafDef {
             factory: "::yororen_ui::headless::focus_ring::focus_ring",
-            extra_args: &[ExtraArg { kind: ExtraArgKind::Custom, attr: "handle" }, ],
+            extra_args: &[ExtraArg { kind: ExtraArgKind::Borrow, attr: "handle" }, ],
             render: RenderMode::Default,
             needs_app: true,
             needs_window: false,
