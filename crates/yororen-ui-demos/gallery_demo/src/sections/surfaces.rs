@@ -29,7 +29,7 @@ pub fn render(_app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .gap(px(12.))
         .child(cell(
             cx.t("demo.surfaces.cell_avatar_initials_status"),
-            avatar("av-1", cx)
+            avatar("ava-1", cx)
                 .initials(cx.t("demo.surfaces.avatar_initials_ab"))
                 .size(px(48.))
                 .circle(true)
@@ -39,7 +39,7 @@ pub fn render(_app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         ))
         .child(cell(
             cx.t("demo.surfaces.cell_avatar_initials_square"),
-            avatar("av-2", cx)
+            avatar("ava-2", cx)
                 .initials(cx.t("demo.surfaces.avatar_initials_cd"))
                 .size(px(48.))
                 .circle(false)
@@ -48,7 +48,7 @@ pub fn render(_app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         ))
         .child(cell(
             cx.t("demo.surfaces.cell_avatar_name"),
-            avatar("av-3", cx)
+            avatar("ava-3", cx)
                 .name(cx.t("demo.surfaces.avatar_name"))
                 .size(px(48.))
                 .render(cx),
@@ -56,7 +56,7 @@ pub fn render(_app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         ));
 
     // --- card (interactive) ---
-    let card_el = card("card-1", cx)
+    let card_el = card("crd-1", cx)
         .interactive(true)
         .render(cx)
         .w(px(220.))
@@ -79,7 +79,7 @@ pub fn render(_app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     let card_wrapped = cell(cx.t("demo.surfaces.cell_card"), card_el, cx);
 
     // --- panel with title ---
-    let panel_el = panel("panel-1", cx)
+    let panel_el = panel("pnl-1", cx)
         .title(cx.t("demo.surfaces.panel_title"))
         .padded(true)
         .render(cx)
@@ -88,7 +88,7 @@ pub fn render(_app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     let panel_wrapped = cell(cx.t("demo.surfaces.cell_panel"), panel_el, cx);
 
     // --- empty_state ---
-    let empty = empty_state("es-1", cx)
+    let empty = empty_state("emp-1", cx)
         .icon(IconSource::Builtin("info".into()))
         .title(cx.t("demo.surfaces.empty_title"))
         .description(cx.t("demo.surfaces.empty_desc"))
@@ -107,7 +107,7 @@ pub fn render(_app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .render(cx)
         .child(cx.t("demo.surfaces.focusable"));
     let ring_focus_handle = cx.focus_handle();
-    let ringed = focus_ring("ring-1", &ring_focus_handle, cx)
+    let ringed = focus_ring("frg-1", &ring_focus_handle, cx)
         .render(cx)
         .child(ring_target);
     let ring_wrapped = cell(cx.t("demo.surfaces.cell_focus_ring"), ringed, cx);
@@ -136,7 +136,7 @@ pub fn render(_app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
 
     // --- shortcut_hint ---
     let sh = shortcut_hint(
-        "sh-1",
+        "sht-1",
         cx.t("demo.surfaces.shortcut_save_caption"),
         vec!["Cmd".to_string(), "S".to_string()],
         cx,

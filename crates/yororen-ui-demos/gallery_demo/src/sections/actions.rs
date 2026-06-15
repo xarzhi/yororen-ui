@@ -83,7 +83,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .gap(px(12.))
         .child(cell(
             cx.t("demo.actions.cell_icon_button"),
-            icon_button("icon-btn-check", cx)
+            icon_button("ibn-check", cx)
                 .on_click(|_, _, _| {})
                 .icon(IconSource::Builtin("check".into()))
                 .render(cx),
@@ -91,7 +91,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         ))
         .child(cell(
             cx.t("demo.actions.cell_icon_button_primary"),
-            icon_button("icon-btn-primary-check", cx)
+            icon_button("ibn-primary-check", cx)
                 .variant(ActionVariantKind::Primary)
                 .on_click(|_, _, _| {})
                 .icon(IconSource::Builtin("check".into()))
@@ -108,7 +108,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .gap(px(12.))
         .child(cell(
             cx.t("demo.actions.cell_toggle_button"),
-            toggle_button("toggle-1", cx)
+            toggle_button("tgb-1", cx)
                 .selected(app.toggle_btn_selected)
                 .caption(cx.t("demo.actions.press_me"))
                 .on_toggle(move |_selected, _ev, _window, cx| {
@@ -139,7 +139,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .child(cell(
             cx.t("demo.actions.cell_split_button"),
             split_button(
-                "split-1",
+                "spb-1",
                 move |_, _, cx| {
                     entity_for_primary.update(cx, |s, _cx| s.toast_count += 1);
                 },
@@ -175,23 +175,23 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .gap(px(12.))
         .child(cell(
             cx.t("demo.actions.cell_button_group"),
-            button_group("btn-group-1", cx)
+            button_group("btg-1", cx)
                 .child(
-                    button("bg-left", cx)
+                    button("btn-left", cx)
                         .variant(ActionVariantKind::Neutral)
                         .caption(left_caption)
                         .on_click(|_, _, _| {})
                         .render(cx),
                 )
                 .child(
-                    button("bg-mid", cx)
+                    button("btn-mid", cx)
                         .variant(ActionVariantKind::Neutral)
                         .caption(mid_caption)
                         .on_click(|_, _, _| {})
                         .render(cx),
                 )
                 .child(
-                    button("bg-right", cx)
+                    button("btn-right", cx)
                         .variant(ActionVariantKind::Neutral)
                         .caption(right_caption)
                         .on_click(|_, _, _| {})

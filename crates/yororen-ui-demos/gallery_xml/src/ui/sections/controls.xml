@@ -5,25 +5,25 @@
     <Row flex row flex_wrap items_center gap="3">
         <InputCell>
             <Slot name="name"><Label id="lbl-cb" text={t!(cx, "demo.controls.cell_checkbox")} muted /></Slot>
-            <Checkbox id="ctrl-cb" @bind={controller.checkbox_value_entity(cx)} />
-            <Slot name="status"><Label id="status-cb" text={t_named!(cx, "demo.input.value", value => controller.checkbox_value(cx))} muted /></Slot>
+            <Checkbox id="cbx-main" @bind={controller.checkbox_value_entity(cx)} />
+            <Slot name="status"><Label id="sta-cb" text={t_named!(cx, "demo.input.value", value => controller.checkbox_value(cx))} muted /></Slot>
         </InputCell>
 
         <InputCell>
             <Slot name="name"><Label id="lbl-sw" text={t!(cx, "demo.controls.cell_switch")} muted /></Slot>
-            <Switch id="ctrl-sw" @bind={controller.switch_value_entity(cx)} />
-            <Slot name="status"><Label id="status-sw" text={t_named!(cx, "demo.input.value", value => controller.switch_value(cx))} muted /></Slot>
+            <Switch id="swt-main" @bind={controller.switch_value_entity(cx)} />
+            <Slot name="status"><Label id="sta-sw" text={t_named!(cx, "demo.input.value", value => controller.switch_value(cx))} muted /></Slot>
         </InputCell>
     </Row>
 
     <InputCell>
         <Slot name="name"><Label id="lbl-rg" text={t!(cx, "demo.controls.cell_radio_group")} muted /></Slot>
-        <RadioGroup id="ctrl-rg" name="choice" selected={controller.radio_value(cx)}>
-            <Radio id="ctrl-radio-0" checked={controller.radio_value(cx) == 0}
+        <RadioGroup id="rdg-choice" name="choice" selected={controller.radio_value(cx)}>
+            <Radio id="rdo-0" checked={controller.radio_value(cx) == 0}
                    on_toggle={controller.select_radio_0} />
-            <Radio id="ctrl-radio-1" checked={controller.radio_value(cx) == 1}
+            <Radio id="rdo-1" checked={controller.radio_value(cx) == 1}
                    on_toggle={controller.select_radio_1} />
-            <Radio id="ctrl-radio-2" checked={controller.radio_value(cx) == 2}
+            <Radio id="rdo-2" checked={controller.radio_value(cx) == 2}
                    on_toggle={controller.select_radio_2} />
         </RadioGroup>
     </InputCell>
@@ -31,7 +31,7 @@
 
     <InputCell>
         <Slot name="name"><Label id="lbl-slider" text={t!(cx, "demo.controls.cell_slider")} muted /></Slot>
-        <Slider id="ctrl-slider" min={0.0} max={100.0} step={1.0}
+        <Slider id="sld-value" min={0.0} max={100.0} step={1.0}
                 @bind={controller.slider_value_entity(cx)} />
     </InputCell>
     <Label id="slider-lbl" text={t_named!(cx, "demo.controls.slider_value", value => format!("{:.1}", controller.slider_value(cx)))} muted />

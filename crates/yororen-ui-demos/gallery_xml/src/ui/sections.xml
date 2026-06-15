@@ -22,7 +22,7 @@
                  rounded={gpui::px(0.)}>
         <Div flex flex_col p="4">
             <Include src="ui/sections/toolbar.xml" />
-            <Divider id="toolbar-divider" />
+            <Divider id="dvr-toolbar" />
         </Div>
         <Section><Include src="ui/sections/actions.xml" /></Section>
         <Section><Include src="ui/sections/display.xml" /></Section>

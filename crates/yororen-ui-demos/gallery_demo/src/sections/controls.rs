@@ -21,7 +21,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
 
     // --- checkbox ---
     let entity_cb = entity.clone();
-    let cb = checkbox("ctrl-cb", cx)
+    let cb = checkbox("cbx-main", cx)
         .checked(app.checkbox_value)
         .on_toggle(move |v, _ev, _w, cx| {
             entity_cb.update(cx, |s, _cx| s.checkbox_value = v);
@@ -30,7 +30,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
 
     // --- switch ---
     let entity_sw = entity.clone();
-    let sw = switch("ctrl-sw", cx)
+    let sw = switch("swt-main", cx)
         .checked(app.switch_value)
         .on_toggle(move |v, _ev, _w, cx| {
             entity_sw.update(cx, |s, _cx| s.switch_value = v);
@@ -46,7 +46,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     )
     .muted(true)
     .render(cx);
-    let rg_with_label = radio_group("ctrl-rg", cx)
+    let rg_with_label = radio_group("rdg-choice", cx)
         .name("choice")
         .selected(app.radio_value)
         .apply(div().flex().flex_row().gap(px(8.)).items_center())
@@ -54,7 +54,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     let rg_with_radios = (0..3).fold(rg_with_label, |acc, i| {
         let entity_r = entity.clone();
         acc.child(
-            radio(format!("ctrl-radio-{i}"), cx)
+            radio(format!("rdo-{i}"), cx)
                 .checked(app.radio_value == i)
                 .on_toggle(move |_v, _ev, _w, cx| {
                     entity_r.update(cx, |s, _cx| s.radio_value = i);
@@ -66,7 +66,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
     // --- slider (unified renderer) ---
     let entity_sl = entity.clone();
     let slider_value = app.slider_value;
-    let slider_track = slider("ctrl-slider", cx)
+    let slider_track = slider("sld-value", cx)
         .value(slider_value)
         .range(0.0, 100.0)
         .step(1.0)

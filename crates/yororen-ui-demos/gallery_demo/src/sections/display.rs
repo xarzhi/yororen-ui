@@ -61,22 +61,22 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .gap(px(4.))
         .child(cell(
             cx.t("demo.display.cell_heading_h1"),
-            heading("h-1", HeadingLevel::H1, cx.t("demo.display.heading_h1"), cx).render(cx),
+            heading("hdg-1", HeadingLevel::H1, cx.t("demo.display.heading_h1"), cx).render(cx),
             cx,
         ))
         .child(cell(
             cx.t("demo.display.cell_heading_h2"),
-            heading("h-2", HeadingLevel::H2, cx.t("demo.display.heading_h2"), cx).render(cx),
+            heading("hdg-2", HeadingLevel::H2, cx.t("demo.display.heading_h2"), cx).render(cx),
             cx,
         ))
         .child(cell(
             cx.t("demo.display.cell_heading_h3"),
-            heading("h-3", HeadingLevel::H3, cx.t("demo.display.heading_h3"), cx).render(cx),
+            heading("hdg-3", HeadingLevel::H3, cx.t("demo.display.heading_h3"), cx).render(cx),
             cx,
         ))
         .child(cell(
             cx.t("demo.display.cell_heading_h4"),
-            heading("h-4", HeadingLevel::H4, cx.t("demo.display.heading_h4"), cx).render(cx),
+            heading("hdg-4", HeadingLevel::H4, cx.t("demo.display.heading_h4"), cx).render(cx),
             cx,
         ));
 
@@ -86,17 +86,17 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .flex_col()
         .gap(px(8.))
         .child(
-            label("d-h-info", cx.t("demo.display.divider_h"), cx)
+            label("dvr-h-info", cx.t("demo.display.divider_h"), cx)
                 .muted(true)
                 .render(cx),
         )
-        .child(divider("d-h1", cx).render(cx))
+        .child(divider("dvr-h1", cx).render(cx))
         .child(
-            label("d-v-info", cx.t("demo.display.divider_v"), cx)
+            label("dvr-v-info", cx.t("demo.display.divider_v"), cx)
                 .muted(true)
                 .render(cx),
         )
-        .child(divider("d-v1", cx).vertical().render(cx).h(px(24.)));
+        .child(divider("dvr-v1", cx).vertical().render(cx).h(px(24.)));
 
     // --- 5 badge variants ---
     let badges = div()
@@ -107,35 +107,35 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .gap(px(8.))
         .child(cell(
             cx.t("button.neutral"),
-            badge("bd-n", cx.t("demo.display.badge_neutral"), cx)
+            badge("bdg-n", cx.t("demo.display.badge_neutral"), cx)
                 .variant(BadgeVariant::Neutral)
                 .render(cx),
             cx,
         ))
         .child(cell(
             cx.t("button.primary"),
-            badge("bd-s", cx.t("demo.display.badge_success"), cx)
+            badge("bdg-s", cx.t("demo.display.badge_success"), cx)
                 .variant(BadgeVariant::Success)
                 .render(cx),
             cx,
         ))
         .child(cell(
             cx.t("button.danger"),
-            badge("bd-w", cx.t("demo.display.badge_warning"), cx)
+            badge("bdg-w", cx.t("demo.display.badge_warning"), cx)
                 .variant(BadgeVariant::Warning)
                 .render(cx),
             cx,
         ))
         .child(cell(
             cx.t("button.danger"),
-            badge("bd-d", cx.t("demo.display.badge_danger"), cx)
+            badge("bdg-d", cx.t("demo.display.badge_danger"), cx)
                 .variant(BadgeVariant::Danger)
                 .render(cx),
             cx,
         ))
         .child(cell(
             cx.t("button.primary"),
-            badge("bd-i", cx.t("demo.display.badge_info"), cx)
+            badge("bdg-i", cx.t("demo.display.badge_info"), cx)
                 .variant(BadgeVariant::Info)
                 .render(cx),
             cx,
@@ -154,7 +154,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .gap(px(8.))
         .child(cell(
             cx.t("demo.display.cell_tag_selected"),
-            tag("tg-1", cx.t("demo.display.tag_toggle"), cx)
+            tag("tag-1", cx.t("demo.display.tag_toggle"), cx)
                 .selected(app.tag_selected)
                 .on_click(move |_, _, cx| {
                     entity_for_tag_click.update(cx, |s, _cx| {
@@ -166,7 +166,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         ))
         .child(cell(
             cx.t("demo.display.cell_tag_closable"),
-            tag("tg-2", cx.t("demo.display.tag_closable"), cx)
+            tag("tag-2", cx.t("demo.display.tag_closable"), cx)
                 .closable(true)
                 .on_close(move |_, _, cx| {
                     entity_for_tag_close.update(cx, |s, _cx| {
@@ -178,7 +178,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         ))
         .child(
             label(
-                "tg-closable-count",
+                "tag-closable-count",
                 format!("{tag_close_events_template} {tag_closable_count}"),
                 cx,
             )
@@ -193,12 +193,12 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .gap(px(8.))
         .child(cell(
             cx.t("demo.display.cell_skeleton_line"),
-            skeleton("sk-line", cx).w(px(180.)).h(px(12.)).render(cx),
+            skeleton("skl-line", cx).w(px(180.)).h(px(12.)).render(cx),
             cx,
         ))
         .child(cell(
             cx.t("demo.display.cell_skeleton_block"),
-            skeleton("sk-block", cx)
+            skeleton("skl-block", cx)
                 .block(true)
                 .w(px(180.))
                 .h(px(60.))
@@ -207,7 +207,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         ))
         .child(cell(
             cx.t("demo.display.cell_skeleton_block_sharp"),
-            skeleton("sk-block-sharp", cx)
+            skeleton("skl-block-sharp", cx)
                 .block(true)
                 .block_sharp(true)
                 .w(px(180.))
@@ -246,7 +246,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .gap(px(12.))
         .child(cell(
             cx.t("demo.display.cell_text"),
-            text("tx-1", cx.t("demo.display.plain_text"), cx)
+            text("txt-1", cx.t("demo.display.plain_text"), cx)
                 .size(px(14.))
                 .render(cx),
             cx,
@@ -254,7 +254,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .child(cell(
             cx.t("demo.display.cell_icon_check"),
             icon(
-                "ic-1",
+                "ico-1",
                 yororen_ui::headless::icon::IconSource::Builtin("check".into()),
                 cx,
             )
@@ -266,7 +266,7 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .child(cell(
             cx.t("demo.display.cell_icon_search"),
             icon(
-                "ic-2",
+                "ico-2",
                 yororen_ui::headless::icon::IconSource::Builtin("search".into()),
                 cx,
             )

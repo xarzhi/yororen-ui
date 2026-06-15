@@ -4,41 +4,41 @@
 
     <Cell>
         <Slot name="label"><Label id="lbl-modal" text={t!(cx, "demo.modal.cell")} muted /></Slot>
-        <Button id="ov-modal-open" caption={t!(cx, "demo.modal.open")}
+        <Button id="ovl-modal-open" caption={t!(cx, "demo.modal.open")}
                 on_click={controller.open_modal} />
     </Cell>
 
     <Cell>
         <Slot name="label"><Label id="lbl-popover" text={t!(cx, "demo.overlays.popover_trigger")} muted /></Slot>
-        <Popover id="ov-popover" state={controller.popover_state(cx)}>
-            <Button slot="trigger" id="ov-popover-trigger"
+        <Popover id="ovl-popover" state={controller.popover_state(cx)}>
+            <Button slot="trigger" id="ovl-popover-trigger"
                     caption={if controller.popover_visible(cx) { t!(cx, "demo.overlays.popover_close") } else { t!(cx, "demo.overlays.popover_open") }}
                     on_click={controller.toggle_popover} />
-            <Menu slot="content" id="ov-menu" state={controller.menu_state(cx)} />
+            <Menu slot="content" id="ovl-menu" state={controller.menu_state(cx)} />
         </Popover>
     </Cell>
 
     <Cell>
         <Slot name="label"><Label id="lbl-tooltip" text={t!(cx, "demo.tooltip.cell")} muted /></Slot>
-        <Tooltip id="ov-tooltip" text={t!(cx, "demo.tooltip.text")}
+        <Tooltip id="ovl-tooltip" text={t!(cx, "demo.tooltip.text")}
                  state={controller.tooltip_state(cx)}>
-            <Label slot="trigger" id="ov-tt-target" text={t!(cx, "demo.tooltip.hover_target")} />
+            <Label slot="trigger" id="ovl-tt-target" text={t!(cx, "demo.tooltip.hover_target")} />
         </Tooltip>
     </Cell>
 
     <Cell>
         <Slot name="label"><Label id="lbl-dropdown" text={t!(cx, "demo.overlays.dropdown_trigger")} muted /></Slot>
-        <DropdownMenu id="ov-dropdown" state={controller.dropdown_state(cx)}>
-            <Button slot="trigger" id="ov-dropdown-trigger"
+        <DropdownMenu id="ovl-dropdown" state={controller.dropdown_state(cx)}>
+            <Button slot="trigger" id="ovl-dropdown-trigger"
                     caption={t!(cx, "demo.overlays.dropdown_open")}
                     on_click={controller.toggle_dropdown} />
-            <Menu slot="content" id="ov-dropdown-body" state={controller.menu_state(cx)} />
+            <Menu slot="content" id="ovl-dropdown-body" state={controller.menu_state(cx)} />
         </DropdownMenu>
     </Cell>
 
     <Cell>
         <Slot name="label"><Label id="lbl-disclosure" text={t!(cx, "demo.disclosure.cell")} muted /></Slot>
-        <Disclosure id="ov-disc" title={t!(cx, "demo.disclosure.title")}
+        <Disclosure id="ovl-disc" title={t!(cx, "demo.disclosure.title")}
                     open={controller.disclosure_open(cx)}
                     on_toggle={controller.toggle_disclosure}>
             {controller.disclosure_body(cx)}
@@ -47,12 +47,12 @@
 
     <Cell>
         <Slot name="label"><Label id="lbl-overlay" text={t!(cx, "demo.overlays.scrim")} muted /></Slot>
-        <Overlay id="ov-overlay" open={controller.is_modal_open(cx)}>
-            <Label id="ov-overlay-info" text={t!(cx, "demo.overlays.scrim_info")} muted />
+        <Overlay id="ovl-overlay" open={controller.is_modal_open(cx)}>
+            <Label id="ovl-overlay-info" text={t!(cx, "demo.overlays.scrim_info")} muted />
         </Overlay>
     </Cell>
 
-    <Label id="ov-summary"
+    <Label id="ovl-summary"
            text={t_named!(cx, "demo.overlays.summary",
                            dropdown => controller.dropdown_demo_value(cx),
                            menu => controller.menu_demo_value(cx))}

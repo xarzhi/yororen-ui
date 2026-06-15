@@ -28,12 +28,12 @@
     <Row flex row flex_wrap items_center gap="3">
         <Cell>
             <Slot name="label"><Label id="lbl-icon-btn" text={t!(cx, "demo.actions.cell_icon_button")} muted /></Slot>
-            <IconButton id="icon-btn-check" icon="check"
+            <IconButton id="ibn-check" icon="check"
                         on_click={controller.noop_click} />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-icon-btn-primary" text={t!(cx, "demo.actions.cell_icon_button_primary")} muted /></Slot>
-            <IconButton id="icon-btn-primary-check" icon="check"
+            <IconButton id="ibn-primary-check" icon="check"
                         variant="primary" on_click={controller.noop_click} />
         </Cell>
     </Row>
@@ -41,7 +41,7 @@
     <Row flex row flex_wrap items_center gap="3">
         <Cell>
             <Slot name="label"><Label id="lbl-toggle" text={t!(cx, "demo.actions.cell_toggle_button")} muted /></Slot>
-            <ToggleButton id="toggle-1" caption={t!(cx, "demo.actions.press_me")}
+            <ToggleButton id="tgb-1" caption={t!(cx, "demo.actions.press_me")}
                           selected={controller.toggle_btn_selected(cx)}
                           on_toggle={controller.press_toggle_from_event} />
         </Cell>
@@ -50,7 +50,7 @@
     <Row flex row flex_wrap items_center gap="3">
         <Cell>
             <Slot name="label"><Label id="lbl-split" text={t!(cx, "demo.actions.cell_split_button")} muted /></Slot>
-            <SplitButton id="split-1" primary={controller.split_button_primary}
+            <SplitButton id="spb-1" primary={controller.split_button_primary}
                          caption={t!(cx, "demo.actions.save")}
                          state={controller.split_button_state(cx)}
                          items={controller.split_button_items(cx)}
@@ -61,12 +61,12 @@
     <Row flex row flex_wrap items_center gap="3">
         <Cell>
             <Slot name="label"><Label id="lbl-group" text={t!(cx, "demo.actions.cell_button_group")} muted /></Slot>
-            <ButtonGroup id="btn-group-1">
-                <Button id="bg-left" caption={t!(cx, "demo.actions.left")} variant="neutral"
+            <ButtonGroup id="btg-1">
+                <Button id="btn-left" caption={t!(cx, "demo.actions.left")} variant="neutral"
                         on_click={controller.noop_click} />
-                <Button id="bg-mid" caption={t!(cx, "demo.actions.mid")} variant="neutral"
+                <Button id="btn-mid" caption={t!(cx, "demo.actions.mid")} variant="neutral"
                         on_click={controller.noop_click} />
-                <Button id="bg-right" caption={t!(cx, "demo.actions.right")} variant="neutral"
+                <Button id="btn-right" caption={t!(cx, "demo.actions.right")} variant="neutral"
                         on_click={controller.noop_click} />
             </ButtonGroup>
         </Cell>

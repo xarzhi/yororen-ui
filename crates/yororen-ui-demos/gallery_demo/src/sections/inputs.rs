@@ -26,7 +26,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
     // text_input
     let entity_text = entity.clone();
     let text_value = app.text_value.clone();
-    let text_input_el = text_input("input-text")
+    let text_input_el = text_input("txi-text")
         .placeholder(cx.t("demo.input.placeholder_type_here"))
         .on_change(move |new: &str, _w, cx| {
             entity_text.update(cx, |s, _cx| s.text_value = new.to_string());
@@ -36,7 +36,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
     // password_input
     let entity_pw = entity.clone();
     let pw_value = app.password_value.clone();
-    let pw_input_el = password_input("input-password")
+    let pw_input_el = password_input("pwd-password")
         .placeholder(cx.t("demo.input.placeholder_password"))
         .mask_char('•')
         .on_change(move |new: &str, _w, cx| {
@@ -49,7 +49,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
     let entity_num_inc = entity.clone();
     let entity_num_dec = entity.clone();
     let num_value = app.number_value;
-    let num_input_el = number_input("input-number")
+    let num_input_el = number_input("num-number")
         .min(0.0)
         .max(100.0)
         .step(1.0)
@@ -68,7 +68,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
     // search_input
     let entity_search = entity.clone();
     let search_value = app.search_value.clone();
-    let search_input_el = search_input("input-search")
+    let search_input_el = search_input("sch-search")
         .placeholder(cx.t("demo.input.placeholder_search"))
         .on_change(move |new: &str, _w, cx| {
             entity_search.update(cx, |s, _cx| s.search_value = new.to_string());
@@ -79,7 +79,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
     // file_path_input
     let entity_fp = entity.clone();
     let fp_value = app.file_path_value.clone();
-    let fp_input_el = file_path_input("input-file-path")
+    let fp_input_el = file_path_input("fpi-file-path")
         .placeholder(cx.t("demo.input.placeholder_path"))
         .on_change(move |new: &str, _w, cx| {
             entity_fp.update(cx, |s, _cx| s.file_path_value = new.to_string());
@@ -93,7 +93,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
     let entity_kb_cancel = entity.clone();
     let kb_value = app.keybinding_value.clone();
     let kb_mode = app.keybinding_mode;
-    let kb_input_el = keybinding_input("input-keybinding")
+    let kb_input_el = keybinding_input("kbi-keybinding")
         .mode(kb_mode)
         .on_change(move |new: &str, _w, cx| {
             entity_kb.update(cx, |s, _cx| s.keybinding_value = new.to_string());
@@ -113,7 +113,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
     // text_area
     let entity_ta = entity.clone();
     let ta_value = app.text_area_value.clone();
-    let ta_input_el = text_area("input-text-area")
+    let ta_input_el = text_area("txa-text-area")
         .placeholder(cx.t("demo.input.placeholder_text_area"))
         .on_change(move |new: &str, _w, cx| {
             entity_ta.update(cx, |s, _cx| s.text_area_value = new.to_string());
@@ -131,7 +131,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
             });
         });
     });
-    let select_el = select("input-select", select_state.clone()).render(cx);
+    let select_el = select("sel-select", select_state.clone()).render(cx);
 
     let entity_combo = entity.clone();
     let combo_state = app.combo_state.clone();
@@ -143,7 +143,7 @@ pub fn render(app: &mut GalleryApp, window: &mut Window, cx: &mut Context<Galler
             });
         });
     });
-    let combo_el = combo_box("input-combo", combo_state.clone()).render(cx, window);
+    let combo_el = combo_box("cmb-combo", combo_state.clone()).render(cx, window);
 
     // assemble — each input goes in its own labelled cell,
     // followed by a status line that shows the live value.

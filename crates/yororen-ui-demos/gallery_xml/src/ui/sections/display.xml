@@ -24,57 +24,57 @@
     <Column flex col gap="2">
         <Cell>
             <Slot name="label"><Label id="lbl-heading-h1" text={t!(cx, "demo.display.cell_heading_h1")} muted /></Slot>
-            <Heading id="h-1" level="H1" text={t!(cx, "demo.display.heading_h1")} />
+            <Heading id="hdg-1" level="H1" text={t!(cx, "demo.display.heading_h1")} />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-heading-h2" text={t!(cx, "demo.display.cell_heading_h2")} muted /></Slot>
-            <Heading id="h-2" level="H2" text={t!(cx, "demo.display.heading_h2")} />
+            <Heading id="hdg-2" level="H2" text={t!(cx, "demo.display.heading_h2")} />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-heading-h3" text={t!(cx, "demo.display.cell_heading_h3")} muted /></Slot>
-            <Heading id="h-3" level="H3" text={t!(cx, "demo.display.heading_h3")} />
+            <Heading id="hdg-3" level="H3" text={t!(cx, "demo.display.heading_h3")} />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-heading-h4" text={t!(cx, "demo.display.cell_heading_h4")} muted /></Slot>
-            <Heading id="h-4" level="H4" text={t!(cx, "demo.display.heading_h4")} />
+            <Heading id="hdg-4" level="H4" text={t!(cx, "demo.display.heading_h4")} />
         </Cell>
     </Column>
 
     <Column flex col gap="2">
         <Cell>
             <Slot name="label"><Label id="lbl-divider-h" text={t!(cx, "demo.display.divider_h")} muted /></Slot>
-            <Divider id="d-h1" />
+            <Divider id="dvr-h1" />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-divider-v" text={t!(cx, "demo.display.divider_v")} muted /></Slot>
-            <Divider id="d-v1" vertical />
+            <Divider id="dvr-v1" vertical />
         </Cell>
     </Column>
 
     <Row flex row flex_wrap items_center gap="2">
         <Cell>
             <Slot name="label"><Label id="lbl-badge-neutral" text={t!(cx, "demo.display.badge_neutral")} muted /></Slot>
-            <Badge id="bd-n" text={t!(cx, "demo.display.badge_neutral")}
+            <Badge id="bdg-n" text={t!(cx, "demo.display.badge_neutral")}
                    variant="neutral" />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-badge-success" text={t!(cx, "demo.display.badge_success")} muted /></Slot>
-            <Badge id="bd-s" text={t!(cx, "demo.display.badge_success")}
+            <Badge id="bdg-s" text={t!(cx, "demo.display.badge_success")}
                    variant="success" />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-badge-warning" text={t!(cx, "demo.display.badge_warning")} muted /></Slot>
-            <Badge id="bd-w" text={t!(cx, "demo.display.badge_warning")}
+            <Badge id="bdg-w" text={t!(cx, "demo.display.badge_warning")}
                    variant="warning" />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-badge-danger" text={t!(cx, "demo.display.badge_danger")} muted /></Slot>
-            <Badge id="bd-d" text={t!(cx, "demo.display.badge_danger")}
+            <Badge id="bdg-d" text={t!(cx, "demo.display.badge_danger")}
                    variant="danger" />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-badge-info" text={t!(cx, "demo.display.badge_info")} muted /></Slot>
-            <Badge id="bd-i" text={t!(cx, "demo.display.badge_info")}
+            <Badge id="bdg-i" text={t!(cx, "demo.display.badge_info")}
                    variant="info" />
         </Cell>
     </Row>
@@ -82,16 +82,16 @@
     <Row flex row flex_wrap items_center gap="3">
         <Cell>
             <Slot name="label"><Label id="lbl-tag-selected" text={t!(cx, "demo.display.cell_tag_selected")} muted /></Slot>
-            <Tag id="tg-1" label={t!(cx, "demo.display.tag_toggle")}
+            <Tag id="tag-1" label={t!(cx, "demo.display.tag_toggle")}
                  selected={controller.tag_selected(cx)}
                  on_click={controller.toggle_tag_selected} />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-tag-closable" text={t!(cx, "demo.display.cell_tag_closable")} muted /></Slot>
-            <Tag id="tg-2" label={t!(cx, "demo.display.tag_closable")}
+            <Tag id="tag-2" label={t!(cx, "demo.display.tag_closable")}
                  closable on_close={controller.close_tag} />
         </Cell>
-        <Label id="tg-closable-count"
+        <Label id="tag-closable-count"
                text={t_named!(cx, "demo.display.tag_close_events", count => controller.tag_close_count(cx))}
                muted />
     </Row>
@@ -99,15 +99,15 @@
     <Row flex row flex_wrap items_start gap="3">
         <Cell>
             <Slot name="label"><Label id="lbl-sk-line" text={t!(cx, "demo.display.cell_skeleton_line")} muted /></Slot>
-            <Skeleton id="sk-line" w={gpui::px(180.0)} h={gpui::px(12.0)} />
+            <Skeleton id="skl-line" w={gpui::px(180.0)} h={gpui::px(12.0)} />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-sk-block" text={t!(cx, "demo.display.cell_skeleton_block")} muted /></Slot>
-            <Skeleton id="sk-block" block w={gpui::px(180.0)} h={gpui::px(60.0)} />
+            <Skeleton id="skl-block" block w={gpui::px(180.0)} h={gpui::px(60.0)} />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-sk-block-sharp" text={t!(cx, "demo.display.cell_skeleton_block_sharp")} muted /></Slot>
-            <Skeleton id="sk-block-sharp" block block_sharp w={gpui::px(180.0)} h={gpui::px(40.0)} />
+            <Skeleton id="skl-block-sharp" block block_sharp w={gpui::px(180.0)} h={gpui::px(40.0)} />
         </Cell>
     </Row>
 
@@ -126,16 +126,16 @@
     <Row flex row flex_wrap items_center gap="3">
         <Cell>
             <Slot name="label"><Label id="lbl-text" text={t!(cx, "demo.display.cell_text")} muted /></Slot>
-            <Text id="tx-1" text={t!(cx, "demo.display.plain_text")} size={14.0} />
+            <Text id="txt-1" text={t!(cx, "demo.display.plain_text")} size={14.0} />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-icon-check" text={t!(cx, "demo.display.cell_icon_check")} muted /></Slot>
-            <Icon id="ic-1" source="check" size={18.0}
+            <Icon id="ico-1" source="check" size={18.0}
                   color={cx.theme().get_color("content.primary").unwrap_or_default()} />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-icon-search" text={t!(cx, "demo.display.cell_icon_search")} muted /></Slot>
-            <Icon id="ic-2" source="search" size={18.0}
+            <Icon id="ico-2" source="search" size={18.0}
                   color={cx.theme().get_color("content.primary").unwrap_or_default()} />
         </Cell>
     </Row>

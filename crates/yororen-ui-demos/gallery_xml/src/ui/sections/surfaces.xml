@@ -5,22 +5,22 @@
     <Row flex row flex_wrap items_center gap="3">
         <Cell>
             <Slot name="label"><Label id="lbl-avatar-status" text={t!(cx, "demo.surfaces.cell_avatar_initials_status")} muted /></Slot>
-            <Avatar id="av-1" initials={t!(cx, "demo.surfaces.avatar_initials_ab")} size={48.0} circle has_status />
+            <Avatar id="ava-1" initials={t!(cx, "demo.surfaces.avatar_initials_ab")} size={48.0} circle has_status />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-avatar-square" text={t!(cx, "demo.surfaces.cell_avatar_initials_square")} muted /></Slot>
-            <Avatar id="av-2" initials={t!(cx, "demo.surfaces.avatar_initials_cd")} size={48.0} />
+            <Avatar id="ava-2" initials={t!(cx, "demo.surfaces.avatar_initials_cd")} size={48.0} />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-avatar-name" text={t!(cx, "demo.surfaces.cell_avatar_name")} muted /></Slot>
-            <Avatar id="av-3" name={t!(cx, "demo.surfaces.avatar_name")} size={48.0} />
+            <Avatar id="ava-3" name={t!(cx, "demo.surfaces.avatar_name")} size={48.0} />
         </Cell>
     </Row>
 
     <Row flex row flex_wrap items_start gap="3">
         <Cell>
             <Slot name="label"><Label id="lbl-card" text={t!(cx, "demo.surfaces.cell_card")} muted /></Slot>
-            <Card id="card-1" interactive>
+            <Card id="crd-1" interactive>
                 <Column flex col gap="2">
                     <Label id="card-title" text={t!(cx, "demo.surfaces.card_title")} strong />
                     <Label id="card-body" text={t!(cx, "demo.surfaces.card_body")} muted />
@@ -32,14 +32,14 @@
 
         <Cell>
             <Slot name="label"><Label id="lbl-panel" text={t!(cx, "demo.surfaces.cell_panel")} muted /></Slot>
-            <Panel id="panel-1" title={t!(cx, "demo.surfaces.panel_title")} padded>
+            <Panel id="pnl-1" title={t!(cx, "demo.surfaces.panel_title")} padded>
                 <Label id="panel-body" text={t!(cx, "demo.surfaces.panel_body")} />
             </Panel>
         </Cell>
 
         <Cell>
             <Slot name="label"><Label id="lbl-empty" text={t!(cx, "demo.surfaces.cell_empty")} muted /></Slot>
-            <EmptyState id="es-1"
+            <EmptyState id="emp-1"
                         icon="info"
                         title={t!(cx, "demo.surfaces.empty_title")}
                         description={t!(cx, "demo.surfaces.empty_desc")}>
@@ -51,7 +51,7 @@
     <Row flex row flex_wrap items_center gap="3">
         <Cell>
             <Slot name="label"><Label id="lbl-focus-ring" text={t!(cx, "demo.surfaces.cell_focus_ring")} muted /></Slot>
-            <FocusRing id="ring-1" handle={&cx.focus_handle()}>
+            <FocusRing id="frg-1" handle={&cx.focus_handle()}>
                 <Button id="focus-btn" caption={t!(cx, "demo.surfaces.focusable")}
                         on_click={controller.noop_click} />
             </FocusRing>
@@ -76,7 +76,7 @@
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-shortcut" text={t!(cx, "demo.surfaces.cell_shortcut_hint")} muted /></Slot>
-            <ShortcutHint id="sh-1" label={t!(cx, "demo.surfaces.shortcut_save_caption")}
+            <ShortcutHint id="sht-1" label={t!(cx, "demo.surfaces.shortcut_save_caption")}
                           keys={vec!["Cmd".to_string(), "S".to_string()]} />
         </Cell>
     </Row>
