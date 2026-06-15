@@ -506,11 +506,9 @@ fn codegen_runtime_leaf(element: &AstElement, cx: &TokenStream) -> Result<TokenS
     // them. This keeps the contract minimal.
     let _ = cx;
     // `tag` is owned (from element.tag) and lives for
-    // the lifetime of the AST; we need a 'static
-    // reference for the runtime lookup. The XML
-    // literal is itself 'static (it's part of the
-    // macro input), so emitting the literal string
-    // yields a 'static reference.
+    // the lifetime of the AST. `render_or_empty` accepts
+    // a borrowed `&str`, so emitting the literal string
+    // is sufficient and no leak is required.
     Ok(quote! {
         ::yororen_ui_xml::runtime::render_or_empty(#tag, #id_expr, #cx)
     })

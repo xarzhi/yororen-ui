@@ -63,6 +63,12 @@ use inventory::collect;
 #[derive(Clone)]
 pub struct ComponentDescriptor {
     /// The XML tag name (e.g. `"Chart"`).
+    ///
+    /// Kept as `&'static str` because `inventory::submit!`
+    /// stores descriptors in a static, and statics cannot
+    /// const-construct an owned `String` from a literal.
+    /// Lookups accept `&str`, so callers never need to
+    /// leak temporary strings.
     pub tag: &'static str,
     /// The factory function: takes `(id, cx)`, returns an
     /// element that gets spliced into the parent.
@@ -94,12 +100,16 @@ pub fn lookup(tag: &str) -> Option<&'static ComponentDescriptor> {
 /// the XML; failing at runtime would be a worse UX than
 /// rendering nothing for a typo'd tag.
 ///
-/// The `id` is passed by `String` (not `&str`) because
-/// the codegen always coerces the `id="…"` attribute to
-/// an owned `String` (to match the typical headless
-/// factory signature). Callers that need a `&str` can
-/// call `.as_str()` inside the factory.
-pub fn render_or_empty(tag: &'static str, id: String, cx: &mut gpui::App) -> AnyElement {
+/// The `tag` is borrowed because callers may supply a
+/// temporary runtime string; the lookup accepts `&str`
+/// even though the static registry stores `&'static str`
+/// tags (required by `inventory::submit!`). The `id` is
+/// passed by `String` (not `&str`) because the codegen
+/// always coerces the `id="…"` attribute to an owned
+/// `String` (to match the typical headless factory
+/// signature). Callers that need a `&str` can call
+/// `.as_str()` inside the factory.
+pub fn render_or_empty(tag: &str, id: String, cx: &mut gpui::App) -> AnyElement {
     match lookup(tag) {
         Some(d) => (d.factory)(&id, cx),
         None => {
@@ -196,14 +206,11 @@ fn render_element_runtime(
                 .find(|a| a.name == "id")
                 .map(|a| a.raw.clone())
                 .unwrap_or_default();
-            // `'static` tag for the registry: the tag is
-            // owned by the AST but we can leak it for
-            // the call (leaks only on actual usage, not
-            // on every call). Alternative: thread a
-            // String-tagged registry. For v0.3, this
-            // leak is acceptable for runtime paths.
-            let tag_static: &'static str = Box::leak(other.to_string().into_boxed_str());
-            Ok(render_or_empty(tag_static, id, cx))
+            // `render_or_empty` accepts a borrowed `&str`,
+            // so we can pass the temporary tag directly
+            // without leaking it to satisfy a `'static`
+            // lifetime.
+            Ok(render_or_empty(other, id, cx))
         }
     }
 }
@@ -261,9 +268,9 @@ fn render_leaf_runtime(
     def: &crate::schema::ComponentDef,
     cx: &mut gpui::App,
 ) -> Result<AnyElement, String> {
-    let id: &'static str = attr_str(element, "id")
-        .map(|s| Box::leak(s.to_string().into_boxed_str()) as &'static str)
-        .unwrap_or_else(|| Box::leak(format!("{}-runtime", element.tag).into_boxed_str()));
+    let id = attr_str(element, "id")
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| format!("{}-runtime", element.tag));
 
     let events: &[(&str, &str)] = if let crate::schema::ComponentKind::Leaf(leaf) = def.kind {
         leaf.events
@@ -282,7 +289,10 @@ fn render_leaf_runtime(
 
     let el: gpui::AnyElement = match element.tag.as_str() {
         "Label" => {
-            let text: gpui::SharedString = attr_str(element, "text").unwrap_or("").into();
+            let text: gpui::SharedString = attr_str(element, "text")
+                .unwrap_or("")
+                .to_string()
+                .into();
             let mut l = yororen_ui_core::headless::label::label(id, text, cx);
             if attr_bool(element, "strong") {
                 l = l.strong(true);
@@ -307,7 +317,7 @@ fn render_leaf_runtime(
         "Button" => {
             let mut b = yororen_ui_core::headless::button::button(id, cx);
             if let Some(caption) = attr_str(element, "caption") {
-                b = b.caption(caption);
+                b = b.caption(caption.to_string());
             }
             if let Some(variant) = attr_variant(element, "variant") {
                 b = b.variant(variant);
@@ -328,13 +338,19 @@ fn render_leaf_runtime(
         "Heading" => {
             let level = attr_heading_level(element, "level")
                 .unwrap_or(yororen_ui_core::headless::heading::HeadingLevel::H1);
-            let text: gpui::SharedString = attr_str(element, "text").unwrap_or("").into();
+            let text: gpui::SharedString = attr_str(element, "text")
+                .unwrap_or("")
+                .to_string()
+                .into();
             yororen_ui_core::headless::heading::heading(id, level, text, cx)
                 .render(cx)
                 .into_any_element()
         }
         "ListItem" => {
-            let title: gpui::SharedString = attr_str(element, "title").unwrap_or("").into();
+            let title: gpui::SharedString = attr_str(element, "title")
+                .unwrap_or("")
+                .to_string()
+                .into();
             let mut li = yororen_ui_core::headless::list_item::list_item(id, title, cx);
             if let Some(selected) = attr_opt_bool(element, "selected") {
                 li = li.selected(selected);
@@ -364,12 +380,12 @@ fn attr_present(element: &ast::AstElement, name: &str) -> bool {
     element.attributes.iter().any(|a| a.name == name)
 }
 
-fn attr_str(element: &ast::AstElement, name: &str) -> Option<&'static str> {
+fn attr_str<'a>(element: &'a ast::AstElement, name: &str) -> Option<&'a str> {
     element
         .attributes
         .iter()
         .find(|a| a.name == name)
-        .map(|a| Box::leak(a.raw.clone().into_boxed_str()) as &'static str)
+        .map(|a| a.raw.as_str())
 }
 
 fn attr_bool(element: &ast::AstElement, name: &str) -> bool {
@@ -463,11 +479,11 @@ mod tests {
 
     #[test]
     fn runtime_registry_lookup_iterates_inventory() {
-        // Register a tag at compile time. The
-        // descriptor's `tag` field is `'static str`,
-        // so the literal works directly. The factory
-        // returns an empty div — we don't need any
-        // actual rendering for the lookup test.
+        // Register a tag at compile time. The descriptor's
+        // `tag` field is `'static str` (required by the
+        // inventory static), so the literal works directly.
+        // The factory returns an empty div — we don't need
+        // any actual rendering for the lookup test.
         fn empty(_id: &str, _cx: &mut gpui::App) -> gpui::AnyElement {
             gpui::div().into_any_element()
         }
