@@ -24,10 +24,57 @@ use yororen_ui::notification::center::{Notification, NotificationCenter, ToastKi
 
 use crate::state::{DarkMode, GalleryState, LocaleChoice, RendererKind};
 use yororen_ui::i18n::Translate;
+use yororen_ui::t_named;
 
 #[derive(Clone)]
 pub struct Controller {
     state: Entity<GalleryState>,
+}
+
+/// A single-read snapshot of the most frequently-accessed
+/// footer / summary fields. Use this when the XML needs several
+/// scalar values in one place to avoid repeated
+/// `state.read(cx)` borrow guards.
+pub struct GallerySnapshot {
+    form_submit_count: usize,
+    form_email_value: String,
+    form_email_error: Option<String>,
+    checkbox_value: bool,
+    switch_value: bool,
+    radio_value: usize,
+    slider_value: f32,
+    toast_count: usize,
+    current_locale: LocaleChoice,
+}
+
+impl GallerySnapshot {
+    pub fn form_submit_count(&self) -> usize {
+        self.form_submit_count
+    }
+    pub fn form_email_value(&self) -> String {
+        self.form_email_value.clone()
+    }
+    pub fn form_email_error(&self) -> Option<String> {
+        self.form_email_error.clone()
+    }
+    pub fn checkbox_value(&self) -> bool {
+        self.checkbox_value
+    }
+    pub fn switch_value(&self) -> bool {
+        self.switch_value
+    }
+    pub fn radio_value(&self) -> usize {
+        self.radio_value
+    }
+    pub fn slider_value(&self) -> f32 {
+        self.slider_value
+    }
+    pub fn toast_count(&self) -> usize {
+        self.toast_count
+    }
+    pub fn current_locale(&self) -> LocaleChoice {
+        self.current_locale
+    }
 }
 
 // Thin 4-arg event adapters for the toolbar toggle buttons so the
@@ -75,6 +122,54 @@ impl Controller {
 
     pub fn state(&self) -> Entity<GalleryState> {
         self.state.clone()
+    }
+
+    /// Read the footer / summary fields once and return a
+    /// snapshot. Use this in XML that needs several scalar values
+    /// in one place instead of calling individual getters.
+    pub fn snapshot(&self, cx: &App) -> GallerySnapshot {
+        let s = self.state.read(cx);
+        GallerySnapshot {
+            form_submit_count: s.form_submit_count,
+            form_email_value: s.form_email_value.read(cx).clone(),
+            form_email_error: s.form_email_error.clone(),
+            checkbox_value: *s.checkbox_value.read(cx),
+            switch_value: *s.switch_value.read(cx),
+            radio_value: s.radio_value,
+            slider_value: *s.slider_value.read(cx),
+            toast_count: s.toast_count.value,
+            current_locale: s.current_locale,
+        }
+    }
+
+    /// Build the footer form-summary text in a single state read.
+    pub fn footer_form_text(&self, cx: &App) -> String {
+        let s = self.snapshot(cx);
+        t_named!(cx, "demo.footer.form_summary",
+            count => s.form_submit_count(),
+            email => s.form_email_value(),
+            error => format!("{:?}", s.form_email_error()))
+        .to_string()
+    }
+
+    /// Build the footer controls-summary text in a single state read.
+    pub fn footer_controls_text(&self, cx: &App) -> String {
+        let s = self.snapshot(cx);
+        t_named!(cx, "demo.footer.controls_summary",
+            checkbox => s.checkbox_value(),
+            switch => s.switch_value(),
+            radio => s.radio_value(),
+            slider => format!("{:.1}", s.slider_value()))
+        .to_string()
+    }
+
+    /// Build the footer toast-summary text in a single state read.
+    pub fn footer_toast_text(&self, cx: &App) -> String {
+        let s = self.snapshot(cx);
+        t_named!(cx, "demo.footer.toast_summary",
+            count => s.toast_count(),
+            locale => s.current_locale().tag())
+        .to_string()
     }
 
     // -------- Toolbar read-only accessors used by view.rs --------
@@ -778,8 +873,9 @@ impl Controller {
     }
 
     pub fn form_status_text(&self, cx: &App) -> String {
-        let submit_count = self.state.read(cx).form_submit_count;
-        let email_error = self.state.read(cx).form_email_error.clone();
+        let s = self.state.read(cx);
+        let submit_count = s.form_submit_count;
+        let email_error = s.form_email_error.clone();
         format!(
             "{} {} | {} {:?}",
             cx.t("demo.form.submitted"),
