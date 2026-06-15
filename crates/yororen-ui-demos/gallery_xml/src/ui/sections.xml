@@ -20,10 +20,10 @@
     <VirtualList id="gallery-sections" size_full
                  border_color={cx.theme().get_color("surface.base").unwrap_or_default()}
                  rounded={gpui::px(0.)}>
-        <Div flex flex_col p="4">
+        <Section>
             <Include src="ui/sections/toolbar.xml" />
             <Divider id="dvr-toolbar" />
-        </Div>
+        </Section>
         <Section><Include src="ui/sections/actions.xml" /></Section>
         <Section><Include src="ui/sections/display.xml" /></Section>
         <Section><Include src="ui/sections/surfaces.xml" /></Section>
