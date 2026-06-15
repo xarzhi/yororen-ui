@@ -2507,8 +2507,8 @@ fn codegen_virtual_list_kind(
         ),
     };
 
-    let on_range_chain = match on_range_tokens {
-        Some(t) => quote! { .on_visible_range_change(#t) },
+    let on_range_stmt = match on_range_tokens {
+        Some(t) => quote! { __props = __props.on_visible_range_change(#t); },
         None => quote! {},
     };
 
@@ -2541,7 +2541,7 @@ fn codegen_virtual_list_kind(
             let __snap = __entity.read(#cx).clone();
             let mut __props = #factory_call;
             __props = __props.row(#row_closure);
-            __props = __props #on_range_chain;
+            #on_range_stmt
             let mut __el = __props.render(#cx);
             #(#style_stmts)*
             ::gpui::IntoElement::into_any_element(__el)

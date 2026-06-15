@@ -287,13 +287,45 @@ pub fn xml_file(input: TokenStream) -> TokenStream {
 /// block; the extra nesting does not change semantics and keeps
 /// the implementation robust against future changes to the
 /// codegen prelude.
+///
+/// If the supplied expression is already the bare identifier
+/// `window`, the binding would be `let window = window;`, which
+/// triggers `clippy::redundant_locals` / `clippy::self_assignment`.
+/// We keep the binding so the outer `window` value is still
+/// considered used, but annotate it with `#[allow(...)]`.
 fn splice_window_let(ts: TokenStream, w_expr: TokenStream) -> TokenStream {
     let ts2: proc_macro2::TokenStream = ts.into();
     let w_expr2: proc_macro2::TokenStream = w_expr.into();
-    let block: proc_macro2::TokenStream = quote::quote! {
-        {
-            let window = #w_expr2;
-            #ts2
+
+    let is_bare_window = syn::parse2::<syn::Expr>(w_expr2.clone())
+        .map(|expr| {
+            if let syn::Expr::Path(syn::ExprPath {
+                qself: None,
+                path,
+                attrs: _,
+            }) = expr
+            {
+                path.is_ident("window")
+            } else {
+                false
+            }
+        })
+        .unwrap_or(false);
+
+    let block: proc_macro2::TokenStream = if is_bare_window {
+        quote::quote! {
+            {
+                #[allow(clippy::redundant_locals, clippy::self_assignment)]
+                let window = #w_expr2;
+                #ts2
+            }
+        }
+    } else {
+        quote::quote! {
+            {
+                let window = #w_expr2;
+                #ts2
+            }
         }
     };
     block.into()
