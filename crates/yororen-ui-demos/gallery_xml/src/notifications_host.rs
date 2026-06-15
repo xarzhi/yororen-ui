@@ -164,7 +164,14 @@ fn toast_card(
     n: Notification,
     id: NotificationId,
 ) -> gpui::Stateful<gpui::Div> {
-    let kind_path = match n.kind {
+    // `n` is owned, so move title / message out instead of cloning.
+    let Notification {
+        title,
+        message,
+        kind,
+        ..
+    } = n;
+    let kind_path = match kind {
         ToastKind::Success => "status.success",
         ToastKind::Warning => "status.warning",
         ToastKind::Error => "status.error",
@@ -228,7 +235,7 @@ fn toast_card(
     // end of the same row, so it visually belongs to the title
     // area.
     let mut text_column = div().flex_1().min_w(px(0.)).flex().flex_col().gap(px(2.));
-    if let Some(title) = n.title.clone() {
+    if let Some(title) = title {
         text_column = text_column.child(
             div()
                 .text_sm()
@@ -237,7 +244,7 @@ fn toast_card(
                 .child(title),
         );
     }
-    text_column = text_column.child(div().text_sm().text_color(kind_fg).child(n.message.clone()));
+    text_column = text_column.child(div().text_sm().text_color(kind_fg).child(message));
 
     // Title row: [title column] [spacer] [close]. This is the
     // row the user asked the close button to share with the
