@@ -401,20 +401,15 @@ pub static BUILTINS: &[ComponentDef] = &[
                     setter: "clickable",
                     value: PropValue::Bool,
                 },
-                // `icon` / `icon_size` are typed `IconSource` /
-                // `gpui::Pixels` in the headless. Until we have
-                // dedicated XML representations, we accept them
-                // as opaque strings and let the user pass them
-                // through as Rust expressions.
                 PropDef {
                     name: "icon",
                     setter: "icon",
-                    value: PropValue::Unknown,
+                    value: PropValue::IconSource,
                 },
                 PropDef {
                     name: "icon_size",
                     setter: "icon_size",
-                    value: PropValue::Unknown,
+                    value: PropValue::Float32,
                 },
             ],
             events: &[("on_click", "on_click")],
@@ -546,12 +541,12 @@ pub static BUILTINS: &[ComponentDef] = &[
                 PropDef {
                     name: "wrap",
                     setter: "wrap",
-                    value: PropValue::Bool,
+                    value: PropValue::Flag,
                 },
                 PropDef {
                     name: "max_lines",
                     setter: "max_lines",
-                    value: PropValue::Unknown,
+                    value: PropValue::UInt,
                 },
             ],
             events: &[],
@@ -596,15 +591,6 @@ pub const RESERVED_ATTRS: &[&str] = &[
     "key",       // <For key={...}>
     "if",        // reserved for future inline-if
 ];
-
-/// Reserved "fixed" attribute → method pairs that are valid on
-/// every container (and don't need to be re-declared in each
-/// `ContainerDef::fixed_methods`).
-///
-/// These are emitted **before** the `ContainerDef::fixed_methods`,
-/// so `Column` with `flex col` is `.flex().flex_col()` in that
-/// order.
-pub const GLOBAL_CONTAINER_METHODS: &[(&str, &str)] = &[("flex", "flex")];
 
 /// Whether a string is a known shorthand suffix that we
 /// should expand to a literal method call. Examples:

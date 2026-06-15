@@ -169,6 +169,10 @@ kind = "Leaf"
 children_before_render = true
 
 # `Popover` / `DropdownMenu` pass trigger/content to builder methods.
+# Note: `<Menu>` has no slots of its own; it is meant to be placed as a
+# `slot="content"` child of `<Popover>` or `<DropdownMenu>`. The slot
+# attribute is consumed by the parent component's slot dispatcher, not by
+# Menu itself.
 [[override_]]
 tag = "Popover"
 kind = "Leaf"

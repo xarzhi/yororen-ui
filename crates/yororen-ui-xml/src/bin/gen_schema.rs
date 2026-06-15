@@ -1195,7 +1195,7 @@ fn render_props(props: &[PropInfo]) -> String {
             PropValue::Bool => "PropValue::Bool",
             PropValue::Variant => "PropValue::Variant",
             PropValue::Flag => "PropValue::Flag",
-            PropValue::Unknown => "PropValue::String /* unknown — review */",
+            PropValue::Unknown => "PropValue::String",
             PropValue::Float64 => "PropValue::Float64",
             PropValue::Float32 => "PropValue::Float32",
             PropValue::UInt => "PropValue::UInt",

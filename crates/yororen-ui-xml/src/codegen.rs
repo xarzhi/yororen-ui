@@ -1575,37 +1575,15 @@ fn codegen_for(
     let each_parsed = attr_expr_only(each)?;
 
     // `<For each={xs} let:item>…</For>` — the `let:item` part
-    // sets the loop variable name (defaults to `it`).
-    // The parser preprocessed `let:item` to `let_item`, so
-    // we look for the `let_item` / `let_index` names here.
-    // The normaliser may have appended `="true"` to the
-    // value-less `let_item` attr; we treat any value of
-    // `let_item` that's `== "true"` (or empty) as the
-    // default — we want the *name*, not the value.
-    let item_name = element
-        .attributes
-        .iter()
-        .find(|a| a.name == "let_item")
-        .map(|a| {
-            // The original `let:item` carried no value, so
-            // the normaliser injected `="true"`. If the
-            // value is `true`, fall back to the default
-            // name `item`; otherwise treat the value as
-            // the custom name.
-            if a.raw == "true" || a.raw.is_empty() {
-                "item".to_string()
-            } else {
-                a.raw.clone()
-            }
-        })
-        .unwrap_or_else(|| "it".to_string());
-    let item_ident = format_ident!("{}", item_name);
+    // sets the loop variable name (defaults to `item` when the
+    // attribute is present, `it` when it is absent). Reuse the
+    // same resolver as `<VirtualList>` so brace expressions like
+    // `let:item={name}` are read from `expr`, not `raw`.
+    let (item_ident, index_ident) = parse_let_bindings(element, "item", "i");
+    let item_ident = item_ident.unwrap_or_else(|| format_ident!("it"));
 
-    // Optional index variable: `let:index={i}` (named `i` by
-    // default; the `let_index` attribute is the marker — the
-    // preprocessor turns `let:index` into `let_index`).
+    // Whether the user requested an index binding.
     let has_index = element.attributes.iter().any(|a| a.name == "let_index");
-    let index_ident = format_ident!("i");
 
     // Optional key: `<For each={xs} key={item.id} let:item>`. When
     // present, the codegen binds a fresh `__key` ident per
@@ -2069,12 +2047,15 @@ fn codegen_match(
 }
 
 /// Resolve the `let:item` / `let:index={name}` bindings on an
-/// element, mirroring `<For>`'s convention. The parser turns
-/// `let:item` into a value-less `let_item` attribute and
-/// `let:index={i}` into a `let_index` attribute whose `raw`
-/// value is the requested identifier (the normaliser may
-/// append `="true"`, so a `true`/empty value falls back to
-/// the default `i`).
+/// element. The parser turns `let:item` into a value-less
+/// `let_item` attribute and `let:index={i}` into a `let_index`
+/// attribute whose `raw` value is the requested identifier (the
+/// normaliser may have appended `="true"`, so a `true`/empty
+/// value falls back to the supplied default).
+///
+/// Brace expressions (`let:item={name}`) carry the name in
+/// `expr` (the de-braced body) and take precedence over `raw`,
+/// which is what makes `<For each={xs} let:item={name}>` work.
 ///
 /// Returns `(item_ident, index_ident)`. `item_ident` is `None`
 /// when no `let:item` is present (the virtual-list row body
@@ -2082,6 +2063,8 @@ fn codegen_match(
 /// hands us — but we support it for symmetry with `<For>`).
 fn parse_let_bindings(
     element: &AstElement,
+    item_default: &str,
+    index_default: &str,
 ) -> (Option<proc_macro2::Ident>, proc_macro2::Ident) {
     // Resolve a `let:`-derived attribute's identifier. Brace
     // expressions (`let:index={i}`) carry the name in `expr`
@@ -2108,14 +2091,14 @@ fn parse_let_bindings(
     }
     let item_ident = resolve_name(
         element.attributes.iter().find(|a| a.name == "let_item"),
-        "item",
+        item_default,
     )
     .map(|s| format_ident!("{}", s));
     let index_ident = resolve_name(
         element.attributes.iter().find(|a| a.name == "let_index"),
-        "index",
+        index_default,
     )
-    .unwrap_or_else(|| "index".to_string());
+    .unwrap_or_else(|| index_default.to_string());
     let index_ident = format_ident!("{}", index_ident);
     (item_ident, index_ident)
 }
@@ -2303,7 +2286,7 @@ fn codegen_virtual_list_kind(
                 )
                 .at(element.byte_offset));
             }
-            let (item_ident, index_ident) = parse_let_bindings(element);
+            let (item_ident, index_ident) = parse_let_bindings(element, "item", "index");
             let child_body =
                 codegen_children_as_element(&element.children, cx, location, source_file)?;
             // Bind `let item = index;` when `let:item` is requested —
@@ -3934,6 +3917,46 @@ mod tests {
     }
 
     #[test]
+    fn for_loop_with_custom_item_name() {
+        // `let:item={name}` must read the identifier from the
+        // de-braced expression, not from the quoted raw value.
+        let s = render(
+            r#"<Column>
+    <For each={items} let:item={name}>
+        <Label id="i" text={name.clone()} />
+    </For>
+</Column>"#,
+        );
+        let normalised: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+        assert!(
+            normalised.contains("forname"),
+            "loop variable should be `name`; got {normalised}"
+        );
+        assert!(
+            normalised.contains("name.clone"),
+            "body should reference `name`; got {normalised}"
+        );
+    }
+
+    #[test]
+    fn for_loop_with_custom_index_name() {
+        // `let:index={idx}` must bind the user's chosen name,
+        // not silently fall back to `i`.
+        let s = render(
+            r#"<Column>
+    <For each={items} let:item={name} let:index={idx}>
+        <Label id="i" text={format!("{}-{}", name, idx)} />
+    </For>
+</Column>"#,
+        );
+        let normalised: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+        assert!(
+            normalised.contains("letidx=__i"),
+            "index binding should use `idx`; got {normalised}"
+        );
+    }
+
+    #[test]
     fn for_loop_with_key_wraps_rows_in_keyed_div() {
         // When `<For key={item.id}>` is supplied, each row
         // gets a fresh wrapper `<Div id=format!("for_row_{key}")>`
@@ -4990,12 +5013,16 @@ mod tests {
             .iter()
             .find(|c| c.tag == "Button")
             .expect("Button is in BUILTINS_GENERATED");
-        let hand_props: std::collections::BTreeSet<_> = match hand.kind {
-            crate::schema::ComponentKind::Leaf(ref l) => l.props.iter().map(|p| p.name).collect(),
+        let hand_props: std::collections::BTreeMap<_, _> = match hand.kind {
+            crate::schema::ComponentKind::Leaf(ref l) => {
+                l.props.iter().map(|p| (p.name, p.value)).collect()
+            }
             _ => panic!("Button is not a leaf"),
         };
-        let gen_props: std::collections::BTreeSet<_> = match gen_entry.kind {
-            crate::schema::ComponentKind::Leaf(ref l) => l.props.iter().map(|p| p.name).collect(),
+        let gen_props: std::collections::BTreeMap<_, _> = match gen_entry.kind {
+            crate::schema::ComponentKind::Leaf(ref l) => {
+                l.props.iter().map(|p| (p.name, p.value)).collect()
+            }
             _ => panic!("generated Button is not a leaf"),
         };
         let hand_events: std::collections::BTreeSet<_> = match hand.kind {
@@ -5030,12 +5057,16 @@ mod tests {
             .iter()
             .find(|c| c.tag == "Label")
             .expect("Label is in BUILTINS_GENERATED");
-        let hand_props: std::collections::BTreeSet<_> = match hand.kind {
-            crate::schema::ComponentKind::Leaf(ref l) => l.props.iter().map(|p| p.name).collect(),
+        let hand_props: std::collections::BTreeMap<_, _> = match hand.kind {
+            crate::schema::ComponentKind::Leaf(ref l) => {
+                l.props.iter().map(|p| (p.name, p.value)).collect()
+            }
             _ => panic!("Label is not a leaf"),
         };
-        let gen_props: std::collections::BTreeSet<_> = match gen_entry.kind {
-            crate::schema::ComponentKind::Leaf(ref l) => l.props.iter().map(|p| p.name).collect(),
+        let gen_props: std::collections::BTreeMap<_, _> = match gen_entry.kind {
+            crate::schema::ComponentKind::Leaf(ref l) => {
+                l.props.iter().map(|p| (p.name, p.value)).collect()
+            }
             _ => panic!("generated Label is not a leaf"),
         };
         // Compare the FIRST extra arg (Label only has one).
