@@ -617,6 +617,7 @@ pub fn is_known_shorthand_method(name: &str) -> bool {
         | "border" | "border_1" | "border_2" | "border_4" | "border_8"
         | "border_t" | "border_b" | "border_l" | "border_r"
         | "border_x" | "border_y"
+        | "border_color"
         | "rounded" | "rounded_sm" | "rounded_md" | "rounded_lg" | "rounded_xl" | "rounded_full"
         | "rounded_none"
         // shadow

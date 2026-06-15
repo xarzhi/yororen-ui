@@ -1,63 +1,72 @@
 <!-- Section 3 — Surfaces. -->
 <Column flex col gap="4">
+    <Template name="Cell">
+        <Div flex flex_col gap="1" p="2" rounded_md border_1
+             border_color={gpui::hsla(0.0, 0.0, 0.5, 0.15)}>
+            <Slot name="label" />
+            <Slot />
+        </Div>
+    </Template>
+
     <Heading id="surfaces-title" level="H2" text={controller.t("demo.section_surfaces", cx)} />
+
     <Row flex row flex_wrap items_center gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-avatar-status" text={controller.t("demo.surfaces.cell_avatar_initials_status", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-avatar-status" text={controller.t("demo.surfaces.cell_avatar_initials_status", cx)} muted /></Slot>
             <Avatar id="av-1" initials={controller.t("demo.surfaces.avatar_initials_ab", cx)} size={48.0} circle has_status />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-avatar-square" text={controller.t("demo.surfaces.cell_avatar_initials_square", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-avatar-square" text={controller.t("demo.surfaces.cell_avatar_initials_square", cx)} muted /></Slot>
             <Avatar id="av-2" initials={controller.t("demo.surfaces.avatar_initials_cd", cx)} size={48.0} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-avatar-name" text={controller.t("demo.surfaces.cell_avatar_name", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-avatar-name" text={controller.t("demo.surfaces.cell_avatar_name", cx)} muted /></Slot>
             <Avatar id="av-3" name={controller.t("demo.surfaces.avatar_name", cx)} size={48.0} />
-        </Column>
+        </Cell>
     </Row>
 
     <Row flex row flex_wrap items_start gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-card" text={controller.t("demo.surfaces.cell_card", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-card" text={controller.t("demo.surfaces.cell_card", cx)} muted /></Slot>
             <Card id="card-1" interactive>
                 <Column flex col gap="2">
                     <Label id="card-title" text={controller.t("demo.surfaces.card_title", cx)} strong />
                     <Label id="card-body" text={controller.t("demo.surfaces.card_body", cx)} muted />
                     <Button id="card-btn" caption={controller.t("demo.surfaces.card_action", cx)}
-                            variant="primary" on_click={controller.press_toggle} />
+                            variant="primary" on_click={controller.noop_click} />
                 </Column>
             </Card>
-        </Column>
+        </Cell>
 
-        <Column flex col gap="1">
-            <Label id="lbl-panel" text={controller.t("demo.surfaces.cell_panel", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-panel" text={controller.t("demo.surfaces.cell_panel", cx)} muted /></Slot>
             <Panel id="panel-1" title={controller.t("demo.surfaces.panel_title", cx)} padded>
                 <Label id="panel-body" text={controller.t("demo.surfaces.panel_body", cx)} />
             </Panel>
-        </Column>
+        </Cell>
 
-        <Column flex col gap="1">
-            <Label id="lbl-empty" text={controller.t("demo.surfaces.cell_empty", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-empty" text={controller.t("demo.surfaces.cell_empty", cx)} muted /></Slot>
             <EmptyState id="es-1"
                         icon={::yororen_ui::headless::icon::IconSource::Builtin("info".into())}
                         title={controller.t("demo.surfaces.empty_title", cx)}
                         description={controller.t("demo.surfaces.empty_desc", cx)}>
                 <Label id="es-extra" text={controller.t("demo.surfaces.empty_custom_child", cx)} muted />
             </EmptyState>
-        </Column>
+        </Cell>
     </Row>
 
     <Row flex row flex_wrap items_center gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-focus-ring" text={controller.t("demo.surfaces.cell_focus_ring", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-focus-ring" text={controller.t("demo.surfaces.cell_focus_ring", cx)} muted /></Slot>
             <FocusRing id="ring-1" handle={&cx.focus_handle()}>
                 <Button id="focus-btn" caption={controller.t("demo.surfaces.focusable", cx)}
-                        on_click={controller.press_toggle} />
+                        on_click={controller.noop_click} />
             </FocusRing>
-        </Column>
+        </Cell>
 
-        <Column flex col gap="1">
-            <Label id="lbl-image" text={controller.t("demo.surfaces.cell_image", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-image" text={controller.t("demo.surfaces.cell_image", cx)} muted /></Slot>
             <Div w={gpui::px(120.0)} h={gpui::px(80.0)}
                  bg={gpui::hsla(0.0, 0.0, 0.85, 1.0)}
                  rounded={gpui::px(4.0)}
@@ -65,18 +74,18 @@
                 <Image id="img-1" source={::yororen_ui::headless::image::ImageSource::Resource("images/sample.png".into())}
                        alt={controller.t("demo.surfaces.image_alt", cx)} />
             </Div>
-        </Column>
+        </Cell>
     </Row>
 
     <Row flex row flex_wrap items_center gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-kbd-display" text={controller.t("demo.surfaces.cell_keybinding_display", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-kbd-display" text={controller.t("demo.surfaces.cell_keybinding_display", cx)} muted /></Slot>
             <KeybindingDisplay id="kbd-1" keys={vec!["Ctrl".to_string(), "S".to_string()]} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-shortcut" text={controller.t("demo.surfaces.cell_shortcut_hint", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-shortcut" text={controller.t("demo.surfaces.cell_shortcut_hint", cx)} muted /></Slot>
             <ShortcutHint id="sh-1" label={controller.t("demo.surfaces.shortcut_save_caption", cx)}
                           keys={vec!["Cmd".to_string(), "S".to_string()]} />
-        </Column>
+        </Cell>
     </Row>
 </Column>

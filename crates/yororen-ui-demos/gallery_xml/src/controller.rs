@@ -11,7 +11,7 @@
 use std::collections::{BTreeSet, HashMap};
 use std::ops::Range;
 
-use gpui::{AnyElement, App, ClickEvent, ElementId, Entity, IntoElement, ParentElement, SharedString, Styled, Window, div, px};
+use gpui::{AnyElement, App, ClickEvent, ElementId, Entity, IntoElement, ParentElement, SharedString, Styled, Window, div, hsla, px};
 
 use yororen_ui::headless::dropdown_menu::{DropdownItem, DropdownMenuItem};
 use yororen_ui::headless::table::TableColumn;
@@ -208,6 +208,29 @@ impl Controller {
 
     pub fn t_with_args(&self, key: &str, cx: &App, args: &[&str]) -> String {
         cx.t_with_args(key, args).to_string()
+    }
+
+    /// Reusable demo "cell" wrapper: a small muted label above the
+    /// component inside a 1px-bordered rounded box. Mirrors
+    /// `gallery_demo::sections::cell`.
+    fn cell(&self, label: impl Into<String>, element: AnyElement, cx: &mut App) -> AnyElement {
+        let label_el = yororen_ui::headless::label::label("cmp-name", label, cx)
+            .muted(true)
+            .render(cx)
+            .text_size(px(11.));
+        div()
+            .relative()
+            .flex()
+            .flex_col()
+            .items_start()
+            .gap(px(2.))
+            .p(px(8.))
+            .rounded(px(6.))
+            .border_1()
+            .border_color(hsla(0.0, 0.0, 0.5, 0.15))
+            .child(label_el)
+            .child(element)
+            .into_any_element()
     }
 
     // -------- Composite state accessors --------
@@ -683,7 +706,11 @@ impl Controller {
             .into_any_element();
             col = col.child(row);
         }
-        col.into_any_element()
+        self.cell(
+            self.t("demo.lists.cell_list", cx),
+            col.into_any_element(),
+            cx,
+        )
     }
 
     pub fn listbox_element(&self, cx: &mut App) -> AnyElement {
@@ -698,7 +725,7 @@ impl Controller {
         } else {
             value
         };
-        div()
+        let el = div()
             .flex()
             .flex_col()
             .gap(px(6.))
@@ -713,7 +740,12 @@ impl Controller {
                 .muted(true)
                 .render(cx),
             )
-            .into_any_element()
+            .into_any_element();
+        self.cell(
+            self.t("demo.lists.cell_listbox", cx),
+            el,
+            cx,
+        )
     }
 
     pub fn email_input_element(&self, cx: &mut App, window: &mut Window) -> AnyElement {
@@ -762,7 +794,7 @@ impl Controller {
         let submit_count = self.state.read(cx).form_submit_count;
         let email_error = self.state.read(cx).form_email_error.clone();
 
-        form_props
+        let el = form_props
             .render(cx)
             .w(px(300.))
             .child(form_field)
@@ -782,12 +814,17 @@ impl Controller {
                 .muted(true)
                 .render(cx),
             )
-            .into_any_element()
+            .into_any_element();
+        self.cell(
+            self.t("demo.form.cell", cx),
+            el,
+            cx,
+        )
     }
 
     pub fn table_element(&self, cx: &mut App) -> AnyElement {
         let state = self.state.clone();
-        yororen_ui::headless::table::table("lists-table", cx)
+        let el = yororen_ui::headless::table::table("lists-table", cx)
             .columns(self.table_columns(cx))
             .rows(self.table_rows(cx))
             .selected(self.state.read(cx).selected_table_row.unwrap_or(0))
@@ -798,7 +835,12 @@ impl Controller {
             })
             .render(cx)
             .w(px(320.))
-            .into_any_element()
+            .into_any_element();
+        self.cell(
+            self.t("demo.lists.cell_table", cx),
+            el,
+            cx,
+        )
     }
 
     pub fn tree_element(&self, cx: &mut App, window: &mut Window) -> AnyElement {
@@ -858,7 +900,11 @@ impl Controller {
             );
         }
 
-        tree.into_any_element()
+        self.cell(
+            self.t("demo.lists.cell_tree", cx),
+            tree.into_any_element(),
+            cx,
+        )
     }
 
     pub fn virtual_list_element(&self, cx: &mut App, _window: &mut Window) -> AnyElement {
@@ -932,14 +978,19 @@ impl Controller {
             .muted(true)
             .render(cx);
 
-        div()
+        let el = div()
             .flex()
             .flex_col()
             .gap(px(6.))
             .child(vl)
             .child(controls)
             .child(status_label)
-            .into_any_element()
+            .into_any_element();
+        self.cell(
+            self.t("demo.lists.cell_vl", cx),
+            el,
+            cx,
+        )
     }
 
     pub fn uniform_list_element(&self, cx: &mut App, _window: &mut Window) -> AnyElement {
@@ -978,25 +1029,35 @@ impl Controller {
             .child(self.t("demo.common.bottom", cx));
         let controls = div().flex().flex_row().gap(px(6.)).child(top_btn).child(bottom_btn);
 
-        div()
+        let el = div()
             .flex()
             .flex_col()
             .gap(px(6.))
             .child(uvl)
             .child(controls)
-            .into_any_element()
+            .into_any_element();
+        self.cell(
+            self.t("demo.lists.cell_uvl", cx),
+            el,
+            cx,
+        )
     }
 
     pub fn spacer_element(&self, cx: &mut App) -> AnyElement {
-        yororen_ui::headless::spacer::spacer("lists-spacer", cx)
+        let el = yororen_ui::headless::spacer::spacer("lists-spacer", cx)
             .render(cx)
             .h(px(16.))
             .w_full()
-            .into_any_element()
+            .into_any_element();
+        self.cell(
+            self.t("demo.lists.cell_spacer", cx),
+            el,
+            cx,
+        )
     }
 
     pub fn radio_group_empty_element(&self, cx: &mut App) -> AnyElement {
-        yororen_ui::headless::radio_group::radio_group("lists-rg", cx)
+        let el = yororen_ui::headless::radio_group::radio_group("lists-rg", cx)
             .name("rg-2")
             .render(cx)
             .child(
@@ -1008,7 +1069,12 @@ impl Controller {
                 .muted(true)
                 .render(cx),
             )
-            .into_any_element()
+            .into_any_element();
+        self.cell(
+            self.t("demo.controls.cell_radio_group_empty", cx),
+            el,
+            cx,
+        )
     }
 
     // -------- Data helpers used by XML --------

@@ -1,65 +1,74 @@
 <!-- Section 1 — Actions. -->
 <Column flex col gap="4">
+    <Template name="Cell">
+        <Div flex flex_col gap="1" p="2" rounded_md border_1
+             border_color={gpui::hsla(0.0, 0.0, 0.5, 0.15)}>
+            <Slot name="label" />
+            <Slot />
+        </Div>
+    </Template>
+
     <Heading id="actions-title" level="H2" text={controller.t("demo.section_actions", cx)} />
+
     <Row flex row flex_wrap items_center gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-btn-neutral" text={controller.t("demo.actions.cell_button_neutral", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-btn-neutral" text={controller.t("demo.actions.cell_button_neutral", cx)} muted /></Slot>
             <Button id="btn-neutral" caption={controller.t("button.neutral", cx)} variant="neutral"
                     on_click={controller.noop_click} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-btn-primary" text={controller.t("demo.actions.cell_button_primary", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-btn-primary" text={controller.t("demo.actions.cell_button_primary", cx)} muted /></Slot>
             <Button id="btn-primary" caption={controller.t("button.primary", cx)} variant="primary"
                     on_click={controller.noop_click} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-btn-danger" text={controller.t("demo.actions.cell_button_danger", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-btn-danger" text={controller.t("demo.actions.cell_button_danger", cx)} muted /></Slot>
             <Button id="btn-danger" caption={controller.t("button.danger", cx)} variant="danger"
                     on_click={controller.noop_click} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-btn-disabled" text={controller.t("demo.actions.cell_button_disabled", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-btn-disabled" text={controller.t("demo.actions.cell_button_disabled", cx)} muted /></Slot>
             <Button id="btn-disabled" caption={controller.t("button.disabled", cx)} disabled
                     on_click={controller.noop_click} />
-        </Column>
+        </Cell>
     </Row>
 
     <Row flex row flex_wrap items_center gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-icon-btn" text={controller.t("demo.actions.cell_icon_button", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-icon-btn" text={controller.t("demo.actions.cell_icon_button", cx)} muted /></Slot>
             <IconButton id="icon-btn-check" icon={::yororen_ui::headless::icon::IconSource::Builtin("check".into())}
                         on_click={controller.noop_click} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-icon-btn-primary" text={controller.t("demo.actions.cell_icon_button_primary", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-icon-btn-primary" text={controller.t("demo.actions.cell_icon_button_primary", cx)} muted /></Slot>
             <IconButton id="icon-btn-primary-check" icon={::yororen_ui::headless::icon::IconSource::Builtin("check".into())}
                         variant="primary" on_click={controller.noop_click} />
-        </Column>
+        </Cell>
     </Row>
 
     <Row flex row flex_wrap items_center gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-toggle" text={controller.t("demo.actions.cell_toggle_button", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-toggle" text={controller.t("demo.actions.cell_toggle_button", cx)} muted /></Slot>
             <ToggleButton id="toggle-1" caption={controller.t("demo.actions.press_me", cx)}
                           selected={controller.toggle_btn_selected(cx)}
                           on_toggle={{ let c = controller.clone(); move |selected, _ev, _w, cx| c.press_toggle_from_bool(selected, cx) }} />
-        </Column>
+        </Cell>
     </Row>
 
     <Row flex row flex_wrap items_center gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-split" text={controller.t("demo.actions.cell_split_button", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-split" text={controller.t("demo.actions.cell_split_button", cx)} muted /></Slot>
             <SplitButton id="split-1" primary={{ let c = controller.clone(); move |ev, w, cx| c.split_button_primary(ev, w, cx) }}
                          caption={controller.t("demo.actions.save", cx)}
                          state={controller.split_button_state(cx)}
                          items={controller.split_button_items(cx)}
                          on_select={controller.split_button_select} />
-        </Column>
+        </Cell>
     </Row>
 
     <Row flex row flex_wrap items_center gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-group" text={controller.t("demo.actions.cell_button_group", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-group" text={controller.t("demo.actions.cell_button_group", cx)} muted /></Slot>
             <ButtonGroup id="btn-group-1">
                 <Button id="bg-left" caption={controller.t("demo.actions.left", cx)} variant="neutral"
                         on_click={controller.noop_click} />
@@ -68,6 +77,6 @@
                 <Button id="bg-right" caption={controller.t("demo.actions.right", cx)} variant="neutral"
                         on_click={controller.noop_click} />
             </ButtonGroup>
-        </Column>
+        </Cell>
     </Row>
 </Column>

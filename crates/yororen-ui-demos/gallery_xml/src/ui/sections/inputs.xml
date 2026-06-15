@@ -1,75 +1,85 @@
 <!-- Section 4 — Inputs. -->
 <Column flex col gap="4">
+    <Template name="InputCell">
+        <Div flex flex_col gap="1" p="2" rounded_md border_1
+             border_color={gpui::hsla(0.0, 0.0, 0.5, 0.15)}>
+            <Slot name="name" />
+            <Slot />
+            <Slot name="status" />
+        </Div>
+    </Template>
+
     <Heading id="inputs-title" level="H2" text={controller.t("demo.section_inputs", cx)} />
-    <Column flex col gap="1">
-        <Label id="lbl-text" text={controller.t("input.text", cx)} muted />
+
+    <InputCell>
+        <Slot name="name"><Label id="lbl-text" text={controller.t("input.text", cx)} muted /></Slot>
         <TextInput id="input-text" placeholder={controller.t("demo.input.placeholder_type_here", cx)}
                    value={controller.text_value(cx)}
                    on_change={controller.set_text_value} />
-        <Label id="status-text" text={format!("{} {:?}", controller.t("demo.input.value", cx), controller.text_value(cx))} muted />
-    </Column>
+        <Slot name="status"><Label id="status-text" text={format!("{} {:?}", controller.t("demo.input.value", cx), controller.text_value(cx))} muted /></Slot>
+    </InputCell>
 
-    <Column flex col gap="1">
-        <Label id="lbl-password" text={controller.t("input.password", cx)} muted />
+    <InputCell>
+        <Slot name="name"><Label id="lbl-password" text={controller.t("input.password", cx)} muted /></Slot>
         <PasswordInput id="input-password" placeholder={controller.t("demo.input.placeholder_password", cx)}
                        mask_char={'•'}
                        on_change={controller.set_password_value} />
-        <Label id="status-password" text={format!("{} {:?}", controller.t("demo.input.value", cx), controller.password_value(cx))} muted />
-    </Column>
+        <Slot name="status"><Label id="status-password" text={format!("{} {:?}", controller.t("demo.input.value", cx), controller.password_value(cx))} muted /></Slot>
+    </InputCell>
 
-    <Column flex col gap="1">
-        <Label id="lbl-number" text={controller.t("input.number", cx)} muted />
+    <InputCell>
+        <Slot name="name"><Label id="lbl-number" text={controller.t("input.number", cx)} muted /></Slot>
         <NumberInput id="input-number" min={0.0} max={100.0} step={1.0}
                      value={controller.number_value(cx)}
                      on_change={controller.set_number_value}
                      on_increment={controller.set_number_value}
                      on_decrement={controller.set_number_value} />
-        <Label id="status-number" text={format!("{} {}", controller.t("demo.input.value", cx), controller.number_value(cx))} muted />
-    </Column>
+        <Slot name="status"><Label id="status-number" text={format!("{} {}", controller.t("demo.input.value", cx), controller.number_value(cx))} muted /></Slot>
+    </InputCell>
 
-    <Column flex col gap="1">
-        <Label id="lbl-search" text={controller.t("input.search", cx)} muted />
+    <InputCell>
+        <Slot name="name"><Label id="lbl-search" text={controller.t("input.search", cx)} muted /></Slot>
         <SearchInput id="input-search" placeholder={controller.t("demo.input.placeholder_search", cx)}
                      value={controller.search_value(cx)}
                      on_change={controller.set_search_value}
                      on_clear={controller.clear_search} />
-        <Label id="status-search" text={format!("{} {:?}", controller.t("demo.input.value", cx), controller.search_value(cx))} muted />
-    </Column>
+        <Slot name="status"><Label id="status-search" text={format!("{} {:?}", controller.t("demo.input.value", cx), controller.search_value(cx))} muted /></Slot>
+    </InputCell>
 
-    <Column flex col gap="1">
-        <Label id="lbl-file" text={controller.t("demo.input.file_path_hint", cx)} muted />
+    <InputCell>
+        <Slot name="name"><Label id="lbl-file" text={controller.t("demo.input.file_path_hint", cx)} muted /></Slot>
         <FilePathInput id="input-file-path" placeholder={controller.t("demo.input.placeholder_path", cx)}
                        value={controller.file_path_value(cx)}
                        on_change={controller.set_file_path_value}
                        on_browse={controller.browse_file_path} />
-        <Label id="status-file" text={format!("{} {:?}", controller.t("demo.input.value", cx), controller.file_path_value(cx))} muted />
-    </Column>
+        <Slot name="status"><Label id="status-file" text={format!("{} {:?}", controller.t("demo.input.value", cx), controller.file_path_value(cx))} muted /></Slot>
+    </InputCell>
 
-    <Column flex col gap="1">
-        <Label id="lbl-keybinding" text={controller.t("demo.input.keybinding_hint", cx)} muted />
+    <InputCell>
+        <Slot name="name"><Label id="lbl-keybinding" text={controller.t("demo.input.keybinding_hint", cx)} muted /></Slot>
         <KeybindingInput id="input-keybinding" mode={controller.keybinding_mode(cx)}
                          on_change={controller.set_keybinding_value}
                          on_start_capture={{ let c = controller.clone(); move |_w, cx| c.start_keybinding_capture(_w, cx) }}
                          on_cancel_capture={{ let c = controller.clone(); move |_w, cx| c.cancel_keybinding_capture(_w, cx) }} />
-        <Label id="status-keybinding" text={format!("{} {:?}  {} {:?}", controller.t("demo.input.value", cx), controller.keybinding_value(cx), controller.t("demo.input.mode", cx), controller.keybinding_mode(cx))} muted />
-    </Column>
+        <Slot name="status"><Label id="status-keybinding" text={format!("{} {:?}  {} {:?}", controller.t("demo.input.value", cx), controller.keybinding_value(cx), controller.t("demo.input.mode", cx), controller.keybinding_mode(cx))} muted /></Slot>
+    </InputCell>
 
-    <Column flex col gap="1">
-        <Label id="lbl-text-area" text={controller.t("demo.input.text_area_hint", cx)} muted />
+    <InputCell>
+        <Slot name="name"><Label id="lbl-text-area" text={controller.t("demo.input.text_area_hint", cx)} muted /></Slot>
         <TextArea id="input-text-area" placeholder={controller.t("demo.input.placeholder_text_area", cx)}
                   on_change={controller.set_text_area_value} />
-        <Label id="status-text-area" text={format!("{} {:?}", controller.t("demo.input.value", cx), controller.text_area_value(cx))} muted />
-    </Column>
+        <Slot name="status"><Label id="status-text-area" text={format!("{} {:?}", controller.t("demo.input.value", cx), controller.text_area_value(cx))} muted /></Slot>
+    </InputCell>
 
-    <Column flex col gap="1">
-        <Label id="lbl-select" text={controller.t("input.select", cx)} muted />
+    <InputCell>
+        <Slot name="name"><Label id="lbl-select" text={controller.t("input.select", cx)} muted /></Slot>
         <Select id="input-select" state={controller.select_state(cx)} />
-        <Label id="status-select" text={format!("{} {}", controller.t("demo.input.value", cx), controller.select_demo_value(cx))} muted />
-    </Column>
+        <Slot name="status"><Label id="status-select" text={format!("{} {}", controller.t("demo.input.value", cx), controller.select_demo_value(cx))} muted /></Slot>
+    </InputCell>
 
-    <Column flex col gap="1">
-        <Label id="lbl-combo" text={controller.t("input.combo", cx)} muted />
+    <InputCell>
+        <Slot name="name"><Label id="lbl-combo" text={controller.t("input.combo", cx)} muted /></Slot>
         <ComboBox id="input-combo" state={controller.combo_state(cx)} />
-        <Label id="status-combo" text={format!("{} {}", controller.t("demo.input.value", cx), controller.combo_demo_value(cx))} muted />
-    </Column>
+        <Slot name="status"><Label id="status-combo" text={format!("{} {}", controller.t("demo.input.value", cx), controller.combo_demo_value(cx))} muted /></Slot>
+    </InputCell>
 </Column>

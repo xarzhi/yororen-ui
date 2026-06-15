@@ -1,24 +1,34 @@
 <!-- Section 5 — Controls. -->
 <Column flex col gap="4">
+    <Template name="InputCell">
+        <Div flex flex_col gap="1" p="2" rounded_md border_1
+             border_color={gpui::hsla(0.0, 0.0, 0.5, 0.15)}>
+            <Slot name="name" />
+            <Slot />
+            <Slot name="status" />
+        </Div>
+    </Template>
+
     <Heading id="controls-title" level="H2" text={controller.t("demo.section_controls", cx)} />
-    <Row flex row flex_wrap items_start gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-cb" text={controller.t("demo.controls.cell_checkbox", cx)} muted />
+
+    <Row flex row flex_wrap items_center gap="3">
+        <InputCell>
+            <Slot name="name"><Label id="lbl-cb" text={controller.t("demo.controls.cell_checkbox", cx)} muted /></Slot>
             <Checkbox id="ctrl-cb" checked={controller.checkbox_value(cx)}
                       on_toggle={controller.set_checkbox} />
-            <Label id="status-cb" text={format!("{} {}", controller.t("demo.input.value", cx), controller.checkbox_value(cx))} muted />
-        </Column>
+            <Slot name="status"><Label id="status-cb" text={format!("{} {}", controller.t("demo.input.value", cx), controller.checkbox_value(cx))} muted /></Slot>
+        </InputCell>
 
-        <Column flex col gap="1">
-            <Label id="lbl-sw" text={controller.t("demo.controls.cell_switch", cx)} muted />
+        <InputCell>
+            <Slot name="name"><Label id="lbl-sw" text={controller.t("demo.controls.cell_switch", cx)} muted /></Slot>
             <Switch id="ctrl-sw" checked={controller.switch_value(cx)}
                     on_toggle={controller.set_switch} />
-            <Label id="status-sw" text={format!("{} {}", controller.t("demo.input.value", cx), controller.switch_value(cx))} muted />
-        </Column>
+            <Slot name="status"><Label id="status-sw" text={format!("{} {}", controller.t("demo.input.value", cx), controller.switch_value(cx))} muted /></Slot>
+        </InputCell>
     </Row>
 
-    <Column flex col gap="2">
-        <Label id="lbl-rg" text={controller.t("demo.controls.cell_radio_group", cx)} muted />
+    <InputCell>
+        <Slot name="name"><Label id="lbl-rg" text={controller.t("demo.controls.cell_radio_group", cx)} muted /></Slot>
         <RadioGroup id="ctrl-rg" name="choice" selected={controller.radio_value(cx)}>
             <Row flex row items_center gap="2">
                 <For each={vec![0usize, 1, 2]} let:item key={item}>
@@ -27,13 +37,13 @@
                 </For>
             </Row>
         </RadioGroup>
-        <Label id="rg-current" text={format!("{} {}", controller.t("demo.controls.selected", cx), controller.radio_value(cx))} muted />
-    </Column>
+    </InputCell>
+    <Label id="rg-current" text={format!("{} {}", controller.t("demo.controls.selected", cx), controller.radio_value(cx))} muted />
 
-    <Column flex col gap="2">
-        <Label id="lbl-slider" text={controller.t("demo.controls.cell_slider", cx)} muted />
+    <InputCell>
+        <Slot name="name"><Label id="lbl-slider" text={controller.t("demo.controls.cell_slider", cx)} muted /></Slot>
         <Slider id="ctrl-slider" value={controller.slider_value(cx)} step={1.0}
                 on_change={controller.set_slider} />
-        <Label id="slider-lbl" text={controller.t("demo.controls.slider_value", cx).replace("{}", &format!("{:.1}", controller.slider_value(cx)))} muted />
-    </Column>
+    </InputCell>
+    <Label id="slider-lbl" text={controller.t("demo.controls.slider_value", cx).replace("{}", &format!("{:.1}", controller.slider_value(cx)))} muted />
 </Column>

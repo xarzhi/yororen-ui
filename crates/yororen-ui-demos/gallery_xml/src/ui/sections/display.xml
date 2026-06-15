@@ -1,129 +1,150 @@
 <!-- Section 2 — Display. -->
 <Column flex col gap="4">
+    <Template name="Cell">
+        <Div flex flex_col gap="1" p="2" rounded_md border_1
+             border_color={gpui::hsla(0.0, 0.0, 0.5, 0.15)}>
+            <Slot name="label" />
+            <Slot />
+        </Div>
+    </Template>
+
     <Heading id="display-title" level="H2" text={controller.t("demo.section_display", cx)} />
+
     <Row flex row flex_wrap items_center gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-lbl-default" text={controller.t("demo.display.cell_label_default", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-lbl-default" text={controller.t("demo.display.cell_label_default", cx)} muted /></Slot>
             <Label id="lbl-default" text={controller.t("demo.display.label_default", cx)} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-lbl-strong" text={controller.t("demo.display.cell_label_strong", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-lbl-strong" text={controller.t("demo.display.cell_label_strong", cx)} muted /></Slot>
             <Label id="lbl-strong" text={controller.t("demo.display.label_strong", cx)} strong />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-lbl-muted" text={controller.t("demo.display.cell_label_muted", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-lbl-muted" text={controller.t("demo.display.cell_label_muted", cx)} muted /></Slot>
             <Label id="lbl-muted" text={controller.t("demo.display.label_muted", cx)} muted />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-lbl-mono" text={controller.t("demo.display.cell_label_mono", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-lbl-mono" text={controller.t("demo.display.cell_label_mono", cx)} muted /></Slot>
             <Label id="lbl-mono" text={controller.t("demo.display.label_mono", cx)} mono />
-        </Column>
+        </Cell>
     </Row>
 
     <Column flex col gap="2">
-        <Label id="lbl-heading-h1" text={controller.t("demo.display.cell_heading_h1", cx)} muted />
-        <Heading id="h-1" level="H1" text={controller.t("demo.display.heading_h1", cx)} />
-        <Label id="lbl-heading-h2" text={controller.t("demo.display.cell_heading_h2", cx)} muted />
-        <Heading id="h-2" level="H2" text={controller.t("demo.display.heading_h2", cx)} />
-        <Label id="lbl-heading-h3" text={controller.t("demo.display.cell_heading_h3", cx)} muted />
-        <Heading id="h-3" level="H3" text={controller.t("demo.display.heading_h3", cx)} />
-        <Label id="lbl-heading-h4" text={controller.t("demo.display.cell_heading_h4", cx)} muted />
-        <Heading id="h-4" level="H4" text={controller.t("demo.display.heading_h4", cx)} />
+        <Cell>
+            <Slot name="label"><Label id="lbl-heading-h1" text={controller.t("demo.display.cell_heading_h1", cx)} muted /></Slot>
+            <Heading id="h-1" level="H1" text={controller.t("demo.display.heading_h1", cx)} />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-heading-h2" text={controller.t("demo.display.cell_heading_h2", cx)} muted /></Slot>
+            <Heading id="h-2" level="H2" text={controller.t("demo.display.heading_h2", cx)} />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-heading-h3" text={controller.t("demo.display.cell_heading_h3", cx)} muted /></Slot>
+            <Heading id="h-3" level="H3" text={controller.t("demo.display.heading_h3", cx)} />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-heading-h4" text={controller.t("demo.display.cell_heading_h4", cx)} muted /></Slot>
+            <Heading id="h-4" level="H4" text={controller.t("demo.display.heading_h4", cx)} />
+        </Cell>
     </Column>
 
     <Column flex col gap="2">
-        <Label id="lbl-divider-h" text={controller.t("demo.display.divider_h", cx)} muted />
-        <Divider id="d-h1" />
-        <Label id="lbl-divider-v" text={controller.t("demo.display.divider_v", cx)} muted />
-        <Divider id="d-v1" vertical />
+        <Cell>
+            <Slot name="label"><Label id="lbl-divider-h" text={controller.t("demo.display.divider_h", cx)} muted /></Slot>
+            <Divider id="d-h1" />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-divider-v" text={controller.t("demo.display.divider_v", cx)} muted /></Slot>
+            <Divider id="d-v1" vertical />
+        </Cell>
     </Column>
 
     <Row flex row flex_wrap items_center gap="2">
-        <Column flex col gap="1">
-            <Label id="lbl-badge-neutral" text={controller.t("demo.display.badge_neutral", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-badge-neutral" text={controller.t("demo.display.badge_neutral", cx)} muted /></Slot>
             <Badge id="bd-n" text={controller.t("demo.display.badge_neutral", cx)}
                    variant={::yororen_ui::headless::badge::BadgeVariant::Neutral} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-badge-success" text={controller.t("demo.display.badge_success", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-badge-success" text={controller.t("demo.display.badge_success", cx)} muted /></Slot>
             <Badge id="bd-s" text={controller.t("demo.display.badge_success", cx)}
                    variant={::yororen_ui::headless::badge::BadgeVariant::Success} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-badge-warning" text={controller.t("demo.display.badge_warning", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-badge-warning" text={controller.t("demo.display.badge_warning", cx)} muted /></Slot>
             <Badge id="bd-w" text={controller.t("demo.display.badge_warning", cx)}
                    variant={::yororen_ui::headless::badge::BadgeVariant::Warning} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-badge-danger" text={controller.t("demo.display.badge_danger", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-badge-danger" text={controller.t("demo.display.badge_danger", cx)} muted /></Slot>
             <Badge id="bd-d" text={controller.t("demo.display.badge_danger", cx)}
                    variant={::yororen_ui::headless::badge::BadgeVariant::Danger} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-badge-info" text={controller.t("demo.display.badge_info", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-badge-info" text={controller.t("demo.display.badge_info", cx)} muted /></Slot>
             <Badge id="bd-i" text={controller.t("demo.display.badge_info", cx)}
                    variant={::yororen_ui::headless::badge::BadgeVariant::Info} />
-        </Column>
+        </Cell>
     </Row>
 
     <Row flex row flex_wrap items_center gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-tag-selected" text={controller.t("demo.display.cell_tag_selected", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-tag-selected" text={controller.t("demo.display.cell_tag_selected", cx)} muted /></Slot>
             <Tag id="tg-1" label={controller.t("demo.display.tag_toggle", cx)}
                  selected={controller.tag_selected(cx)}
                  on_click={controller.toggle_tag_selected} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-tag-closable" text={controller.t("demo.display.cell_tag_closable", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-tag-closable" text={controller.t("demo.display.cell_tag_closable", cx)} muted /></Slot>
             <Tag id="tg-2" label={controller.t("demo.display.tag_closable", cx)}
                  closable on_close={controller.close_tag} />
-        </Column>
+        </Cell>
         <Label id="tg-closable-count"
                text={format!("{} {}", controller.t("demo.display.tag_close_events", cx), controller.tag_close_count(cx))}
                muted />
     </Row>
 
     <Row flex row flex_wrap items_start gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-sk-line" text={controller.t("demo.display.cell_skeleton_line", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-sk-line" text={controller.t("demo.display.cell_skeleton_line", cx)} muted /></Slot>
             <Div w={gpui::px(180.0)} h={gpui::px(12.0)}><Skeleton id="sk-line" /></Div>
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-sk-block" text={controller.t("demo.display.cell_skeleton_block", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-sk-block" text={controller.t("demo.display.cell_skeleton_block", cx)} muted /></Slot>
             <Div w={gpui::px(180.0)} h={gpui::px(60.0)}><Skeleton id="sk-block" block /></Div>
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-sk-block-sharp" text={controller.t("demo.display.cell_skeleton_block_sharp", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-sk-block-sharp" text={controller.t("demo.display.cell_skeleton_block_sharp", cx)} muted /></Slot>
             <Div w={gpui::px(180.0)} h={gpui::px(40.0)}><Skeleton id="sk-block-sharp" block block_sharp /></Div>
-        </Column>
+        </Cell>
     </Row>
 
     <Column flex col gap="2">
-        <Column flex col gap="1">
-            <Label id="lbl-progress-det" text={controller.t("demo.display.cell_progress_determinate", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-progress-det" text={controller.t("demo.display.cell_progress_determinate", cx)} muted /></Slot>
             <Progress id="prg-1" value={controller.progress(cx)} max={1.0}
                       label={controller.t("demo.display.loading", cx)} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-progress-indet" text={controller.t("demo.display.cell_progress_indeterminate", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-progress-indet" text={controller.t("demo.display.cell_progress_indeterminate", cx)} muted /></Slot>
             <Progress id="prg-indet" indeterminate />
-        </Column>
+        </Cell>
     </Column>
 
     <Row flex row flex_wrap items_center gap="3">
-        <Column flex col gap="1">
-            <Label id="lbl-text" text={controller.t("demo.display.cell_text", cx)} muted />
+        <Cell>
+            <Slot name="label"><Label id="lbl-text" text={controller.t("demo.display.cell_text", cx)} muted /></Slot>
             <Text id="tx-1" text={controller.t("demo.display.plain_text", cx)} size={14.0} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-icon-check" text={controller.t("demo.display.cell_icon_check", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-icon-check" text={controller.t("demo.display.cell_icon_check", cx)} muted /></Slot>
             <Icon id="ic-1" source={::yororen_ui::headless::icon::IconSource::Builtin("check".into())} size={18.0}
                   color={cx.theme().get_color("content.primary").unwrap_or_default()} />
-        </Column>
-        <Column flex col gap="1">
-            <Label id="lbl-icon-search" text={controller.t("demo.display.cell_icon_search", cx)} muted />
+        </Cell>
+        <Cell>
+            <Slot name="label"><Label id="lbl-icon-search" text={controller.t("demo.display.cell_icon_search", cx)} muted /></Slot>
             <Icon id="ic-2" source={::yororen_ui::headless::icon::IconSource::Builtin("search".into())} size={18.0}
                   color={cx.theme().get_color("content.primary").unwrap_or_default()} />
-        </Column>
+        </Cell>
     </Row>
 </Column>

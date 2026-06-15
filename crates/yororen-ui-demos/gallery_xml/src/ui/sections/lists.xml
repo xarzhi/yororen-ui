@@ -1,48 +1,13 @@
 <!-- Section 7 — Lists, Tables, Trees, Forms. -->
 <Column flex col gap="4">
     <Heading id="lists-title" level="H2" text={controller.t("demo.section_lists", cx)} />
-    <Column flex col gap="1">
-        <Label id="lbl-list" text={controller.t("demo.lists.cell_list", cx)} muted />
-        {controller.list_item_rows(cx, window)}
-    </Column>
-
-    <Column flex col gap="1">
-        <Label id="lbl-listbox" text={controller.t("demo.lists.cell_listbox", cx)} muted />
-        {controller.listbox_element(cx)}
-    </Column>
-
-    <Column flex col gap="1">
-        <Label id="lbl-form" text={controller.t("demo.form.cell", cx)} muted />
-        {controller.form_element(cx, window)}
-    </Column>
-
-    <Column flex col gap="1">
-        <Label id="lbl-table" text={controller.t("demo.lists.cell_table", cx)} muted />
-        {controller.table_element(cx)}
-    </Column>
-
-    <Column flex col gap="1">
-        <Label id="lbl-tree" text={controller.t("demo.lists.cell_tree", cx)} muted />
-        {controller.tree_element(cx, window)}
-    </Column>
-
-    <Column flex col gap="1">
-        <Label id="lbl-vl" text={controller.t("demo.lists.cell_vl", cx)} muted />
-        {controller.virtual_list_element(cx, window)}
-    </Column>
-
-    <Column flex col gap="1">
-        <Label id="lbl-uvl" text={controller.t("demo.lists.cell_uvl", cx)} muted />
-        {controller.uniform_list_element(cx, window)}
-    </Column>
-
-    <Column flex col gap="1">
-        <Label id="lbl-spacer" text={controller.t("demo.lists.cell_spacer", cx)} muted />
-        {controller.spacer_element(cx)}
-    </Column>
-
-    <Column flex col gap="1">
-        <Label id="lbl-rg-empty" text={controller.t("demo.controls.cell_radio_group_empty", cx)} muted />
-        {controller.radio_group_empty_element(cx)}
-    </Column>
+    {controller.list_item_rows(cx, window)}
+    {controller.listbox_element(cx)}
+    {controller.form_element(cx, window)}
+    {controller.table_element(cx)}
+    {controller.tree_element(cx, window)}
+    {controller.virtual_list_element(cx, window)}
+    {controller.uniform_list_element(cx, window)}
+    {controller.spacer_element(cx)}
+    {controller.radio_group_empty_element(cx)}
 </Column>

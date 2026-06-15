@@ -1,42 +1,51 @@
 <!-- Section 6 — Overlays. -->
 <Column flex col gap="4">
+    <Template name="Cell">
+        <Div flex flex_col gap="1" p="2" rounded_md border_1
+             border_color={gpui::hsla(0.0, 0.0, 0.5, 0.15)}>
+            <Slot name="label" />
+            <Slot />
+        </Div>
+    </Template>
+
     <Heading id="overlays-title" level="H2" text={controller.t("demo.section_overlays", cx)} />
-    <Column flex col gap="1">
-        <Label id="lbl-modal" text={controller.t("demo.modal.cell", cx)} muted />
+
+    <Cell>
+        <Slot name="label"><Label id="lbl-modal" text={controller.t("demo.modal.cell", cx)} muted /></Slot>
         <Button id="ov-modal-open" caption={controller.t("demo.modal.open", cx)}
                 on_click={controller.open_modal} />
-    </Column>
+    </Cell>
 
-    <Column flex col gap="1">
-        <Label id="lbl-popover" text={controller.t("demo.overlays.popover_trigger", cx)} muted />
+    <Cell>
+        <Slot name="label"><Label id="lbl-popover" text={controller.t("demo.overlays.popover_trigger", cx)} muted /></Slot>
         <Popover id="ov-popover" state={controller.popover_state(cx)}>
             <Button slot="trigger" id="ov-popover-trigger"
                     caption={if controller.popover_visible(cx) { controller.t("demo.overlays.popover_close", cx) } else { controller.t("demo.overlays.popover_open", cx) }}
                     on_click={controller.toggle_popover} />
             <Menu slot="content" id="ov-menu" state={controller.menu_state(cx)} />
         </Popover>
-    </Column>
+    </Cell>
 
-    <Column flex col gap="1">
-        <Label id="lbl-tooltip" text={controller.t("demo.tooltip.cell", cx)} muted />
+    <Cell>
+        <Slot name="label"><Label id="lbl-tooltip" text={controller.t("demo.tooltip.cell", cx)} muted /></Slot>
         <Tooltip id="ov-tooltip" text={controller.t("demo.tooltip.text", cx)}
                  state={controller.tooltip_state(cx)}>
             <Label slot="trigger" id="ov-tt-target" text={controller.t("demo.tooltip.hover_target", cx)} />
         </Tooltip>
-    </Column>
+    </Cell>
 
-    <Column flex col gap="1">
-        <Label id="lbl-dropdown" text={controller.t("demo.overlays.dropdown_trigger", cx)} muted />
+    <Cell>
+        <Slot name="label"><Label id="lbl-dropdown" text={controller.t("demo.overlays.dropdown_trigger", cx)} muted /></Slot>
         <DropdownMenu id="ov-dropdown" state={controller.dropdown_state(cx)}>
             <Button slot="trigger" id="ov-dropdown-trigger"
                     caption={controller.t("demo.overlays.dropdown_open", cx)}
                     on_click={controller.toggle_dropdown} />
             <Menu slot="content" id="ov-dropdown-body" state={controller.menu_state(cx)} />
         </DropdownMenu>
-    </Column>
+    </Cell>
 
-    <Column flex col gap="1">
-        <Label id="lbl-disclosure" text={controller.t("demo.disclosure.cell", cx)} muted />
+    <Cell>
+        <Slot name="label"><Label id="lbl-disclosure" text={controller.t("demo.disclosure.cell", cx)} muted /></Slot>
         <Disclosure id="ov-disc" title={controller.t("demo.disclosure.title", cx)}
                     open={controller.disclosure_open(cx)}
                     on_toggle={controller.toggle_disclosure}>
@@ -44,14 +53,14 @@
                 <Label id="ov-disc-body" text={controller.t("demo.disclosure.body", cx)} />
             </Column>
         </Disclosure>
-    </Column>
+    </Cell>
 
-    <Column flex col gap="1">
-        <Label id="lbl-overlay" text={controller.t("demo.overlays.scrim", cx)} muted />
+    <Cell>
+        <Slot name="label"><Label id="lbl-overlay" text={controller.t("demo.overlays.scrim", cx)} muted /></Slot>
         <Overlay id="ov-overlay" open={controller.is_modal_open(cx)}>
             <Label id="ov-overlay-info" text={controller.t("demo.overlays.scrim_info", cx)} muted />
         </Overlay>
-    </Column>
+    </Cell>
 
     <Label id="ov-summary"
            text={controller.t("demo.overlays.summary", cx).replacen("{}", &controller.dropdown_demo_value(cx), 1).replacen("{}", &controller.menu_demo_value(cx), 1)}
