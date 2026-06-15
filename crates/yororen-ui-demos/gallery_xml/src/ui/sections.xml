@@ -7,14 +7,15 @@
      `window.use_keyed_state(id, …)`, so the host view carries
      no controller field.
 
-     The shared cell templates are included at the root level
-     (sibling to the VirtualList) so they are registered once at
-     compile time and are never re-evaluated as part of a virtual
-     row. Each row is a `<Div p="4">` wrapper + an `<Include>` of
-     the matching section file; `p="4"` gives a modest 16-px inset
-     without the previous 24-px "huge margin" look. -->
+     The shared cell / section templates are included at the root
+     level (sibling to the VirtualList) so they are registered once
+     at compile time and are never re-evaluated as part of a virtual
+     row. Standard rows use the shared `<Section>` template, which
+     applies the modest 16-px `p="4"` inset without repeating the
+     wrapper on every line. -->
 <Fragment>
     <Include src="ui/shared/cell.xml" />
+    <Include src="ui/shared/section.xml" />
 
     <VirtualList id="gallery-sections" size_full
                  border_color={cx.theme().get_color("surface.base").unwrap_or_default()}
@@ -23,13 +24,13 @@
             <Include src="ui/sections/toolbar.xml" />
             <Divider id="toolbar-divider" />
         </Div>
-        <Div p="4"><Include src="ui/sections/actions.xml" /></Div>
-        <Div p="4"><Include src="ui/sections/display.xml" /></Div>
-        <Div p="4"><Include src="ui/sections/surfaces.xml" /></Div>
-        <Div p="4"><Include src="ui/sections/inputs.xml" /></Div>
-        <Div p="4"><Include src="ui/sections/controls.xml" /></Div>
-        <Div p="4"><Include src="ui/sections/overlays.xml" /></Div>
-        <Div p="4"><Include src="ui/sections/lists.xml" /></Div>
-        <Div p="4"><Include src="ui/sections/footer.xml" /></Div>
+        <Section><Include src="ui/sections/actions.xml" /></Section>
+        <Section><Include src="ui/sections/display.xml" /></Section>
+        <Section><Include src="ui/sections/surfaces.xml" /></Section>
+        <Section><Include src="ui/sections/inputs.xml" /></Section>
+        <Section><Include src="ui/sections/controls.xml" /></Section>
+        <Section><Include src="ui/sections/overlays.xml" /></Section>
+        <Section><Include src="ui/sections/lists.xml" /></Section>
+        <Section><Include src="ui/sections/footer.xml" /></Section>
     </VirtualList>
 </Fragment>

@@ -1,0 +1,8 @@
+<!-- Shared section wrapper: adds the standard 16-px inset to a row. -->
+<Fragment>
+    <Template name="Section">
+        <Div p="4">
+            <Slot />
+        </Div>
+    </Template>
+</Fragment>
