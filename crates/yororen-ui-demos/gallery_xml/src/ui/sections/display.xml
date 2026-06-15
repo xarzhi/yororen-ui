@@ -90,10 +90,10 @@
             <Slot name="label"><Label id="lbl-tag-closable" text={t!(cx, "demo.display.cell_tag_closable")} muted /></Slot>
             <Tag id="tag-2" label={t!(cx, "demo.display.tag_closable")}
                  closable on_close={controller.close_tag} />
+            <Label id="tag-closable-count"
+                   text={t_named!(cx, "demo.display.tag_close_events", count => controller.tag_close_count(cx))}
+                   muted />
         </Cell>
-        <Label id="tag-closable-count"
-               text={t_named!(cx, "demo.display.tag_close_events", count => controller.tag_close_count(cx))}
-               muted />
     </Row>
 
     <Row flex row flex_wrap items_start gap="3">
