@@ -75,11 +75,7 @@ impl TokenTagRenderer {
     }
 
     pub fn border_radius(&self, _state: &TagRenderState, theme: &Theme) -> Pixels {
-        gpui::px(
-            theme
-                .get_number("tokens.control.tag.radius")
-                .unwrap_or(4.0) as f32,
-        )
+        gpui::px(theme.get_number("tokens.radii.pill").unwrap_or(0.0) as f32)
     }
 
     pub fn close_size(&self, _state: &TagRenderState, _theme: &Theme) -> Pixels {
@@ -110,13 +106,17 @@ impl TagRenderer for TokenTagRenderer {
         let fs = self.font_size(&state, theme);
         let fw = self.font_weight(&state, theme);
         let r = self.border_radius(&state, theme);
+        // Closable tags keep the close affordance flush with the
+        // right pill edge; non-closable tags use symmetric padding.
+        let right_pad = if props.closable { p / 2. } else { p };
         let mut el = div()
             .flex()
             .items_center()
             .bg(bg)
             .text_color(fg)
             .min_h(h)
-            .px(p)
+            .pl(p)
+            .pr(right_pad)
             .text_size(fs)
             .font_weight(fw)
             .rounded(r)
