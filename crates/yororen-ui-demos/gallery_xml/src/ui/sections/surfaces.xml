@@ -40,7 +40,7 @@
         <Cell>
             <Slot name="label"><Label id="lbl-empty" text={t!(cx, "demo.surfaces.cell_empty")} muted /></Slot>
             <EmptyState id="es-1"
-                        icon={::yororen_ui::headless::icon::IconSource::Builtin("info".into())}
+                        icon="info"
                         title={t!(cx, "demo.surfaces.empty_title")}
                         description={t!(cx, "demo.surfaces.empty_desc")}>
                 <Label id="es-extra" text={t!(cx, "demo.surfaces.empty_custom_child")} muted />
@@ -63,7 +63,7 @@
                  bg={gpui::hsla(0.0, 0.0, 0.85, 1.0)}
                  rounded={gpui::px(4.0)}
                  border_1>
-                <Image id="img-1" source={::yororen_ui::headless::image::ImageSource::Resource("images/sample.png".into())}
+                <Image id="img-1" source="images/sample.png"
                        alt={t!(cx, "demo.surfaces.image_alt")} />
             </Div>
         </Cell>

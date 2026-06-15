@@ -55,27 +55,27 @@
         <Cell>
             <Slot name="label"><Label id="lbl-badge-neutral" text={t!(cx, "demo.display.badge_neutral")} muted /></Slot>
             <Badge id="bd-n" text={t!(cx, "demo.display.badge_neutral")}
-                   variant={::yororen_ui::headless::badge::BadgeVariant::Neutral} />
+                   variant="neutral" />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-badge-success" text={t!(cx, "demo.display.badge_success")} muted /></Slot>
             <Badge id="bd-s" text={t!(cx, "demo.display.badge_success")}
-                   variant={::yororen_ui::headless::badge::BadgeVariant::Success} />
+                   variant="success" />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-badge-warning" text={t!(cx, "demo.display.badge_warning")} muted /></Slot>
             <Badge id="bd-w" text={t!(cx, "demo.display.badge_warning")}
-                   variant={::yororen_ui::headless::badge::BadgeVariant::Warning} />
+                   variant="warning" />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-badge-danger" text={t!(cx, "demo.display.badge_danger")} muted /></Slot>
             <Badge id="bd-d" text={t!(cx, "demo.display.badge_danger")}
-                   variant={::yororen_ui::headless::badge::BadgeVariant::Danger} />
+                   variant="danger" />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-badge-info" text={t!(cx, "demo.display.badge_info")} muted /></Slot>
             <Badge id="bd-i" text={t!(cx, "demo.display.badge_info")}
-                   variant={::yororen_ui::headless::badge::BadgeVariant::Info} />
+                   variant="info" />
         </Cell>
     </Row>
 
@@ -130,12 +130,12 @@
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-icon-check" text={t!(cx, "demo.display.cell_icon_check")} muted /></Slot>
-            <Icon id="ic-1" source={::yororen_ui::headless::icon::IconSource::Builtin("check".into())} size={18.0}
+            <Icon id="ic-1" source="check" size={18.0}
                   color={cx.theme().get_color("content.primary").unwrap_or_default()} />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-icon-search" text={t!(cx, "demo.display.cell_icon_search")} muted /></Slot>
-            <Icon id="ic-2" source={::yororen_ui::headless::icon::IconSource::Builtin("search".into())} size={18.0}
+            <Icon id="ic-2" source="search" size={18.0}
                   color={cx.theme().get_color("content.primary").unwrap_or_default()} />
         </Cell>
     </Row>

@@ -28,12 +28,12 @@
     <Row flex row flex_wrap items_center gap="3">
         <Cell>
             <Slot name="label"><Label id="lbl-icon-btn" text={t!(cx, "demo.actions.cell_icon_button")} muted /></Slot>
-            <IconButton id="icon-btn-check" icon={::yororen_ui::headless::icon::IconSource::Builtin("check".into())}
+            <IconButton id="icon-btn-check" icon="check"
                         on_click={controller.noop_click} />
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-icon-btn-primary" text={t!(cx, "demo.actions.cell_icon_button_primary")} muted /></Slot>
-            <IconButton id="icon-btn-primary-check" icon={::yororen_ui::headless::icon::IconSource::Builtin("check".into())}
+            <IconButton id="icon-btn-primary-check" icon="check"
                         variant="primary" on_click={controller.noop_click} />
         </Cell>
     </Row>
