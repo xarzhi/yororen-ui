@@ -27,6 +27,11 @@ pub struct GalleryApp {
 impl GalleryApp {
     pub fn new(cx: &mut Context<Self>, controller: Controller) -> Self {
         // Re-render whenever the underlying state entity changes.
+        // Note: GalleryState is a single entity that holds every
+        // demo field, so any mutation triggers a full view re-render.
+        // This is fine for the demo scale; a production app with
+        // many independent fields should split state into multiple
+        // entities and observe each one individually.
         let state = cx.global::<StateRef>().state.clone();
         cx.observe(&state, |_this, _state, cx| cx.notify()).detach();
         Self { controller }
