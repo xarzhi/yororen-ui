@@ -906,19 +906,19 @@ impl Controller {
     pub fn table_rows(&self, cx: &App) -> Vec<Vec<SharedString>> {
         vec![
             vec![
-                cx.t("demo.lists.table_row_alice").into(),
-                cx.t("demo.lists.table_row_age_30").into(),
-                cx.t("demo.lists.table_row_beijing").into(),
+                cx.t("demo.lists.table_row_alice"),
+                cx.t("demo.lists.table_row_age_30"),
+                cx.t("demo.lists.table_row_beijing"),
             ],
             vec![
-                cx.t("demo.lists.table_row_bob").into(),
-                cx.t("demo.lists.table_row_age_25").into(),
-                cx.t("demo.lists.table_row_shanghai").into(),
+                cx.t("demo.lists.table_row_bob"),
+                cx.t("demo.lists.table_row_age_25"),
+                cx.t("demo.lists.table_row_shanghai"),
             ],
             vec![
-                cx.t("demo.lists.table_row_carol").into(),
-                cx.t("demo.lists.table_row_age_28").into(),
-                cx.t("demo.lists.table_row_shenzhen").into(),
+                cx.t("demo.lists.table_row_carol"),
+                cx.t("demo.lists.table_row_age_28"),
+                cx.t("demo.lists.table_row_shenzhen"),
             ],
         ]
     }
