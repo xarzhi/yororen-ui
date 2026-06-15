@@ -416,7 +416,7 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
         tag: "KeybindingDisplay",
         kind: ComponentKind::Leaf(LeafDef {
             factory: "::yororen_ui::headless::keybinding_display::keybinding_display",
-            extra_args: &[ExtraArg { kind: ExtraArgKind::Custom, attr: "keys" }, ],
+            extra_args: &[ExtraArg { kind: ExtraArgKind::StringList, attr: "keys" }, ],
             render: RenderMode::Default,
             needs_app: true,
             needs_window: false,
@@ -792,7 +792,7 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
         tag: "ShortcutHint",
         kind: ComponentKind::Leaf(LeafDef {
             factory: "::yororen_ui::headless::shortcut_hint::shortcut_hint",
-            extra_args: &[ExtraArg { kind: ExtraArgKind::Text, attr: "label" }, ExtraArg { kind: ExtraArgKind::Custom, attr: "keys" }, ],
+            extra_args: &[ExtraArg { kind: ExtraArgKind::Text, attr: "label" }, ExtraArg { kind: ExtraArgKind::StringList, attr: "keys" }, ],
             render: RenderMode::Default,
             needs_app: true,
             needs_window: false,

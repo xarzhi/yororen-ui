@@ -251,6 +251,11 @@ pub enum ExtraArgKind {
     KeybindingInputMode,
     /// A gpui colour positional argument (`Hsla` / `Rgba`).
     Color,
+    /// An iterator of strings (e.g. `KeybindingDisplay`'s
+    /// `keys: impl IntoIterator<Item = impl Into<String>>`).
+    /// Literal XML attribute values are rejected; brace
+    /// expressions pass through verbatim.
+    StringList,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

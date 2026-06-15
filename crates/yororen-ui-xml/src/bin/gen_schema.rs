@@ -168,6 +168,8 @@ enum ExtraArgKind {
     ImageSource,
     /// Factory arg is `KeybindingInputMode`.
     KeybindingInputMode,
+    /// Factory arg is `impl IntoIterator<Item = impl Into<String>>`.
+    StringList,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -850,6 +852,8 @@ fn analyse_factory(sig: &Signature) -> Result<(Vec<ExtraArgInfo>, bool), String>
             ExtraArgKind::ImageSource
         } else if is_keybinding_mode(ty) {
             ExtraArgKind::KeybindingInputMode
+        } else if is_string_list(ty) {
+            ExtraArgKind::StringList
         } else if is_string_like(ty) {
             ExtraArgKind::Text
         } else if is_callback(ty) {
@@ -891,6 +895,11 @@ fn is_string_like(ty: &Type) -> bool {
             || rendered == "String"
             || rendered == "& str"
             || rendered == "&'static str")
+}
+
+fn is_string_list(ty: &Type) -> bool {
+    let rendered = ty.to_token_stream().to_string().replace(' ', "");
+    rendered.contains("IntoIterator") && rendered.contains("Into<String>")
 }
 
 fn is_usize(ty: &Type) -> bool {
@@ -1178,6 +1187,7 @@ fn render_extra_args(args: &[ExtraArgInfo]) -> String {
             ExtraArgKind::IconSource => "ExtraArgKind::IconSource",
             ExtraArgKind::ImageSource => "ExtraArgKind::ImageSource",
             ExtraArgKind::KeybindingInputMode => "ExtraArgKind::KeybindingInputMode",
+            ExtraArgKind::StringList => "ExtraArgKind::StringList",
         };
         s.push_str(&format!(
             "ExtraArg {{ kind: {}, attr: {:?} }}, ",

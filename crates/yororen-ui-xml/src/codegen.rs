@@ -874,6 +874,29 @@ fn codegen_leaf(
                 )
                 .at(element.byte_offset));
             }
+            (ExtraArgKind::StringList, Some(a)) => {
+                if a.expr.is_some() {
+                    attr_value_tokens(a)?
+                } else {
+                    return Err(XmlError::new(
+                        XmlErrorKind::InvalidExpression,
+                        a.span,
+                        format!(
+                            "<{}> attribute `{}` requires a brace expression, e.g. `{}={{vec![\"Cmd\".into(), \"S\".into()]}}`",
+                            element.tag, extra.attr, extra.attr
+                        ),
+                    )
+                    .at(a.byte_offset));
+                }
+            }
+            (ExtraArgKind::StringList, None) => {
+                return Err(XmlError::new(
+                    XmlErrorKind::UnknownAttribute,
+                    element.span,
+                    format!("<{}> requires a `{}` attribute", element.tag, extra.attr),
+                )
+                .at(element.byte_offset));
+            }
             (ExtraArgKind::Callback, Some(a)) => {
                 let expr = attr_value_tokens(a)?;
                 auto_wrap_callback_expr(a, expr)
