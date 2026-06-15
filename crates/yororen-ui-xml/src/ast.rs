@@ -53,4 +53,12 @@ pub enum AstNode {
         /// character in the original XML.
         byte_offset: usize,
     },
+    /// A brace expression used as a child node, e.g.
+    /// `<Column>{controller.foo(cx)}</Column>`. The expression
+    /// must evaluate to something implementing `gpui::IntoElement`.
+    Expr {
+        expr: String,
+        span: Span,
+        byte_offset: usize,
+    },
 }

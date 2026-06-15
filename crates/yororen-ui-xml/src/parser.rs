@@ -627,14 +627,33 @@ fn element_from(
             children.push(AstNode::Element(element_from(child, span, location)));
         } else if child.is_text() {
             let text = child.text().unwrap_or("");
-            let trimmed = text.trim();
-            if !trimmed.is_empty() {
-                let text_offset = byte_offset_for_text(child, location, trimmed);
-                children.push(AstNode::Text {
-                    text: trimmed.to_string(),
-                    span: span_for_node(child, span),
-                    byte_offset: text_offset,
-                });
+            let base = child.range().start;
+            let segments = split_text_content(text);
+            for (is_expr, content, rel) in segments {
+                let trimmed = content.trim();
+                if trimmed.is_empty() {
+                    continue;
+                }
+                let offset = base + rel + content.find(trimmed).unwrap_or(0);
+                if is_expr {
+                    let inner = trimmed[1..trimmed.len() - 1]
+                        .replace("&quot;", "\"")
+                        .replace("&apos;", "'")
+                        .replace("&lt;", "<")
+                        .replace("&gt;", ">")
+                        .replace("&amp;", "&");
+                    children.push(AstNode::Expr {
+                        expr: inner,
+                        span: span_for_node(child, span),
+                        byte_offset: offset,
+                    });
+                } else {
+                    children.push(AstNode::Text {
+                        text: trimmed.to_string(),
+                        span: span_for_node(child, span),
+                        byte_offset: offset,
+                    });
+                }
             }
         }
     }
@@ -679,15 +698,51 @@ fn byte_offset_for_attr(attr: roxmltree::Attribute, _location: &LocationTracker)
     attr.range().start
 }
 
-/// Byte offset of the first non-whitespace character of a
-/// text node. Falls back to the node range start.
-fn byte_offset_for_text(node: roxmltree::Node, location: &LocationTracker, trimmed: &str) -> usize {
-    let raw = node.text().unwrap_or("");
-    if let Some(rel) = raw.find(trimmed) {
-        node.range().start + rel
-    } else {
-        byte_offset_for_node(node, location)
+/// Split a raw XML text node into plain-text and brace-expression
+/// segments. Each `{...}` block becomes an expression segment; braces
+/// are matched by depth so nested braces work. Everything outside
+/// braces becomes text segments. Returns `(is_expr, content, rel_byte_offset)`
+/// for each non-empty segment.
+fn split_text_content(text: &str) -> Vec<(bool, String, usize)> {
+    let mut out = Vec::new();
+    let mut byte = 0usize;
+    let mut chars = text.char_indices().peekable();
+    while let Some((i, c)) = chars.next() {
+        if c == '{' {
+            // Start of a brace expression.
+            let start = i;
+            let mut depth = 1usize;
+            let mut end = i + 1;
+            while let Some((j, d)) = chars.next() {
+                end = j + d.len_utf8();
+                if d == '{' {
+                    depth += 1;
+                } else if d == '}' {
+                    depth -= 1;
+                    if depth == 0 {
+                        break;
+                    }
+                }
+            }
+            out.push((true, text[start..end].to_string(), start));
+            byte = end;
+        } else {
+            // Plain text up to the next '{'.
+            let start = i;
+            let mut end = i + c.len_utf8();
+            while let Some(&(j, d)) = chars.peek() {
+                if d == '{' {
+                    break;
+                }
+                chars.next();
+                end = j + d.len_utf8();
+            }
+            out.push((false, text[start..end].to_string(), start));
+            byte = end;
+        }
     }
+    let _ = byte; // unused, kept for clarity
+    out
 }
 
 /// Detect whether `s` is a brace expression (`{...}`) — with

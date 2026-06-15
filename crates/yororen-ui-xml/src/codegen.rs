@@ -1163,7 +1163,7 @@ fn codegen_leaf(
                     )
                     .at(element.byte_offset));
                 }
-                AstNode::Element(_) => {
+                AstNode::Expr { .. } | AstNode::Element(_) => {
                     let child_expr = if def.unwrap_children {
                         codegen_child_unwrapped(child, cx, location, source_file)?
                     } else {
@@ -1247,7 +1247,7 @@ fn codegen_leaf(
                         .at(element.byte_offset));
                     }
                 }
-                AstNode::Element(_) => {
+                AstNode::Expr { .. } | AstNode::Element(_) => {
                     let child_expr = codegen_child(child, cx, location, source_file)?;
                     child_stmts.push(quote! {
                         let __el = ::gpui::ParentElement::child(__el, #child_expr);
@@ -1785,7 +1785,7 @@ fn codegen_match(
                 )
                 .at(e.byte_offset));
             }
-            AstNode::Text { .. } => {
+            AstNode::Text { .. } | AstNode::Expr { .. } => {
                 return Err(XmlError::new(
                     XmlErrorKind::Unsupported,
                     location.span_outer(),
@@ -1977,6 +1977,9 @@ fn codegen_child(
 ) -> Result<TokenStream, XmlError> {
     match node {
         AstNode::Element(e) => codegen_element(e, cx, location, source_file),
+        AstNode::Expr { expr, span, byte_offset } => {
+            parse_ts(expr, *span, *byte_offset, "child expression")
+        }
         AstNode::Text { text, .. } => {
             // Text content inside a container is uncommon — only
             // meaningful for `<Button>Click me</Button>` (handled
@@ -2003,6 +2006,9 @@ fn codegen_child_unwrapped(
                 ComponentKind::Leaf(l) => codegen_leaf(e, l, cx, location, source_file, false),
                 _ => codegen_element(e, cx, location, source_file),
             }
+        }
+        AstNode::Expr { expr, span, byte_offset } => {
+            parse_ts(expr, *span, *byte_offset, "child expression")
         }
         AstNode::Text { text, .. } => Ok(quote! { #text }),
     }
