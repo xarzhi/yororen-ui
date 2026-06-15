@@ -105,9 +105,14 @@ impl TextInputRenderer for BrutalTextInputRenderer {
         let disabled = props.disabled;
         let on_change = props.on_change.clone();
         let on_submit = props.on_submit.clone();
+        let initial_value = props.initial_value.clone();
 
         let state = window.use_keyed_state(props.id.clone(), cx, |_window, cx| {
-            TextInputState::new(&mut *cx)
+            let mut s = TextInputState::new(&mut *cx);
+            if let Some(v) = initial_value.clone() {
+                s.value = v;
+            }
+            s
         });
         state.update(cx, |s, _cx| {
             s.placeholder = SharedString::from(placeholder_str);

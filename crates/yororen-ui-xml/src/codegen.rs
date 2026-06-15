@@ -102,10 +102,15 @@ fn parse_ts(
 /// entry point supplies the call site). `cx_expr` is the
 /// `cx = <expr>` token stream from the optional preamble, or
 /// `None` to default to the bare identifier `cx`.
+/// `source_file` is the absolute path of the file that
+/// invoked the macro (used to resolve relative `<Include
+/// src="…">` paths); pass `None` to fall back to the
+/// current working directory (the runtime / test path).
 pub fn codegen(
     xml_text: &str,
     outer_span: Span,
     cx_expr: Option<TokenStream>,
+    source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
     let line_starts = crate::parser::line_starts(xml_text);
     let location = crate::parser::LocationTracker {
@@ -113,29 +118,297 @@ pub fn codegen(
         xml: xml_text,
         outer_span,
     };
-    let element = crate::parser::parse(xml_text, outer_span, &location)?;
+    let mut element = crate::parser::parse(xml_text, outer_span, &location)?;
+    // Template pre-pass: collect every `<Template name="…">`
+    // in the root's children, then walk the rest of the tree
+    // and substitute `<X>` invocations with the template body,
+    // replacing each `<Slot>` with the caller's matching
+    // content. Templates themselves are dropped from the
+    // output (they're compile-time-only).
+    let templates = collect_templates(&element)?;
+    expand_template_invocations(&mut element, &templates, outer_span)?;
     let cx_tokens = match cx_expr {
         Some(expr) => quote! { (#expr) },
         None => quote! { cx },
     };
-    let body = codegen_element(&element, &cx_tokens, &location)?;
-    // Wrap the body in a block that imports the traits the
-    // generated code needs. This keeps the call site clean:
-    // the user never has to remember to `use gpui::Styled;`
-    // for `<Column flex>` to compile.
-    Ok(quote! {
-        {
-            #[allow(unused_imports)]
-            use ::gpui::{IntoElement, ParentElement, StatefulInteractiveElement, InteractiveElement, Styled};
-            #body
+    let body = codegen_element(&element, &cx_tokens, &location, source_file)?;
+    // The generated body uses fully-qualified trait method
+    // calls (`::gpui::Styled::#m(__el, …)`,
+    // `::gpui::ParentElement::child(__el, …)`, etc.) so the
+    // caller does not need to import any gpui traits. The
+    // result is a plain block expression returning the root
+    // element.
+    Ok(quote! { { #body } })
+}
+
+/// Walk the AST and lift every `<Template name="…">`
+/// (at any depth) into a name → body map. Returns
+/// `Err` if a duplicate name is found — the user gets a
+/// helpful error pointing at the second definition.
+///
+/// Templates are file-scoped: they can live anywhere in
+/// the XML — at the root, nested inside a `<Column>`, or
+/// alongside other content. The pre-pass walks the whole
+/// tree so the user doesn't have to remember to put
+/// them at the top.
+fn collect_templates(
+    root: &AstElement,
+) -> Result<std::collections::HashMap<String, AstElement>, XmlError> {
+    use std::collections::HashMap;
+    let mut templates: HashMap<String, AstElement> = HashMap::new();
+    walk_for_templates(root, &mut templates)?;
+    Ok(templates)
+}
+
+/// Recursive helper for `collect_templates`. Visits
+/// every element in the tree and registers any
+/// `<Template name="…">` it finds.
+fn walk_for_templates(
+    el: &AstElement,
+    out: &mut std::collections::HashMap<String, AstElement>,
+) -> Result<(), XmlError> {
+    if el.tag == "Template" {
+        let name_attr = el.attributes.iter().find(|a| a.name == "name");
+        let Some(name_attr) = name_attr else {
+            return Err(XmlError::new(
+                XmlErrorKind::UnknownAttribute,
+                el.span,
+                "<Template> requires a `name=\"…\"` attribute",
+            )
+            .at(el.byte_offset));
+        };
+        if name_attr.expr.is_some() {
+            return Err(XmlError::new(
+                XmlErrorKind::Unsupported,
+                name_attr.span,
+                "<Template name> requires a literal identifier, not a brace expression",
+            )
+            .at(name_attr.byte_offset));
         }
-    })
+        let name = name_attr.raw.clone();
+        if out.contains_key(&name) {
+            return Err(XmlError::new(
+                XmlErrorKind::Unsupported,
+                el.span,
+                format!("duplicate <Template name=\"{name}\"> — template names must be unique"),
+            )
+            .at(el.byte_offset));
+        }
+        out.insert(name, el.clone());
+    }
+    for child in &el.children {
+        if let AstNode::Element(c) = child {
+            walk_for_templates(c, out)?;
+        }
+    }
+    Ok(())
+}
+
+/// Walk the AST in-place. Every `<X>` whose tag matches a
+/// template name is replaced with the template body, with
+/// each `<Slot>` substituted by the caller's matching
+/// content. Children of `<X>` that aren't wrapped in
+/// `<Slot name="…">` go to the *default* slot (any
+/// unnamed `<Slot/>` in the template).
+///
+/// The transformation recurses into the template body so
+/// nested template calls work; it also recurses into the
+/// caller-side slot content so `<If>` / `<For>` inside
+/// slots are handled normally.
+fn expand_template_invocations(
+    element: &mut AstElement,
+    templates: &std::collections::HashMap<String, AstElement>,
+    outer_span: Span,
+) -> Result<(), XmlError> {
+    // First, recurse into the existing children — they may
+    // themselves contain template calls (nested templates).
+    let mut new_children: Vec<AstNode> = Vec::new();
+    for child in &mut element.children {
+        if let AstNode::Element(e) = child {
+            expand_template_invocations(e, templates, outer_span)?;
+            // After recursion, drop `<Template>` definitions
+            // (they're compile-time-only, never emitted).
+            if e.tag == "Template" {
+                continue;
+            }
+            // If the (post-recursion) element is a template
+            // invocation, splice in the expansion.
+            if let Some(template) = templates.get(&e.tag) {
+                let expanded = instantiate_template(template, e, outer_span)?;
+                new_children.push(expanded);
+                continue;
+            }
+        }
+        new_children.push(child.clone());
+    }
+    element.children = new_children;
+    Ok(())
+}
+
+/// Materialise a single `<X>` invocation. The caller-side
+/// children of `<X>` are split into named-slot content
+/// (children of `<Slot name="…">` inside the call) and
+/// the default slot (everything else). The template body
+/// is then cloned and each `<Slot>` inside is replaced by
+/// the matching caller-side content.
+fn instantiate_template(
+    template: &AstElement,
+    call: &AstElement,
+    outer_span: Span,
+) -> Result<AstNode, XmlError> {
+    // Split the call's children into named-slot content and
+    // the default slot. A child is a "named slot" iff it's
+    // an element whose tag is `Slot` AND has a `name=`
+    // attribute; otherwise it contributes to the default
+    // slot.
+    let mut named_slots: std::collections::HashMap<String, Vec<AstNode>> =
+        std::collections::HashMap::new();
+    let mut default_slot: Vec<AstNode> = Vec::new();
+    for child in &call.children {
+        if let AstNode::Element(e) = child
+            && e.tag == "Slot"
+        {
+            let name_attr = e.attributes.iter().find(|a| a.name == "name");
+            if let Some(name_attr) = name_attr {
+                if name_attr.expr.is_some() {
+                    return Err(XmlError::new(
+                        XmlErrorKind::Unsupported,
+                        name_attr.span,
+                        "<Slot name> requires a literal identifier, not a brace expression",
+                    )
+                    .at(name_attr.byte_offset));
+                }
+                let name = name_attr.raw.clone();
+                named_slots.insert(name, e.children.clone());
+                continue;
+            }
+            // Unnamed `<Slot>` at the call site: errors.
+            // The user should put the default-slot content
+            // directly inside `<X>`, not wrapped in `<Slot/>`.
+            return Err(XmlError::new(
+                XmlErrorKind::Unsupported,
+                e.span,
+                "<Slot/> at the call site must have a `name` attribute — default-slot content goes directly inside the template call",
+            )
+            .at(e.byte_offset));
+        }
+        default_slot.push(child.clone());
+    }
+
+    // The template's body must be a single child (or a
+    // Fragment-like sequence). For Phase 2 we wrap multiple
+    // top-level template children in a synthetic `<Fragment>`
+    // so the result composes uniformly.
+    let mut body = template.children.clone();
+    // If the template body is empty, treat it as a single
+    // empty Fragment.
+    if body.is_empty() {
+        body.push(AstNode::Element(AstElement {
+            tag: "Fragment".to_string(),
+            span: outer_span,
+            byte_offset: 0,
+            attributes: Vec::new(),
+            children: Vec::new(),
+        }));
+    }
+    // Walk the body and replace every `<Slot>` with the
+    // matching content. A `<Slot name="X">` (with explicit
+    // name) is replaced by `named_slots["X"]`; `<Slot/>`
+    // (no name) is replaced by the default slot. Missing
+    // named slots → empty content (so the template's
+    // structure is preserved).
+    substitute_slots(&mut body, &named_slots, &default_slot)?;
+    // If there's exactly one body child, return it directly;
+    // otherwise wrap in a synthetic Fragment so the parent's
+    // `.child(...)` chain works.
+    if body.len() == 1 {
+        Ok(body.into_iter().next().unwrap())
+    } else {
+        Ok(AstNode::Element(AstElement {
+            tag: "Fragment".to_string(),
+            span: outer_span,
+            byte_offset: 0,
+            attributes: Vec::new(),
+            children: body,
+        }))
+    }
+}
+
+/// Replace every `<Slot name="…">` / `<Slot/>` in `body`
+/// with the matching caller-side content. Recurses into
+/// nested elements (a `<Slot>` inside an `<If>` is still
+/// a slot). Multiple `<Slot>` with the same name in the
+/// template are all replaced (one-to-many fan-out).
+fn substitute_slots(
+    body: &mut Vec<AstNode>,
+    named_slots: &std::collections::HashMap<String, Vec<AstNode>>,
+    default_slot: &[AstNode],
+) -> Result<(), XmlError> {
+    // Walk the body, building a new children list. When we
+    // hit a `<Slot>`, we splice in the matching content
+    // (replacing the Slot, not wrapping it). For non-slot
+    // elements, recurse into their children so nested slots
+    // get substituted too.
+    let mut out: Vec<AstNode> = Vec::new();
+    for node in body.drain(..) {
+        if let AstNode::Element(e) = &node
+            && e.tag == "Slot"
+        {
+            let name_attr = e.attributes.iter().find(|a| a.name == "name");
+            let replacement = match name_attr {
+                Some(n) => {
+                    if n.expr.is_some() {
+                        return Err(XmlError::new(
+                            XmlErrorKind::Unsupported,
+                            n.span,
+                            "<Slot name> inside a template must be a literal",
+                        )
+                        .at(n.byte_offset));
+                    }
+                    named_slots.get(&n.raw).cloned().unwrap_or_default()
+                }
+                None => default_slot.to_vec(),
+            };
+            out.extend(replacement);
+            continue;
+        }
+        // Non-slot: recurse into the element's own children
+        // so a `<Slot>` nested inside (e.g. inside an
+        // `<If>`) is also substituted. The element itself
+        // passes through unchanged.
+        if let AstNode::Element(mut e) = node {
+            substitute_slots(&mut e.children, named_slots, default_slot)?;
+            out.push(AstNode::Element(e));
+        } else {
+            out.push(node);
+        }
+    }
+    *body = out;
+    Ok(())
+}
+
+/// Threaded-through context for the codegen recursion. Holds
+/// the `cx` expression, the source-file path (used by
+/// `<Include>` to resolve relative paths), and the
+/// `LocationTracker` for diagnostics.
+///
+/// Not currently used as a parameter on every helper (most
+/// only need `cx` + `location`); kept as a doc-level
+/// reference for the source-file threading and as a
+/// future-proofing hook if we want to push more state
+/// through the recursion.
+#[allow(dead_code)]
+struct CodegenCtx<'a> {
+    cx: &'a TokenStream,
+    source_file: Option<&'a str>,
+    location: &'a crate::parser::LocationTracker<'a>,
 }
 
 fn codegen_element(
     element: &AstElement,
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
+    source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
     // Unknown tags fall through to the runtime registry
     // (see `crate::runtime` and the `register_xml_component!`
@@ -146,9 +419,11 @@ fn codegen_element(
     let def = lookup_component(&element.tag).unwrap_or(&RUNTIME_LEAF_FALLBACK);
 
     match def.kind {
-        ComponentKind::Container(c) => codegen_container(element, c, cx, location),
+        ComponentKind::Container(c) => codegen_container(element, c, cx, location, source_file),
         ComponentKind::Leaf(l) => codegen_leaf(element, l, cx, location),
-        ComponentKind::ControlFlow(c) => codegen_control_flow(element, c, cx, location),
+        ComponentKind::ControlFlow(c) => {
+            codegen_control_flow(element, c, cx, location, source_file)
+        }
         ComponentKind::RuntimeLeaf => codegen_runtime_leaf(element, cx),
     }
 }
@@ -209,17 +484,25 @@ fn codegen_container(
     def: ContainerDef,
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
+    source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
-    let mut tokens = quote! { gpui::div() };
+    // Build the container as a sequence of `let __el = ...;`
+    // statements rather than one giant method chain. This keeps
+    // the type-checker happy when the XML grows large and
+    // contains many closures (workaround for a rustc quirk
+    // where huge closure-bearing expressions can be mis-parsed
+    // in `impl Trait` return positions).
+    let mut stmts: Vec<TokenStream> = Vec::new();
+    stmts.push(quote! { let __el = gpui::div(); });
 
     for attr in &element.attributes {
-        apply_container_attr(&mut tokens, attr, def, element)?;
+        apply_container_attr(&mut stmts, attr, def, element)?;
     }
 
     // Walk children, merging consecutive If/ElseIf/Else
     // into a single Rust if/else chain (which must be a
     // single block expression so it can be the argument
-    // of `.child(...)`).
+    // of `ParentElement::child`).
     let mut i = 0;
     while i < element.children.len() {
         let child = &element.children[i];
@@ -240,17 +523,22 @@ fn codegen_container(
                 }
                 j += 1;
             }
-            let chain_expr = codegen_if_chain(&element.children[i..j], cx, location)?;
-            tokens.append_all(quote! { .child(#chain_expr) });
+            let chain_expr = codegen_if_chain(&element.children[i..j], cx, location, source_file)?;
+            stmts.push(quote! { let __el = ::gpui::ParentElement::child(__el, #chain_expr); });
             i = j;
         } else {
-            let child_expr = codegen_child(child, cx, location)?;
-            tokens.append_all(quote! { .child(#child_expr) });
+            let child_expr = codegen_child(child, cx, location, source_file)?;
+            stmts.push(quote! { let __el = ::gpui::ParentElement::child(__el, #child_expr); });
             i += 1;
         }
     }
 
-    Ok(tokens)
+    Ok(quote! {
+        {
+            #(#stmts)*
+            __el
+        }
+    })
 }
 
 /// Combine a run of `If` / `ElseIf` / `Else` siblings
@@ -265,6 +553,7 @@ fn codegen_if_chain(
     branches: &[AstNode],
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
+    source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
     if branches.is_empty() {
         return Ok(quote! { gpui::div() });
@@ -286,6 +575,7 @@ fn codegen_if_chain(
             element_tag_to_branch_kind(&element.tag)?,
             cx,
             location,
+            source_file,
         )?;
         chain.append_all(branch_expr);
         // After the first branch, every subsequent one
@@ -318,18 +608,18 @@ fn element_tag_to_branch_kind(tag: &str) -> Result<ControlFlowDef, XmlError> {
 }
 
 fn apply_container_attr(
-    tokens: &mut TokenStream,
+    stmts: &mut Vec<TokenStream>,
     attr: &AstAttribute,
     def: ContainerDef,
     element: &AstElement,
 ) -> Result<(), XmlError> {
     if attr.name == "id" {
-        // `id="my-button"` becomes `.id("my-button".into())` —
-        // we don't use the `id` attr on containers today but
-        // reserve the slot so that future custom containers
-        // can wire it.
+        // `id="my-button"` becomes
+        // `::gpui::InteractiveElement::id(__el, "my-button".into())`.
         let value = attr_value_tokens(attr)?;
-        tokens.append_all(quote! { .id(#value) });
+        stmts.push(quote! {
+            let __el = ::gpui::InteractiveElement::id(__el, #value);
+        });
         return Ok(());
     }
 
@@ -343,7 +633,9 @@ fn apply_container_attr(
             .copied()
         {
             let m = format_ident!("{}", method);
-            tokens.append_all(quote! { .#m() });
+            stmts.push(quote! {
+                let __el = ::gpui::Styled::#m(__el);
+            });
             return Ok(());
         }
     }
@@ -351,7 +643,7 @@ fn apply_container_attr(
     // Brace expression on a container: pass through to the
     // matching Styled method.
     if let Some(expr) = &attr.expr {
-        // `gap={pixels}` → `.gap(pixels)`
+        // `gap={pixels}` → `::gpui::Styled::gap(__el, pixels)`
         if is_spacing_prefix(&attr.name) {
             let m = format_ident!("{}", attr.name);
             let parsed = parse_ts(
@@ -360,10 +652,13 @@ fn apply_container_attr(
                 attr.byte_offset,
                 &format!("expression for `{}`", attr.name),
             )?;
-            tokens.append_all(quote! { .#m(#parsed) });
+            stmts.push(quote! {
+                let __el = ::gpui::Styled::#m(__el, #parsed);
+            });
             return Ok(());
         }
-        // `gap_3={...}` or `flex_grow={...}` → `.gap_3(expr)`
+        // `gap_3={...}` or `flex_grow={...}` →
+        // `::gpui::Styled::gap_3(__el, expr)`
         if is_known_shorthand_method(&attr.name) || is_spacing_shorthand(&attr.name) {
             let m = format_ident!("{}", attr.name);
             let parsed = parse_ts(
@@ -372,12 +667,15 @@ fn apply_container_attr(
                 attr.byte_offset,
                 &format!("expression for `{}`", attr.name),
             )?;
-            tokens.append_all(quote! { .#m(#parsed) });
+            stmts.push(quote! {
+                let __el = ::gpui::Styled::#m(__el, #parsed);
+            });
             return Ok(());
         }
     }
 
-    // Literal value on a spacing prefix: `gap="3"` → `.gap_3()`.
+    // Literal value on a spacing prefix: `gap="3"` →
+    // `::gpui::Styled::gap_3(__el)`.
     if attr.expr.is_none() && is_spacing_prefix(&attr.name) {
         let value = attr.raw.as_str();
         // The gpui method name is `<attr>_<value>`. Allow
@@ -396,7 +694,9 @@ fn apply_container_attr(
         // Translate `0p5` (XML) → `0p5` (method name)
         let method = format!("{}_{}", attr.name, value);
         let m = format_ident!("{}", method);
-        tokens.append_all(quote! { .#m() });
+        stmts.push(quote! {
+            let __el = ::gpui::Styled::#m(__el);
+        });
         return Ok(());
     }
 
@@ -408,16 +708,19 @@ fn apply_container_attr(
     {
         // The normaliser should have converted a bare attr
         // to `="true"`, so this is the common path.
+        let m = format_ident!("{}", attr.name);
         if attr.raw == "true" {
-            let m = format_ident!("{}", attr.name);
-            tokens.append_all(quote! { .#m() });
+            stmts.push(quote! {
+                let __el = ::gpui::Styled::#m(__el);
+            });
             return Ok(());
         }
         // `flex_grow="0.5"` — odd but possible; we just
         // pass the value as a string to the method.
         let raw = attr.raw.as_str();
-        let m = format_ident!("{}", attr.name);
-        tokens.append_all(quote! { .#m(#raw) });
+        stmts.push(quote! {
+            let __el = ::gpui::Styled::#m(__el, #raw);
+        });
         return Ok(());
     }
 
@@ -519,7 +822,13 @@ fn codegen_leaf(
         element.byte_offset,
         &format!("factory path for <{}>", element.tag),
     )?;
-    let mut tokens = quote! { #factory(#(#factory_args),*) };
+
+    // Build the leaf as a sequence of statements so trait
+    // methods can be fully qualified and the final type is
+    // `AnyElement` without relying on the call site to import
+    // `IntoElement`, `ParentElement`, etc.
+    let mut stmts: Vec<TokenStream> = Vec::new();
+    stmts.push(quote! { let mut __el = #factory(#(#factory_args),*); });
 
     // 3. Apply prop / event setters in declaration order.
     for attr in &element.attributes {
@@ -559,7 +868,7 @@ fn codegen_leaf(
                     attr.byte_offset,
                     "@bind requires a brace expression, e.g. `@bind={self.name}`",
                 )?;
-                tokens.append_all(emit_bind(&parsed, def, cx));
+                stmts.extend(emit_bind(&parsed, def, cx));
                 continue;
             } else {
                 return Err(XmlError::new(
@@ -592,7 +901,7 @@ fn codegen_leaf(
                     }
                     let raw = attr.raw.as_str();
                     if raw == "true" {
-                        tokens.append_all(quote! { .#m() });
+                        stmts.push(quote! { __el = __el.#m(); });
                     }
                     // `raw == "false"` → skip the call (the
                     // default for unset).
@@ -600,7 +909,7 @@ fn codegen_leaf(
                 }
                 _ => {
                     let value = prop_value_tokens(attr, prop.value)?;
-                    tokens.append_all(quote! { .#m(#value) });
+                    stmts.push(quote! { __el = __el.#m(#value); });
                 }
             }
             continue;
@@ -619,7 +928,14 @@ fn codegen_leaf(
             // of `move |ev, w, cx| controller.increment(ev, w, cx)`.
             let expr = attr_expr_only(attr)?;
             let expr = auto_wrap_event_expr(attr, expr);
-            tokens.append_all(quote! { .#m(#expr) });
+            // Component event setters are inherent methods on
+            // the component builder (e.g. `ButtonProps::on_click`),
+            // so a normal method call is enough and avoids
+            // requiring `StatefulInteractiveElement` to be in
+            // scope at the call site.
+            stmts.push(quote! {
+                __el = __el.#m(#expr);
+            });
             continue;
         }
         // Event modifiers: `on_click.stop={...}` /
@@ -631,9 +947,29 @@ fn codegen_leaf(
         {
             let m = format_ident!("{}", setter);
             let expr = attr_expr_only(attr)?;
-            let expr = auto_wrap_event_expr(attr, expr);
-            let wrapped = wrap_event_with_modifiers(&modifiers, expr, attr.span)?;
-            tokens.append_all(quote! { .#m(#wrapped) });
+            // For modifiers we build the closure body inline
+            // rather than wrapping an already-auto-wrapped
+            // closure. This keeps the receiver clone outside
+            // the `move` closure so the original binding
+            // (e.g. `controller`) is not captured and can be
+            // reused by other handlers.
+            let (clone_stmt, call_expr) = auto_wrap_event_call(attr, expr);
+            let body = wrap_event_body_with_modifiers(&modifiers, call_expr, attr.span)?;
+            let closure = if let Some(stmt) = clone_stmt {
+                quote! {
+                    {
+                        #stmt
+                        move |__ev, __window, cx| { #body }
+                    }
+                }
+            } else {
+                quote! {
+                    move |__ev, __window, cx| { #body }
+                }
+            };
+            stmts.push(quote! {
+                __el = __el.#m(#closure);
+            });
             continue;
         }
         return Err(XmlError::new(
@@ -645,6 +981,10 @@ fn codegen_leaf(
     }
 
     // 4. Apply render mode.
+    // After `.render(...)` the type changes from the
+    // component's props/builder to `AnyElement`, so we
+    // shadow `__el` with a fresh `let` rather than
+    // reassigning (which would fix the original type).
     match def.render {
         RenderMode::Default => {
             // The render method typically takes `(&App)`; a
@@ -655,10 +995,10 @@ fn codegen_leaf(
                 // Both `cx` and `window` are expected
                 // as `&mut App` / `&mut Window` by the
                 // renderer's `render` signature.
-                tokens.append_all(quote! { .render(&mut *#cx, &mut *window) });
+                stmts.push(quote! { let __el = __el.render(&mut *#cx, &mut *window); });
             } else {
                 let app_ref = quote! { &*#cx };
-                tokens.append_all(quote! { .render(#app_ref) });
+                stmts.push(quote! { let __el = __el.render(#app_ref); });
             }
         }
         RenderMode::Apply => {
@@ -672,13 +1012,19 @@ fn codegen_leaf(
     if def.supports_text_child
         && let Some(text) = extract_text_content(&element.children)
     {
-        tokens.append_all(quote! { .child(#text) });
+        stmts.push(quote! {
+            let __el = ::gpui::ParentElement::child(__el, #text);
+        });
     }
 
     // 6. Wrap to AnyElement so the result composes into a parent.
-    tokens.append_all(quote! { .into_any_element() });
+    stmts.push(quote! { ::gpui::IntoElement::into_any_element(__el) });
 
-    Ok(tokens)
+    Ok(quote! {
+        {
+            #(#stmts)*
+        }
+    })
 }
 
 fn codegen_control_flow(
@@ -686,24 +1032,25 @@ fn codegen_control_flow(
     def: ControlFlowDef,
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
+    source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
     match def {
         ControlFlowDef::If | ControlFlowDef::ElseIf | ControlFlowDef::Else => {
-            codegen_if_branch(element, def, cx, location)
+            codegen_if_branch(element, def, cx, location, source_file)
         }
-        ControlFlowDef::For => codegen_for(element, cx, location),
-        ControlFlowDef::Fragment => codegen_fragment(element, cx, location),
-        ControlFlowDef::Include => codegen_include(element, cx, location),
-        ControlFlowDef::Template => codegen_template(element, cx, location),
+        ControlFlowDef::For => codegen_for(element, cx, location, source_file),
+        ControlFlowDef::Fragment => codegen_fragment(element, cx, location, source_file),
+        ControlFlowDef::Include => codegen_include(element, cx, location, source_file),
+        ControlFlowDef::Template => codegen_template(element, cx, location, source_file),
         ControlFlowDef::Slot => codegen_slot(element, cx),
-        ControlFlowDef::Match => codegen_match(element, cx, location),
+        ControlFlowDef::Match => codegen_match(element, cx, location, source_file),
         ControlFlowDef::Case => Err(XmlError::new(
             XmlErrorKind::Unsupported,
             element.span,
             "<Case> must appear directly inside a <Match>",
         )
         .at(element.byte_offset)),
-        ControlFlowDef::State => codegen_state(element, cx, location),
+        ControlFlowDef::State => codegen_state(element, cx, location, source_file),
     }
 }
 
@@ -712,6 +1059,7 @@ fn codegen_if_branch(
     kind: ControlFlowDef,
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
+    source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
     let condition = if matches!(kind, ControlFlowDef::Else) {
         TokenStream::new()
@@ -745,7 +1093,7 @@ fn codegen_if_branch(
         )
         .at(element.byte_offset));
     } else if element.children.len() == 1 {
-        codegen_child(&element.children[0], cx, location)?
+        codegen_child(&element.children[0], cx, location, source_file)?
     } else {
         return Err(XmlError::new(
             XmlErrorKind::Unsupported,
@@ -771,6 +1119,7 @@ fn codegen_for(
     element: &AstElement,
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
+    source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
     let each = element
         .attributes
@@ -819,6 +1168,37 @@ fn codegen_for(
     let has_index = element.attributes.iter().any(|a| a.name == "let_index");
     let index_ident = format_ident!("i");
 
+    // Optional key: `<For each={xs} key={item.id} let:item>`. When
+    // present, the codegen binds a fresh `__key` ident per
+    // iteration so the child can use it (e.g. in `id={...}`) and
+    // — importantly — the row's wrapper `<Div>` gets its own
+    // `id` derived from the key. That gives the row a stable
+    // `ElementId` across re-renders: even when the user mutates
+    // `each` (insertion / removal / reordering), gpui's keyed
+    // state survives because the per-row id is the user's `key`,
+    // not the row's `enumerate` index.
+    //
+    // The codegen therefore:
+    //   1. Splits `<For each=… key=…>` into a `(each, key)` pair.
+    //   2. Emits `let __key = (key_expr);` per iteration.
+    //   3. Wraps the child in `gpui::div().id(format!(…))` so the
+    //      wrapper itself is keyed.
+    let key_attr = element.attributes.iter().find(|a| a.name == "key");
+    if let Some(k) = key_attr
+        && k.expr.is_none()
+    {
+        return Err(XmlError::new(
+            XmlErrorKind::InvalidExpression,
+            k.span,
+            "<For key> requires a brace expression, e.g. `key={item.id}`",
+        )
+        .at(k.byte_offset));
+    }
+    let key_parsed = match key_attr {
+        Some(k) => Some(attr_expr_only(k)?),
+        None => None,
+    };
+
     let child_expr = if element.children.is_empty() {
         return Err(XmlError::new(
             XmlErrorKind::Unsupported,
@@ -827,7 +1207,7 @@ fn codegen_for(
         )
         .at(element.byte_offset));
     } else if element.children.len() == 1 {
-        codegen_child(&element.children[0], cx, location)?
+        codegen_child(&element.children[0], cx, location, source_file)?
     } else {
         return Err(XmlError::new(
             XmlErrorKind::Unsupported,
@@ -837,53 +1217,99 @@ fn codegen_for(
         .at(element.byte_offset));
     };
 
-    // `<For each={xs} let:item>` produces
-    //   xs.into_iter().map(|item| { … }).collect::<Vec<_>>()
-    // but that yields `Vec<AnyElement>`, not `IntoElement`.
-    // For Phase 1 we wrap it in a `div()` with the children
-    // appended so it slots into a parent.
-    if has_index {
-        let mut body = quote! { gpui::div() };
-        for_each_in_each(
+    // The `<For>` body becomes a Rust `for` loop that appends
+    // each row as a `.child(...)`. When a `key` is present the
+    // row is wrapped in a `<Div id={format!("for_{key}", …)}>`
+    // so gpui's keyed state (and the per-row `TextInputState`
+    // inside it) survives reorders.
+    let body = match (has_index, key_parsed.is_some()) {
+        (true, true) => emit_for_loop(
             &each_parsed,
             &item_ident,
             &index_ident,
             true,
+            true,
+            &key_parsed.unwrap(),
             &child_expr,
-            &mut body,
-        );
-        Ok(body)
-    } else {
-        let mut body = quote! { gpui::div() };
-        for_each_in_each(
+        ),
+        (true, false) => emit_for_loop(
+            &each_parsed,
+            &item_ident,
+            &index_ident,
+            true,
+            false,
+            &TokenStream::new(),
+            &child_expr,
+        ),
+        (false, true) => emit_for_loop(
             &each_parsed,
             &item_ident,
             &index_ident,
             false,
+            true,
+            &key_parsed.unwrap(),
             &child_expr,
-            &mut body,
-        );
-        Ok(body)
-    }
+        ),
+        (false, false) => emit_for_loop(
+            &each_parsed,
+            &item_ident,
+            &index_ident,
+            false,
+            false,
+            &TokenStream::new(),
+            &child_expr,
+        ),
+    };
+    Ok(body)
 }
 
-fn for_each_in_each(
+/// Emit the runtime loop body for `<For>`. The shape is
+/// one of four variants (with or without index, with or
+/// without key) — they all build a `gpui::div()` and
+/// append each row as a child. The keyed variants wrap
+/// each row in a `gpui::div().id(format!(…))` so the row
+/// has a stable `ElementId` derived from the key.
+fn emit_for_loop(
     each_parsed: &TokenStream,
     item_ident: &proc_macro2::Ident,
     index_ident: &proc_macro2::Ident,
     has_index: bool,
+    has_key: bool,
+    key_parsed: &TokenStream,
     child_expr: &TokenStream,
-    body: &mut TokenStream,
-) {
-    // Emit the children as a chain of `.child(...)` calls
-    // inside a block that runs at runtime.
-    *body = if has_index {
+) -> TokenStream {
+    // We always wrap each row in a fresh `gpui::div()` with
+    // an id that is either the key (stable) or a combination
+    // of index + key (useful when the child needs both). The
+    // key-as-id is what makes per-row state survive
+    // reorderings.
+    let row_wrapper = if has_key {
+        quote! {
+            {
+                let __row = gpui::div();
+                let __row = ::gpui::InteractiveElement::id(
+                    __row,
+                    format!("for_row_{}", #key_parsed),
+                );
+                ::gpui::ParentElement::child(__row, #child_expr)
+            }
+        }
+    } else {
+        quote! {
+            {
+                let __row = gpui::div();
+                ::gpui::ParentElement::child(__row, #child_expr)
+            }
+        }
+    };
+
+    if has_index {
         quote! {
             {
                 let mut __div = gpui::div();
-                for (__i, #item_ident) in (#each_parsed).into_iter().enumerate() {
+                for (__i, #item_ident) in (#each_parsed).iter().enumerate() {
                     let #index_ident = __i;
-                    __div = __div.child(#child_expr);
+                    __div = ::gpui::ParentElement::child(__div, #row_wrapper);
                 }
                 __div
             }
@@ -892,23 +1318,24 @@ fn for_each_in_each(
         quote! {
             {
                 let mut __div = gpui::div();
-                for #item_ident in (#each_parsed).into_iter() {
-                    __div = __div.child(#child_expr);
+                for #item_ident in (#each_parsed).iter() {
+                    __div = ::gpui::ParentElement::child(__div, #row_wrapper);
                 }
                 __div
             }
         }
-    };
+    }
 }
 
 fn codegen_fragment(
     element: &AstElement,
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
+    source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
     let mut children_tokens = TokenStream::new();
     for child in &element.children {
-        let expr = codegen_child(child, cx, location)?;
+        let expr = codegen_child(child, cx, location, source_file)?;
         children_tokens.append_all(quote! { #expr, });
     }
     Ok(quote! { (#children_tokens) })
@@ -920,10 +1347,17 @@ fn codegen_fragment(
 /// `xml! { … }` invocation as additional sibling
 /// elements. This is the file-include sibling of
 /// `xml_file!` — useful inside a larger XML literal.
+///
+/// `source_file` is the path of the file that invoked
+/// the enclosing `xml!` macro. Relative `src` paths
+/// are resolved against this file's parent directory,
+/// matching `xml_file!`'s convention. When `None`
+/// (the runtime / test path), we fall back to CWD.
 fn codegen_include(
     element: &AstElement,
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
+    source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
     let src_attr = element
         .attributes
@@ -951,7 +1385,7 @@ fn codegen_include(
     }
     let path = src_attr.raw.as_str();
     let outer_span = location.span_outer();
-    let resolved = resolve_include_path(path, outer_span)?;
+    let resolved = resolve_include_path(path, source_file)?;
     let contents = std::fs::read_to_string(&resolved).map_err(|e| {
         XmlError::new(
             XmlErrorKind::ParseError,
@@ -967,7 +1401,10 @@ fn codegen_include(
     // a comma-separated sequence of expressions. The
     // included file gets its own `LocationTracker` so
     // error offsets are local to the included XML, not
-    // the parent.
+    // the parent. Children of the included file are
+    // resolved relative to the included file itself
+    // (a relative `<Include>` inside an included file
+    // is relative to the includee, not the includer).
     let line_starts = crate::parser::line_starts(&contents);
     let included_root = {
         let included_location = crate::parser::LocationTracker {
@@ -985,30 +1422,48 @@ fn codegen_include(
             xml: &contents,
             outer_span,
         };
-        let expr = codegen_child(child, cx, &included_location)?;
+        let resolved_path_str = resolved.to_str();
+        let expr = codegen_child(child, cx, &included_location, resolved_path_str)?;
         inner.append_all(quote! { #expr, });
     }
     Ok(quote! { (#inner) })
 }
 
 /// Try to resolve a relative `path` against the
-/// call-site source file. In the proc-macro context,
-/// the `outer_span` is the user's literal token span;
-/// `proc_macro2::Span` doesn't expose the source file
-/// (that's a `proc_macro::Span` method), so for the
-/// MVP we use `CARGO_MANIFEST_DIR` of the current build
-/// as the base. The full implementation will thread
-/// the file path through from the proc-macro entry.
-fn resolve_include_path(path: &str, _span: Span) -> Result<std::path::PathBuf, XmlError> {
+/// `source_file` (the path of the `.rs` file that
+/// invoked the enclosing `xml!` macro). Absolute paths
+/// pass through; relative paths are joined to the
+/// source file's parent directory.
+///
+/// When `source_file` is `None` (the runtime loader /
+/// unit-test path), we fall back to the current
+/// working directory — this preserves the behaviour
+/// tests rely on.
+fn resolve_include_path(
+    path: &str,
+    source_file: Option<&str>,
+) -> Result<std::path::PathBuf, XmlError> {
     use std::path::Path;
     let p = Path::new(path);
     if p.is_absolute() {
         return Ok(p.to_path_buf());
     }
-    // Fall back to CWD. The proc-macro entry point
-    // would override this with the real source file
-    // path in a future revision.
-    Ok(Path::new(".").join(path))
+    match source_file {
+        Some(src) => {
+            let source = Path::new(src);
+            // `proc_macro::Span::file()` returns a
+            // forward-slash path on every platform
+            // (proc-macros run on a host-agnostic layer),
+            // but be defensive and strip any leading
+            // junk that some toolchains prepend.
+            let dir = source
+                .parent()
+                .filter(|d| !d.as_os_str().is_empty())
+                .unwrap_or_else(|| Path::new("."));
+            Ok(dir.join(path))
+        }
+        None => Ok(Path::new(".").join(path)),
+    }
 }
 
 /// `<Template name="X">…</Template>` for the MVP
@@ -1019,8 +1474,9 @@ fn codegen_template(
     element: &AstElement,
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
+    source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
-    codegen_fragment(element, cx, location)
+    codegen_fragment(element, cx, location, source_file)
 }
 
 /// `<Slot/>` is a no-op for the MVP. Future revisions
@@ -1041,6 +1497,7 @@ fn codegen_match(
     element: &AstElement,
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
+    source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
     let on_attr = element
         .attributes
@@ -1112,7 +1569,7 @@ fn codegen_match(
             )
             .at(arm.byte_offset));
         } else if arm.children.len() == 1 {
-            codegen_child(&arm.children[0], cx, location)?
+            codegen_child(&arm.children[0], cx, location, source_file)?
         } else {
             return Err(XmlError::new(
                 XmlErrorKind::Unsupported,
@@ -1161,6 +1618,7 @@ fn codegen_state(
     element: &AstElement,
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
+    source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
     let name_attr = element
         .attributes
@@ -1234,7 +1692,7 @@ fn codegen_state(
     let body = if element.children.is_empty() {
         quote! { gpui::div() }
     } else if element.children.len() == 1 {
-        codegen_child(&element.children[0], cx, location)?
+        codegen_child(&element.children[0], cx, location, source_file)?
     } else {
         return Err(XmlError::new(
             XmlErrorKind::Unsupported,
@@ -1256,9 +1714,10 @@ fn codegen_child(
     node: &AstNode,
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
+    source_file: Option<&str>,
 ) -> Result<TokenStream, XmlError> {
     match node {
-        AstNode::Element(e) => codegen_element(e, cx, location),
+        AstNode::Element(e) => codegen_element(e, cx, location, source_file),
         AstNode::Text { text, .. } => {
             // Text content inside a container is uncommon — only
             // meaningful for `<Button>Click me</Button>` (handled
@@ -1301,7 +1760,12 @@ fn prop_value_tokens(attr: &AstAttribute, kind: PropValue) -> Result<TokenStream
             &format!("attribute `{}`", attr.name),
         )?;
         return Ok(match kind {
-            PropValue::String | PropValue::Variant | PropValue::Bool | PropValue::Unknown => {
+            PropValue::String
+            | PropValue::Variant
+            | PropValue::Bool
+            | PropValue::Float32
+            | PropValue::Float64
+            | PropValue::Unknown => {
                 quote! { #parsed }
             }
             PropValue::Flag => quote! { #parsed /* unreachable */ },
@@ -1347,22 +1811,34 @@ fn prop_value_tokens(attr: &AstAttribute, kind: PropValue) -> Result<TokenStream
             }
         }),
         PropValue::Unknown => Ok(quote! { (#raw).to_string() }),
+        PropValue::Float64 => Ok(quote! { (#raw).to_string() }),
+        PropValue::Float32 => Ok(quote! { (#raw).to_string() }),
     }
 }
 
 /// Emit the expansion of `@bind={entity}` for a given
-/// component. We pick the value setter (preferring a
-/// `value` / `text` named prop) and the change event
-/// (preferring `on_change`). The resulting token stream
+/// component. The macro reads the current value via
+/// `yororen_ui::headless::XmlBinding::xml_read` and writes
+/// the new value back via
+/// `yororen_ui::headless::XmlBinding::xml_write`. The
+/// trait is what makes `@bind` work for **any** `T` —
+/// `Entity<T>` has a blanket impl, but the user can also
+/// impl `XmlBinding<MyType>` for their own handle (a
+/// wrapper around `Entity<MyForm>`, an `Arc<MyState>`, …)
+/// to plug into the same `@bind` sugar.
+///
+/// We pick the value setter (preferring a `value` /
+/// `text` / `checked` named prop) and the change event
+/// (preferring `on_change`, then `on_toggle` for
+/// boolean-style components). The resulting token stream
 /// appends both calls to the props builder.
-fn emit_bind(entity: &TokenStream, def: LeafDef, cx: &TokenStream) -> TokenStream {
+fn emit_bind(entity: &TokenStream, def: LeafDef, cx: &TokenStream) -> Vec<TokenStream> {
     // Pick the value prop. Prefer `value` (TextInput,
     // SearchInput, NumberInput, …); fall back to
     // `checked` (Checkbox, Switch, ToggleButton); then
     // `text` (Label-like). If none of these exist, the
     // read side is skipped — the entity's current value
-    // is read on each render anyway (e.g. a `name`
-    // setter on `Avatar`).
+    // is read on each render anyway.
     let value_prop = def
         .props
         .iter()
@@ -1377,53 +1853,80 @@ fn emit_bind(entity: &TokenStream, def: LeafDef, cx: &TokenStream) -> TokenStrea
         .find(|(n, _)| *n == "on_change")
         .or_else(|| def.events.iter().find(|(n, _)| *n == "on_toggle"));
 
-    let mut out = TokenStream::new();
+    let mut out: Vec<TokenStream> = Vec::new();
     if let Some(prop) = value_prop {
         let m = format_ident!("{}", prop.setter);
-        // Read the current value: `entity.read(cx).clone()`.
-        // We clone the entity so the original binding in
-        // the user's scope isn't moved.
-        out.append_all(quote! {
-            .#m({
+        // Read the current value via the `XmlBinding` trait
+        // — the blanket `impl<T: Clone> XmlBinding<T> for
+        // Entity<T>` handles the common case, and user
+        // impls route through the same call site. We clone
+        // the entity so the original binding in the user's
+        // scope isn't moved.
+        out.push(quote! {
+            __el = __el.#m({
                 let __bind = (#entity).clone();
-                __bind.read(#cx).clone()
-            })
+                ::yororen_ui::headless::XmlBinding::xml_read(&__bind, #cx)
+            });
         });
     }
     if let Some((event_attr, setter)) = change_event {
         let m = format_ident!("{}", setter);
         // Pick the closure signature based on the event
         // name. on_change takes `(&str, &mut Window,
-        // &mut App)`; on_toggle takes
+        // &mut App)` for text inputs and `(f64, &mut Window,
+        // &mut App)` for number inputs; on_toggle takes
         // `(bool, Option<&ClickEvent>, &mut Window,
-        // &mut App)`. We match on the attribute name
-        // to decide which shape to emit.
+        // &mut App)`. We use the value setter's type
+        // (Float → f64, anything else → String) to pick
+        // the right `XmlBinding<T>` instantiation.
         let event_name = *event_attr;
+        let value_is_f32 = matches!(
+            value_prop.map(|p| p.value),
+            Some(PropValue::Float32)
+        );
+        let value_is_f64 = matches!(
+            value_prop.map(|p| p.value),
+            Some(PropValue::Float64)
+        );
         let writeback = if event_name == "on_toggle" {
             quote! {
-                .#m({
+                __el = __el.#m({
                     let __bind = (#entity).clone();
                     move |__v: bool, _ev: Option<&gpui::ClickEvent>, _window: &mut gpui::Window, cx: &mut gpui::App| {
-                        __bind.update(cx, |__s: &mut bool, _| {
-                            *__s = __v;
-                        });
+                        ::yororen_ui::headless::XmlBinding::<bool>::xml_write(&__bind, __v, cx);
                     }
-                })
+                });
+            }
+        } else if value_is_f64 {
+            quote! {
+                __el = __el.#m({
+                    let __bind = (#entity).clone();
+                    move |__v: f64, _window: &mut gpui::Window, cx: &mut gpui::App| {
+                        ::yororen_ui::headless::XmlBinding::<f64>::xml_write(&__bind, __v, cx);
+                    }
+                });
+            }
+        } else if value_is_f32 {
+            quote! {
+                __el = __el.#m({
+                    let __bind = (#entity).clone();
+                    move |__v: f32, _window: &mut gpui::Window, cx: &mut gpui::App| {
+                        ::yororen_ui::headless::XmlBinding::<f32>::xml_write(&__bind, __v, cx);
+                    }
+                });
             }
         } else {
             quote! {
-                .#m({
+                __el = __el.#m({
                     let __bind = (#entity).clone();
                     move |__v: &str, _window: &mut gpui::Window, cx: &mut gpui::App| {
                         let __new: String = __v.to_string();
-                        __bind.update(cx, |__s: &mut String, _| {
-                            *__s = __new;
-                        });
+                        ::yororen_ui::headless::XmlBinding::<String>::xml_write(&__bind, __new, cx);
                     }
-                })
+                });
             }
         };
-        out.append_all(writeback);
+        out.push(writeback);
     }
     out
 }
@@ -1491,6 +1994,24 @@ fn auto_wrap_event_expr(attr: &AstAttribute, expr: TokenStream) -> TokenStream {
         return expr;
     };
     let trimmed = raw.trim();
+    // Decide whether to auto-wrap. We *never* auto-wrap
+    // user-supplied closures (they have `{` or `|`),
+    // and we *always* auto-wrap bare path expressions
+    // (`controller.foo` with no args). The interesting
+    // middle case is a call expression like
+    // `controller.goto(Section::Actions)` — the user is
+    // calling a method whose RETURN VALUE is the event
+    // handler. That's a "factory" call (the controller
+    // method produces the closure to wire up). The
+    // auto-wrap should NOT fire here either; we just
+    // pass the call result through and the compiler
+    // checks that the result is the right closure type.
+    //
+    // Concretely: the only expressions we auto-wrap are
+    // those that syntactically look like a path / field
+    // reference with NO call or closure body. Anything
+    // containing `(` / `{` / `|` is the user's code and
+    // we pass it through verbatim.
     let looks_like_path = !trimmed.contains('(')
         && !trimmed.contains('{')
         && !trimmed.contains('|')
@@ -1521,12 +2042,43 @@ fn auto_wrap_event_expr(attr: &AstAttribute, expr: TokenStream) -> TokenStream {
                 #expr(__arg0, __w, __cx)
             }
         },
-        // Field access (`obj.method`) — pre-clone the
-        // receiver into a hygienic local so each
-        // closure captures its own clone. We emit a
-        // block (statement + expression) so the
-        // codegen can splice this directly into the
-        // `.on_click({ … })` slot.
+        // `controller.method(args)` — a method call whose
+        // result is itself the event handler (a closure
+        // factory: `goto(Section::Actions) -> impl Fn(...)`).
+        // Pass the call result through verbatim; the
+        // receiver is cloned inline so the closure can
+        // move it. We don't auto-wrap into a 3-arg
+        // closure because the call has its own argument
+        // list and the resulting value IS already a
+        // closure.
+        syn::Expr::Call(call) => {
+            let func = call.func;
+            // The function being called: clone its
+            // receiver once, so the inline call can use
+            // the owned value.
+            match &*func {
+                syn::Expr::Field(field) => {
+                    let receiver = &field.base;
+                    let clone_ident =
+                        format_ident!("__auto_clone", span = Span::mixed_site());
+                    let member = &field.member;
+                    let args = call.args.iter();
+                    quote! {
+                        {
+                            let #clone_ident = (#receiver).clone();
+                            #clone_ident.#member(#(#args),*)
+                        }
+                    }
+                }
+                _ => {
+                    // Path-style call (`my_func(args)`).
+                    // Pass the result through directly.
+                    quote! { #expr }
+                }
+            }
+        }
+        // `controller.method` — bare field access. Wrap
+        // into a 3-arg closure that calls the method.
         syn::Expr::Field(field) => {
             let receiver = field.base;
             let member = field.member;
@@ -1544,13 +2096,69 @@ fn auto_wrap_event_expr(attr: &AstAttribute, expr: TokenStream) -> TokenStream {
                 }
             }
         }
-        // Method call, deref, etc. — fall back to
-        // direct call (single-use capture).
-        _ => quote! {
-            move |__arg0, __w: &mut gpui::Window, __cx: &mut gpui::App| {
-                #expr(__arg0, __w, __cx)
+        // Method call, deref, closure literal, etc. —
+        // the user wrote their own expression; pass it
+        // through verbatim. The compiler will reject it
+        // if the type doesn't match the setter's bound.
+        _ => quote! { #expr },
+    }
+}
+
+/// Like [`auto_wrap_event_expr`], but for use with event
+/// modifiers. Instead of returning a complete closure, it
+/// returns:
+///
+/// 1. An optional statement that pre-clones the receiver
+///    (e.g. `let __auto_clone = (controller).clone();`).
+///    This statement must be placed *outside* the final
+///    `move` closure so the closure only captures the clone.
+/// 2. A call expression that invokes the user's handler
+///    inside the closure body with the standard event args
+///    (`__ev, __window, cx`).
+fn auto_wrap_event_call(attr: &AstAttribute, expr: TokenStream) -> (Option<TokenStream>, TokenStream) {
+    let Some(raw) = &attr.expr else {
+        return (None, quote! { #expr(__ev, __window, cx) });
+    };
+    let trimmed = raw.trim();
+    let looks_like_path = !trimmed.contains('(')
+        && !trimmed.contains('{')
+        && !trimmed.contains('|')
+        && !trimmed.is_empty();
+    if !looks_like_path {
+        return (None, quote! { #expr(__ev, __window, cx) });
+    }
+    let Ok(parsed) = syn::parse_str::<syn::Expr>(trimmed) else {
+        return (None, quote! { #expr(__ev, __window, cx) });
+    };
+
+    let clone_ident = format_ident!("__auto_clone", span = Span::mixed_site());
+    match parsed {
+        // `controller.method(args)` — a method call that
+        // returns an event handler closure. Clone the
+        // receiver, then call the method and immediately
+        // invoke the returned closure with the event args.
+        syn::Expr::Call(call) => match &*call.func {
+            syn::Expr::Field(field) => {
+                let receiver = &field.base;
+                let member = &field.member;
+                let args = call.args.iter();
+                let clone = quote! { let #clone_ident = (#receiver).clone(); };
+                let call = quote! { #clone_ident.#member(#(#args),*)(__ev, __window, cx) };
+                (Some(clone), call)
             }
+            _ => (None, quote! { #expr(__ev, __window, cx) }),
         },
+        // `controller.method` — bare field access. Clone the
+        // receiver, then call the method with the event args.
+        syn::Expr::Field(field) => {
+            let receiver = field.base;
+            let member = field.member;
+            let clone = quote! { let #clone_ident = (#receiver).clone(); };
+            let call = quote! { #clone_ident.#member(__ev, __window, cx) };
+            (Some(clone), call)
+        }
+        // Associated function or bare path — no receiver.
+        _ => (None, quote! { #expr(__ev, __window, cx) }),
     }
 }
 
@@ -1713,70 +2321,120 @@ fn split_event_modifiers(name: &str) -> Option<(&str, Vec<&str>)> {
     Some((base, modifiers))
 }
 
-/// Wrap a user's event closure with the given modifiers.
-/// Each modifier adds an outer closure that intercepts
-/// the event before forwarding to the user's code.
+/// Build the body of a 3-arg event closure for an event
+/// with modifiers. `inner_call` is the expression that
+/// invokes the user's handler (e.g.
+/// `__auto_clone.show_toast(__ev, __window, cx)`). The
+/// returned token stream is the body of a closure with
+/// signature `|__ev, __window, cx|`, with all modifier
+/// checks applied around the inner call.
 ///
-/// Currently supported:
-///
-/// - `.stop` / `.prevent` — no-op at the macro level
-///   (gpui's event callbacks don't expose propagation
-///   control to Rust closures — these are accepted for
-///   forward compatibility / hover-state hint, and
-///   silently forwarded to the user's closure).
-/// - Keyboard filters (`.enter`, `.escape`, `.tab`,
-///   `.space`, `.up`, `.down`, `.left`, `.right`,
-///   `.backspace`, `.delete`, `.home`, `.end`) — wrap
-///   the closure so it only fires when the first event
-///   argument has `keystroke().key == "<filter>"`.
-///
-/// Multiple modifiers are composed left-to-right: the
-/// first listed is the outermost wrapper.
-///
-/// The wrapped closure assumes the headless event
-/// signature is `(EventArg, &mut Window, &mut App)`
-/// where `EventArg` exposes `keystroke() -> Keystroke`
-/// (true for `on_key_down` / `on_key_up`). For
-/// modifiers that don't apply to a given event
-/// signature, the generated wrapper degrades to a
-/// pass-through and the user gets a regular Rust
-/// error if the underlying call site doesn't accept
-/// the wrapper shape.
-fn wrap_event_with_modifiers(
+/// Modifiers are applied right-to-left so the leftmost
+/// modifier listed in XML becomes the outermost check.
+fn wrap_event_body_with_modifiers(
     modifiers: &[&str],
-    inner: TokenStream,
-    _span: Span,
+    inner_call: TokenStream,
+    span: Span,
 ) -> Result<TokenStream, XmlError> {
     if modifiers.is_empty() {
-        return Ok(inner);
+        return Ok(inner_call);
     }
-    let mut wrapped = inner;
-    // Wrap right-to-left so the leftmost modifier ends
-    // up as the outermost closure (the one the headless
-    // component invokes).
+    let mut body = inner_call;
     for modifier in modifiers.iter().rev() {
-        wrapped = match *modifier {
-            // No-op for now — see doc comment.
-            "stop" | "prevent" => quote! {
-                move |__ev, __window, cx| {
-                    #wrapped(__ev, __window, cx)
-                }
+        body = match *modifier {
+            // `.stop` — ask the platform not to propagate
+            // the event further. gpui's `App::stop_propagation`
+            // is a flag the dispatcher reads; calling it here
+            // before the user's handler runs is the contract.
+            "stop" => quote! {
+                { cx.stop_propagation(); #body }
             },
-            // Keyboard filter: gate the inner closure on
-            // the keystroke key matching the modifier name.
+            // `.prevent` — ask the platform to skip the
+            // default action for the event.
+            "prevent" => quote! {
+                { __window.prevent_default(); #body }
+            },
+            // Modifier-key filters. Each maps to a boolean
+            // field on `gpui::Modifiers` — the event arg's
+            // `.modifiers()` accessor returns one. `.meta`
+            // is accepted as an alias for `.platform` (the
+            // macOS Command key) because "cmd" / "meta" is
+            // the more familiar name on Windows / Linux.
+            "ctrl" => wrap_modifier_flag_body(body, "control"),
+            "shift" => wrap_modifier_flag_body(body, "shift"),
+            "alt" => wrap_modifier_flag_body(body, "alt"),
+            "platform" | "meta" | "cmd" => wrap_modifier_flag_body(body, "platform"),
+            "secondary" => wrap_modifier_flag_body(body, "secondary"),
+            "function" => wrap_modifier_flag_body(body, "function"),
+            // Keyboard filters — gate on the keystroke key.
+            // `__ev.keystroke().key` returns the printable
+            // name (`"enter"`, `"escape"`, `"tab"`, …) which
+            // is exactly what the user writes in the XML.
             key => {
+                if !is_known_key_filter(key) {
+                    return Err(XmlError::new(
+                        XmlErrorKind::InvalidExpression,
+                        span,
+                        format!(
+                            "unknown event modifier `{key}`; expected one of `stop`, `prevent`, `ctrl`, `shift`, `alt`, `platform` (alias `meta`/`cmd`), `secondary`, `function`, or a key name like `enter` / `escape` / `tab`"
+                        ),
+                    ));
+                }
                 let key_lit = format!("\"{key}\"");
                 quote! {
-                    move |__ev, __window, cx| {
-                        if __ev.keystroke().key == #key_lit {
-                            #wrapped(__ev, __window, cx)
-                        }
+                    if __ev.keystroke().key == #key_lit {
+                        #body
                     }
                 }
             }
         };
     }
-    Ok(wrapped)
+    Ok(body)
+}
+
+/// Wrap a closure body with a single modifier-key gate.
+/// Emits `if __ev.modifiers().<flag> { #body }` so the
+/// filter only fires when the corresponding `Modifiers`
+/// field is set. The flag is spliced as a Rust field-access
+/// identifier (`control`, `shift`, `alt`, `platform`,
+/// `secondary`, `function`).
+fn wrap_modifier_flag_body(body: TokenStream, flag: &str) -> TokenStream {
+    let flag_ident = format_ident!("{}", flag);
+    quote! {
+        if __ev.modifiers().#flag_ident {
+            #body
+        }
+    }
+}
+
+/// The set of keyboard key names accepted as `.xxx`
+/// modifiers on event attributes. Anything outside this
+/// set is rejected so the user gets a clear error
+/// instead of a typo silently never firing.
+fn is_known_key_filter(name: &str) -> bool {
+    matches!(
+        name,
+        // Whitespace / editing
+        "enter"
+        | "escape"
+        | "tab"
+        | "space"
+        | "backspace"
+        | "delete"
+        // Arrow keys
+        | "up"
+        | "down"
+        | "left"
+        | "right"
+        // Navigation
+        | "home"
+        | "end"
+        | "pageup"
+        | "pagedown"
+        // Function keys (F1..F12)
+        | "f1" | "f2" | "f3" | "f4" | "f5" | "f6"
+        | "f7" | "f8" | "f9" | "f10" | "f11" | "f12"
+    )
 }
 
 #[cfg(test)]
@@ -1792,7 +2450,7 @@ mod tests {
     use proc_macro2::Span;
 
     fn render(xml: &str) -> String {
-        let ts = codegen(xml, Span::call_site(), None).expect("codegen succeeds");
+        let ts = codegen(xml, Span::call_site(), None, None).expect("codegen succeeds");
         ts.to_string()
     }
 
@@ -1801,16 +2459,16 @@ mod tests {
         let s = render(r#"<Column col />"#);
         // Must start with `gpui::div()` and contain `flex_col`.
         assert!(s.contains("gpui :: div ()"), "{s}");
-        assert!(s.contains("flex_col ()"), "{s}");
+        assert!(s.contains("flex_col"), "{s}");
     }
 
     #[test]
     fn column_with_gap_and_padding() {
         let s = render(r#"<Column flex col gap="3" p="4" />"#);
-        assert!(s.contains("flex ()"), "{s}");
-        assert!(s.contains("flex_col ()"), "{s}");
-        assert!(s.contains("gap_3 ()"), "{s}");
-        assert!(s.contains("p_4 ()"), "{s}");
+        assert!(s.contains("flex"), "{s}");
+        assert!(s.contains("flex_col"), "{s}");
+        assert!(s.contains("gap_3"), "{s}");
+        assert!(s.contains("p_4"), "{s}");
     }
 
     #[test]
@@ -1854,13 +2512,15 @@ mod tests {
     </Row>
 </Column>"#,
         );
-        // quote! adds spaces between tokens, so `.child` becomes
-        // `. child` in the printed form. We strip spaces first.
+        // Child wiring now uses fully-qualified
+        // `::gpui::ParentElement::child(__el, ...)`, so we
+        // look for the method name rather than the dotted
+        // syntax.
         let normalised: String = s.chars().filter(|c| !c.is_whitespace()).collect();
-        assert!(normalised.contains(".child"), "{normalised}");
+        assert!(normalised.contains("child"), "{normalised}");
         // Two `child` calls inside the column for label/row,
         // then two more inside the row.
-        assert_eq!(normalised.matches(".child").count(), 4, "{normalised}");
+        assert_eq!(normalised.matches("child").count(), 4, "{normalised}");
     }
 
     #[test]
@@ -1902,11 +2562,79 @@ mod tests {
     </For>
 </Column>"#,
         );
-        assert!(s.contains("into_iter ()"), "{s}");
+        assert!(s.contains("iter ()"), "{s}");
         assert!(s.contains("items"), "{s}");
         // The loop variable is the `let:item` name.
         let normalised: String = s.chars().filter(|c| !c.is_whitespace()).collect();
         assert!(normalised.contains("foritem"), "{normalised}");
+    }
+
+    #[test]
+    fn for_loop_with_key_wraps_rows_in_keyed_div() {
+        // When `<For key={item.id}>` is supplied, each row
+        // gets a fresh wrapper `<Div id=format!("for_row_{key}")>`
+        // so the row has a stable `ElementId` across reorders.
+        // Without this, gpui's per-row `TextInputState` (keyed
+        // by ElementId) would be lost when the user mutates
+        // the underlying list (e.g. reorders or inserts).
+        let s = render(
+            r#"<Column>
+    <For each={todos} let:item key={item.id}>
+        <Checkbox id="cb" @bind={item.done} />
+    </For>
+</Column>"#,
+        );
+        // The wrapper div is present and uses the key
+        // expression in its id.
+        let normalised: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+        assert!(
+            normalised.contains("for_row_"),
+            "row wrapper should use `for_row_{{}}` id format; got {normalised}"
+        );
+        // The key expression itself must be in the output
+        // (we splice `item.id` into the format! call).
+        assert!(
+            normalised.contains("item.id"),
+            "key expression must be spliced into the wrapper id; got {normalised}"
+        );
+    }
+
+    #[test]
+    fn for_loop_without_key_does_not_emit_keyed_wrapper() {
+        // The legacy `<For each={xs} let:item>` (no key)
+        // path doesn't pay the per-row `format!` cost — the
+        // row wrapper is a plain `gpui::div()`. This keeps
+        // existing showcase XMLs compiling unchanged.
+        let s = render(
+            r#"<Column>
+    <For each={items} let:item>
+        <Label id="l" text={item.name} />
+    </For>
+</Column>"#,
+        );
+        let normalised: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+        assert!(
+            !normalised.contains("for_row_"),
+            "unkeyed <For> must not emit a keyed wrapper; got {normalised}"
+        );
+    }
+
+    #[test]
+    fn for_loop_key_must_be_brace_expression() {
+        // A bare `key="…"` is an error — keys must be
+        // expressions so they're per-iteration, not static.
+        let err = codegen(
+            r#"<Column>
+    <For each={items} let:item key="static">
+        <Label id="l" text="x" />
+    </For>
+</Column>"#,
+            Span::call_site(),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert!(err.message.contains("key"), "{}", err.message);
     }
 
     #[test]
@@ -1917,7 +2645,7 @@ mod tests {
         // `runtime::render_or_empty`. The codegen must
         // emit a call into the runtime module rather
         // than erroring.
-        let ts = codegen(r#"<MyWidget id="x" />"#, Span::call_site(), None).expect("codegen ok");
+        let ts = codegen(r#"<MyWidget id="x" />"#, Span::call_site(), None, None).expect("codegen ok");
         let s = ts.to_string();
         assert!(s.contains("render_or_empty"), "{s}");
         assert!(s.contains("\"MyWidget\""), "{s}");
@@ -1928,7 +2656,7 @@ mod tests {
         // The runtime registry needs an `id` to call
         // the factory — the codegen still validates
         // this even on the runtime path.
-        let err = codegen("<MyWidget />", Span::call_site(), None).unwrap_err();
+        let err = codegen("<MyWidget />", Span::call_site(), None, None).unwrap_err();
         assert!(
             matches!(err.kind, crate::error::XmlErrorKind::UnknownAttribute),
             "{err:?}"
@@ -1942,6 +2670,7 @@ mod tests {
             r#"<Label id="x" text="hi" href="bad" />"#,
             Span::call_site(),
             None,
+            None,
         )
         .unwrap_err();
         assert!(
@@ -1952,7 +2681,7 @@ mod tests {
 
     #[test]
     fn unknown_attribute_on_container_is_an_error() {
-        let err = codegen(r#"<Column flex hover="red" />"#, Span::call_site(), None).unwrap_err();
+        let err = codegen(r#"<Column flex hover="red" />"#, Span::call_site(), None, None).unwrap_err();
         assert!(
             matches!(err.kind, crate::error::XmlErrorKind::UnknownAttribute),
             "{err:?}"
@@ -1961,7 +2690,7 @@ mod tests {
 
     #[test]
     fn missing_id_on_leaf_is_an_error() {
-        let err = codegen(r#"<Label text="hi" />"#, Span::call_site(), None).unwrap_err();
+        let err = codegen(r#"<Label text="hi" />"#, Span::call_site(), None, None).unwrap_err();
         assert!(
             matches!(err.kind, crate::error::XmlErrorKind::UnknownAttribute),
             "{err:?}"
@@ -1971,7 +2700,7 @@ mod tests {
 
     #[test]
     fn missing_id_is_a_helpful_message() {
-        let err = codegen(r#"<Button caption="Save" />"#, Span::call_site(), None).unwrap_err();
+        let err = codegen(r#"<Button caption="Save" />"#, Span::call_site(), None, None).unwrap_err();
         assert!(err.message.contains("Button"), "{err}");
     }
 
@@ -1980,6 +2709,7 @@ mod tests {
         let err = codegen(
             r#"<Label id="x" text="hi" strong="maybe" />"#,
             Span::call_site(),
+            None,
             None,
         )
         .unwrap_err();
@@ -1995,6 +2725,7 @@ mod tests {
             r#"<Button id="x" variant="catastrophic" />"#,
             Span::call_site(),
             None,
+            None,
         )
         .unwrap_err();
         assert!(
@@ -2007,7 +2738,7 @@ mod tests {
 
     #[test]
     fn xml_parse_error_propagates() {
-        let err = codegen("<Column>", Span::call_site(), None).unwrap_err();
+        let err = codegen("<Column>", Span::call_site(), None, None).unwrap_err();
         assert!(
             matches!(err.kind, crate::error::XmlErrorKind::ParseError),
             "{err:?}"
@@ -2024,7 +2755,7 @@ mod tests {
         // that produces an `InvalidExpression` error
         // pointing at the offending attribute.
         let xml = "<Column>\n  <Label id=\"a\" text=\"hi\" />\n  <Button id=\"x\" variant=\"catastrophic\" />\n</Column>";
-        let err = codegen(xml, Span::call_site(), None).unwrap_err();
+        let err = codegen(xml, Span::call_site(), None, None).unwrap_err();
         assert!(
             matches!(err.kind, crate::error::XmlErrorKind::InvalidExpression),
             "{err:?}"
@@ -2053,6 +2784,7 @@ mod tests {
             r#"<Label id="x" text="hi" href="bad" />"#,
             Span::call_site(),
             None,
+            None,
         )
         .unwrap_err();
         let rendered = err.render_with(None);
@@ -2066,6 +2798,7 @@ mod tests {
         let err = codegen(
             r#"<Label id="x" text="hi" strong="maybe" />"#,
             Span::call_site(),
+            None,
             None,
         )
         .unwrap_err();
@@ -2105,31 +2838,130 @@ mod tests {
     fn event_modifier_emits_keystroke_filter_for_known_keys() {
         // Test the helper directly — the schema doesn't
         // currently register `on_key_down` as a built-in
-        // event, but the wrapper generator should still
-        // produce the right shape when fed an inner
-        // closure.
-        let inner: TokenStream =
-            syn::parse_str("move |_ev, _w, _cx| {}").expect("parse inner closure");
-        let wrapped = wrap_event_with_modifiers(&["enter"], inner, Span::call_site())
+        // event, but the body generator should still
+        // produce the right shape around an inner call.
+        let inner_call: TokenStream =
+            syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
+        let body = wrap_event_body_with_modifiers(&["enter"], inner_call, Span::call_site())
             .expect("wrap with .enter");
-        let s = wrapped.to_string();
+        let s = body.to_string();
         assert!(s.contains("keystroke"), "{s}");
         assert!(s.contains("enter"), "{s}");
     }
 
     #[test]
     fn event_modifier_chains_multiple_filters() {
-        // Two modifiers wrap the user's closure twice —
-        // the inner closure is called only when both
-        // gates pass. The wrapped token stream should
-        // contain two `keystroke()` invocations.
-        let inner: TokenStream =
-            syn::parse_str("move |_ev, _w, _cx| {}").expect("parse inner closure");
-        let wrapped = wrap_event_with_modifiers(&["ctrl", "enter"], inner, Span::call_site())
+        // Two modifiers wrap the inner call — the call is
+        // reached only when both gates pass. `ctrl` uses
+        // `__ev.modifiers().control` and `enter` uses
+        // `__ev.keystroke().key`; the body contains both
+        // accessors.
+        let inner_call: TokenStream =
+            syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
+        let body = wrap_event_body_with_modifiers(&["ctrl", "enter"], inner_call, Span::call_site())
             .expect("wrap with .ctrl.enter");
-        let s = wrapped.to_string();
-        let keystroke_count = s.matches("keystroke").count();
-        assert!(keystroke_count >= 2, "{s}");
+        let s = body.to_string();
+        // The outer modifier check is `modifiers().control`.
+        assert!(s.contains("modifiers"), "{s}");
+        assert!(s.contains("control"), "{s}");
+        // The inner key check is `keystroke().key == "enter"`.
+        assert!(s.contains("keystroke"), "{s}");
+        assert!(s.contains("enter"), "{s}");
+    }
+
+    #[test]
+    fn event_modifier_stop_emits_stop_propagation() {
+        // `.stop` must call `cx.stop_propagation()` so the
+        // gpui dispatcher skips ancestor handlers for the
+        // same event. Verify the body contains the exact
+        // API call.
+        let inner_call: TokenStream =
+            syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
+        let body =
+            wrap_event_body_with_modifiers(&["stop"], inner_call, Span::call_site()).expect("wrap .stop");
+        let s = body.to_string();
+        assert!(s.contains("stop_propagation"), "{s}");
+    }
+
+    #[test]
+    fn event_modifier_prevent_emits_window_prevent_default() {
+        // `.prevent` must call `window.prevent_default()`
+        // (a `Window` method) — the closure receives the
+        // window as its 2nd arg, so we splice that.
+        let inner_call: TokenStream =
+            syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
+        let body = wrap_event_body_with_modifiers(&["prevent"], inner_call, Span::call_site())
+            .expect("wrap .prevent");
+        let s = body.to_string();
+        assert!(s.contains("prevent_default"), "{s}");
+        assert!(s.contains("__window"), "{s}");
+    }
+
+    #[test]
+    fn event_modifier_shift_uses_modifiers_accessor() {
+        // `.shift` should gate on `Modifiers::shift`, not on
+        // a (non-existent) keystroke key called "shift".
+        // This is the bug the audit fixed: previously
+        // `.shift` was treated as a keyboard filter and
+        // checked `keystroke().key == "shift"` which never
+        // fires.
+        let inner_call: TokenStream =
+            syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
+        let body = wrap_event_body_with_modifiers(&["shift"], inner_call, Span::call_site())
+            .expect("wrap .shift");
+        let s = body.to_string();
+        // The wrapper reads `modifiers().shift`, not a
+        // keystroke comparison.
+        assert!(s.contains("modifiers"), "{s}");
+        assert!(s.contains("shift"), "{s}");
+        assert!(
+            !s.contains("\"shift\""),
+            ".shift must not compile to a key-string compare; got {s}"
+        );
+    }
+
+    #[test]
+    fn event_modifier_alt_and_meta_alias_platform() {
+        // `.alt` reads `modifiers().alt`. `.meta` is
+        // accepted as a Windows/Linux-friendly alias for
+        // `.platform` (the macOS Command key) — both
+        // splice to the same `Modifiers::platform` field.
+        let inner_call: TokenStream =
+            syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
+        for mod_name in ["alt", "meta", "platform", "cmd"] {
+            let body = wrap_event_body_with_modifiers(&[mod_name], inner_call.clone(), Span::call_site())
+                .unwrap_or_else(|e| panic!("wrap .{mod_name}: {e}"));
+            let s = body.to_string();
+            assert!(
+                s.contains("modifiers"),
+                ".{mod_name} should splice modifiers() access; got {s}"
+            );
+        }
+    }
+
+    #[test]
+    fn event_modifier_known_keys_list_includes_arrows_and_fkeys() {
+        // Spot-check the well-known key set: arrow keys,
+        // F-keys, and navigation keys.
+        for k in ["enter", "escape", "tab", "up", "down", "f12", "home", "end", "pageup"] {
+            assert!(is_known_key_filter(k), "{k} should be a known key");
+        }
+        // Garbage keys are rejected.
+        assert!(!is_known_key_filter("garbage"));
+        assert!(!is_known_key_filter("return"));
+    }
+
+    #[test]
+    fn event_modifier_unknown_modifier_is_an_error() {
+        // A typo'd modifier (`.stpo` instead of `.stop`)
+        // must surface a clear compile error rather than
+        // silently never firing.
+        let inner_call: TokenStream =
+            syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
+        let err = wrap_event_body_with_modifiers(&["stpo"], inner_call, Span::call_site())
+            .expect_err("unknown modifier should error");
+        assert!(err.message.contains("stpo"), "{}", err.message);
+        assert!(err.message.contains("`stop`"), "{}", err.message);
     }
 
     #[test]
@@ -2139,7 +2971,7 @@ mod tests {
         // so the modifier dispatch falls through to the
         // unknown-attribute error.
         let xml = r#"<TextInput id="x" on_key_down.enter={move |_, _, _| {}} />"#;
-        let err = codegen(xml, Span::call_site(), None).unwrap_err();
+        let err = codegen(xml, Span::call_site(), None, None).unwrap_err();
         assert!(matches!(
             err.kind,
             crate::error::XmlErrorKind::UnknownAttribute
@@ -2154,7 +2986,7 @@ mod tests {
         // it into a closure that adapts the standard
         // 3-arg event signature to the user's method.
         let xml = r#"<Button id="x" caption="+" on_click={controller.increment} />"#;
-        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let ts = codegen(xml, Span::call_site(), None, None).expect("codegen ok");
         let s = ts.to_string();
         // The pre-cloned receiver is captured by the
         // closure; the method call uses it (not the
@@ -2175,7 +3007,7 @@ mod tests {
         // its own clone and the original `controller`
         // can be used by the next handler.
         let xml = r#"<Button id="x" caption="x" on_click={controller.handle} />"#;
-        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let ts = codegen(xml, Span::call_site(), None, None).expect("codegen ok");
         let s = ts.to_string();
         assert!(s.contains("(controller) . clone"), "{s}");
         // Two separate clone idents would mean two
@@ -2196,7 +3028,7 @@ mod tests {
                 <Button id="b" caption="b" on_click={controller.handle_b} />
             </Column>
         "#;
-        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let ts = codegen(xml, Span::call_site(), None, None).expect("codegen ok");
         let s = ts.to_string();
         // Two distinct `__auto_clone` bindings (proc-macro
         // hygiene via Span::mixed_site).
@@ -2211,7 +3043,7 @@ mod tests {
         // must NOT auto-wrap (otherwise the args would
         // be doubled).
         let xml = r#"<Button id="x" caption="x" on_click={move |ev, w, cx| controller.handle(ev, w, cx)} />"#;
-        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let ts = codegen(xml, Span::call_site(), None, None).expect("codegen ok");
         let s = ts.to_string();
         // The user's `__arg0` / `__w` / `__cx` placeholder
         // names must NOT appear (they're only used by the
@@ -2229,7 +3061,7 @@ mod tests {
         // expression (parens present) — it must pass
         // through verbatim, NOT be wrapped.
         let xml = r#"<Button id="x" caption="x" on_click={build_handler()} />"#;
-        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let ts = codegen(xml, Span::call_site(), None, None).expect("codegen ok");
         let s = ts.to_string();
         assert!(!s.contains("__arg0"), "{s}");
         assert!(s.contains("build_handler ()"), "{s}");
@@ -2249,7 +3081,7 @@ mod tests {
                 </Case>
             </Match>
         "#;
-        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let ts = codegen(xml, Span::call_site(), None, None).expect("codegen ok");
         let s = ts.to_string();
         assert!(s.contains("match"), "{s}");
         assert!(s.contains("Status :: Loading"), "{s}");
@@ -2273,7 +3105,7 @@ mod tests {
                 </Case>
             </Match>
         "#;
-        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let ts = codegen(xml, Span::call_site(), None, None).expect("codegen ok");
         let s = ts.to_string();
         assert!(s.contains("0 =>"), "{s}");
         assert!(s.contains("_ =>"), "{s}");
@@ -2282,7 +3114,7 @@ mod tests {
     #[test]
     fn match_without_cases_is_an_error() {
         let xml = r#"<Match on={x} />"#;
-        let err = codegen(xml, Span::call_site(), None).unwrap_err();
+        let err = codegen(xml, Span::call_site(), None, None).unwrap_err();
         assert!(
             matches!(err.kind, crate::error::XmlErrorKind::Unsupported),
             "{err:?}"
@@ -2293,7 +3125,7 @@ mod tests {
     #[test]
     fn case_outside_match_is_an_error() {
         let xml = r#"<Column><Case pattern={A}><Label id="x" text="hi" /></Case></Column>"#;
-        let err = codegen(xml, Span::call_site(), None).unwrap_err();
+        let err = codegen(xml, Span::call_site(), None, None).unwrap_err();
         assert!(
             matches!(err.kind, crate::error::XmlErrorKind::Unsupported),
             "{err:?}"
@@ -2309,7 +3141,7 @@ mod tests {
                 <Label id="l" text={count.read(cx).to_string()} />
             </State>
         "#;
-        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let ts = codegen(xml, Span::call_site(), None, None).expect("codegen ok");
         let s = ts.to_string();
         assert!(s.contains("let count"), "{s}");
         assert!(s.contains(". new"), "{s}");
@@ -2320,12 +3152,12 @@ mod tests {
     fn state_default_handles_bool_and_string() {
         // Bool literal.
         let xml = r#"<State name="on" default="true"><Label id="l" text="x" /></State>"#;
-        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let ts = codegen(xml, Span::call_site(), None, None).expect("codegen ok");
         let s = ts.to_string();
         assert!(s.contains("true"), "{s}");
         // String literal.
         let xml = r#"<State name="name" default="anonymous"><Label id="l" text="x" /></State>"#;
-        let ts = codegen(xml, Span::call_site(), None).expect("codegen ok");
+        let ts = codegen(xml, Span::call_site(), None, None).expect("codegen ok");
         let s = ts.to_string();
         assert!(s.contains("String :: from"), "{s}");
         assert!(s.contains("anonymous"), "{s}");
@@ -2334,7 +3166,7 @@ mod tests {
     #[test]
     fn state_without_default_is_an_error() {
         let xml = r#"<State name="x"><Label id="l" text="hi" /></State>"#;
-        let err = codegen(xml, Span::call_site(), None).unwrap_err();
+        let err = codegen(xml, Span::call_site(), None, None).unwrap_err();
         assert!(
             matches!(err.kind, crate::error::XmlErrorKind::UnknownAttribute),
             "{err:?}"
@@ -2474,60 +3306,229 @@ mod tests {
         // against `quote!`'s token-spacing behaviour.
         let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
         assert!(compact.contains("placeholder"), "{s}");
-        // The codegen binds the entity to a local
-        // variable `__bind` and calls `.update` on it.
-        assert!(compact.contains("__bind.update"), "{s}");
+        // The codegen goes through the `XmlBinding` trait
+        // for both the read and the write side. The
+        // read side emits `xml_read` (text_input's `value`
+        // setter now exists; the renderer mints the state
+        // with the supplied initial value). The write
+        // side emits `xml_write` for `on_change`.
+        assert!(compact.contains("xml_read"), "{s}");
+        assert!(compact.contains("xml_write"), "{s}");
         assert!(compact.contains("on_change"), "{s}");
     }
 
     #[test]
     fn bind_attribute_emits_value_read_for_components_with_value_setter() {
         // Checkbox has a `checked` setter + `on_toggle`
-        // event. `@bind` emits a `__bind.read(cx).clone()`
-        // into the `checked` setter and a write-back
-        // closure via `on_toggle`. (The `__bind` local
-        // is bound to the entity expression; the
-        // assertion below looks for it instead of the
-        // raw entity path because the codegen uses the
-        // local.)
+        // event. `@bind` emits a `XmlBinding::xml_read`
+        // call into the `checked` setter and a
+        // write-back closure via `XmlBinding::xml_write`
+        // in `on_toggle`. The codegen no longer touches
+        // `Entity::read` / `Entity::update` directly —
+        // all access goes through the trait so user
+        // impls (a wrapper handle around a complex
+        // entity) get picked up automatically.
         let s = render(r#"<Checkbox id="x" @bind={self.flag} />"#);
         let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
-        assert!(compact.contains("__bind.read"), "{s}");
-        assert!(compact.contains("__bind.update"), "{s}");
+        assert!(compact.contains("xml_read"), "{s}");
+        assert!(compact.contains("xml_write"), "{s}");
         assert!(compact.contains("on_toggle"), "{s}");
     }
 
     #[test]
-    fn template_emits_children_inline() {
-        // `<Template>` for the MVP simply inlines its
-        // children at the call site.
-        let s = render(
+    fn bind_on_text_input_now_emits_value_setter() {
+        // The headline change of Phase 2 @bind: TextInput
+        // now exposes a `value(impl Into<String>)` setter
+        // (the renderer uses it to seed the initial text
+        // content of the input). With this setter in the
+        // schema, `@bind={self.name}` on `<TextInput>`
+        // emits both:
+        //   1. `.value(XmlBinding::xml_read(&entity, cx))`
+        //      — read the current value of the bound
+        //      entity and pass it to the setter.
+        //   2. `.on_change({ … XmlBinding::xml_write(&entity, …) })`
+        //      — write the new value back when the user
+        //      edits the input.
+        // Before Phase 2 the read side was silently
+        // skipped because TextInput had no `value` setter.
+        let s = render(r#"<TextInput id="x" @bind={self.name} />"#);
+        let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+        // The read side: `XmlBinding::xml_read` is called
+        // and the result fed to `.value(…)`.
+        assert!(compact.contains("xml_read"), "{s}");
+        assert!(compact.contains(".value("), "{s}");
+        // The write side: `xml_write` is in the
+        // `on_change` closure.
+        assert!(compact.contains("xml_write"), "{s}");
+        assert!(compact.contains("on_change"), "{s}");
+    }
+
+    #[test]
+    fn template_requires_name_attribute() {
+        // `<Template>` without `name` is an error — the
+        // tag's whole point is to define a *named*
+        // template that the rest of the file can call.
+        let err = codegen(
             r#"<Column>
     <Template>
         <Label id="a" text="A" />
     </Template>
 </Column>"#,
-        );
-        let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
-        assert!(compact.contains("label::label"), "{s}");
-        assert!(compact.contains("\"A\""), "{s}");
+            Span::call_site(),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert!(err.message.contains("name"), "{}", err.message);
     }
 
     #[test]
-    fn slot_is_a_no_op() {
-        // `<Slot/>` doesn't emit anything — it just
-        // disappears. Future revisions will wire
-        // caller-side slot-filling.
+    fn template_is_dropped_from_output() {
+        // `<Template>` is compile-time-only; the
+        // generated code must NOT emit anything for the
+        // definition itself, only for its callers.
+        let s = render(
+            r#"<Column>
+    <Template name="X">
+        <Label id="a" text="A" />
+    </Template>
+</Column>"#,
+        );
+        // The Column should be empty — the Template was
+        // dropped, leaving no children.
+        let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+        assert!(!compact.contains("label::label"), "{s}");
+    }
+
+    #[test]
+    fn template_invocation_substitutes_default_slot() {
+        // A `<X>…</X>` call inlines the template body, with
+        // the caller's children replacing the default
+        // `<Slot/>` placeholder. The template's wrapping
+        // `<Div>` is preserved.
+        let s = render(
+            r#"<Column>
+    <Template name="Card">
+        <Div>
+            <Slot/>
+        </Div>
+    </Template>
+    <Card>
+        <Label id="body" text="Hello" />
+    </Card>
+</Column>"#,
+        );
+        let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+        // The caller's Label must appear in the output.
+        assert!(compact.contains("label::label"), "{s}");
+        assert!(compact.contains("Hello"), "{s}");
+        // The wrapping div is preserved too.
+        assert!(compact.contains("gpui::div()"), "{s}");
+    }
+
+    #[test]
+    fn template_invocation_substitutes_named_slot() {
+        // `<Slot name="header"/>` in the template body is
+        // replaced by the caller's `<Slot name="header">…</Slot>`
+        // content; the default slot goes to the unnamed
+        // children of the call.
+        let s = render(
+            r#"<Column>
+    <Template name="Card">
+        <Div>
+            <Slot name="header"/>
+            <Slot/>
+        </Div>
+    </Template>
+    <Card>
+        <Slot name="header">
+            <Label id="h" text="Title" />
+        </Slot>
+        <Label id="body" text="Hello" />
+    </Card>
+</Column>"#,
+        );
+        let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+        // Both the header and the body must be present.
+        assert!(compact.contains("Title"), "{s}");
+        assert!(compact.contains("Hello"), "{s}");
+    }
+
+    #[test]
+    fn template_duplicate_name_is_an_error() {
+        // Two `<Template name="X">` in the same file is
+        // ambiguous — the second definition wins silently,
+        // which is a footgun. We error explicitly.
+        let err = codegen(
+            r#"<Column>
+    <Template name="X">
+        <Label id="a" text="A" />
+    </Template>
+    <Template name="X">
+        <Label id="b" text="B" />
+    </Template>
+</Column>"#,
+            Span::call_site(),
+            None,
+            None,
+        )
+        .unwrap_err();
+        assert!(err.message.contains("duplicate"), "{}", err.message);
+    }
+
+    #[test]
+    fn slot_in_root_is_a_no_op_when_no_template_invocation() {
+        // `<Slot/>` at the root (outside any template
+        // invocation) is meaningless and just disappears —
+        // it has no template to be substituted into. The
+        // surrounding Container's child chain is preserved.
         let s = render(r#"<Column><Slot/></Column>"#);
-        // The Column still has its `child` chain.
         assert!(s.contains("gpui :: div ()"), "{s}");
     }
 
     #[test]
     fn include_requires_src() {
-        // No `src` attribute → error.
-        let err = codegen(r#"<Column><Include /></Column>"#, Span::call_site(), None).unwrap_err();
+        let err = codegen(r#"<Column><Include /></Column>"#, Span::call_site(), None, None).unwrap_err();
         assert!(err.message.contains("src"), "{err}");
+    }
+
+    #[test]
+    fn include_resolves_relative_to_source_file() {
+        // The resolver should join a relative `<Include
+        // src="…">` against the source file's parent
+        // directory, not the current working directory.
+        use std::path::PathBuf;
+        let resolved = resolve_include_path(
+            "ui/header.xml",
+            Some("/home/dev/proj/src/view.rs"),
+        )
+        .expect("resolve");
+        assert_eq!(resolved, PathBuf::from("/home/dev/proj/src/ui/header.xml"));
+    }
+
+    #[test]
+    fn include_passes_absolute_paths_through() {
+        // Absolute `src` paths skip the join and are
+        // used verbatim.
+        use std::path::PathBuf;
+        let resolved = resolve_include_path(
+            "/etc/foo.xml",
+            Some("/home/dev/proj/src/view.rs"),
+        )
+        .expect("resolve");
+        assert_eq!(resolved, PathBuf::from("/etc/foo.xml"));
+    }
+
+    #[test]
+    fn include_falls_back_to_cwd_without_source_file() {
+        // When the caller doesn't supply a source file
+        // (the runtime loader, or a test), the resolver
+        // falls back to the current working directory —
+        // matching the behaviour tests rely on.
+        use std::path::PathBuf;
+        let resolved =
+            resolve_include_path("ui/header.xml", None).expect("resolve");
+        assert_eq!(resolved, PathBuf::from("./ui/header.xml"));
     }
 
     #[test]
@@ -2535,6 +3536,7 @@ mod tests {
         let err = codegen(
             r#"<TextInput id="x" @bind="not_an_expr" placeholder="…" />"#,
             Span::call_site(),
+            None,
             None,
         )
         .unwrap_err();

@@ -129,6 +129,14 @@ pub enum PropValue {
     String,
     Bool,
     Variant,
+    /// A `f64`-typed setter (e.g. `NumberInput::value`).
+    /// The codegen emits `f64` writes through `XmlBinding<f64>`
+    /// when this kind is paired with `on_change`.
+    Float64,
+    /// A `f32`-typed setter (e.g. `Slider::value`).
+    /// The codegen emits `f32` writes through `XmlBinding<f32>`
+    /// when this kind is paired with `on_change`.
+    Float32,
     /// A zero-arg setter (`fn wrap(self) -> Self`). The
     /// codegen emits `.setter()` when the attribute is
     /// present (regardless of value). Used for flag-style

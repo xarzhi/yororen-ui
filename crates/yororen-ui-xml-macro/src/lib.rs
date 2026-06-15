@@ -65,7 +65,14 @@ pub fn xml(input: TokenStream) -> TokenStream {
         xml: &args.xml,
         outer_span,
     };
-    match yororen_ui_xml::codegen::codegen(&args.xml, outer_span, cx_expr) {
+    // The `proc_macro::Span::call_site().file()` call
+    // gives the absolute path of the file that invoked
+    // this macro. The codegen uses it to resolve relative
+    // `<Include src="…">` paths the same way `xml_file!`
+    // does (so XML-include and XML-file point to the
+    // same file from the same source file).
+    let source_file = proc_macro::Span::call_site().file();
+    match yororen_ui_xml::codegen::codegen(&args.xml, outer_span, cx_expr, Some(&source_file)) {
         Ok(ts) => ts.into(),
         Err(e) => syn::Error::new(outer_span, e.render_with(Some(&location)))
             .to_compile_error()
@@ -78,26 +85,54 @@ pub fn xml(input: TokenStream) -> TokenStream {
 ///   relative to the source file that contains the macro call
 /// - `xml_file!(cx = &mut **cx, "path.xml")` — explicit `cx`
 ///   binding, same path resolution
+/// - `xml_file!(cx = &mut **cx, window = window, "path.xml")`
+///   — also pass `&mut Window` for components whose render
+///   method needs it (e.g. `TextInput`, `NumberInput`)
 #[proc_macro]
 pub fn xml_file(input: TokenStream) -> TokenStream {
-    // Parse the leading `cx = <expr>,` (optional) and a
-    // trailing string literal path.
+    // Parse the leading `cx = <expr>,` (optional) and
+    // optional `window = <expr>,` and the trailing string
+    // literal path.
     let parser = |stream: ParseStream| -> syn::Result<XmlFileArgs> {
         let mut cx: Option<syn::Expr> = None;
-        if stream.peek(syn::Ident) && stream.peek2(syn::Token![=]) {
-            let ident: syn::Ident = stream.parse()?;
-            if ident != "cx" {
-                return Err(syn::Error::new(ident.span(), "expected `cx`"));
+        let mut window: Option<syn::Expr> = None;
+        // The leading key=… clauses: `cx`, `window`, in any order,
+        // each followed by a comma.
+        loop {
+            if !stream.peek(syn::Ident) || !stream.peek2(syn::Token![=]) {
+                break;
             }
+            let ident: syn::Ident = stream.parse()?;
             let _eq: syn::Token![=] = stream.parse()?;
-            cx = Some(stream.parse()?);
-            let _comma: syn::Token![,] = stream.parse()?;
+            let expr: syn::Expr = stream.parse()?;
+            match ident.to_string().as_str() {
+                "cx" => cx = Some(expr),
+                "window" => window = Some(expr),
+                other => {
+                    return Err(syn::Error::new(
+                        ident.span(),
+                        format!("expected `cx` or `window`, got `{other}`"),
+                    ));
+                }
+            }
+            // Optional trailing comma before the next clause or
+            // the path. We always parse a comma when one is
+            // present, then peek to see if more clauses follow.
+            if stream.peek(syn::Token![,]) {
+                let _: syn::Token![,] = stream.parse()?;
+                // Continue the loop if the next token is an
+                // `ident = …` pair; otherwise fall through to
+                // the path parse.
+                continue;
+            }
+            break;
         }
         let path: syn::LitStr = stream.parse()?;
         let call_site = proc_macro::Span::call_site();
         let source_file = call_site.file();
         Ok(XmlFileArgs {
             cx,
+            window,
             path: path.value(),
             path_span: path.span(),
             source_file,
@@ -139,6 +174,7 @@ pub fn xml_file(input: TokenStream) -> TokenStream {
         }
     };
     let cx_expr = args.cx.map(|e| quote::quote! { #e });
+    let _window_expr = args.window.map(|e| quote::quote! { #e });
     // Build the location tracker from the *file's* content
     // so error messages point to the right file. (Even
     // though the proc-macro's outer span points at the
@@ -150,7 +186,12 @@ pub fn xml_file(input: TokenStream) -> TokenStream {
         xml: &contents,
         outer_span,
     };
-    match yororen_ui_xml::codegen::codegen(&contents, outer_span, cx_expr) {
+    match yororen_ui_xml::codegen::codegen(
+        &contents,
+        outer_span,
+        cx_expr,
+        Some(&args.source_file),
+    ) {
         Ok(ts) => ts.into(),
         Err(e) => syn::Error::new(outer_span, e.render_with(Some(&location)))
             .to_compile_error()
@@ -158,8 +199,36 @@ pub fn xml_file(input: TokenStream) -> TokenStream {
     }
 }
 
+/// Insert `let window = <expr>;` as the first statement
+/// inside the codegen's leading `{ use …; … }` block.
+///
+/// `ts` is expected to be `{ #[allow(unused_imports)] use
+/// …; <body> }`. We rebuild it as `{ use …; let window =
+/// <expr>; <body> }` so the generated code can reference
+/// `window` for components whose render method takes it.
+///
+/// Implementation note: we DON'T add another `{ … }` wrap
+/// around `ts` — that would create a doubly-nested block
+/// and confuse some rustc diagnostics into reading the
+/// outer block as a closure.
+#[allow(dead_code)]
+fn splice_window_let(ts: TokenStream, w_expr: TokenStream) -> TokenStream {
+    let ts2: proc_macro2::TokenStream = ts.into();
+    let w_expr2: proc_macro2::TokenStream = w_expr.into();
+    let block: proc_macro2::TokenStream = quote::quote! {
+        {
+            #[allow(unused_imports)]
+            use ::gpui::{IntoElement, ParentElement, StatefulInteractiveElement, InteractiveElement, Styled};
+            let window = #w_expr2;
+            #ts2
+        }
+    };
+    block.into()
+}
+
 struct XmlFileArgs {
     cx: Option<syn::Expr>,
+    window: Option<syn::Expr>,
     path: String,
     path_span: Span,
     source_file: String,

@@ -20,6 +20,7 @@ members = [
     "crates/yororen-ui-demos/counter",
     "crates/yororen-ui-demos/showcase_xml",
     "crates/yororen-ui-demos/gallery_demo",
+    "crates/yororen-ui-demos/gallery_xml",
     "crates/yororen-ui-demos/inputs_demo",
     "crates/yororen-ui-demos/layers_demo",
     "crates/yororen-ui-demos/theme_showcase",

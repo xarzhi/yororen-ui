@@ -832,6 +832,14 @@ pub struct TextInputProps {
     pub custom_border: Option<Hsla>,
     pub custom_focus_border: Option<Hsla>,
     pub custom_text_color: Option<Hsla>,
+    /// Optional initial value seeded by the caller. The
+    /// renderer reads this when minting the
+    /// `TextInputState` via `use_keyed_state` so the input
+    /// starts with the supplied text. Distinct from the
+    /// renderer's internal `value` field — `initial_value`
+    /// is a one-shot seed, the live value lives in the
+    /// state entity and is updated by every keystroke.
+    pub initial_value: Option<String>,
 }
 
 /// Build a fresh `TextInputProps`. The factory takes only the
@@ -855,12 +863,24 @@ pub fn text_input(id: impl Into<gpui::ElementId>) -> TextInputProps {
         custom_border: None,
         custom_focus_border: None,
         custom_text_color: None,
+        initial_value: None,
     }
 }
 
 impl TextInputProps {
     pub fn placeholder(mut self, v: impl Into<String>) -> Self {
         self.placeholder = v.into();
+        self
+    }
+    /// One-shot initial value. The renderer reads this when
+    /// minting the `TextInputState` so the input starts
+    /// with the supplied text. Subsequent edits live in
+    /// the state entity and are not affected by changing
+    /// `initial_value` on a later render (to reset the
+    /// input at runtime, bump the `id` so a fresh state
+    /// is minted).
+    pub fn value(mut self, v: impl Into<String>) -> Self {
+        self.initial_value = Some(v.into());
         self
     }
     pub fn disabled(mut self, v: bool) -> Self {

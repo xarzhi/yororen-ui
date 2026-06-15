@@ -69,6 +69,14 @@ struct OverrideEntry {
     /// (overrides the generator's heuristic).
     #[serde(default)]
     supports_text_child: Option<bool>,
+    /// Force `needs_window` to a specific value
+    /// (overrides the generator's signature inspector).
+    /// Used when the generator's `render_takes_window`
+    /// helper misses a `&mut Window` arg (e.g. a
+    /// recently-added component whose render signature
+    /// the heuristic doesn't yet recognise).
+    #[serde(default)]
+    needs_window: Option<bool>,
 }
 
 #[derive(Debug, Default, serde::Deserialize)]
@@ -139,6 +147,14 @@ enum PropValue {
     String,
     Bool,
     Variant,
+    /// `f64` setter (e.g. `NumberInput::value`).
+    /// The codegen pairs this with `on_change` to emit
+    /// a `f64`-typed `XmlBinding::xml_write` call.
+    Float64,
+    /// `f32` setter (e.g. `Slider::value`).
+    /// The codegen pairs this with `on_change` to emit
+    /// a `f32`-typed `XmlBinding::xml_write` call.
+    Float32,
     /// Zero-arg flag setter (`fn X(self) -> Self`).
     Flag,
     /// Not a recognised type — the user must annotate.
@@ -299,6 +315,9 @@ fn apply_overrides(entries: Vec<Extracted>, overrides: &[OverrideEntry]) -> Vec<
                 }
                 if let Some(false) = o.supports_text_child {
                     e.supports_text_child = false;
+                }
+                if let Some(v) = o.needs_window {
+                    e.needs_window = v;
                 }
             }
             e
@@ -588,6 +607,12 @@ fn classify_arg(ty: &Type) -> PropValue {
         let n = seg.ident.to_string();
         if n == "bool" {
             return PropValue::Bool;
+        }
+        if n == "f64" {
+            return PropValue::Float64;
+        }
+        if n == "f32" {
+            return PropValue::Float32;
         }
         // Known variant enums.
         if matches!(
@@ -899,6 +924,8 @@ fn render_props(props: &[PropInfo]) -> String {
             PropValue::Variant => "PropValue::Variant",
             PropValue::Flag => "PropValue::Flag",
             PropValue::Unknown => "PropValue::String /* unknown — review */",
+            PropValue::Float64 => "PropValue::Float64",
+            PropValue::Float32 => "PropValue::Float32",
         };
         s.push_str(&format!(
             "PropDef {{ name: {:?}, setter: {:?}, value: {} }},\n            ",

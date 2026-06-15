@@ -4393,6 +4393,7 @@ pub yororen_ui_core::headless::text_input::TextInputProps::has_custom_bg: bool
 pub yororen_ui_core::headless::text_input::TextInputProps::has_custom_border: bool
 pub yororen_ui_core::headless::text_input::TextInputProps::has_custom_focus_border: bool
 pub yororen_ui_core::headless::text_input::TextInputProps::id: gpui::window::ElementId
+pub yororen_ui_core::headless::text_input::TextInputProps::initial_value: core::option::Option<alloc::string::String>
 pub yororen_ui_core::headless::text_input::TextInputProps::max_length: core::option::Option<usize>
 pub yororen_ui_core::headless::text_input::TextInputProps::on_change: core::option::Option<yororen_ui_core::headless::text_input::TextChangeCallback>
 pub yororen_ui_core::headless::text_input::TextInputProps::on_submit: core::option::Option<yororen_ui_core::headless::text_input::TextChangeCallback>
@@ -4411,6 +4412,7 @@ pub fn yororen_ui_core::headless::text_input::TextInputProps::on_change<F>(self,
 pub fn yororen_ui_core::headless::text_input::TextInputProps::on_submit<F>(self, F) -> Self where F: 'static + core::marker::Send + core::marker::Sync + core::ops::function::Fn(&str, &mut gpui::window::Window, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::text_input::TextInputProps::placeholder(self, impl core::convert::Into<alloc::string::String>) -> Self
 pub fn yororen_ui_core::headless::text_input::TextInputProps::render(self, &mut gpui::app::App, &mut gpui::window::Window) -> gpui::element::AnyElement
+pub fn yororen_ui_core::headless::text_input::TextInputProps::value(self, impl core::convert::Into<alloc::string::String>) -> Self
 impl core::clone::Clone for yororen_ui_core::headless::text_input::TextInputProps
 pub fn yororen_ui_core::headless::text_input::TextInputProps::clone(&self) -> yororen_ui_core::headless::text_input::TextInputProps
 impl core::marker::Freeze for yororen_ui_core::headless::text_input::TextInputProps
@@ -5146,6 +5148,12 @@ impl core::marker::Unpin for yororen_ui_core::headless::virtual_list::VirtualLis
 impl core::marker::UnsafeUnpin for yororen_ui_core::headless::virtual_list::VirtualListController
 impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::virtual_list::VirtualListController
 impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::virtual_list::VirtualListController
+pub trait yororen_ui_core::headless::XmlBinding<T>
+pub fn yororen_ui_core::headless::XmlBinding::xml_read(&self, &gpui::app::App) -> T
+pub fn yororen_ui_core::headless::XmlBinding::xml_write(&self, T, &mut gpui::app::App)
+impl<T: core::clone::Clone + 'static> yororen_ui_core::headless::XmlBinding<T> for gpui::app::entity_map::Entity<T>
+pub fn gpui::app::entity_map::Entity<T>::xml_read(&self, &gpui::app::App) -> T
+pub fn gpui::app::entity_map::Entity<T>::xml_write(&self, T, &mut gpui::app::App)
 pub fn yororen_ui_core::headless::avatar(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::avatar::AvatarProps
 pub fn yororen_ui_core::headless::badge(impl core::convert::Into<gpui::window::ElementId>, impl core::convert::Into<alloc::string::String>, &mut gpui::app::App) -> yororen_ui_core::headless::badge::BadgeProps
 pub fn yororen_ui_core::headless::button(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::button::ButtonProps

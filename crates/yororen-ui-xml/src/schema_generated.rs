@@ -3,7 +3,7 @@
 //!
 //! Source of truth: `yororen-ui-core/src/headless/*.rs`
 //! plus `yororen-ui-xml/overrides.toml`.
-//! Last regenerated with: 60 entries (13 from overrides), 4 skipped.
+//! Last regenerated with: 60 entries (14 from overrides), 4 skipped.
 //!
 //! Skipped files (need manual schema entry or a schema
 //! extension — see `gen_schema.rs` notes):
@@ -477,13 +477,13 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
             extra_args: &[],
             render: RenderMode::Default,
             needs_app: false,
-            needs_window: false,
+            needs_window: true,
             props: &[PropDef { name: "placeholder", setter: "placeholder", value: PropValue::String },
             PropDef { name: "disabled", setter: "disabled", value: PropValue::Bool },
-            PropDef { name: "min", setter: "min", value: PropValue::String /* unknown — review */ },
-            PropDef { name: "max", setter: "max", value: PropValue::String /* unknown — review */ },
-            PropDef { name: "step", setter: "step", value: PropValue::String /* unknown — review */ },
-            PropDef { name: "value", setter: "value", value: PropValue::String /* unknown — review */ },
+            PropDef { name: "min", setter: "min", value: PropValue::Float64 },
+            PropDef { name: "max", setter: "max", value: PropValue::Float64 },
+            PropDef { name: "step", setter: "step", value: PropValue::Float64 },
+            PropDef { name: "value", setter: "value", value: PropValue::Float64 },
             PropDef { name: "has_custom_bg", setter: "has_custom_bg", value: PropValue::Bool },
             PropDef { name: "has_custom_border", setter: "has_custom_border", value: PropValue::Bool },
             PropDef { name: "has_custom_focus_border", setter: "has_custom_focus_border", value: PropValue::Bool },
@@ -583,8 +583,8 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
             render: RenderMode::Default,
             needs_app: true,
             needs_window: false,
-            props: &[PropDef { name: "value", setter: "value", value: PropValue::String /* unknown — review */ },
-            PropDef { name: "max", setter: "max", value: PropValue::String /* unknown — review */ },
+            props: &[PropDef { name: "value", setter: "value", value: PropValue::Float32 },
+            PropDef { name: "max", setter: "max", value: PropValue::Float32 },
             PropDef { name: "label", setter: "label", value: PropValue::String },
             PropDef { name: "indeterminate", setter: "indeterminate", value: PropValue::Bool },
             PropDef { name: "has_custom_height", setter: "has_custom_height", value: PropValue::Bool },
@@ -706,8 +706,8 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
             render: RenderMode::Default,
             needs_app: true,
             needs_window: false,
-            props: &[PropDef { name: "value", setter: "value", value: PropValue::String /* unknown — review */ },
-            PropDef { name: "step", setter: "step", value: PropValue::String /* unknown — review */ },
+            props: &[PropDef { name: "value", setter: "value", value: PropValue::Float32 },
+            PropDef { name: "step", setter: "step", value: PropValue::Float32 },
             PropDef { name: "disabled", setter: "disabled", value: PropValue::Bool },
             ],
             events: &[("on_change", "on_change"), ],
@@ -852,6 +852,7 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
             needs_app: false,
             needs_window: true,
             props: &[PropDef { name: "placeholder", setter: "placeholder", value: PropValue::String },
+            PropDef { name: "value", setter: "value", value: PropValue::String },
             PropDef { name: "disabled", setter: "disabled", value: PropValue::Bool },
             PropDef { name: "max_length", setter: "max_length", value: PropValue::String /* unknown — review */ },
             PropDef { name: "has_custom_bg", setter: "has_custom_bg", value: PropValue::Bool },

@@ -128,3 +128,55 @@ pub use crate::renderer::markers;
 // name the struct — `.apply(div)` consumes the value.
 // Power users can import the struct explicitly via
 // `use yororen_ui::headless::button::ButtonProps;`.
+
+/// Trait used by the `yororen-ui-xml` macro's `@bind={…}`
+/// sugar to read a value out of an entity and write one
+/// back. The default impl for `Entity<T>` is the
+/// "obvious" one (`read → clone` / `update → assign`),
+/// so for any plain `gpui::Entity<T>` the user just writes
+///
+/// ```ignore
+/// <Checkbox @bind={my_bool} />
+/// <TextInput @bind={my_string} />
+/// ```
+///
+/// To extend `@bind` to a custom container (e.g. an
+/// `Entity<MyForm>` that maps to several inputs), the user
+/// implements `XmlBinding<MyValue>` for their handle and
+/// the macro picks it up via the bound `T`:
+///
+/// ```ignore
+/// impl XmlBinding<UserId> for Entity<UserSession> {
+///     fn xml_read(&self, cx: &App) -> UserId {
+///         self.read(cx).user_id.clone()
+///     }
+///     fn xml_write(&self, value: UserId, cx: &mut App) {
+///         self.update(cx, |s, _| s.user_id = value);
+///     }
+/// }
+/// ```
+///
+/// The macro emits `XmlBinding::xml_read(&entity, cx)` and
+/// `XmlBinding::xml_write(&entity, value, cx)` — these
+/// calls go through the trait, so the user's impl is
+/// picked up automatically.
+pub trait XmlBinding<T> {
+    /// Read the current value out of the bound entity.
+    /// The macro calls this once per render to seed the
+    /// component's initial state.
+    fn xml_read(&self, cx: &gpui::App) -> T;
+    /// Write a new value back into the entity. The macro
+    /// calls this from the component's `on_change` /
+    /// `on_toggle` callback whenever the user mutates the
+    /// input.
+    fn xml_write(&self, value: T, cx: &mut gpui::App);
+}
+
+impl<T: Clone + 'static> XmlBinding<T> for gpui::Entity<T> {
+    fn xml_read(&self, cx: &gpui::App) -> T {
+        self.read(cx).clone()
+    }
+    fn xml_write(&self, value: T, cx: &mut gpui::App) {
+        self.update(cx, |s, _cx| *s = value);
+    }
+}

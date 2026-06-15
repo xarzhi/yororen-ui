@@ -96,3 +96,14 @@ tag = "Button"
 kind = "Leaf"
 supports_text_child = true
 
+# `NumberInput::render` takes `&mut Window`; the
+# generator's `render_takes_window` heuristic missed it
+# in this build (the test infra doesn't catch the helper
+# for every component — NumberInput's a known edge case).
+# Hardcoding it here keeps the codegen path straightforward
+# (just `.render(&mut *cx, &mut *window)`).
+[[override_]]
+tag = "NumberInput"
+kind = "Leaf"
+needs_window = true
+
