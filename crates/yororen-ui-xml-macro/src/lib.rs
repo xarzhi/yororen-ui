@@ -130,7 +130,7 @@ pub fn xml(input: TokenStream) -> TokenStream {
         Ok((ts, included_paths)) => {
             let paths: Vec<PathBuf> = included_paths.into_iter().map(absolutize).collect();
             let deps = include_dependencies(&paths);
-            let ts: TokenStream2 = ts.into();
+            let ts: TokenStream2 = ts;
             quote::quote! { { #deps #ts } }.into()
         }
         Err(e) => syn::Error::new(outer_span, e.render_with(Some(&location)))
@@ -265,7 +265,7 @@ pub fn xml_file(input: TokenStream) -> TokenStream {
                 included_paths.into_iter().map(absolutize).collect();
             paths.push(resolved_path);
             let deps = include_dependencies(&paths);
-            let ts: TokenStream2 = ts.into();
+            let ts: TokenStream2 = ts;
             let ts = quote::quote! { { #deps #ts } };
             match window_expr {
                 Some(w_expr) => splice_window_let(ts.into(), w_expr.into()),
