@@ -78,23 +78,6 @@ use crate::codegen::{
     templates::{collect_templates, expand_template_invocations},
 };
 
-std::thread_local! {
-    /// User-supplied component schema injected by the
-    /// proc-macro entry point. The macro reads
-    /// `yororen-ui-xml-components.toml` at the call site
-    /// and stashes the definitions here for the duration
-    /// of the codegen pass.
-    static USER_SCHEMA: std::cell::RefCell<Vec<ComponentDef>> = const { std::cell::RefCell::new(Vec::new()) };
-}
-
-/// Look up a tag using the currently active user schema.
-pub(crate) fn lookup_with_user_schema(tag: &str) -> Option<ComponentDef> {
-    USER_SCHEMA.with(|s| {
-        let borrowed = s.borrow();
-        crate::schema::lookup_component_owned(tag, &borrowed)
-    })
-}
-
 /// Parse a string of Rust tokens into a `TokenStream`. Any
 /// error is converted into an `XmlError::InvalidExpression`.
 /// `byte_offset` is the position in the original XML to
@@ -152,7 +135,6 @@ pub fn codegen_with_includes(
     source_file: Option<&str>,
     user_schema: &[ComponentDef],
 ) -> Result<(TokenStream, Vec<std::path::PathBuf>), XmlError> {
-    USER_SCHEMA.with(|s| *s.borrow_mut() = user_schema.to_vec());
     let line_starts = crate::parser::line_starts(xml_text);
     let location = crate::parser::LocationTracker {
         line_starts: &line_starts,
@@ -181,7 +163,7 @@ pub fn codegen_with_includes(
         Some(expr) => quote! { (#expr) },
         None => quote! { cx },
     };
-    let body = codegen_element(&element, &cx_tokens, &location, source_file)?;
+    let body = codegen_element(&element, &cx_tokens, &location, source_file, user_schema)?;
     // The generated body uses fully-qualified trait method
     // calls (`::gpui::Styled::#m(__el, …)`,
     // `::gpui::ParentElement::child(__el, …)`, etc.) so the
@@ -213,6 +195,7 @@ pub(crate) fn codegen_element(
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
+    user_schema: &[ComponentDef],
 ) -> Result<TokenStream, XmlError> {
     // Unknown tags fall through to the runtime registry
     // (see `crate::runtime` and the `register_xml_component!`
@@ -220,13 +203,16 @@ pub(crate) fn codegen_element(
     // render via inventory lookup — at the cost of
     // losing compile-time attribute / event validation
     // for that tag.
-    let def = lookup_with_user_schema(&element.tag).unwrap_or(RUNTIME_LEAF_FALLBACK.clone());
+    let def = crate::schema::lookup_component_owned(&element.tag, user_schema)
+        .unwrap_or(RUNTIME_LEAF_FALLBACK.clone());
 
     match def.kind {
-        ComponentKind::Container(c) => codegen_container(element, c, cx, location, source_file),
-        ComponentKind::Leaf(l) => codegen_leaf(element, l, cx, location, source_file, true),
+        ComponentKind::Container(c) => {
+            codegen_container(element, c, cx, location, source_file, user_schema)
+        }
+        ComponentKind::Leaf(l) => codegen_leaf(element, l, cx, location, source_file, true, user_schema),
         ComponentKind::ControlFlow(c) => {
-            codegen_control_flow(element, c, cx, location, source_file)
+            codegen_control_flow(element, c, cx, location, source_file, user_schema)
         }
         ComponentKind::RuntimeLeaf => codegen_runtime_leaf(element, cx),
     }
@@ -295,9 +281,10 @@ pub(crate) fn codegen_child(
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
+    user_schema: &[ComponentDef],
 ) -> Result<TokenStream, XmlError> {
     match node {
-        AstNode::Element(e) => codegen_element(e, cx, location, source_file),
+        AstNode::Element(e) => codegen_element(e, cx, location, source_file, user_schema),
         AstNode::Expr {
             expr,
             span,
@@ -329,16 +316,17 @@ pub(crate) fn codegen_children_as_element(
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
+    user_schema: &[ComponentDef],
 ) -> Result<TokenStream, XmlError> {
     if children.is_empty() {
         Ok(quote! { gpui::div() })
     } else if children.len() == 1 {
-        codegen_child(&children[0], cx, location, source_file)
+        codegen_child(&children[0], cx, location, source_file, user_schema)
     } else {
         let mut stmts: Vec<TokenStream> = Vec::new();
         stmts.push(quote! { let __el = gpui::div(); });
         for child in children {
-            let child_expr = codegen_child(child, cx, location, source_file)?;
+            let child_expr = codegen_child(child, cx, location, source_file, user_schema)?;
             stmts.push(quote! {
                 let __el = ::gpui::ParentElement::child(__el, #child_expr);
             });
@@ -360,13 +348,17 @@ pub(crate) fn codegen_child_unwrapped(
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
+    user_schema: &[ComponentDef],
 ) -> Result<TokenStream, XmlError> {
     match node {
         AstNode::Element(e) => {
-            let def = lookup_with_user_schema(&e.tag).unwrap_or(RUNTIME_LEAF_FALLBACK.clone());
+            let def = crate::schema::lookup_component_owned(&e.tag, user_schema)
+                .unwrap_or(RUNTIME_LEAF_FALLBACK.clone());
             match def.kind {
-                ComponentKind::Leaf(l) => codegen_leaf(e, l, cx, location, source_file, false),
-                _ => codegen_element(e, cx, location, source_file),
+                ComponentKind::Leaf(l) => {
+                    codegen_leaf(e, l, cx, location, source_file, false, user_schema)
+                }
+                _ => codegen_element(e, cx, location, source_file, user_schema),
             }
         }
         AstNode::Expr {

@@ -3,7 +3,7 @@ use quote::{TokenStreamExt, format_ident, quote};
 
 use crate::ast::{AstElement, AstNode};
 use crate::error::{XmlError, XmlErrorKind};
-use crate::schema::ControlFlowDef;
+use crate::schema::{ComponentDef, ControlFlowDef};
 
 use crate::codegen::{
     attr::{attr_expr_only, parse_let_bindings},
@@ -25,6 +25,7 @@ pub(crate) fn codegen_if_chain(
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
+    user_schema: &[ComponentDef],
 ) -> Result<TokenStream, XmlError> {
     if branches.is_empty() {
         return Ok(quote! { gpui::div() });
@@ -47,6 +48,7 @@ pub(crate) fn codegen_if_chain(
             cx,
             location,
             source_file,
+            user_schema,
         )?;
         chain.append_all(branch_expr);
         // After the first branch, every subsequent one
@@ -96,26 +98,33 @@ pub(crate) fn codegen_control_flow(
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
+    user_schema: &[ComponentDef],
 ) -> Result<TokenStream, XmlError> {
     match def {
         ControlFlowDef::If | ControlFlowDef::ElseIf | ControlFlowDef::Else => {
-            codegen_if_branch(element, def, cx, location, source_file)
+            codegen_if_branch(element, def, cx, location, source_file, user_schema)
         }
-        ControlFlowDef::For => codegen_for(element, cx, location, source_file),
-        ControlFlowDef::Fragment => codegen_fragment(element, cx, location, source_file),
-        ControlFlowDef::Template => codegen_template(element, cx, location, source_file),
+        ControlFlowDef::For => codegen_for(element, cx, location, source_file, user_schema),
+        ControlFlowDef::Fragment => {
+            codegen_fragment(element, cx, location, source_file, user_schema)
+        }
+        ControlFlowDef::Template => {
+            codegen_template(element, cx, location, source_file, user_schema)
+        }
         ControlFlowDef::Slot => codegen_slot(element, cx),
-        ControlFlowDef::Match => codegen_match(element, cx, location, source_file),
+        ControlFlowDef::Match => codegen_match(element, cx, location, source_file, user_schema),
         ControlFlowDef::Case => Err(XmlError::new(
             XmlErrorKind::Unsupported,
             element.span,
             "<Case> must appear directly inside a <Match>",
         )
         .at(element.byte_offset)),
-        ControlFlowDef::State => codegen_state(element, cx, location, source_file),
-        ControlFlowDef::VirtualList => codegen_virtual_list(element, cx, location, source_file),
+        ControlFlowDef::State => codegen_state(element, cx, location, source_file, user_schema),
+        ControlFlowDef::VirtualList => {
+            codegen_virtual_list(element, cx, location, source_file, user_schema)
+        }
         ControlFlowDef::UniformVirtualList => {
-            codegen_uniform_virtual_list(element, cx, location, source_file)
+            codegen_uniform_virtual_list(element, cx, location, source_file, user_schema)
         }
         ControlFlowDef::Include => Err(XmlError::new(
             XmlErrorKind::Unsupported,
@@ -131,6 +140,7 @@ pub(crate) fn codegen_if_branch(
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
+    user_schema: &[ComponentDef],
 ) -> Result<TokenStream, XmlError> {
     let condition = if matches!(kind, ControlFlowDef::Else) {
         TokenStream::new()
@@ -162,7 +172,8 @@ pub(crate) fn codegen_if_branch(
         )
         .at(element.byte_offset));
     }
-    let child_expr = codegen_children_as_element(&element.children, cx, location, source_file)?;
+    let child_expr =
+        codegen_children_as_element(&element.children, cx, location, source_file, user_schema)?;
 
     // Wrap the branch body so every arm has the same concrete
     // element type (`AnyElement`). This keeps if/else chains
@@ -182,6 +193,7 @@ pub(crate) fn codegen_for(
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
+    user_schema: &[ComponentDef],
 ) -> Result<TokenStream, XmlError> {
     let each = element
         .attributes
@@ -247,7 +259,8 @@ pub(crate) fn codegen_for(
         )
         .at(element.byte_offset));
     }
-    let child_expr = codegen_children_as_element(&element.children, cx, location, source_file)?;
+    let child_expr =
+        codegen_children_as_element(&element.children, cx, location, source_file, user_schema)?;
 
     // The `<For>` body becomes a Rust `for` loop that appends
     // each row as a `.child(...)`. When a `key` is present the
@@ -364,12 +377,13 @@ pub(crate) fn codegen_fragment(
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
+    user_schema: &[ComponentDef],
 ) -> Result<TokenStream, XmlError> {
     // A Fragment is just a transparent group of children.
     // When it has multiple children we wrap them in a plain
     // `gpui::div()` so the result is always a single
     // `impl IntoElement`.
-    codegen_children_as_element(&element.children, cx, location, source_file)
+    codegen_children_as_element(&element.children, cx, location, source_file, user_schema)
 }
 
 fn codegen_match(
@@ -377,6 +391,7 @@ fn codegen_match(
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
+    user_schema: &[ComponentDef],
 ) -> Result<TokenStream, XmlError> {
     let on_attr = element
         .attributes
@@ -448,7 +463,8 @@ fn codegen_match(
             )
             .at(arm.byte_offset));
         }
-        let body = codegen_children_as_element(&arm.children, cx, location, source_file)?;
+        let body =
+            codegen_children_as_element(&arm.children, cx, location, source_file, user_schema)?;
         arms.append_all(quote! { #pattern_parsed => { #body }, });
         arm_count += 1;
     }
@@ -468,6 +484,7 @@ fn codegen_state(
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
+    user_schema: &[ComponentDef],
 ) -> Result<TokenStream, XmlError> {
     let name_attr = element
         .attributes
@@ -538,7 +555,8 @@ fn codegen_state(
         }
     };
 
-    let body = codegen_children_as_element(&element.children, cx, location, source_file)?;
+    let body =
+        codegen_children_as_element(&element.children, cx, location, source_file, user_schema)?;
 
     Ok(quote! {
         {

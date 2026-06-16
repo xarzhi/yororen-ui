@@ -2,6 +2,7 @@ use proc_macro2::{Span, TokenStream};
 
 use crate::ast::{AstElement, AstNode};
 use crate::error::{XmlError, XmlErrorKind};
+use crate::schema::ComponentDef;
 
 use crate::codegen::control_flow::codegen_fragment;
 
@@ -260,8 +261,9 @@ pub(crate) fn codegen_template(
     cx: &TokenStream,
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
+    user_schema: &[ComponentDef],
 ) -> Result<TokenStream, XmlError> {
-    codegen_fragment(element, cx, location, source_file)
+    codegen_fragment(element, cx, location, source_file, user_schema)
 }
 
 /// `<Slot/>` is a no-op for the MVP. Future revisions

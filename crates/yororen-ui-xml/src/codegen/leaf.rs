@@ -4,8 +4,8 @@ use quote::{format_ident, quote};
 use crate::ast::{AstElement, AstNode};
 use crate::error::{XmlError, XmlErrorKind};
 use crate::schema::{
-    ExtraArgKind, LeafDef, PropValue, RenderMode, is_known_shorthand_method, is_spacing_prefix,
-    is_spacing_shorthand,
+    ComponentDef, ExtraArgKind, LeafDef, PropValue, RenderMode, is_known_shorthand_method,
+    is_spacing_prefix, is_spacing_shorthand,
 };
 
 use crate::codegen::{
@@ -34,6 +34,7 @@ pub(crate) fn codegen_leaf(
     location: &crate::parser::LocationTracker<'_>,
     source_file: Option<&str>,
     wrap_to_any: bool,
+    user_schema: &[ComponentDef],
 ) -> Result<TokenStream, XmlError> {
     let _ = location; // Currently unused — byte_offset lives on AST nodes.
     // 1. Resolve the id (first factory arg).
@@ -498,6 +499,7 @@ pub(crate) fn codegen_leaf(
             cx,
             location,
             source_file,
+            user_schema,
         )?;
         stmts.push(quote! { __el = __el.#setter(#child_expr); });
     }
@@ -519,9 +521,9 @@ pub(crate) fn codegen_leaf(
                 }
                 AstNode::Expr { .. } | AstNode::Element(_) => {
                     let child_expr = if def.unwrap_children {
-                        codegen_child_unwrapped(child, cx, location, source_file)?
+                        codegen_child_unwrapped(child, cx, location, source_file, user_schema)?
                     } else {
-                        codegen_child(child, cx, location, source_file)?
+                        codegen_child(child, cx, location, source_file, user_schema)?
                     };
                     stmts.push(quote! {
                         __el = __el.child(#child_expr);
@@ -610,8 +612,13 @@ pub(crate) fn codegen_leaf(
                 while j < remaining_children.len() && is_if_element(&remaining_children[j]) {
                     j += 1;
                 }
-                let chain_expr =
-                    codegen_if_chain(&remaining_children[i..j], cx, location, source_file)?;
+                let chain_expr = codegen_if_chain(
+                    &remaining_children[i..j],
+                    cx,
+                    location,
+                    source_file,
+                    user_schema,
+                )?;
                 child_stmts.push(quote! {
                     let __el = ::gpui::ParentElement::child(__el, #chain_expr);
                 });
@@ -642,7 +649,7 @@ pub(crate) fn codegen_leaf(
                         }
                     }
                     AstNode::Expr { .. } | AstNode::Element(_) => {
-                        let child_expr = codegen_child(child, cx, location, source_file)?;
+                        let child_expr = codegen_child(child, cx, location, source_file, user_schema)?;
                         child_stmts.push(quote! {
                             let __el = ::gpui::ParentElement::child(__el, #child_expr);
                         });
