@@ -696,6 +696,74 @@ fn event_call_expression_is_not_wrapped() {
 }
 
 #[test]
+fn event_method_call_factory_is_pre_cloned() {
+    // `<Button on_click={controller.goto(Section::Actions)}>` is a
+    // method-call factory: it returns the closure that should be
+    // wired up. The receiver must be pre-cloned so the original
+    // `controller` remains available for other handlers.
+    let xml = r#"<Button id="x" caption="x" on_click={controller.goto(Section::Actions)} />"#;
+    let ts = codegen(xml, Span::call_site(), None, None, &[]).expect("codegen ok");
+    let s = ts.to_string();
+    assert!(s.contains("__auto_clone"), "{s}");
+    assert!(s.contains("(controller) . clone"), "{s}");
+    assert!(s.contains(". goto (Section :: Actions)"), "{s}");
+    // The factory result is passed through, not wrapped again.
+    assert!(!s.contains("move | __arg0"), "{s}");
+}
+
+#[test]
+fn event_modifier_method_call_factory_pre_clones() {
+    // `on_click.stop={controller.goto(Section::Actions)}` clones
+    // the receiver and invokes the returned closure with the
+    // standard event args.
+    let xml = r#"<Button id="x" caption="x" on_click.stop={controller.goto(Section::Actions)} />"#;
+    let ts = codegen(xml, Span::call_site(), None, None, &[]).expect("codegen ok");
+    let s = ts.to_string();
+    assert!(s.contains("__auto_clone"), "{s}");
+    assert!(s.contains("(controller) . clone"), "{s}");
+    assert!(s.contains(". goto (Section :: Actions) (__ev , __window , cx)"), "{s}");
+}
+
+#[test]
+fn event_modifier_call_chain_passes_through() {
+    // `on_click.stop={controller.method(args)(extra)}` is an
+    // already-invoked call chain. The codegen must NOT append
+    // `(__ev, __window, cx)` to it.
+    let xml = r#"<Button id="x" caption="x" on_click.stop={controller.method(args)(extra)} />"#;
+    let ts = codegen(xml, Span::call_site(), None, None, &[]).expect("codegen ok");
+    let s = ts.to_string();
+    // The chain call itself must appear verbatim.
+    assert!(s.contains(". method (args) (extra)"), "{s}");
+    // No duplicated event args after the chain.
+    assert!(!s.contains("(extra) (__ev , __window , cx)"), "{s}");
+    // The modifier wrapper still runs.
+    assert!(s.contains("stop_propagation"), "{s}");
+}
+
+#[test]
+fn event_macro_call_passes_through() {
+    // Macro invocations like `handler!()` are parsed and passed
+    // through verbatim; the old string heuristic is no longer used.
+    let xml = r#"<Button id="x" caption="x" on_click={handler!()} />"#;
+    let ts = codegen(xml, Span::call_site(), None, None, &[]).expect("codegen ok");
+    let s = ts.to_string();
+    assert!(s.contains("handler ! ()"), "{s}");
+    // Not auto-wrapped into a fresh closure.
+    assert!(!s.contains("__arg0"), "{s}");
+}
+
+#[test]
+fn event_reference_passes_through() {
+    // `&controller.handle` is not a bare path; it should be parsed
+    // and passed through without being auto-wrapped.
+    let xml = r#"<Button id="x" caption="x" on_click={&controller.handle} />"#;
+    let ts = codegen(xml, Span::call_site(), None, None, &[]).expect("codegen ok");
+    let s = ts.to_string();
+    assert!(s.contains("& controller . handle"), "{s}");
+    assert!(!s.contains("__auto_clone"), "{s}");
+}
+
+#[test]
 fn tree_item_on_toggle_uses_click_event_signature() {
     // `on_toggle` on TreeItem is a click-style event
     // (`&ClickEvent, &mut Window, &mut App`), not the

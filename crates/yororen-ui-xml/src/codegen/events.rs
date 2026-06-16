@@ -22,14 +22,18 @@ use crate::error::{XmlError, XmlErrorKind};
 /// })
 /// ```
 ///
-/// Detection: if the brace expression has no `(`, `{`, or
-/// `|`, it's a bare identifier path / field reference —
-/// we wrap it. Otherwise we pass it through verbatim
-/// (the user wrote their own closure).
+/// Detection: the raw expression is parsed with
+/// `syn::Expr` and classified by AST shape. Bare paths
+/// (`Module::function`), field accesses (`obj.method`),
+/// and method/factory calls (`obj.method(args)`) are
+/// auto-wrapped and have their receiver pre-cloned.
+/// User-written closures, blocks, macros, references,
+/// and already-invoked call chains are passed through
+/// verbatim.
 ///
-/// **Receiver cloning**: for `obj.method` (an
-/// `Expr::Field`), we inject `.clone()` between the
-/// receiver and the method call so multiple event
+/// **Receiver cloning**: for `obj.method` and
+/// `obj.method(args)` we emit the receiver clone once,
+/// outside the generated closure, so multiple event
 /// handlers in the same XML can share a single
 /// `controller` instance without `move` conflicts.
 /// The user's `controller` type must implement
@@ -95,97 +99,63 @@ pub(crate) fn auto_wrap_closure_expr(
         return expr;
     };
     let trimmed = raw.trim();
-    // Decide whether to auto-wrap. We *never* auto-wrap
-    // user-supplied closures (they have `{` or `|`),
-    // and we *always* auto-wrap bare path expressions
-    // (`controller.foo` with no args). The interesting
-    // middle case is a call expression like
-    // `controller.goto(Section::Actions)` — the user is
-    // calling a method whose RETURN VALUE is the event
-    // handler. That's a "factory" call (the controller
-    // method produces the closure to wire up). The
-    // auto-wrap should NOT fire here either; we just
-    // pass the call result through and the compiler
-    // checks that the result is the right closure type.
-    //
-    // Concretely: the only expressions we auto-wrap are
-    // those that syntactically look like a path / field
-    // reference with NO call or closure body. Anything
-    // containing `(` / `{` / `|` is the user's code and
-    // we pass it through verbatim.
-    let looks_like_path = !trimmed.contains('(')
-        && !trimmed.contains('{')
-        && !trimmed.contains('|')
-        && !trimmed.is_empty();
-    if !looks_like_path {
+    if trimmed.is_empty() {
         return expr;
     }
-    // Parse the expression so we can detect a
-    // field-access (`controller.method`) and pre-clone
-    // the receiver outside the closure. Pre-cloning
-    // (rather than `.clone()` inside the body) lets
-    // multiple event handlers in the same XML share a
-    // single `controller` — each closure captures its
-    // own clone and the original `controller` is left
-    // available for the next handler.
     let Ok(parsed) = syn::parse_str::<syn::Expr>(trimmed) else {
-        return quote! {
-            move |#params| {
-                #expr(#call_args)
-            }
-        };
+        return quote! { #expr };
     };
+
     match parsed {
-        // Associated function (`Module::function`) —
+        // Associated function / bare path (`Module::function`) —
         // no receiver, no clone needed.
         syn::Expr::Path(_) => quote! {
             move |#params| {
                 #expr(#call_args)
             }
         },
-        // `controller.method(args)` — a method call whose
-        // result is itself the event handler (a closure
-        // factory: `goto(Section::Actions) -> impl Fn(...)`).
-        // Pass the call result through verbatim; the
-        // receiver is cloned inline so the closure can
-        // move it. We don't auto-wrap into a 3-arg
-        // closure because the call has its own argument
-        // list and the resulting value IS already a
-        // closure.
-        syn::Expr::Call(call) => {
-            let func = call.func;
-            // The function being called: clone its
-            // receiver once, so the inline call can use
-            // the owned value.
-            match &*func {
-                syn::Expr::Field(field) => {
-                    let receiver = &field.base;
-                    let clone_ident = format_ident!("__auto_clone", span = Span::mixed_site());
-                    let member = &field.member;
-                    let args = call.args.iter();
-                    quote! {
-                        {
-                            let #clone_ident = (#receiver).clone();
-                            #clone_ident.#member(#(#args),*)
-                        }
-                    }
-                }
-                _ => {
-                    // Path-style call (`my_func(args)`).
-                    // Pass the result through directly.
-                    quote! { #expr }
+        // `controller.method(args)` — a method call whose result
+        // is itself the event handler (a closure factory). Clone
+        // the receiver outside the generated closure and pass the
+        // factory result through.
+        syn::Expr::MethodCall(call) => {
+            let receiver = &call.receiver;
+            let method = &call.method;
+            let args = call.args.iter();
+            let clone_ident = format_ident!("__auto_clone", span = Span::mixed_site());
+            quote! {
+                {
+                    let #clone_ident = (#receiver).clone();
+                    #clone_ident.#method(#(#args),*)
                 }
             }
         }
-        // `controller.method` — bare field access. Wrap
-        // into the right closure shape for the event.
+        // `(controller.method)(args)` — field access used as a
+        // function (unusual syntax, kept for backwards
+        // compatibility). Clone the receiver and call the field.
+        syn::Expr::Call(call) => {
+            if let Some(field) = call_as_field(&call) {
+                let receiver = &field.base;
+                let member = &field.member;
+                let args = call.args.iter();
+                let clone_ident = format_ident!("__auto_clone", span = Span::mixed_site());
+                quote! {
+                    {
+                        let #clone_ident = (#receiver).clone();
+                        #clone_ident.#member(#(#args),*)
+                    }
+                }
+            } else {
+                // Path-style call (`my_func(args)`) or already
+                // invoked chain — pass the result through directly.
+                quote! { #expr }
+            }
+        }
+        // `controller.method` — bare field access. Wrap into the
+        // right closure shape for the event.
         syn::Expr::Field(field) => {
             let receiver = field.base;
             let member = field.member;
-            // `Span::mixed_site()` yields a unique span
-            // per call, so every auto-wrapped closure
-            // gets a distinct `__auto_clone_N` ident
-            // (proc-macro hygiene).
             let clone_ident = format_ident!("__auto_clone", span = Span::mixed_site());
             quote! {
                 {
@@ -196,13 +166,14 @@ pub(crate) fn auto_wrap_closure_expr(
                 }
             }
         }
-        // Method call, deref, closure literal, etc. —
-        // the user wrote their own expression; pass it
-        // through verbatim. The compiler will reject it
-        // if the type doesn't match the setter's bound.
+        // User closures, blocks, macros, references, and other
+        // complex expressions — pass through verbatim. The
+        // compiler will reject them if the type doesn't match the
+        // setter's bound.
         _ => quote! { #expr },
     }
 }
+
 pub(crate) fn auto_wrap_event_call(
     attr: &AstAttribute,
     expr: TokenStream,
@@ -211,11 +182,7 @@ pub(crate) fn auto_wrap_event_call(
         return (None, quote! { #expr(__ev, __window, cx) });
     };
     let trimmed = raw.trim();
-    let looks_like_path = !trimmed.contains('(')
-        && !trimmed.contains('{')
-        && !trimmed.contains('|')
-        && !trimmed.is_empty();
-    if !looks_like_path {
+    if trimmed.is_empty() {
         return (None, quote! { #expr(__ev, __window, cx) });
     }
     let Ok(parsed) = syn::parse_str::<syn::Expr>(trimmed) else {
@@ -224,23 +191,40 @@ pub(crate) fn auto_wrap_event_call(
 
     let clone_ident = format_ident!("__auto_clone", span = Span::mixed_site());
     match parsed {
-        // `controller.method(args)` — a method call that
-        // returns an event handler closure. Clone the
-        // receiver, then call the method and immediately
-        // invoke the returned closure with the event args.
-        syn::Expr::Call(call) => match &*call.func {
-            syn::Expr::Field(field) => {
+        // `controller.method(args)` — a method call returning a
+        // closure factory. Clone the receiver, then invoke the
+        // returned closure with the event args.
+        syn::Expr::MethodCall(call) => {
+            let receiver = &call.receiver;
+            let method = &call.method;
+            let args = call.args.iter();
+            let clone = quote! { let #clone_ident = (#receiver).clone(); };
+            let call = quote! { #clone_ident.#method(#(#args),*)(__ev, __window, cx) };
+            (Some(clone), call)
+        }
+        // `(controller.method)(args)` — field access used as a
+        // function. Clone receiver and invoke the result.
+        syn::Expr::Call(call) => {
+            if let Some(field) = call_as_field(&call) {
                 let receiver = &field.base;
                 let member = &field.member;
                 let args = call.args.iter();
                 let clone = quote! { let #clone_ident = (#receiver).clone(); };
                 let call = quote! { #clone_ident.#member(#(#args),*)(__ev, __window, cx) };
                 (Some(clone), call)
+            } else if is_chain_call(&call) {
+                // Already-invoked chain like
+                // `controller.method(args)(extra)` — the user has
+                // fully applied the expression, so pass it through
+                // verbatim instead of appending event args.
+                (None, quote! { #expr })
+            } else {
+                // Factory call (`some_fn()`) whose result is the
+                // event handler. Invoke it with event args.
+                (None, quote! { #expr(__ev, __window, cx) })
             }
-            _ => (None, quote! { #expr(__ev, __window, cx) }),
-        },
-        // `controller.method` — bare field access. Clone the
-        // receiver, then call the method with the event args.
+        }
+        // `controller.method` — bare field access.
         syn::Expr::Field(field) => {
             let receiver = field.base;
             let member = field.member;
@@ -248,9 +232,40 @@ pub(crate) fn auto_wrap_event_call(
             let call = quote! { #clone_ident.#member(__ev, __window, cx) };
             (Some(clone), call)
         }
-        // Associated function or bare path — no receiver.
+        // Associated function / bare path — no receiver.
+        syn::Expr::Path(_) => (None, quote! { #expr(__ev, __window, cx) }),
+        // User closures, blocks, macros, references, etc.
         _ => (None, quote! { #expr(__ev, __window, cx) }),
     }
+}
+
+/// Peel off `Expr::Paren` / `Expr::Group` wrappers so that
+/// `(controller.method)(args)` is classified the same as the
+/// underlying field access.
+fn unwrap_paren_group(expr: &syn::Expr) -> &syn::Expr {
+    match expr {
+        syn::Expr::Paren(p) => unwrap_paren_group(&p.expr),
+        syn::Expr::Group(g) => unwrap_paren_group(&g.expr),
+        _ => expr,
+    }
+}
+
+/// If `call` is a direct call whose callee is a field access,
+/// return that field. Example: `(controller.method)(args)`.
+fn call_as_field(call: &syn::ExprCall) -> Option<&syn::ExprField> {
+    match unwrap_paren_group(&call.func) {
+        syn::Expr::Field(field) => Some(field),
+        _ => None,
+    }
+}
+
+/// True when `call` is part of a call chain whose callee has
+/// already been invoked, e.g. `controller.method(args)(extra)`.
+fn is_chain_call(call: &syn::ExprCall) -> bool {
+    matches!(
+        unwrap_paren_group(&call.func),
+        syn::Expr::Call(_) | syn::Expr::MethodCall(_) | syn::Expr::Await(_)
+    )
 }
 
 /// Split an attribute name like `on_click.stop.enter` into
