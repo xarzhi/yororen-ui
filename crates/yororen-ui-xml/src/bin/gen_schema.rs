@@ -810,6 +810,19 @@ fn classify_arg(ty: &Type) -> PropValue {
     if rendered.contains("KeybindingInputMode") {
         return PropValue::KeybindingInputMode;
     }
+    // Typed containers / custom objects that cannot be
+    // expressed as XML literals. These require a brace
+    // expression (rendered as `PropValue::Custom`).
+    // Check before the generic `Into` heuristic so that
+    // `impl Into<TreeNodeId>` is not misclassified as String.
+    if rendered.contains("TreeData")
+        || rendered.contains("TreeNodeId")
+        || rendered.starts_with("Vec <")
+        || rendered.starts_with("HashMap <")
+        || rendered.starts_with("BTreeMap <")
+    {
+        return PropValue::Custom;
+    }
     // `impl Into<SharedString>` / `impl Into<String>` / `&str` / `String`.
     // Exclude `IntoIterator` (e.g. `keys: impl IntoIterator<Item = impl Into<String>>`).
     if !rendered.contains("IntoIterator")

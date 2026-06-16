@@ -3,7 +3,7 @@
 //!
 //! Source of truth: `yororen-ui-core/src/headless/*.rs`
 //! plus `yororen-ui-xml/overrides.toml`.
-//! Last regenerated with: 61 entries (29 from overrides), 4 skipped.
+//! Last regenerated with: 61 entries (28 from overrides), 4 skipped.
 //!
 //! Skipped files (need manual schema entry or a schema
 //! extension — see `gen_schema.rs` notes):
@@ -884,7 +884,7 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
             needs_window: false,
             props: &[PropDef { name: "disabled", setter: "disabled", value: PropValue::Bool },
             PropDef { name: "caption", setter: "caption", value: PropValue::String },
-            PropDef { name: "items", setter: "items", value: PropValue::Unknown },
+            PropDef { name: "items", setter: "items", value: PropValue::Custom },
             PropDef { name: "state", setter: "state", value: PropValue::Unknown },
             ],
             events: &[("on_select", "on_select"), ],
@@ -895,7 +895,6 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
         }),
         doc: "auto-generated from `headless::split_button`",
     },
-    // NOTE: review needed: prop `items` has unclassified type `Vec < DropdownItem >`
     // NOTE: review needed: prop `state` has unclassified type `Entity < DropdownMenuState >`
     // NOTE: extra_args = 1 entries
     ComponentDef {
@@ -1094,6 +1093,7 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
             needs_app: true,
             needs_window: false,
             props: &[PropDef { name: "data", setter: "data", value: PropValue::Custom },
+            PropDef { name: "expanded", setter: "expanded", value: PropValue::Custom },
             PropDef { name: "selected", setter: "selected", value: PropValue::Custom },
             ],
             events: &[],
@@ -1104,7 +1104,6 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
         }),
         doc: "auto-generated from `headless::tree`",
     },
-    // NOTE: review needed: prop `data` has unclassified type `TreeData`
     ComponentDef {
         tag: "TreeItem",
         kind: ComponentKind::Leaf(LeafDef {

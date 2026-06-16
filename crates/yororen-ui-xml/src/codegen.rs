@@ -2923,12 +2923,28 @@ fn prop_value_tokens(attr: &AstAttribute, kind: PropValue) -> Result<TokenStream
             // else is rejected with a helpful note.
             parse_hex_color(raw, attr)
         }
-        PropValue::Unknown => Ok(quote! { (#raw).to_string() }),
+        PropValue::Unknown => Err(XmlError::new(
+            XmlErrorKind::InvalidExpression,
+            attr.span,
+            format!(
+                "attribute `{}` requires a brace expression because its type is not string-coercible",
+                attr.name
+            ),
+        )
+        .at(attr.byte_offset)),
         PropValue::Custom => {
             if attr.expr.is_some() {
                 unreachable!("brace expressions are handled at the top of prop_value_tokens")
             } else {
-                Ok(quote! { (#raw).into() })
+                Err(XmlError::new(
+                    XmlErrorKind::InvalidExpression,
+                    attr.span,
+                    format!(
+                        "attribute `{}` requires a brace expression because it is a custom type",
+                        attr.name
+                    ),
+                )
+                .at(attr.byte_offset))
             }
         }
         PropValue::Float64 => {
