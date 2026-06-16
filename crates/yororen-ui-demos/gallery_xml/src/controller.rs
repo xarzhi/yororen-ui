@@ -474,7 +474,7 @@ impl Controller {
             s.current_locale = choice;
             // Re-resolve translated labels so the tree stays in
             // sync with the new locale.
-            s.tree_data = GalleryState::build_tree_data(&**cx);
+            s.tree_data = GalleryState::build_tree_data(cx);
         });
     }
 
