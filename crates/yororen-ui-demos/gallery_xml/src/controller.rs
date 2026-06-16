@@ -679,9 +679,10 @@ impl Controller {
         entity.update(cx, |s, _cx| *s = value.to_string());
     }
 
-    pub fn browse_file_path(&self, _value: &str, _w: &mut Window, cx: &mut App) {
-        let entity = self.state.read(cx).file_path_value.clone();
-        entity.update(cx, |s, _cx| *s = "/tmp/example.txt".to_string());
+    pub fn browse_file_path(&self, _value: &str, _w: &mut Window, _cx: &mut App) {
+        // The renderer already wrote the picked path into the
+        // input's bound state and fired `on_change`; this hook is
+        // only for extra work (logging, validation, etc.).
     }
 
     pub fn start_keybinding_capture(&self, _w: &mut Window, cx: &mut App) {
