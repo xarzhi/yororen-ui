@@ -1084,7 +1084,7 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
         tag: "TreeItem",
         kind: ComponentKind::Leaf(LeafDef {
             factory: "::yororen_ui::headless::tree_item::tree_item",
-            extra_args: &[ExtraArg { kind: ExtraArgKind::Text, attr: "node_id" }, ExtraArg { kind: ExtraArgKind::Text, attr: "label" }, ],
+            extra_args: &[ExtraArg { kind: ExtraArgKind::Custom, attr: "node_id" }, ExtraArg { kind: ExtraArgKind::Text, attr: "label" }, ],
             render: RenderMode::Default,
             needs_app: true,
             needs_window: true,

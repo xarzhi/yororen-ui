@@ -457,9 +457,7 @@ fn apply_overrides(entries: Vec<Extracted>, overrides: &[OverrideEntry]) -> Vec<
                     // value/setter for known names, append new ones.
                     for p in props.iter().filter(|p| p.len() == 3) {
                         if let Some(value) = parse_prop_value(&p[2]) {
-                            if let Some(existing) =
-                                e.props.iter_mut().find(|x| x.name == p[0])
-                            {
+                            if let Some(existing) = e.props.iter_mut().find(|x| x.name == p[0]) {
                                 existing.setter = p[1].clone();
                                 existing.value = value;
                             } else {
@@ -638,9 +636,7 @@ fn extract(ast: &syn::File, module_name: &str) -> Result<Option<Extracted>, Stri
                         _ => continue,
                     },
                     2 => match (&inputs[0], &inputs[1]) {
-                        (FnArg::Receiver(r), FnArg::Typed(pt))
-                            if is_mutable_self_by_value(r) =>
-                        {
+                        (FnArg::Receiver(r), FnArg::Typed(pt)) if is_mutable_self_by_value(r) => {
                             (false, Some(&*pt.ty))
                         }
                         _ => continue,
@@ -951,6 +947,10 @@ fn analyse_factory(sig: &Signature) -> Result<(Vec<ExtraArgInfo>, bool), String>
             ExtraArgKind::StringList
         } else if is_borrow(ty) {
             ExtraArgKind::Borrow
+        } else if is_tree_node_id(ty) {
+            // Must precede `is_string_like`: `impl Into<TreeNodeId>`
+            // contains `Into` and would otherwise be misclassified as Text.
+            ExtraArgKind::Custom
         } else if is_string_like(ty) {
             ExtraArgKind::Text
         } else if is_callback(ty) {
@@ -1031,6 +1031,11 @@ fn is_image_source(ty: &Type) -> bool {
 fn is_keybinding_mode(ty: &Type) -> bool {
     let rendered = ty.to_token_stream().to_string();
     rendered.contains("KeybindingInputMode")
+}
+
+fn is_tree_node_id(ty: &Type) -> bool {
+    let rendered = ty.to_token_stream().to_string();
+    rendered.contains("TreeNodeId")
 }
 
 fn is_callback(ty: &Type) -> bool {

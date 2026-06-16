@@ -721,7 +721,10 @@ fn event_modifier_method_call_factory_pre_clones() {
     let s = ts.to_string();
     assert!(s.contains("__auto_clone"), "{s}");
     assert!(s.contains("(controller) . clone"), "{s}");
-    assert!(s.contains(". goto (Section :: Actions) (__ev , __window , cx)"), "{s}");
+    assert!(
+        s.contains(". goto (Section :: Actions) (__ev , __window , cx)"),
+        "{s}"
+    );
 }
 
 #[test]
@@ -1359,6 +1362,117 @@ fn generated_schema_invariants() {
     }
 }
 
+#[test]
+fn generated_schema_preserves_typed_enum_categories() {
+    // Guard against regressions where `impl Into<IconSource>` or
+    // similar gets misclassified as a plain String/Variant.
+    use crate::schema::{ComponentKind, ExtraArgKind, PropValue};
+
+    fn leaf_props(tag: &str) -> &'static [crate::schema::PropDef] {
+        let generated = crate::schema_generated::BUILTINS_GENERATED;
+        let def = generated
+            .iter()
+            .find(|c| c.tag == tag)
+            .unwrap_or_else(|| panic!("missing {tag}"));
+        match def.kind {
+            ComponentKind::Leaf(leaf) => leaf.props,
+            _ => panic!("{tag} is not a leaf"),
+        }
+    }
+
+    fn leaf_extra_args(tag: &str) -> &'static [crate::schema::ExtraArg] {
+        let generated = crate::schema_generated::BUILTINS_GENERATED;
+        let def = generated
+            .iter()
+            .find(|c| c.tag == tag)
+            .unwrap_or_else(|| panic!("missing {tag}"));
+        match def.kind {
+            ComponentKind::Leaf(leaf) => leaf.extra_args,
+            _ => panic!("{tag} is not a leaf"),
+        }
+    }
+
+    // Setters that take `impl Into<IconSource>` must stay IconSource.
+    assert_eq!(
+        leaf_props("EmptyState")
+            .iter()
+            .find(|p| p.name == "icon")
+            .unwrap()
+            .value,
+        PropValue::IconSource,
+        "EmptyState::icon must remain IconSource"
+    );
+    assert_eq!(
+        leaf_props("IconButton")
+            .iter()
+            .find(|p| p.name == "icon")
+            .unwrap()
+            .value,
+        PropValue::IconSource,
+        "IconButton::icon must remain IconSource"
+    );
+    assert_eq!(
+        leaf_props("ToggleButton")
+            .iter()
+            .find(|p| p.name == "icon")
+            .unwrap()
+            .value,
+        PropValue::IconSource,
+        "ToggleButton::icon must remain IconSource"
+    );
+
+    // Factory positional args must keep their dedicated enum categories.
+    assert_eq!(
+        leaf_extra_args("Icon")
+            .iter()
+            .find(|e| e.attr == "source")
+            .unwrap()
+            .kind,
+        ExtraArgKind::IconSource,
+        "Icon::source must remain IconSource"
+    );
+    assert_eq!(
+        leaf_extra_args("Image")
+            .iter()
+            .find(|e| e.attr == "source")
+            .unwrap()
+            .kind,
+        ExtraArgKind::ImageSource,
+        "Image::source must remain ImageSource"
+    );
+
+    // KeybindingInputMode setter.
+    assert_eq!(
+        leaf_props("KeybindingInput")
+            .iter()
+            .find(|p| p.name == "mode")
+            .unwrap()
+            .value,
+        PropValue::KeybindingInputMode,
+        "KeybindingInput::mode must remain KeybindingInputMode"
+    );
+
+    // TreeNodeId props must be categorised consistently (both Custom).
+    assert_eq!(
+        leaf_props("Tree")
+            .iter()
+            .find(|p| p.name == "selected")
+            .unwrap()
+            .value,
+        PropValue::Custom,
+        "Tree::selected must remain Custom (TreeNodeId)"
+    );
+    assert_eq!(
+        leaf_extra_args("TreeItem")
+            .iter()
+            .find(|e| e.attr == "node_id")
+            .unwrap()
+            .kind,
+        ExtraArgKind::Custom,
+        "TreeItem::node_id must remain Custom (TreeNodeId)"
+    );
+}
+
 /// The generated file must not contain any "review needed"
 /// comments. Those comments indicate props the generator
 /// couldn't classify; the --check mode of gen-schema now
@@ -1614,6 +1728,22 @@ fn virtual_list_requires_children() {
     )
     .unwrap_err();
     assert!(err.message.contains("at least one child"), "{err}");
+}
+
+#[test]
+fn virtual_list_rejects_row_with_children() {
+    // `row=` provides an explicit row closure; children would be
+    // silently ignored by the codegen. Reject instead.
+    let err = codegen(
+        r#"<VirtualList id="x" item_count={9} row={|_| {}}><Label id="y" text="hi" /></VirtualList>"#,
+        Span::call_site(),
+        None,
+        None,
+        &[],
+    )
+    .unwrap_err();
+    assert!(err.message.contains("row"), "{err}");
+    assert!(err.message.contains("children"), "{err}");
 }
 
 #[test]

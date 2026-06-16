@@ -105,11 +105,12 @@ pub(crate) fn codegen_virtual_list_kind(
     };
 
     // --- detect row mode -------------------------------------------
-    // Three modes:
+    // Three mutually-exclusive modes:
     //   1. Explicit `row={closure}` + `item_count` — the caller
     //      supplies a ready-made row closure (useful when the row
     //      body needs controller state that must not be captured
-    //      from the surrounding scope).
+    //      from the surrounding scope). Children are not allowed
+    //      in this mode.
     //   2. `item_count` + children — the children become the row
     //      template, re-invoked per visible index.
     //   3. Children only — each direct child is one row.
@@ -215,6 +216,22 @@ pub(crate) fn codegen_virtual_list_kind(
             (count_expr, row_closure, quote! {}, index_ident)
         }
     };
+
+    // Explicit `row=` and children are mutually exclusive: mode 1
+    // already provides the full row closure, so any children would
+    // be silently ignored. Reject instead of dropping them.
+    if row_attr.is_some() && !element.children.is_empty() {
+        return Err(XmlError::new(
+            XmlErrorKind::Unsupported,
+            element.span,
+            format!(
+                "<{}> `row={{...}}` cannot be used together with children; \
+                 remove the children or use `item_count={{...}}` with children instead",
+                element.tag
+            ),
+        )
+        .at(element.byte_offset));
+    }
 
     // --- optional attributes ---------------------------------------
     let overdraw_expr = match element.attributes.iter().find(|a| a.name == "overdraw") {
