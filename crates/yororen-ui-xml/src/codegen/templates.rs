@@ -252,10 +252,13 @@ pub(crate) fn substitute_slots(
     Ok(())
 }
 
-/// `<Template name="X">…</Template>` for the MVP
-/// simply emits its children in place (the template
-/// "name" attribute is reserved for future
-/// cross-references). Slots are no-ops.
+/// Codegen path for any `<Template>` that survives
+/// `expand_template_invocations`. In practice the
+/// pre-pass strips every `<Template>` definition from
+/// the AST (see [`expand_template_invocations`]), so
+/// this codegen is only reachable if a stray `<Template>`
+/// slips past it — which is treated as a transparent
+/// fragment so the rest of the file still compiles.
 pub(crate) fn codegen_template(
     element: &AstElement,
     cx: &TokenStream,
@@ -265,8 +268,12 @@ pub(crate) fn codegen_template(
     codegen_fragment(element, cx, source_file, user_schema)
 }
 
-/// `<Slot/>` is a no-op for the MVP. Future revisions
-/// will wire caller-side slot-filling.
+/// Codegen path for any `<Slot/>` that survives
+/// [`substitute_slots`]. The slot pre-pass replaces
+/// every `<Slot/>` with the caller's slot content, so
+/// a Slot reaching codegen is a no-op (the
+/// corresponding empty token stream is dropped by the
+/// parent's `.child(...)` chain).
 pub(crate) fn codegen_slot(
     _element: &AstElement,
     _cx: &TokenStream,

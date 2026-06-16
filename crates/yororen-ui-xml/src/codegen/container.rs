@@ -161,7 +161,8 @@ pub(crate) fn apply_container_attr(
                     "invalid spacing suffix `{value}` for `{}`; expected a number (0, 1, 2, …) or `full`",
                     attr.name
                 ),
-            ));
+            )
+            .at(attr.byte_offset));
         }
         // Translate `0p5` (XML) → `0p5` (method name)
         let method = format!("{}_{}", attr.name, value);
@@ -173,27 +174,33 @@ pub(crate) fn apply_container_attr(
     }
 
     // Bare method name on a container (`flex`, `flex_col`,
-    // `w_full`, …). Only valid when the value is the
-    // normaliser-added `"true"`.
+    // `w_full`, …). These are all zero-arg gpui flags in
+    // [`is_known_shorthand_method`] / [`is_spacing_shorthand`],
+    // so the only valid literal form is `"true"` (which the
+    // normaliser adds to bare attributes). Anything else
+    // would compile to `.method(__el, "<raw>")` and produce
+    // a confusing "too many arguments" rustc error far from
+    // the XML — so we reject it up front.
     if attr.expr.is_none()
         && (is_known_shorthand_method(&attr.name) || is_spacing_shorthand(&attr.name))
     {
-        // The normaliser should have converted a bare attr
-        // to `="true"`, so this is the common path.
-        let m = format_ident!("{}", attr.name);
         if attr.raw == "true" {
+            let m = format_ident!("{}", attr.name);
             stmts.push(quote! {
                 let __el = ::gpui::Styled::#m(__el);
             });
             return Ok(());
         }
-        // `flex_grow="0.5"` — odd but possible; we just
-        // pass the value as a string to the method.
-        let raw = attr.raw.as_str();
-        stmts.push(quote! {
-            let __el = ::gpui::Styled::#m(__el, #raw);
-        });
-        return Ok(());
+        let name = attr.name.clone();
+        let raw = attr.raw.clone();
+        return Err(XmlError::new(
+            XmlErrorKind::InvalidExpression,
+            attr.span,
+            format!(
+                "attribute `{name}` is a flag (no value); drop `=\"{raw}\"` and use `<{name}>` instead"
+            ),
+        )
+        .at(attr.byte_offset));
     }
 
     let accepted = accepted_container_attrs(&def);
@@ -220,15 +227,20 @@ pub(crate) fn apply_container_attr(
     ))
 }
 
+/// Numeric suffixes accepted after spacing prefixes (`gap`, `p`,
+/// `m`, …). Each maps to a real gpui method like `gap_3` / `p_4`.
+const NUMERIC_SPACING_SUFFIX: &[&str] = &[
+    "0", "0p5", "1", "1p5", "2", "2p5", "3", "3p5", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+    "16", "20", "24", "32", "40", "48", "56", "64", "72", "80", "96",
+];
+/// Textual spacing suffixes. `full` is the only commonly used one;
+/// the fractional entries are gpui's Tailwind-style shorthands.
+const TEXTUAL_SPACING_SUFFIX: &[&str] = &[
+    "full", "1_2", "1_3", "2_3", "1_4", "3_4", "1_5", "2_5", "3_5", "4_5", "1_6", "5_6", "1_12",
+];
+
 pub(crate) fn is_valid_spacing_suffix(s: &str) -> bool {
-    pub(crate) const NUMERIC: &[&str] = &[
-        "0", "0p5", "1", "1p5", "2", "2p5", "3", "3p5", "4", "5", "6", "7", "8", "9", "10", "11",
-        "12", "16", "20", "24", "32", "40", "48", "56", "64", "72", "80", "96",
-    ];
-    pub(crate) const TEXTUAL: &[&str] = &[
-        "full", "1_2", "1_3", "2_3", "1_4", "3_4", "1_5", "2_5", "3_5", "4_5", "1_6", "5_6", "1_12",
-    ];
-    NUMERIC.contains(&s) || TEXTUAL.contains(&s)
+    NUMERIC_SPACING_SUFFIX.contains(&s) || TEXTUAL_SPACING_SUFFIX.contains(&s)
 }
 pub(crate) fn accepted_container_attrs(def: &ContainerDef) -> String {
     let mut parts = vec!["id".to_string()];

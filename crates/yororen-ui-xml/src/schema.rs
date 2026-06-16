@@ -536,25 +536,30 @@ pub fn is_known_shorthand_method(name: &str) -> bool {
     ) || is_spacing_shorthand(name)
 }
 
+/// Numeric suffixes for `is_spacing_shorthand`. Mirrors the table
+/// in [`crate::codegen::container::is_valid_spacing_suffix`] —
+/// keep the two in sync when adding new entries.
+const SPACING_NUMERIC: &[&str] = &[
+    "0", "0p5", "1", "1p5", "2", "2p5", "3", "3p5", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+    "16", "20", "24", "32", "40", "48", "56", "64", "72", "80", "96",
+];
+/// Textual spacing suffixes for `is_spacing_shorthand`. Same
+/// sync note as [`SPACING_NUMERIC`].
+const SPACING_TEXTUAL: &[&str] = &[
+    "full", "1_2", "1_3", "2_3", "1_4", "3_4", "1_5", "2_5", "3_5", "4_5", "1_6", "5_6", "1_12",
+];
+
 /// Spacing shorthands for `gap`, `p`, `m`, `px`, `py`, `pt`,
 /// `pb`, `pl`, `pr`, `mx`, `my`, `mt`, `mb`, `ml`, `mr`, and
 /// their `gap_x_` / `gap_y_` siblings. Each numeric / textual
 /// suffix maps to a real gpui method.
 pub fn is_spacing_shorthand(name: &str) -> bool {
-    const NUMERIC: &[&str] = &[
-        "0", "0p5", "1", "1p5", "2", "2p5", "3", "3p5", "4", "5", "6", "7", "8", "9", "10", "11",
-        "12", "16", "20", "24", "32", "40", "48", "56", "64", "72", "80", "96",
-    ];
-    const FULL: &[&str] = &[
-        "full", "1_2", "1_3", "2_3", "1_4", "3_4", "1_5", "2_5", "3_5", "4_5", "1_6", "5_6", "1_12",
-    ];
-
     let prefix_end = if let Some(stripped) = name.strip_suffix("_full") {
         Some(stripped)
     } else if let Some(idx) = name.rfind('_') {
         let (prefix, suffix) = name.split_at(idx);
         let suffix = &suffix[1..];
-        if NUMERIC.contains(&suffix) || FULL.contains(&suffix) {
+        if SPACING_NUMERIC.contains(&suffix) || SPACING_TEXTUAL.contains(&suffix) {
             Some(prefix)
         } else {
             None

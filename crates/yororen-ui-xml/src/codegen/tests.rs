@@ -243,6 +243,70 @@ fn for_loop_key_must_be_brace_expression() {
 }
 
 #[test]
+fn for_loop_each_must_be_brace_expression() {
+    // `<For each="literal">` is rejected — `each` is the
+    // loop source and has to be a runtime expression so
+    // the iterator is re-evaluated each frame.
+    let err = codegen(
+        r#"<Column>
+    <For each="vec![1, 2, 3]" let:item>
+        <Label id="l" text={item} />
+    </For>
+</Column>"#,
+        Span::call_site(),
+        None,
+        None,
+        &[],
+    )
+    .unwrap_err();
+    assert!(err.message.contains("brace expression"), "{}", err.message);
+}
+
+#[test]
+fn container_flag_with_non_true_literal_is_an_error() {
+    // `<Div flex_grow="false">` previously compiled to
+    // `__el.flex_grow(__el, "false")` — a confusing
+    // "too many arguments" rustc error. Now it's a
+    // clear XML-layer diagnostic.
+    let err = codegen(
+        r#"<Column flex_grow="false" />"#,
+        Span::call_site(),
+        None,
+        None,
+        &[],
+    )
+    .unwrap_err();
+    assert!(err.message.contains("flag"), "{}", err.message);
+    assert!(err.message.contains("flex_grow"), "{}", err.message);
+    assert!(
+        err.offset.is_some(),
+        "flag error should carry byte_offset; got {:?}",
+        err.offset
+    );
+}
+
+#[test]
+fn container_spacing_with_bad_suffix_carries_offset() {
+    // `<Div gap="999">` (invalid suffix) must surface a
+    // diagnostic with `at line N, column M:` rather than
+    // the single-line fallback.
+    let err = codegen(
+        r#"<Column gap="999" />"#,
+        Span::call_site(),
+        None,
+        None,
+        &[],
+    )
+    .unwrap_err();
+    assert!(err.message.contains("invalid spacing suffix"), "{}", err.message);
+    assert!(
+        err.offset.is_some(),
+        "spacing suffix error should carry byte_offset; got {:?}",
+        err.offset
+    );
+}
+
+#[test]
 fn unknown_tag_falls_through_to_runtime_registry() {
     // Unknown tags used to be a hard error; with the
     // runtime registry (`register_xml_component!`)
