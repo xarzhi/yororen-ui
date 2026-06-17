@@ -12,7 +12,7 @@
         <Slot name="label"><Label id="lbl-popover" text={t!(cx, "demo.overlays.popover_trigger")} muted /></Slot>
         <Popover id="ovl-popover" state={controller.popover_state(cx)}>
             <Button slot="trigger" id="ovl-popover-trigger"
-                    caption={if controller.popover_visible(cx) { t!(cx, "demo.overlays.popover_close") } else { t!(cx, "demo.overlays.popover_open") }}
+                    caption={if controller.snapshot(cx).popover_visible { t!(cx, "demo.overlays.popover_close") } else { t!(cx, "demo.overlays.popover_open") }}
                     on_click={controller.toggle_popover} />
             <Menu slot="content" id="ovl-menu" state={controller.menu_state(cx)} />
         </Popover>
@@ -39,10 +39,10 @@
     <Cell>
         <Slot name="label"><Label id="lbl-disclosure" text={t!(cx, "demo.disclosure.cell")} muted /></Slot>
         <Disclosure id="ovl-disc" title={t!(cx, "demo.disclosure.title")}
-                    open={controller.disclosure_open(cx)}
+                    open={controller.snapshot(cx).disclosure_open}
                     on_toggle={controller.toggle_disclosure}>
             <Div pl={gpui::px(16.)}>
-                <If condition={controller.disclosure_open(cx)}>
+                <If condition={controller.snapshot(cx).disclosure_open}>
                     <Label id="ovl-disc-body" text={t!(cx, "demo.disclosure.body")} muted />
                 </If>
             </Div>
@@ -51,14 +51,14 @@
 
     <Cell>
         <Slot name="label"><Label id="lbl-overlay" text={t!(cx, "demo.overlays.scrim")} muted /></Slot>
-        <Overlay id="ovl-overlay" open={controller.is_modal_open(cx)}>
+        <Overlay id="ovl-overlay" open={controller.snapshot(cx).is_modal_open}>
             <Label id="ovl-overlay-info" text={t!(cx, "demo.overlays.scrim_info")} muted />
         </Overlay>
     </Cell>
 
     <Label id="ovl-summary"
            text={t_named!(cx, "demo.overlays.summary",
-                           dropdown => controller.dropdown_demo_value(cx),
-                           menu => controller.menu_demo_value(cx))}
+                           dropdown => controller.snapshot(cx).dropdown_demo_value,
+                           menu => controller.snapshot(cx).menu_demo_value)}
            muted />
 </Column>

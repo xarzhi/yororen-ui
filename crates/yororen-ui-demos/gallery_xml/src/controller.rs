@@ -17,6 +17,7 @@ use gpui::{
 };
 
 use yororen_ui::headless::dropdown_menu::{DropdownItem, DropdownMenuItem};
+use yororen_ui::headless::keybinding_input::KeybindingInputMode;
 use yororen_ui::headless::table::TableColumn;
 use yororen_ui::headless::tree::TreeData;
 use yororen_ui::headless::tree_item::TreeNodeId;
@@ -31,50 +32,59 @@ pub struct Controller {
     state: Entity<GalleryState>,
 }
 
-/// A single-read snapshot of the most frequently-accessed
-/// footer / summary fields. Use this when the XML needs several
-/// scalar values in one place to avoid repeated
-/// `state.read(cx)` borrow guards.
+/// A single-read snapshot of all scalar demo fields.
+///
+/// Use `controller.snapshot(cx)` in XML brace expressions to
+/// read any plain value without paying for a separate
+/// `state.read(cx)` borrow guard per field. `Entity<T>` fields
+/// that participate in `@bind` are intentionally **not** here —
+/// they keep their own `*_entity(cx)` accessors.
 pub struct GallerySnapshot {
-    form_submit_count: usize,
-    form_email_value: String,
-    form_email_error: Option<String>,
-    checkbox_value: bool,
-    switch_value: bool,
-    radio_value: usize,
-    slider_value: f32,
-    toast_count: usize,
-    current_locale: LocaleChoice,
-}
+    // Toolbar
+    pub current_renderer: RendererKind,
+    pub dark_mode: DarkMode,
+    pub current_locale: LocaleChoice,
+    pub toast_count: usize,
 
-impl GallerySnapshot {
-    pub fn form_submit_count(&self) -> usize {
-        self.form_submit_count
-    }
-    pub fn form_email_value(&self) -> String {
-        self.form_email_value.clone()
-    }
-    pub fn form_email_error(&self) -> Option<String> {
-        self.form_email_error.clone()
-    }
-    pub fn checkbox_value(&self) -> bool {
-        self.checkbox_value
-    }
-    pub fn switch_value(&self) -> bool {
-        self.switch_value
-    }
-    pub fn radio_value(&self) -> usize {
-        self.radio_value
-    }
-    pub fn slider_value(&self) -> f32 {
-        self.slider_value
-    }
-    pub fn toast_count(&self) -> usize {
-        self.toast_count
-    }
-    pub fn current_locale(&self) -> LocaleChoice {
-        self.current_locale
-    }
+    // Display
+    pub tag_selected: bool,
+    pub tag_close_count: usize,
+    pub progress_value: f32,
+    pub toggle_btn_selected: bool,
+
+    // Overlays
+    pub disclosure_open: bool,
+    pub popover_visible: bool,
+    pub dropdown_visible: bool,
+    pub is_modal_open: bool,
+    pub dropdown_demo_value: String,
+    pub menu_demo_value: String,
+
+    // Lists
+    pub selected_list_item: Option<usize>,
+    pub selected_table_row: Option<usize>,
+    pub form_submit_count: usize,
+    pub form_email_value: String,
+    pub form_email_error: Option<String>,
+
+    // Controls
+    pub checkbox_value: bool,
+    pub switch_value: bool,
+    pub radio_value: usize,
+    pub slider_value: f32,
+
+    // Inputs
+    pub text_value: String,
+    pub password_value: String,
+    pub number_value: f64,
+    pub search_value: String,
+    pub file_path_value: String,
+    pub keybinding_value: String,
+    pub keybinding_mode: KeybindingInputMode,
+    pub text_area_value: String,
+    pub select_demo_value: String,
+    pub combo_demo_value: String,
+    pub listbox_demo_value: String,
 }
 
 // Thin 4-arg event adapters for the toolbar toggle buttons so the
@@ -124,21 +134,51 @@ impl Controller {
         self.state.clone()
     }
 
-    /// Read the footer / summary fields once and return a
-    /// snapshot. Use this in XML that needs several scalar values
-    /// in one place instead of calling individual getters.
+    /// Read all scalar fields once and return a snapshot.
+    /// XML brace expressions should use this instead of individual
+    /// getters to avoid repeated `state.read(cx)` borrow guards.
     pub fn snapshot(&self, cx: &App) -> GallerySnapshot {
         let s = self.state.read(cx);
         GallerySnapshot {
+            current_renderer: s.current_renderer,
+            dark_mode: s.dark_mode,
+            current_locale: s.current_locale,
+            toast_count: s.toast_count.value,
+
+            tag_selected: s.tag_selected,
+            tag_close_count: s.tag_closable_count.value,
+            progress_value: s.progress_value,
+            toggle_btn_selected: s.toggle_btn_selected,
+
+            disclosure_open: s.disclosure_open,
+            popover_visible: s.popover_state.read(cx).is_visible(),
+            dropdown_visible: s.dropdown_state.read(cx).is_visible(),
+            is_modal_open: s.modal_state.read(cx).open,
+            dropdown_demo_value: s.dropdown_demo_value.clone(),
+            menu_demo_value: s.menu_demo_value.clone(),
+
+            selected_list_item: s.selected_list_item,
+            selected_table_row: s.selected_table_row,
             form_submit_count: s.form_submit_count,
             form_email_value: s.form_email_value.read(cx).clone(),
             form_email_error: s.form_email_error.clone(),
+
             checkbox_value: *s.checkbox_value.read(cx),
             switch_value: *s.switch_value.read(cx),
             radio_value: s.radio_value,
             slider_value: *s.slider_value.read(cx),
-            toast_count: s.toast_count.value,
-            current_locale: s.current_locale,
+
+            text_value: s.text_value.read(cx).clone(),
+            password_value: s.password_value.read(cx).clone(),
+            number_value: *s.number_value.read(cx),
+            search_value: s.search_value.read(cx).clone(),
+            file_path_value: s.file_path_value.read(cx).clone(),
+            keybinding_value: s.keybinding_value.clone(),
+            keybinding_mode: s.keybinding_mode,
+            text_area_value: s.text_area_value.read(cx).clone(),
+            select_demo_value: s.select_demo_value.clone(),
+            combo_demo_value: s.combo_demo_value.clone(),
+            listbox_demo_value: s.listbox_demo_value.clone(),
         }
     }
 
@@ -146,9 +186,9 @@ impl Controller {
     pub fn footer_form_text(&self, cx: &App) -> String {
         let s = self.snapshot(cx);
         t_named!(cx, "demo.footer.form_summary",
-            count => s.form_submit_count(),
-            email => s.form_email_value(),
-            error => format!("{:?}", s.form_email_error()))
+            count => s.form_submit_count,
+            email => s.form_email_value,
+            error => format!("{:?}", s.form_email_error))
         .to_string()
     }
 
@@ -156,10 +196,10 @@ impl Controller {
     pub fn footer_controls_text(&self, cx: &App) -> String {
         let s = self.snapshot(cx);
         t_named!(cx, "demo.footer.controls_summary",
-            checkbox => s.checkbox_value(),
-            switch => s.switch_value(),
-            radio => s.radio_value(),
-            slider => format!("{:.1}", s.slider_value()))
+            checkbox => s.checkbox_value,
+            switch => s.switch_value,
+            radio => s.radio_value,
+            slider => format!("{:.1}", s.slider_value))
         .to_string()
     }
 
@@ -167,214 +207,15 @@ impl Controller {
     pub fn footer_toast_text(&self, cx: &App) -> String {
         let s = self.snapshot(cx);
         t_named!(cx, "demo.footer.toast_summary",
-            count => s.toast_count(),
-            locale => s.current_locale().tag())
+            count => s.toast_count,
+            locale => s.current_locale.tag())
         .to_string()
     }
 
-    // -------- Toolbar read-only accessors used by view.rs --------
-
-    pub fn current_renderer(&self, cx: &App) -> RendererKind {
-        self.state.read(cx).current_renderer
-    }
-
-    pub fn dark_mode(&self, cx: &App) -> DarkMode {
-        self.state.read(cx).dark_mode
-    }
+    // -------- Entity accessors used by `@bind` and view.rs --------
 
     pub fn modal_state(&self, cx: &App) -> Entity<yororen_ui::headless::modal::ModalState> {
         self.state.read(cx).modal_state.clone()
-    }
-
-    // -------- Read-only helpers used directly by XML --------
-
-    pub fn toast_count(&self, cx: &App) -> usize {
-        self.state.read(cx).toast_count.value
-    }
-
-    pub fn tag_close_count(&self, cx: &App) -> usize {
-        self.state.read(cx).tag_closable_count.value
-    }
-
-    pub fn tag_selected(&self, cx: &App) -> bool {
-        self.state.read(cx).tag_selected
-    }
-
-    pub fn progress(&self, cx: &App) -> f32 {
-        self.state.read(cx).progress_value
-    }
-
-    pub fn toggle_btn_selected(&self, cx: &App) -> bool {
-        self.state.read(cx).toggle_btn_selected
-    }
-
-    pub fn is_modal_open(&self, cx: &App) -> bool {
-        self.state.read(cx).modal_state.read(cx).open
-    }
-
-    pub fn popover_visible(&self, cx: &App) -> bool {
-        self.state.read(cx).popover_state.read(cx).is_visible()
-    }
-
-    pub fn dropdown_visible(&self, cx: &App) -> bool {
-        self.state.read(cx).dropdown_state.read(cx).is_visible()
-    }
-
-    pub fn disclosure_open(&self, cx: &App) -> bool {
-        self.state.read(cx).disclosure_open
-    }
-
-    pub fn dropdown_demo_value(&self, cx: &App) -> String {
-        self.state.read(cx).dropdown_demo_value.clone()
-    }
-
-    pub fn menu_demo_value(&self, cx: &App) -> String {
-        self.state.read(cx).menu_demo_value.clone()
-    }
-
-    pub fn listbox_demo_value(&self, cx: &App) -> String {
-        self.state.read(cx).listbox_demo_value.clone()
-    }
-
-    pub fn select_demo_value(&self, cx: &App) -> String {
-        self.state.read(cx).select_demo_value.clone()
-    }
-
-    pub fn combo_demo_value(&self, cx: &App) -> String {
-        self.state.read(cx).combo_demo_value.clone()
-    }
-
-    pub fn form_email_error(&self, cx: &App) -> Option<String> {
-        self.state.read(cx).form_email_error.clone()
-    }
-
-    pub fn form_email_value(&self, cx: &App) -> String {
-        self.state.read(cx).form_email_value.read(cx).clone()
-    }
-
-    pub fn form_email_value_entity(&self, cx: &App) -> Entity<String> {
-        self.state.read(cx).form_email_value.clone()
-    }
-
-    pub fn form_submit_count(&self, cx: &App) -> usize {
-        self.state.read(cx).form_submit_count
-    }
-
-    pub fn selected_table_row(&self, cx: &App) -> Option<usize> {
-        self.state.read(cx).selected_table_row
-    }
-
-    pub fn selected_list_item(&self, cx: &App) -> Option<usize> {
-        self.state.read(cx).selected_list_item
-    }
-
-    pub fn list_items(&self, cx: &App) -> Vec<gpui::SharedString> {
-        self.state.read(cx).list_items.clone()
-    }
-
-    pub fn vl_status(&self, cx: &App) -> (String, usize, usize) {
-        let s = self.state.read(cx);
-        let visible = format!("{:?}", s.vl_visible_range);
-        (visible, s.vl_item_count, s.vl_load_count)
-    }
-
-    pub fn tree_expanded(&self, cx: &App) -> BTreeSet<TreeNodeId> {
-        self.state.read(cx).tree_expanded.clone()
-    }
-
-    pub fn tree_selected(&self, cx: &App) -> Option<TreeNodeId> {
-        self.state.read(cx).tree_selected.clone()
-    }
-
-    pub fn radio_value(&self, cx: &App) -> usize {
-        self.state.read(cx).radio_value
-    }
-
-    pub fn checkbox_value(&self, cx: &App) -> bool {
-        *self.state.read(cx).checkbox_value.read(cx)
-    }
-
-    pub fn checkbox_value_entity(&self, cx: &App) -> Entity<bool> {
-        self.state.read(cx).checkbox_value.clone()
-    }
-
-    pub fn switch_value(&self, cx: &App) -> bool {
-        *self.state.read(cx).switch_value.read(cx)
-    }
-
-    pub fn switch_value_entity(&self, cx: &App) -> Entity<bool> {
-        self.state.read(cx).switch_value.clone()
-    }
-
-    pub fn slider_value(&self, cx: &App) -> f32 {
-        *self.state.read(cx).slider_value.read(cx)
-    }
-
-    pub fn slider_value_entity(&self, cx: &App) -> Entity<f32> {
-        self.state.read(cx).slider_value.clone()
-    }
-
-    pub fn text_value(&self, cx: &App) -> String {
-        self.state.read(cx).text_value.read(cx).clone()
-    }
-
-    pub fn text_value_entity(&self, cx: &App) -> Entity<String> {
-        self.state.read(cx).text_value.clone()
-    }
-
-    pub fn search_value(&self, cx: &App) -> String {
-        self.state.read(cx).search_value.read(cx).clone()
-    }
-
-    pub fn search_value_entity(&self, cx: &App) -> Entity<String> {
-        self.state.read(cx).search_value.clone()
-    }
-
-    pub fn number_value(&self, cx: &App) -> f64 {
-        *self.state.read(cx).number_value.read(cx)
-    }
-
-    pub fn number_value_entity(&self, cx: &App) -> Entity<f64> {
-        self.state.read(cx).number_value.clone()
-    }
-
-    pub fn keybinding_value(&self, cx: &App) -> String {
-        self.state.read(cx).keybinding_value.clone()
-    }
-
-    pub fn keybinding_mode(
-        &self,
-        cx: &App,
-    ) -> yororen_ui::headless::keybinding_input::KeybindingInputMode {
-        self.state.read(cx).keybinding_mode
-    }
-
-    pub fn text_area_value(&self, cx: &App) -> String {
-        self.state.read(cx).text_area_value.read(cx).clone()
-    }
-
-    pub fn text_area_value_entity(&self, cx: &App) -> Entity<String> {
-        self.state.read(cx).text_area_value.clone()
-    }
-
-    pub fn password_value(&self, cx: &App) -> String {
-        self.state.read(cx).password_value.read(cx).clone()
-    }
-
-    pub fn password_value_entity(&self, cx: &App) -> Entity<String> {
-        self.state.read(cx).password_value.clone()
-    }
-
-    pub fn file_path_value(&self, cx: &App) -> String {
-        self.state.read(cx).file_path_value.read(cx).clone()
-    }
-
-    pub fn file_path_value_entity(&self, cx: &App) -> Entity<String> {
-        self.state.read(cx).file_path_value.clone()
-    }
-
-    pub fn current_locale(&self, cx: &App) -> LocaleChoice {
-        self.state.read(cx).current_locale
     }
 
     /// Reusable demo "cell" wrapper: a small muted label above the
@@ -456,6 +297,62 @@ impl Controller {
 
     pub fn vl_item_count(&self, cx: &App) -> usize {
         self.state.read(cx).vl_item_count
+    }
+
+    // -------- Entity accessors for `@bind` --------
+
+    pub fn form_email_value_entity(&self, cx: &App) -> Entity<String> {
+        self.state.read(cx).form_email_value.clone()
+    }
+
+    pub fn checkbox_value_entity(&self, cx: &App) -> Entity<bool> {
+        self.state.read(cx).checkbox_value.clone()
+    }
+
+    pub fn switch_value_entity(&self, cx: &App) -> Entity<bool> {
+        self.state.read(cx).switch_value.clone()
+    }
+
+    pub fn slider_value_entity(&self, cx: &App) -> Entity<f32> {
+        self.state.read(cx).slider_value.clone()
+    }
+
+    pub fn text_value_entity(&self, cx: &App) -> Entity<String> {
+        self.state.read(cx).text_value.clone()
+    }
+
+    pub fn password_value_entity(&self, cx: &App) -> Entity<String> {
+        self.state.read(cx).password_value.clone()
+    }
+
+    pub fn number_value_entity(&self, cx: &App) -> Entity<f64> {
+        self.state.read(cx).number_value.clone()
+    }
+
+    pub fn search_value_entity(&self, cx: &App) -> Entity<String> {
+        self.state.read(cx).search_value.clone()
+    }
+
+    pub fn file_path_value_entity(&self, cx: &App) -> Entity<String> {
+        self.state.read(cx).file_path_value.clone()
+    }
+
+    pub fn text_area_value_entity(&self, cx: &App) -> Entity<String> {
+        self.state.read(cx).text_area_value.clone()
+    }
+
+    // -------- Collection / complex accessors --------
+
+    pub fn list_items(&self, cx: &App) -> Vec<gpui::SharedString> {
+        self.state.read(cx).list_items.clone()
+    }
+
+    pub fn tree_expanded(&self, cx: &App) -> BTreeSet<TreeNodeId> {
+        self.state.read(cx).tree_expanded.clone()
+    }
+
+    pub fn tree_selected(&self, cx: &App) -> Option<TreeNodeId> {
+        self.state.read(cx).tree_selected.clone()
     }
 
     // -------- Toolbar actions --------
@@ -730,7 +627,7 @@ impl Controller {
     // -------- Lists section --------
 
     pub fn submit_form(&self, _vals: HashMap<SharedString, String>, _w: &mut Window, cx: &mut App) {
-        let email = self.form_email_value(cx);
+        let email = self.snapshot(cx).form_email_value;
         let must_contain = cx.t("demo.form.must_contain_at");
         self.state.update(cx, |s, _cx| {
             s.form_submit_count += 1;
@@ -856,7 +753,7 @@ impl Controller {
     }
 
     pub fn listbox_status_text(&self, cx: &App) -> String {
-        let value = self.listbox_demo_value(cx);
+        let value = self.snapshot(cx).listbox_demo_value;
         let status = if value.is_empty() {
             "—".to_string()
         } else {
@@ -867,19 +764,17 @@ impl Controller {
     }
 
     pub fn form_email_error_text(&self, cx: &App) -> String {
-        self.form_email_error(cx).unwrap_or_default()
+        self.snapshot(cx).form_email_error.unwrap_or_default()
     }
 
     pub fn form_status_text(&self, cx: &App) -> String {
-        let s = self.state.read(cx);
-        let submit_count = s.form_submit_count;
-        let email_error = s.form_email_error.clone();
+        let s = self.snapshot(cx);
         format!(
             "{} {} | {} {:?}",
             cx.t("demo.form.submitted"),
-            submit_count,
+            s.form_submit_count,
             cx.t("demo.form.last_error"),
-            email_error
+            s.form_email_error
         )
     }
 

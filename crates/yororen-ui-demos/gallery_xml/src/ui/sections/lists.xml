@@ -7,7 +7,7 @@
         <Column flex col gap="2" w={gpui::px(220.)}>
             <For each={controller.list_items(cx)} let:item let:index={i} key={i}>
                 <ListItem id={format!("li-{}", i + 1)} title={item.clone()}
-                          selected={controller.selected_list_item(cx) == Some(i)}
+                          selected={controller.snapshot(cx).selected_list_item == Some(i)}
                           on_click={controller.select_list_item_handler(i)} />
             </For>
         </Column>
@@ -40,7 +40,7 @@
     <Cell>
         <Slot name="label"><Label id="lbl-table" text={t!(cx, "demo.lists.cell_table")} muted /></Slot>
         <Table id="lists-table" columns={controller.table_columns(cx)} rows={controller.table_rows(cx)}
-               selected={controller.selected_table_row(cx).unwrap_or(0)}
+               selected={controller.snapshot(cx).selected_table_row.unwrap_or(0)}
                on_select={controller.table_row_handler()} />
     </Cell>
 

@@ -6,29 +6,29 @@
 
     <Row flex items_center gap="2" flex_wrap>
         <ToggleButton id="renderer-default" caption={t!(cx, "demo.renderer_default")}
-                      selected={controller.current_renderer(cx) == crate::state::RendererKind::Default}
+                      selected={controller.snapshot(cx).current_renderer == crate::state::RendererKind::Default}
                       variant="primary"
                       on_toggle={controller.select_default_renderer} />
         <ToggleButton id="renderer-brutalism" caption={t!(cx, "demo.renderer_brutalism")}
-                      selected={controller.current_renderer(cx) == crate::state::RendererKind::Brutalism}
+                      selected={controller.snapshot(cx).current_renderer == crate::state::RendererKind::Brutalism}
                       variant="primary"
                       on_toggle={controller.select_brutalism_renderer} />
 
         <ToggleButton id="dark-light" caption={t!(cx, "demo.theme_light")}
-                      selected={controller.dark_mode(cx) == crate::state::DarkMode::Light}
+                      selected={controller.snapshot(cx).dark_mode == crate::state::DarkMode::Light}
                       on_toggle={controller.select_light_theme} />
         <ToggleButton id="dark-dark" caption={t!(cx, "demo.theme_dark")}
-                      selected={controller.dark_mode(cx) == crate::state::DarkMode::Dark}
+                      selected={controller.snapshot(cx).dark_mode == crate::state::DarkMode::Dark}
                       on_toggle={controller.select_dark_theme} />
 
         <ToggleButton id="locale-en" caption="EN"
-                      selected={controller.current_locale(cx) == crate::state::LocaleChoice::En}
+                      selected={controller.snapshot(cx).current_locale == crate::state::LocaleChoice::En}
                       on_toggle={controller.select_english_locale} />
         <ToggleButton id="locale-zh" caption="中文"
-                      selected={controller.current_locale(cx) == crate::state::LocaleChoice::ZhCn}
+                      selected={controller.snapshot(cx).current_locale == crate::state::LocaleChoice::ZhCn}
                       on_toggle={controller.select_chinese_locale} />
         <ToggleButton id="locale-ar" caption="العربية"
-                      selected={controller.current_locale(cx) == crate::state::LocaleChoice::Ar}
+                      selected={controller.snapshot(cx).current_locale == crate::state::LocaleChoice::Ar}
                       on_toggle={controller.select_arabic_locale} />
 
         <Div flex_1 />

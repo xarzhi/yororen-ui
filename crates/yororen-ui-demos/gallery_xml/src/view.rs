@@ -44,9 +44,8 @@ impl Render for GalleryApp {
         // 1. Per-render renderer + theme install. Cheap and
         //    guarantees the window reflects the latest toolbar
         //    toggle.
-        let renderer = self.controller.current_renderer(cx);
-        let dark = self.controller.dark_mode(cx);
-        install_renderer(&mut **cx, renderer, dark);
+        let snapshot = self.controller.snapshot(cx);
+        install_renderer(&mut **cx, snapshot.current_renderer, snapshot.dark_mode);
 
         // 2. Register the host window with the notification center
         //    so toasts can auto-dismiss.
@@ -86,7 +85,7 @@ fn build_modal_overlay(
     window: &mut Window,
     cx: &mut Context<GalleryApp>,
 ) -> gpui::Deferred {
-    if !app.controller.is_modal_open(cx) {
+    if !app.controller.snapshot(cx).is_modal_open {
         return gpui::deferred(div()).with_priority(2);
     }
 

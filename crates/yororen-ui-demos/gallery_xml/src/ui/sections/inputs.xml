@@ -6,7 +6,7 @@
         <Slot name="name"><Label id="lbl-text" text={t!(cx, "input.text")} muted /></Slot>
         <TextInput id="txi-text" placeholder={t!(cx, "demo.input.placeholder_type_here")}
                    @bind={controller.text_value_entity(cx)} />
-        <Slot name="status"><Label id="sta-text" text={t_named!(cx, "demo.input.value", value => controller.text_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="sta-text" text={t_named!(cx, "demo.input.value", value => controller.snapshot(cx).text_value)} muted /></Slot>
     </InputCell>
 
     <InputCell>
@@ -14,7 +14,7 @@
         <PasswordInput id="pwd-password" placeholder={t!(cx, "demo.input.placeholder_password")}
                        mask_char={'•'}
                        @bind={controller.password_value_entity(cx)} />
-        <Slot name="status"><Label id="sta-password" text={t_named!(cx, "demo.input.value", value => controller.password_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="sta-password" text={t_named!(cx, "demo.input.value", value => controller.snapshot(cx).password_value)} muted /></Slot>
     </InputCell>
 
     <InputCell>
@@ -23,7 +23,7 @@
                      @bind={controller.number_value_entity(cx)}
                      on_increment={controller.set_number_value}
                      on_decrement={controller.set_number_value} />
-        <Slot name="status"><Label id="sta-number" text={t_named!(cx, "demo.input.value", value => controller.number_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="sta-number" text={t_named!(cx, "demo.input.value", value => controller.snapshot(cx).number_value)} muted /></Slot>
     </InputCell>
 
     <InputCell>
@@ -31,7 +31,7 @@
         <SearchInput id="sch-search" placeholder={t!(cx, "demo.input.placeholder_search")}
                      @bind={controller.search_value_entity(cx)}
                      on_clear={controller.clear_search} />
-        <Slot name="status"><Label id="sta-search" text={t_named!(cx, "demo.input.value", value => controller.search_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="sta-search" text={t_named!(cx, "demo.input.value", value => controller.snapshot(cx).search_value)} muted /></Slot>
     </InputCell>
 
     <InputCell>
@@ -39,34 +39,34 @@
         <FilePathInput id="fpi-file-path" placeholder={t!(cx, "demo.input.placeholder_path")}
                        @bind={controller.file_path_value_entity(cx)}
                        on_browse={controller.browse_file_path} />
-        <Slot name="status"><Label id="sta-file" text={t_named!(cx, "demo.input.value", value => controller.file_path_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="sta-file" text={t_named!(cx, "demo.input.value", value => controller.snapshot(cx).file_path_value)} muted /></Slot>
     </InputCell>
 
     <InputCell>
         <Slot name="name"><Label id="lbl-keybinding" text={t!(cx, "demo.input.keybinding_hint")} muted /></Slot>
-        <KeybindingInput id="kbi-keybinding" mode={controller.keybinding_mode(cx)}
+        <KeybindingInput id="kbi-keybinding" mode={controller.snapshot(cx).keybinding_mode}
                          on_change={controller.set_keybinding_value}
                          on_start_capture={controller.start_keybinding_capture}
                          on_cancel_capture={controller.cancel_keybinding_capture} />
-        <Slot name="status"><Label id="sta-keybinding" text={t_named!(cx, "demo.input.keybinding_status", value => controller.keybinding_value(cx), mode => format!("{:?}", controller.keybinding_mode(cx)))} muted /></Slot>
+        <Slot name="status"><Label id="sta-keybinding" text={t_named!(cx, "demo.input.keybinding_status", value => controller.snapshot(cx).keybinding_value, mode => format!("{:?}", controller.snapshot(cx).keybinding_mode))} muted /></Slot>
     </InputCell>
 
     <InputCell>
         <Slot name="name"><Label id="lbl-text-area" text={t!(cx, "demo.input.text_area_hint")} muted /></Slot>
         <TextArea id="txa-text-area" placeholder={t!(cx, "demo.input.placeholder_text_area")}
                   @bind={controller.text_area_value_entity(cx)} />
-        <Slot name="status"><Label id="sta-text-area" text={t_named!(cx, "demo.input.value", value => controller.text_area_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="sta-text-area" text={t_named!(cx, "demo.input.value", value => controller.snapshot(cx).text_area_value)} muted /></Slot>
     </InputCell>
 
     <InputCell>
         <Slot name="name"><Label id="lbl-select" text={t!(cx, "input.select")} muted /></Slot>
         <Select id="sel-select" state={controller.select_state(cx)} />
-        <Slot name="status"><Label id="sta-select" text={t_named!(cx, "demo.input.value", value => controller.select_demo_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="sta-select" text={t_named!(cx, "demo.input.value", value => controller.snapshot(cx).select_demo_value)} muted /></Slot>
     </InputCell>
 
     <InputCell>
         <Slot name="name"><Label id="lbl-combo" text={t!(cx, "input.combo")} muted /></Slot>
         <ComboBox id="cmb-combo" state={controller.combo_state(cx)} />
-        <Slot name="status"><Label id="sta-combo" text={t_named!(cx, "demo.input.value", value => controller.combo_demo_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="sta-combo" text={t_named!(cx, "demo.input.value", value => controller.snapshot(cx).combo_demo_value)} muted /></Slot>
     </InputCell>
 </Column>

@@ -6,33 +6,33 @@
         <InputCell>
             <Slot name="name"><Label id="lbl-cb" text={t!(cx, "demo.controls.cell_checkbox")} muted /></Slot>
             <Checkbox id="cbx-main" @bind={controller.checkbox_value_entity(cx)} />
-            <Slot name="status"><Label id="sta-cb" text={t_named!(cx, "demo.input.value", value => controller.checkbox_value(cx))} muted /></Slot>
+            <Slot name="status"><Label id="sta-cb" text={t_named!(cx, "demo.input.value", value => controller.snapshot(cx).checkbox_value)} muted /></Slot>
         </InputCell>
 
         <InputCell>
             <Slot name="name"><Label id="lbl-sw" text={t!(cx, "demo.controls.cell_switch")} muted /></Slot>
             <Switch id="swt-main" @bind={controller.switch_value_entity(cx)} />
-            <Slot name="status"><Label id="sta-sw" text={t_named!(cx, "demo.input.value", value => controller.switch_value(cx))} muted /></Slot>
+            <Slot name="status"><Label id="sta-sw" text={t_named!(cx, "demo.input.value", value => controller.snapshot(cx).switch_value)} muted /></Slot>
         </InputCell>
     </Row>
 
     <InputCell>
         <Slot name="name"><Label id="lbl-rg" text={t!(cx, "demo.controls.cell_radio_group")} muted /></Slot>
-        <RadioGroup id="rdg-choice" name="choice" selected={controller.radio_value(cx)}>
-            <Radio id="rdo-0" checked={controller.radio_value(cx) == 0}
+        <RadioGroup id="rdg-choice" name="choice" selected={controller.snapshot(cx).radio_value}>
+            <Radio id="rdo-0" checked={controller.snapshot(cx).radio_value == 0}
                    on_toggle={controller.select_radio_0} />
-            <Radio id="rdo-1" checked={controller.radio_value(cx) == 1}
+            <Radio id="rdo-1" checked={controller.snapshot(cx).radio_value == 1}
                    on_toggle={controller.select_radio_1} />
-            <Radio id="rdo-2" checked={controller.radio_value(cx) == 2}
+            <Radio id="rdo-2" checked={controller.snapshot(cx).radio_value == 2}
                    on_toggle={controller.select_radio_2} />
         </RadioGroup>
-        <Slot name="status"><Label id="rg-current" text={t_named!(cx, "demo.controls.selected", value => controller.radio_value(cx))} muted /></Slot>
+        <Slot name="status"><Label id="rg-current" text={t_named!(cx, "demo.controls.selected", value => controller.snapshot(cx).radio_value)} muted /></Slot>
     </InputCell>
 
     <InputCell>
         <Slot name="name"><Label id="lbl-slider" text={t!(cx, "demo.controls.cell_slider")} muted /></Slot>
         <Slider id="sld-value" min={0.0} max={100.0} step={1.0}
                 @bind={controller.slider_value_entity(cx)} />
-        <Slot name="status"><Label id="slider-lbl" text={t_named!(cx, "demo.controls.slider_value", value => format!("{:.1}", controller.slider_value(cx)))} muted /></Slot>
+        <Slot name="status"><Label id="slider-lbl" text={t_named!(cx, "demo.controls.slider_value", value => format!("{:.1}", controller.snapshot(cx).slider_value))} muted /></Slot>
     </InputCell>
 </Column>
