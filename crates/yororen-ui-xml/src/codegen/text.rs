@@ -88,8 +88,18 @@ pub(crate) fn parse_string_interpolation(text: &str) -> Option<Vec<InterpPart>> 
             parts.push(InterpPart::Expr(text[start..j].to_string()));
             i = j + 1; // skip the closing `}`
         } else {
-            current_literal.push(bytes[i] as char);
-            i += 1;
+            // Decode the next full UTF-8 char (1–4 bytes) starting
+            // at byte position `i` and push it whole. The old
+            // version pushed a single `u8 as char`, which treated
+            // every byte ≥ 0x80 as a Latin-1 code point and
+            // mangled multi-byte UTF-8 sequences — e.g. "Café
+            // {count}" became "CafÃ© {count}".
+            let c = text[i..]
+                .chars()
+                .next()
+                .expect("byte at `i` is part of a valid UTF-8 codepoint");
+            current_literal.push(c);
+            i += c.len_utf8();
         }
     }
     if !current_literal.is_empty() {
@@ -134,4 +144,54 @@ pub(crate) fn extract_text_content(children: &[AstNode]) -> Option<String> {
         }
     }
     if text.is_empty() { None } else { Some(text) }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// `parse_string_interpolation` walks the input byte-by-byte
+    /// to find `{…}` expressions, but the literal segments in
+    /// between must keep their original UTF-8 encoding. The old
+    /// implementation pushed a single `u8 as char`, which is
+    /// `Latin-1`-style and mangles multi-byte sequences: "Café"
+    /// (`43 61 66 C3 A9`) became "CafÃ©" (`43 61 66 C3 83 C2 A9`).
+    #[test]
+    fn interpolation_preserves_multibyte_utf8_literals() {
+        let parts = parse_string_interpolation("Café {count}").expect("has {");
+        match &parts[..] {
+            [InterpPart::Literal(prefix), InterpPart::Expr(expr)] => {
+                assert_eq!(prefix, "Café ");
+                assert_eq!(expr, "count");
+            }
+            other => panic!("unexpected parts: {other:?}"),
+        }
+    }
+
+    /// CJK / 3-byte sequences exercise the same fix at a
+    /// different byte length. "你好" is `E4 BD A0 E5 A5 BD`.
+    #[test]
+    fn interpolation_preserves_cjk_literals() {
+        let parts = parse_string_interpolation("你好,{name}!").expect("has {");
+        assert!(matches!(&parts[0], InterpPart::Literal(s) if s == "你好,"));
+        assert!(matches!(&parts[1], InterpPart::Expr(s) if s == "name"));
+        assert!(matches!(&parts[2], InterpPart::Literal(s) if s == "!"));
+    }
+
+    /// Emoji / 4-byte sequences ("🦀" is `F0 9F A6 80`).
+    #[test]
+    fn interpolation_preserves_emoji_literals() {
+        let parts = parse_string_interpolation("🦀 {v} 🦀").expect("has {");
+        assert!(matches!(&parts[0], InterpPart::Literal(s) if s == "🦀 "));
+        assert!(matches!(&parts[1], InterpPart::Expr(s) if s == "v"));
+        assert!(matches!(&parts[2], InterpPart::Literal(s) if s == " 🦀"));
+    }
+
+    /// A literal segment that contains no `{` should never be
+    /// split into multiple parts.
+    #[test]
+    fn interpolation_no_braces_returns_none() {
+        assert!(parse_string_interpolation("plain ascii").is_none());
+        assert!(parse_string_interpolation("纯中文也没有花括号").is_none());
+    }
 }

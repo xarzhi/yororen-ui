@@ -42,47 +42,33 @@ pub fn parse(
     // codegen arms recognise `bind` specially; we pre-rewrite
     // `@bind` to `bind` here so roxmltree is happy.
     let un_atd = rewrite_at_bind(xml);
-    let preprocessed = rewrite_let_attrs(&un_atd);
-    let normalized = normalise_bool_attrs(&preprocessed);
+    // The `let:NAME` → `let_NAME` rewrite is now done inside
+    // `normalise_bool_attrs` (tag-aware, attribute-name only).
+    // A previous global byte scan used to mangle `let:` inside
+    // text content, comments, CDATA, and attribute values —
+    // e.g. `<Label>let:foo</Label>` was emitted as
+    // `<Label>let_foo</Label>`, silently changing the visible
+    // text. We integrate the rewrite into the same byte-level
+    // tag walk that already handles bare-attr normalisation.
+    let normalized = normalise_bool_attrs(&un_atd);
     let doc = roxmltree::Document::parse(&normalized).map_err(|e| {
-        // The error from roxmltree is a textual message
-        // without a precise position; try to extract the
-        // "at line N, column M" hint and convert to an
-        // offset. If that fails, fall back to offset 0
-        // (the whole literal).
-        let offset = parse_roxmltree_offset(&format!("{e}"), &normalized).unwrap_or(0);
+        // `roxmltree::Error::pos()` returns a `TextPos { row, col }`
+        // — a structured position. We only use it when the error
+        // actually carries coordinates (some variants, like
+        // `InvalidXmlPrefixUri`, return a position with row=0).
+        let pos = e.pos();
+        let line_starts = LocationTracker::compute(&normalized);
+        let line_idx = (pos.row as usize).saturating_sub(1).min(line_starts.len().saturating_sub(1));
+        let offset = if line_idx < line_starts.len() {
+            line_starts[line_idx] + (pos.col as usize).saturating_sub(1)
+        } else {
+            0
+        };
         XmlError::new(XmlErrorKind::ParseError, outer_span, format!("{e}")).at(offset)
     })?;
 
     let root = doc.root_element();
     Ok(element_from(root, outer_span, location))
-}
-
-/// Parse `error_text` looking for "at line N, column M"
-/// (the message format `roxmltree` emits) and convert it
-/// to a byte offset using the line_starts table baked
-/// into the normalised XML. Returns `None` if the error
-/// format is unexpected.
-fn parse_roxmltree_offset(error_text: &str, normalized_xml: &str) -> Option<usize> {
-    // roxmltree formats errors roughly as:
-    //   "<error message> at line N, column M"
-    let line_marker = " at line ";
-    let col_marker = ", column ";
-    let line_idx = error_text.find(line_marker)? + line_marker.len();
-    let after_line = &error_text[line_idx..];
-    let line_end = after_line.find(|c: char| !c.is_ascii_digit())?;
-    let line: usize = after_line[..line_end].parse().ok()?;
-    let col_idx = after_line.find(col_marker)? + col_marker.len();
-    let after_col = &after_line[col_idx..];
-    let col_end = after_col.find(|c: char| !c.is_ascii_digit())?;
-    let col: usize = after_col[..col_end].parse().ok()?;
-    // Build a tiny line_starts table for the normalised
-    // XML on the fly (we don't have access to the
-    // tracker's table here, but the offsets line up
-    // because the preprocessors are line-preserving).
-    let starts = LocationTracker::compute(normalized_xml);
-    let l_idx = line.saturating_sub(1).min(starts.len().saturating_sub(1));
-    Some(starts[l_idx] + col.saturating_sub(1))
 }
 
 /// Convert `@bind` to `bind` so the attribute name is
@@ -184,50 +170,6 @@ impl<'a> LocationTracker<'a> {
     }
 }
 
-/// Convert `<For ... let:item>...</For>` and
-/// `<For ... let:index={i}>...</For>` into forms that
-/// roxmltree can parse. The transformation is intentionally
-/// lossless from the codegen's perspective: we record the
-/// original names so the codegen arm for `<For>` can rebuild
-/// `let:item` and `let:index` in the generated Rust.
-///
-/// Operates on bytes to preserve UTF-8 sequences (the
-/// preprocessor must never mangle multi-byte chars).
-pub(crate) fn rewrite_let_attrs(input: &str) -> String {
-    // We need to find `let:NAME` and `let:NAME={...}` inside
-    // start tags and rewrite them. The codegen reads the
-    // original name from a marker; here we only need to make
-    // roxmltree happy. Use a stable encoding:
-    //   let:item        → let_item
-    //   let:index={i}   → let_index="{i}"
-    let bytes = input.as_bytes();
-    let mut out: Vec<u8> = Vec::with_capacity(input.len());
-    let mut i = 0;
-    while i < bytes.len() {
-        if i + 3 < bytes.len()
-            && bytes[i] == b'l'
-            && bytes[i + 1] == b'e'
-            && bytes[i + 2] == b't'
-            && bytes[i + 3] == b':'
-        {
-            // Replace the colon with an underscore. This is
-            // a textual rewrite (not tag-aware) — the only
-            // places we expect `let:` are inside `<For>`'s
-            // start tag, so this is safe in practice.
-            out.extend_from_slice(b"let_");
-            i += 4;
-            while i < bytes.len() && (bytes[i].is_ascii_alphanumeric() || bytes[i] == b'_') {
-                out.push(bytes[i]);
-                i += 1;
-            }
-            continue;
-        }
-        out.push(bytes[i]);
-        i += 1;
-    }
-    String::from_utf8(out).expect("rewrite_let_attrs: output is valid UTF-8")
-}
-
 /// Rewrite `<Tag bare_attr bare_attr2="v" />` →
 /// `<Tag bare_attr="true" bare_attr2="v" />`. Operates on a
 /// single source string and is safe for typical XML used by
@@ -327,7 +269,21 @@ pub(crate) fn normalise_bool_attrs(input: &str) -> String {
                     i += 1;
                 }
                 let name = &input[name_start..i];
-                out.extend_from_slice(name.as_bytes());
+                // Tag-aware `let:` → `let_` rewrite. The colon
+                // is illegal in XML attribute names; the codegen
+                // looks for `let_item` / `let_index` to wire up
+                // the row-template bindings. We only rewrite
+                // when the name sits inside a start tag (which
+                // it does, by construction of the surrounding
+                // state machine), so `let:` inside text content,
+                // comments, CDATA, or attribute values is
+                // preserved verbatim.
+                if let Some(rest) = name.strip_prefix("let:") {
+                    out.extend_from_slice(b"let_");
+                    out.extend_from_slice(rest.as_bytes());
+                } else {
+                    out.extend_from_slice(name.as_bytes());
+                }
                 if i < bytes.len() && bytes[i] == b'=' {
                     // Normal `attr="value"` or `attr={...}` —
                     // copy as-is until the matching closer.
@@ -728,6 +684,49 @@ mod tests {
     fn leaves_text_content_alone() {
         let s = normalise_bool_attrs(r#"<Button>Click me</Button>"#);
         assert_eq!(s, r#"<Button>Click me</Button>"#);
+    }
+
+    /// The `let:NAME` → `let_NAME` rewrite is now tag-aware.
+    /// It must fire only inside start-tag attribute names, and
+    /// leave text content, comments, CDATA, and attribute
+    /// values untouched. The old global byte scan mangled all
+    /// four — these tests pin down the new behaviour.
+    #[test]
+    fn rewrites_let_in_start_tag_attribute_names() {
+        let s = normalise_bool_attrs(r#"<For each={xs} let:item>...</For>"#);
+        assert_eq!(s, r#"<For each="{xs}" let_item="true">...</For>"#);
+    }
+
+    #[test]
+    fn rewrites_let_with_value_in_start_tag() {
+        let s = normalise_bool_attrs(r#"<For each={xs} let:item={n}>...</For>"#);
+        assert_eq!(s, r#"<For each="{xs}" let_item="{n}">...</For>"#);
+    }
+
+    #[test]
+    fn leaves_let_colon_in_text_content_alone() {
+        // The old global rewriter turned this into
+        // `<Label>let_foo</Label>`, silently corrupting the
+        // visible text. The new tag-aware rewriter must leave
+        // it alone.
+        let s = normalise_bool_attrs(r#"<Label>let:foo = bar</Label>"#);
+        assert_eq!(s, r#"<Label>let:foo = bar</Label>"#);
+    }
+
+    #[test]
+    fn leaves_let_colon_in_attribute_values_alone() {
+        // Attribute values are user data — never rewrite.
+        let s = normalise_bool_attrs(r#"<Label text="let:foo" />"#);
+        assert_eq!(s, r#"<Label text="let:foo" />"#);
+    }
+
+    #[test]
+    fn leaves_let_colon_in_comments_alone() {
+        // Comments are stripped by roxmltree anyway, but the
+        // preprocessor must not mangle the byte stream for
+        // the parser.
+        let s = normalise_bool_attrs(r#"<Foo><!-- let:foo --></Foo>"#);
+        assert_eq!(s, r#"<Foo><!-- let:foo --></Foo>"#);
     }
 
     #[test]

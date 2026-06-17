@@ -56,34 +56,62 @@ fn load_user_schema(source_file: &str) -> Result<Vec<ComponentDef>, syn::Error> 
     })
 }
 
-/// Parsed form of `xml! { cx = expr, <Column>...</Column> }`.
+/// Parsed form of `xml! { cx = expr, window = expr, <Column>...</Column> }`.
 ///
 /// The optional `cx = <expr>,` preamble lets the user thread a
 /// `&mut gpui::App` into factory calls. When omitted we use
 /// the bare identifier `cx`.
+///
+/// The optional `window = <expr>,` preamble threads a
+/// `&mut gpui::Window` into the generated code, which the
+/// codegen needs for components whose render method takes
+/// it (e.g. `<VirtualList>` mints a controller via
+/// `window.use_keyed_state(...)`). When omitted the codegen
+/// falls back to the bare identifier `window` — which is
+/// only valid inside a `Render::render` closure that
+/// receives `window` as a parameter.
 struct XmlArgs {
     cx: Option<syn::Expr>,
+    window: Option<syn::Expr>,
     xml: String,
 }
 
 impl Parse for XmlArgs {
     fn parse(input: ParseStream) -> SynResult<Self> {
-        // Optional `cx = <expr>,` preamble.
+        // Optional key=value preamble: `cx = <expr>,` and
+        // `window = <expr>,`, in any order, each followed
+        // by a comma. Mirrors [`xml_file!`].
         let mut cx: Option<syn::Expr> = None;
-        if input.peek(syn::Ident) && input.peek2(syn::Token![=]) {
-            let ident: syn::Ident = input.parse()?;
-            if ident != "cx" {
-                return Err(syn::Error::new(ident.span(), "expected `cx`"));
+        let mut window: Option<syn::Expr> = None;
+        loop {
+            if !input.peek(syn::Ident) || !input.peek2(syn::Token![=]) {
+                break;
             }
+            let ident: syn::Ident = input.parse()?;
             let _eq: syn::Token![=] = input.parse()?;
-            cx = Some(input.parse()?);
-            let _comma: syn::Token![,] = input.parse()?;
+            let expr: syn::Expr = input.parse()?;
+            match ident.to_string().as_str() {
+                "cx" => cx = Some(expr),
+                "window" => window = Some(expr),
+                other => {
+                    return Err(syn::Error::new(
+                        ident.span(),
+                        format!("expected `cx` or `window`, got `{other}`"),
+                    ));
+                }
+            }
+            if input.peek(syn::Token![,]) {
+                let _: syn::Token![,] = input.parse()?;
+                continue;
+            }
+            break;
         }
         // The XML literal — anything until the end of the input.
         // We slurp the remaining tokens as a string.
         let xml_tokens = input.to_string();
         Ok(XmlArgs {
             cx,
+            window,
             xml: xml_tokens,
         })
     }
@@ -157,6 +185,33 @@ pub fn bind(input: TokenStream) -> TokenStream {
     ts.into()
 }
 
+/// Compile an inline XML literal into a `gpui` element.
+///
+/// Recognised leading preamble clauses (all optional, in any
+/// order, each followed by a comma):
+///
+/// - `cx = <expr>` — a `&mut gpui::App` threaded into factory
+///   calls. Defaults to the bare identifier `cx` when the
+///   macro is used inside a `Render::render` closure.
+/// - `window = <expr>` — a `&mut gpui::Window` threaded into
+///   components that need it (e.g. `<VirtualList>` mints its
+///   controller via `window.use_keyed_state(...)`). Defaults
+///   to the bare identifier `window`; if your render closure
+///   doesn't have a `window` parameter, pass an explicit
+///   `window = <expr>` clause.
+///
+/// ```ignore
+/// // Inside a `Render::render` closure:
+/// xml! {
+///     cx = &mut **cx,
+///     window = window,
+///     <Column>
+///         <VirtualList id="list" item_count={count}>
+///             <Label text="row" />
+///         </VirtualList>
+///     </Column>
+/// }
+/// ```
 #[proc_macro]
 pub fn xml(input: TokenStream) -> TokenStream {
     let parser = |stream: ParseStream| XmlArgs::parse(stream);
@@ -166,6 +221,7 @@ pub fn xml(input: TokenStream) -> TokenStream {
     };
     let outer_span = Span::call_site();
     let cx_expr = args.cx.map(|e| quote::quote! { #e });
+    let window_expr = args.window.map(|e| quote::quote! { #e });
     // Build the location tracker up-front so we can use it
     // both for parsing/codegen AND for rendering the
     // diagnostic in case either fails. The error returned
@@ -199,7 +255,19 @@ pub fn xml(input: TokenStream) -> TokenStream {
             let paths: Vec<PathBuf> = included_paths.into_iter().map(absolutize).collect();
             let deps = include_dependencies(&paths);
             let ts: TokenStream2 = ts;
-            quote::quote! { { #deps #ts } }.into()
+            let ts = quote::quote! { { #deps #ts } };
+            // Mirror [`xml_file!`]: when the user passed an
+            // explicit `window = <expr>`, splice a
+            // `let window = <expr>;` so the codegen can
+            // reference `window` for components that need
+            // `&mut Window` (e.g. `<VirtualList>` mints its
+            // controller via `window.use_keyed_state`).
+            // Without this, `<VirtualList>` inside `xml!`
+            // would compile-fail with an unresolved `window`.
+            match window_expr {
+                Some(w_expr) => splice_window_let(ts.into(), w_expr.into()),
+                None => ts.into(),
+            }
         }
         Err(e) => syn::Error::new(outer_span, e.render_with(Some(&location)))
             .to_compile_error()

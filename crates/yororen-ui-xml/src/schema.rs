@@ -542,18 +542,27 @@ pub fn is_stateful_interactive_method(name: &str) -> bool {
     )
 }
 
-/// Numeric suffixes for `is_spacing_shorthand`. Mirrors the table
-/// in [`crate::codegen::container::is_valid_spacing_suffix`] —
-/// keep the two in sync when adding new entries.
-const SPACING_NUMERIC: &[&str] = &[
+/// Numeric suffixes for `is_spacing_shorthand`. The container
+/// codegen reuses this table via [`NUMERIC_SPACING_SUFFIX`] to
+/// validate literal `gap="3"`, `p="4"`, `w="full"`, etc. — keep
+/// it the single source of truth so the two views cannot drift.
+pub const NUMERIC_SPACING_SUFFIX: &[&str] = &[
     "0", "0p5", "1", "1p5", "2", "2p5", "3", "3p5", "4", "5", "6", "7", "8", "9", "10", "11", "12",
     "16", "20", "24", "32", "40", "48", "56", "64", "72", "80", "96",
 ];
-/// Textual spacing suffixes for `is_spacing_shorthand`. Same
-/// sync note as [`SPACING_NUMERIC`].
-const SPACING_TEXTUAL: &[&str] = &[
+/// Textual spacing suffixes. Same single-source-of-truth note
+/// as [`NUMERIC_SPACING_SUFFIX`].
+pub const TEXTUAL_SPACING_SUFFIX: &[&str] = &[
     "full", "1_2", "1_3", "2_3", "1_4", "3_4", "1_5", "2_5", "3_5", "4_5", "1_6", "5_6", "1_12",
 ];
+
+/// Numeric suffixes for `is_spacing_shorthand`. Mirrors the
+/// table in [`crate::codegen::container::is_valid_spacing_suffix`]
+/// — keep the two in sync when adding new entries.
+const SPACING_NUMERIC: &[&str] = NUMERIC_SPACING_SUFFIX;
+/// Textual spacing suffixes for `is_spacing_shorthand`. Same
+/// sync note as [`SPACING_NUMERIC`].
+const SPACING_TEXTUAL: &[&str] = TEXTUAL_SPACING_SUFFIX;
 
 /// Spacing shorthands for `gap`, `p`, `m`, `px`, `py`, `pt`,
 /// `pb`, `pl`, `pr`, `mx`, `my`, `mt`, `mb`, `ml`, `mr`, and

@@ -1,11 +1,13 @@
+use std::sync::atomic::{AtomicUsize, Ordering};
+
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
 use crate::ast::{AstAttribute, AstElement, AstNode};
 use crate::error::{XmlError, XmlErrorKind};
 use crate::schema::{
-    ContainerDef, is_known_shorthand_method, is_spacing_prefix, is_spacing_shorthand,
-    is_stateful_interactive_method,
+    ContainerDef, NUMERIC_SPACING_SUFFIX, TEXTUAL_SPACING_SUFFIX, is_known_shorthand_method,
+    is_spacing_prefix, is_spacing_shorthand, is_stateful_interactive_method,
 };
 
 use crate::codegen::{
@@ -301,16 +303,35 @@ pub(crate) fn apply_container_attr(
     ))
 }
 
+/// Monotonic counter used to mint unique `ElementId` values
+/// for containers that the codegen promotes from `Div` to
+/// `Stateful<Div>`. The previous implementation used a single
+/// hardcoded string — `"__yororen_xml_container"` — which
+/// collided across sibling stateful-promoted containers in
+/// the same parent, causing them to share the same
+/// `ElementId` (and therefore the same `Stateful` state).
+///
+/// `proc-macro` invocations can run on multiple threads, so
+/// we use an `AtomicUsize` rather than a plain `Cell` for
+/// thread safety. The counter is purely a compile-time
+/// bookkeeping aid: the value is baked into the generated
+/// code as a `usize` literal, and `gpui::ElementId: From<usize>`
+/// turns it into an id with zero runtime allocation.
+static STATEFUL_ID_COUNTER: AtomicUsize = AtomicUsize::new(0);
+
 /// Promote a bare `gpui::Div` to `Stateful<gpui::Div>` so that
 /// `StatefulInteractiveElement` methods (e.g. `overflow_y_scroll`)
-/// can be called. Uses an internal id; a user-supplied `id="…"`
-/// attribute later in the same tag will simply override it.
+/// can be called. Mints a unique `ElementId` from the
+/// [`STATEFUL_ID_COUNTER`] (one per call site per proc-macro
+/// invocation); a user-supplied `id="…"` attribute later in
+/// the same tag will simply override it.
 fn ensure_stateful(stmts: &mut Vec<TokenStream>, stateful: &mut bool) {
     if !*stateful {
+        let id = STATEFUL_ID_COUNTER.fetch_add(1, Ordering::Relaxed);
         stmts.push(quote! {
             let __el = ::gpui::InteractiveElement::id(
                 __el,
-                ::gpui::ElementId::from("__yororen_xml_container"),
+                ::gpui::ElementId::from(#id as usize),
             );
         });
         *stateful = true;
@@ -319,18 +340,18 @@ fn ensure_stateful(stmts: &mut Vec<TokenStream>, stateful: &mut bool) {
 
 /// Numeric suffixes accepted after spacing prefixes (`gap`, `p`,
 /// `m`, …). Each maps to a real gpui method like `gap_3` / `p_4`.
-const NUMERIC_SPACING_SUFFIX: &[&str] = &[
-    "0", "0p5", "1", "1p5", "2", "2p5", "3", "3p5", "4", "5", "6", "7", "8", "9", "10", "11", "12",
-    "16", "20", "24", "32", "40", "48", "56", "64", "72", "80", "96",
-];
-/// Textual spacing suffixes. `full` is the only commonly used one;
-/// the fractional entries are gpui's Tailwind-style shorthands.
-const TEXTUAL_SPACING_SUFFIX: &[&str] = &[
-    "full", "1_2", "1_3", "2_3", "1_4", "3_4", "1_5", "2_5", "3_5", "4_5", "1_6", "5_6", "1_12",
-];
+///
+/// Sourced from [`crate::schema::NUMERIC_SPACING_SUFFIX`] so the
+/// schema and the container codegen validator can never drift.
+const NUMERIC_SPACING_SUFFIX_LOCAL: &[&str] = NUMERIC_SPACING_SUFFIX;
+/// Textual spacing suffixes. `full` is the only commonly used
+/// one; the fractional entries are gpui's Tailwind-style
+/// shorthands. Sourced from
+/// [`crate::schema::TEXTUAL_SPACING_SUFFIX`].
+const TEXTUAL_SPACING_SUFFIX_LOCAL: &[&str] = TEXTUAL_SPACING_SUFFIX;
 
 pub(crate) fn is_valid_spacing_suffix(s: &str) -> bool {
-    NUMERIC_SPACING_SUFFIX.contains(&s) || TEXTUAL_SPACING_SUFFIX.contains(&s)
+    NUMERIC_SPACING_SUFFIX_LOCAL.contains(&s) || TEXTUAL_SPACING_SUFFIX_LOCAL.contains(&s)
 }
 
 /// Flex-layout shorthand flags whose gpui method only mutates
