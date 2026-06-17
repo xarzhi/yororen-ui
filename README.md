@@ -319,6 +319,20 @@ Icon paths map to embedded SVG assets under `assets/icons/`. For app-specific ic
 yororen_ui = "0.3"
 ```
 
+The `xml` feature is enabled by default so `xml!` / `xml_file!` work out of the box. To opt out:
+
+```toml
+[dependencies]
+yororen_ui = { version = "0.3", default-features = false }
+```
+
+If you disabled default features and still want XML support, enable it explicitly:
+
+```toml
+[dependencies]
+yororen_ui = { version = "0.3", default-features = false, features = ["xml"] }
+```
+
 ### From GitHub (latest development)
 
 ```toml

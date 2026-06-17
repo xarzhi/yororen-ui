@@ -298,7 +298,11 @@ fn container_spacing_with_bad_suffix_carries_offset() {
         &[],
     )
     .unwrap_err();
-    assert!(err.message.contains("invalid spacing suffix"), "{}", err.message);
+    assert!(
+        err.message.contains("invalid spacing suffix"),
+        "{}",
+        err.message
+    );
     assert!(
         err.offset.is_some(),
         "spacing suffix error should carry byte_offset; got {:?}",
@@ -530,7 +534,7 @@ fn event_modifier_emits_keystroke_filter_for_known_keys() {
     // produce the right shape around an inner call.
     let inner_call: TokenStream =
         syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
-    let body = wrap_event_body_with_modifiers(&["enter"], inner_call, Span::call_site())
+    let body = wrap_event_body_with_modifiers(&["enter"], inner_call, Span::call_site(), "__ev")
         .expect("wrap with .enter");
     let s = body.to_string();
     assert!(s.contains("keystroke"), "{s}");
@@ -546,8 +550,9 @@ fn event_modifier_chains_multiple_filters() {
     // accessors.
     let inner_call: TokenStream =
         syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
-    let body = wrap_event_body_with_modifiers(&["ctrl", "enter"], inner_call, Span::call_site())
-        .expect("wrap with .ctrl.enter");
+    let body =
+        wrap_event_body_with_modifiers(&["ctrl", "enter"], inner_call, Span::call_site(), "__ev")
+            .expect("wrap with .ctrl.enter");
     let s = body.to_string();
     // The outer modifier check is `modifiers().control`.
     assert!(s.contains("modifiers"), "{s}");
@@ -565,7 +570,7 @@ fn event_modifier_stop_emits_stop_propagation() {
     // API call.
     let inner_call: TokenStream =
         syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
-    let body = wrap_event_body_with_modifiers(&["stop"], inner_call, Span::call_site())
+    let body = wrap_event_body_with_modifiers(&["stop"], inner_call, Span::call_site(), "__ev")
         .expect("wrap .stop");
     let s = body.to_string();
     assert!(s.contains("stop_propagation"), "{s}");
@@ -578,7 +583,7 @@ fn event_modifier_prevent_emits_window_prevent_default() {
     // window as its 2nd arg, so we splice that.
     let inner_call: TokenStream =
         syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
-    let body = wrap_event_body_with_modifiers(&["prevent"], inner_call, Span::call_site())
+    let body = wrap_event_body_with_modifiers(&["prevent"], inner_call, Span::call_site(), "__ev")
         .expect("wrap .prevent");
     let s = body.to_string();
     assert!(s.contains("prevent_default"), "{s}");
@@ -595,7 +600,7 @@ fn event_modifier_shift_uses_modifiers_accessor() {
     // fires.
     let inner_call: TokenStream =
         syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
-    let body = wrap_event_body_with_modifiers(&["shift"], inner_call, Span::call_site())
+    let body = wrap_event_body_with_modifiers(&["shift"], inner_call, Span::call_site(), "__ev")
         .expect("wrap .shift");
     let s = body.to_string();
     // The wrapper reads `modifiers().shift`, not a
@@ -617,9 +622,13 @@ fn event_modifier_alt_and_meta_alias_platform() {
     let inner_call: TokenStream =
         syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
     for mod_name in ["alt", "meta", "platform", "cmd"] {
-        let body =
-            wrap_event_body_with_modifiers(&[mod_name], inner_call.clone(), Span::call_site())
-                .unwrap_or_else(|e| panic!("wrap .{mod_name}: {e}"));
+        let body = wrap_event_body_with_modifiers(
+            &[mod_name],
+            inner_call.clone(),
+            Span::call_site(),
+            "__ev",
+        )
+        .unwrap_or_else(|e| panic!("wrap .{mod_name}: {e}"));
         let s = body.to_string();
         assert!(
             s.contains("modifiers"),
@@ -649,7 +658,7 @@ fn event_modifier_unknown_modifier_is_an_error() {
     // silently never firing.
     let inner_call: TokenStream =
         syn::parse_str("__inner(__ev, __window, cx)").expect("parse inner call");
-    let err = wrap_event_body_with_modifiers(&["stpo"], inner_call, Span::call_site())
+    let err = wrap_event_body_with_modifiers(&["stpo"], inner_call, Span::call_site(), "__ev")
         .expect_err("unknown modifier should error");
     assert!(err.message.contains("stpo"), "{}", err.message);
     assert!(err.message.contains("`stop`"), "{}", err.message);
@@ -685,9 +694,9 @@ fn event_bare_path_is_auto_wrapped_into_closure() {
     assert!(s.contains("move"), "{s}");
     assert!(s.contains("__auto_clone"), "{s}");
     assert!(s.contains(". increment"), "{s}");
-    assert!(s.contains("__arg0"), "{s}");
-    assert!(s.contains("__w"), "{s}");
-    assert!(s.contains("__cx"), "{s}");
+    assert!(s.contains("__ev"), "{s}");
+    assert!(s.contains("__window"), "{s}");
+    assert!(s.contains("cx"), "{s}");
 }
 
 #[test]
@@ -1132,6 +1141,76 @@ fn bind_on_text_input_emits_value_setter() {
     // `on_change` closure.
     assert!(compact.contains("xml_write"), "{s}");
     assert!(compact.contains("on_change"), "{s}");
+}
+
+#[test]
+fn bind_attribute_on_checkbox_uses_bool_writeback() {
+    // Checkbox's `checked` prop is `Bool` and its
+    // `on_toggle` passes the new boolean state. `@bind`
+    // must emit `XmlBinding::<bool>::xml_write`.
+    let s = render(r#"<Checkbox id="x" @bind={self.flag} />"#);
+    let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+    assert!(compact.contains("XmlBinding::<bool>"), "{s}");
+    assert!(compact.contains("xml_write"), "{s}");
+    assert!(compact.contains("on_toggle"), "{s}");
+}
+
+#[test]
+fn bind_attribute_on_tree_item_toggles_bool_on_click() {
+    // TreeItem's `on_toggle` is a click callback, not a
+    // boolean setter. `@bind` must read the current
+    // boolean value, negate it, and write it back.
+    let s = render(r#"<TreeItem id="x" node_id="a" label="A" @bind={self.selected} />"#);
+    let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+    assert!(compact.contains("xml_read"), "{s}");
+    assert!(compact.contains("xml_write"), "{s}");
+    assert!(compact.contains("on_toggle"), "{s}");
+    assert!(compact.contains("!__current"), "{s}");
+}
+
+#[test]
+fn event_modifier_on_toggle_checkbox_uses_four_args() {
+    // `on_toggle.stop` on Checkbox must emit a 4-arg
+    // closure matching the headless setter.
+    let s = render(r#"<Checkbox id="x" checked="true" on_toggle.stop={handler} />"#);
+    let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+    assert!(compact.contains("__arg0:bool"), "{s}");
+    assert!(compact.contains("Option<&gpui::ClickEvent>"), "{s}");
+    assert!(compact.contains("stop_propagation"), "{s}");
+}
+
+#[test]
+fn event_modifier_on_toggle_tree_item_uses_three_args() {
+    // `on_toggle.stop` on TreeItem must emit a 3-arg
+    // click-style closure.
+    let s = render(r#"<TreeItem id="x" node_id="a" label="A" on_toggle.stop={handler} />"#);
+    let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+    assert!(!compact.contains("__arg0:bool"), "{s}");
+    assert!(compact.contains("&gpui::ClickEvent"), "{s}");
+    assert!(compact.contains("stop_propagation"), "{s}");
+}
+
+#[test]
+fn bind_macro_in_event_attr_expands_with_signature() {
+    // `bind!(controller.increment, 1)` should be expanded by
+    // the XML macro into a closure that matches the event.
+    let s = render(r#"<Button id="x" caption="x" on_click={bind!(controller.increment, 1)} />"#);
+    let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+    assert!(compact.contains("__auto_clone"), "{s}");
+    assert!(compact.contains("controller"), "{s}");
+    assert!(compact.contains(".increment(1"), "{s}");
+}
+
+#[test]
+fn bind_macro_in_event_modifier_expands_with_signature() {
+    // `on_click.stop={bind!(controller.increment, 1)}` clones
+    // the receiver and inserts the bound arg before event args.
+    let s =
+        render(r#"<Button id="x" caption="x" on_click.stop={bind!(controller.increment, 1)} />"#);
+    let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+    assert!(compact.contains("__auto_clone"), "{s}");
+    assert!(compact.contains("stop_propagation"), "{s}");
+    assert!(compact.contains(".increment(1"), "{s}");
 }
 
 #[test]

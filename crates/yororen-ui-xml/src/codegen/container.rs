@@ -57,12 +57,8 @@ pub(crate) fn codegen_container(
                 }
                 j += 1;
             }
-            let chain_expr = codegen_if_chain(
-                &element.children[i..j],
-                cx,
-                source_file,
-                user_schema,
-            )?;
+            let chain_expr =
+                codegen_if_chain(&element.children[i..j], cx, source_file, user_schema)?;
             stmts.push(quote! { let __el = ::gpui::ParentElement::child(__el, #chain_expr); });
             i = j;
         } else {

@@ -4,8 +4,13 @@ use proc_macro2::Span;
 fn bench_codegen(c: &mut Criterion) {
     let inputs = [
         ("simple_label", r#"<Label id="l" text="Hello" />"#),
-        ("button_with_event", r#"<Button id="b" caption="Save" on_click={controller.save} />"#),
-        ("nested_containers", r#"
+        (
+            "button_with_event",
+            r#"<Button id="b" caption="Save" on_click={controller.save} />"#,
+        ),
+        (
+            "nested_containers",
+            r#"
 <Column flex col gap="3" p="4">
     <Row flex row gap="2">
         <Label id="l1" text="One" />
@@ -14,35 +19,36 @@ fn bench_codegen(c: &mut Criterion) {
     </Row>
     <Button id="b" caption="OK" variant="primary" />
 </Column>
-"#),
-        ("for_loop", r#"
+"#,
+        ),
+        (
+            "for_loop",
+            r#"
 <Column flex col gap="2">
     <For each={items.clone()} let:item let:index={i} key={i}>
         <Label id={format!("l-{}", i)} text={item.clone()} />
     </For>
 </Column>
-"#),
-        ("conditional", r#"
+"#,
+        ),
+        (
+            "conditional",
+            r#"
 <Column flex col gap="2">
     <If condition={show_title}>
         <Heading id="h" level="H2" text="Title" />
     </If>
     <Label id="l" text="Body" />
 </Column>
-"#),
+"#,
+        ),
     ];
 
     for (name, xml) in inputs {
         c.bench_function(&format!("codegen/{name}"), |b| {
             b.iter(|| {
-                yororen_ui_xml::codegen::codegen(
-                    xml,
-                    Span::call_site(),
-                    None,
-                    None,
-                    &[],
-                )
-                .expect("codegen succeeds")
+                yororen_ui_xml::codegen::codegen(xml, Span::call_site(), None, None, &[])
+                    .expect("codegen succeeds")
             })
         });
     }

@@ -286,10 +286,8 @@ fn render_leaf_runtime(
 
     let el: gpui::AnyElement = match element.tag.as_str() {
         "Label" => {
-            let text: gpui::SharedString = attr_str(element, "text")
-                .unwrap_or("")
-                .to_string()
-                .into();
+            let text: gpui::SharedString =
+                attr_str(element, "text").unwrap_or("").to_string().into();
             let mut l = yororen_ui_core::headless::label::label(id, text, cx);
             if attr_bool(element, "strong") {
                 l = l.strong(true);
@@ -335,19 +333,15 @@ fn render_leaf_runtime(
         "Heading" => {
             let level = attr_heading_level(element, "level")
                 .unwrap_or(yororen_ui_core::headless::heading::HeadingLevel::H1);
-            let text: gpui::SharedString = attr_str(element, "text")
-                .unwrap_or("")
-                .to_string()
-                .into();
+            let text: gpui::SharedString =
+                attr_str(element, "text").unwrap_or("").to_string().into();
             yororen_ui_core::headless::heading::heading(id, level, text, cx)
                 .render(cx)
                 .into_any_element()
         }
         "ListItem" => {
-            let title: gpui::SharedString = attr_str(element, "title")
-                .unwrap_or("")
-                .to_string()
-                .into();
+            let title: gpui::SharedString =
+                attr_str(element, "title").unwrap_or("").to_string().into();
             let mut li = yororen_ui_core::headless::list_item::list_item(id, title, cx);
             if let Some(selected) = attr_opt_bool(element, "selected") {
                 li = li.selected(selected);
@@ -505,4 +499,3 @@ mod tests {
         assert!(matches!(button.kind, crate::schema::ComponentKind::Leaf(_)));
     }
 }
-

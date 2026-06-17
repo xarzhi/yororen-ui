@@ -103,9 +103,7 @@ pub(crate) fn codegen_control_flow(
         }
         ControlFlowDef::For => codegen_for(element, cx, source_file, user_schema),
         ControlFlowDef::Fragment => codegen_fragment(element, cx, source_file, user_schema),
-        ControlFlowDef::Template => {
-            codegen_template(element, cx, source_file, user_schema)
-        }
+        ControlFlowDef::Template => codegen_template(element, cx, source_file, user_schema),
         ControlFlowDef::Slot => codegen_slot(element, cx),
         ControlFlowDef::Match => codegen_match(element, cx, source_file, user_schema),
         ControlFlowDef::Case => Err(XmlError::new(
@@ -115,9 +113,7 @@ pub(crate) fn codegen_control_flow(
         )
         .at(element.byte_offset)),
         ControlFlowDef::State => codegen_state(element, cx, source_file, user_schema),
-        ControlFlowDef::VirtualList => {
-            codegen_virtual_list(element, cx, source_file, user_schema)
-        }
+        ControlFlowDef::VirtualList => codegen_virtual_list(element, cx, source_file, user_schema),
         ControlFlowDef::UniformVirtualList => {
             codegen_uniform_virtual_list(element, cx, source_file, user_schema)
         }
@@ -166,8 +162,7 @@ pub(crate) fn codegen_if_branch(
         )
         .at(element.byte_offset));
     }
-    let child_expr =
-        codegen_children_as_element(&element.children, cx, source_file, user_schema)?;
+    let child_expr = codegen_children_as_element(&element.children, cx, source_file, user_schema)?;
 
     // Wrap the branch body so every arm has the same concrete
     // element type (`AnyElement`). This keeps if/else chains
@@ -229,6 +224,17 @@ pub(crate) fn codegen_for(
     //   3. Wraps the child in `gpui::div().id(format!(…))` so the
     //      wrapper itself is keyed.
     let key_attr = element.attributes.iter().find(|a| a.name == "key");
+    if key_attr.is_none() {
+        // Emit a compile-time warning for the legacy unkeyed
+        // path. Stable proc-macro diagnostics are not available,
+        // so we print to stderr; the warning still surfaces
+        // during the build and points the user to the fix.
+        let location = source_file.map(|f| format!(" in {f}")).unwrap_or_default();
+        eprintln!(
+            "warning: <For> without `key` uses legacy unkeyed rendering; stateful children may lose identity on reorder{}\n         help: add `key={{unique_expr}}` to give rows a stable identity",
+            location
+        );
+    }
     if let Some(k) = key_attr
         && k.expr.is_none()
     {
@@ -252,8 +258,7 @@ pub(crate) fn codegen_for(
         )
         .at(element.byte_offset));
     }
-    let child_expr =
-        codegen_children_as_element(&element.children, cx, source_file, user_schema)?;
+    let child_expr = codegen_children_as_element(&element.children, cx, source_file, user_schema)?;
 
     // The `<For>` body becomes a Rust `for` loop that appends
     // each row as a `.child(...)`. When a `key` is present the
@@ -454,8 +459,7 @@ fn codegen_match(
             )
             .at(arm.byte_offset));
         }
-        let body =
-            codegen_children_as_element(&arm.children, cx, source_file, user_schema)?;
+        let body = codegen_children_as_element(&arm.children, cx, source_file, user_schema)?;
         arms.append_all(quote! { #pattern_parsed => { #body }, });
         arm_count += 1;
     }
@@ -545,8 +549,7 @@ fn codegen_state(
         }
     };
 
-    let body =
-        codegen_children_as_element(&element.children, cx, source_file, user_schema)?;
+    let body = codegen_children_as_element(&element.children, cx, source_file, user_schema)?;
 
     Ok(quote! {
         {

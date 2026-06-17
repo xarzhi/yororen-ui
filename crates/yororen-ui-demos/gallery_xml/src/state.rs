@@ -12,9 +12,7 @@ use std::collections::BTreeSet;
 
 use gpui::{App, AppContext, Entity, Global, SharedString};
 
-use yororen_ui::t;
 use yororen_ui::headless::combo_box::ComboBoxState;
-use yororen_ui::i18n::Translate;
 use yororen_ui::headless::dropdown_menu::DropdownMenuState;
 use yororen_ui::headless::keybinding_input::KeybindingInputMode;
 use yororen_ui::headless::listbox::{ListboxOption, ListboxState};
@@ -26,6 +24,8 @@ use yororen_ui::headless::tooltip::TooltipState;
 use yororen_ui::headless::tree::{TreeData, node_id as tree_node_id};
 use yororen_ui::headless::tree_item::TreeNodeId;
 use yororen_ui::headless::virtual_list::{UniformVirtualListController, VirtualListController};
+use yororen_ui::i18n::Translate;
+use yororen_ui::t;
 
 /// The 3 locales the toolbar can switch between.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -146,10 +146,26 @@ impl GalleryState {
         let leaf1 = tree_node_id("leaf1");
         let leaf2 = tree_node_id("leaf2");
         data.add(None, root.clone(), cx.t("demo.lists.tree_root"));
-        data.add(Some(root.clone()), child1.clone(), cx.t("demo.lists.tree_child1"));
-        data.add(Some(root.clone()), child2.clone(), cx.t("demo.lists.tree_child2"));
-        data.add(Some(child1.clone()), leaf1.clone(), cx.t("demo.lists.tree_leaf1"));
-        data.add(Some(child1.clone()), leaf2.clone(), cx.t("demo.lists.tree_leaf2"));
+        data.add(
+            Some(root.clone()),
+            child1.clone(),
+            cx.t("demo.lists.tree_child1"),
+        );
+        data.add(
+            Some(root.clone()),
+            child2.clone(),
+            cx.t("demo.lists.tree_child2"),
+        );
+        data.add(
+            Some(child1.clone()),
+            leaf1.clone(),
+            cx.t("demo.lists.tree_leaf1"),
+        );
+        data.add(
+            Some(child1.clone()),
+            leaf2.clone(),
+            cx.t("demo.lists.tree_leaf2"),
+        );
         data
     }
 
@@ -270,9 +286,8 @@ impl GalleryState {
             tree_expanded: BTreeSet::new(),
             tree_selected: None,
             tree_data: Self::build_tree_data(cx),
-            list_controller: cx.new(|_| {
-                VirtualListController::new(100, gpui::ListAlignment::Top, gpui::px(20.))
-            }),
+            list_controller: cx
+                .new(|_| VirtualListController::new(100, gpui::ListAlignment::Top, gpui::px(20.))),
             vl_visible_range: None,
             vl_item_count: 100,
             vl_load_count: 0,

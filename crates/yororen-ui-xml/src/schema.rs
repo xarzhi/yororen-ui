@@ -677,6 +677,13 @@ pub fn lookup_component_owned(tag: &str, user_schema: &[ComponentDef]) -> Option
 /// [[component]]
 /// tag = "Chart"
 /// factory = "my_crate::chart::chart"
+/// render = "Default"
+/// needs_window = false
+/// supports_text_child = true
+///
+/// [[component.extra_args]]
+/// kind = "Text"
+/// attr = "title"
 ///
 /// [[component.props]]
 /// name = "data"
@@ -686,12 +693,20 @@ pub fn lookup_component_owned(tag: &str, user_schema: &[ComponentDef]) -> Option
 /// [[component.events]]
 /// name = "on_click"
 /// setter = "on_click"
+///
+/// [[component.slots]]
+/// name = "trigger"
+/// setter = "trigger"
 /// ```
 ///
 /// `value` must be one of: `String`, `Bool`, `UInt`, `Float32`,
 /// `Float64`, `Variant`, `BadgeVariant`, `HeadingLevel`,
 /// `IconSource`, `ImageSource`, `KeybindingInputMode`, `Color`,
 /// `Flag`, `Unknown`.
+///
+/// `extra_args.kind` must be one of: `Custom`, `Callback`, `Text`,
+/// `UInt`, `HeadingLevel`, `IconSource`, `ImageSource`,
+/// `KeybindingInputMode`, `Color`, `StringList`, `Borrow`.
 #[derive(Debug, serde::Deserialize)]
 struct UserFile {
     #[serde(default)]
@@ -704,14 +719,32 @@ struct UserComponent {
     factory: String,
     #[serde(default = "default_render")]
     render: String,
+    #[serde(default = "default_true")]
+    needs_app: bool,
+    #[serde(default)]
+    needs_window: bool,
+    #[serde(default)]
+    extra_args: Vec<UserExtraArg>,
     #[serde(default)]
     props: Vec<UserProp>,
     #[serde(default)]
     events: Vec<UserEvent>,
+    #[serde(default)]
+    supports_text_child: bool,
+    #[serde(default)]
+    children_before_render: bool,
+    #[serde(default)]
+    unwrap_children: bool,
+    #[serde(default)]
+    slots: Vec<UserSlot>,
 }
 
 fn default_render() -> String {
     "Default".to_string()
+}
+
+fn default_true() -> bool {
+    true
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -723,6 +756,18 @@ struct UserProp {
 
 #[derive(Debug, serde::Deserialize)]
 struct UserEvent {
+    name: String,
+    setter: String,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct UserExtraArg {
+    kind: String,
+    attr: String,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct UserSlot {
     name: String,
     setter: String,
 }
@@ -753,6 +798,26 @@ fn build_user_component(def: UserComponent) -> Result<ComponentDef, String> {
         .map(|e| (leak_str(e.name), leak_str(e.setter)))
         .collect();
 
+    let extra_args: Vec<ExtraArg> = def
+        .extra_args
+        .into_iter()
+        .map(|e| {
+            Ok(ExtraArg {
+                kind: parse_extra_arg_kind(&e.kind)?,
+                attr: leak_str(e.attr),
+            })
+        })
+        .collect::<Result<Vec<_>, String>>()?;
+
+    let slots: Vec<SlotDef> = def
+        .slots
+        .into_iter()
+        .map(|s| SlotDef {
+            name: leak_str(s.name),
+            setter: leak_str(s.setter),
+        })
+        .collect();
+
     let render = match def.render.as_str() {
         "Default" => RenderMode::Default,
         "Apply" => RenderMode::Apply,
@@ -761,16 +826,16 @@ fn build_user_component(def: UserComponent) -> Result<ComponentDef, String> {
 
     let leaf = LeafDef {
         factory: leak_str(def.factory),
-        extra_args: &[],
+        extra_args: leak_slice(extra_args),
         render,
-        needs_app: true,
-        needs_window: false,
+        needs_app: def.needs_app,
+        needs_window: def.needs_window,
         props: leak_slice(props),
         events: leak_slice(events),
-        supports_text_child: false,
-        children_before_render: false,
-        unwrap_children: false,
-        slots: &[],
+        supports_text_child: def.supports_text_child,
+        children_before_render: def.children_before_render,
+        unwrap_children: def.unwrap_children,
+        slots: leak_slice(slots),
     };
 
     Ok(ComponentDef {
@@ -809,6 +874,23 @@ fn parse_prop_value(raw: &str) -> Result<PropValue, String> {
     }
 }
 
+fn parse_extra_arg_kind(raw: &str) -> Result<ExtraArgKind, String> {
+    match raw {
+        "Custom" => Ok(ExtraArgKind::Custom),
+        "Callback" => Ok(ExtraArgKind::Callback),
+        "Text" => Ok(ExtraArgKind::Text),
+        "UInt" => Ok(ExtraArgKind::UInt),
+        "HeadingLevel" => Ok(ExtraArgKind::HeadingLevel),
+        "IconSource" => Ok(ExtraArgKind::IconSource),
+        "ImageSource" => Ok(ExtraArgKind::ImageSource),
+        "KeybindingInputMode" => Ok(ExtraArgKind::KeybindingInputMode),
+        "Color" => Ok(ExtraArgKind::Color),
+        "StringList" => Ok(ExtraArgKind::StringList),
+        "Borrow" => Ok(ExtraArgKind::Borrow),
+        other => Err(format!("unknown ExtraArgKind `{other}`")),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -841,6 +923,55 @@ setter = "on_click"
         assert_eq!(leaf.props[0].value, PropValue::String);
         assert_eq!(leaf.events.len(), 1);
         assert_eq!(leaf.events[0].0, "on_click");
+    }
+
+    #[test]
+    fn parse_user_schema_extended_leaf_def() {
+        let toml = r#"
+[[component]]
+tag = "Dialog"
+factory = "my_crate::dialog::dialog"
+render = "Default"
+needs_app = false
+needs_window = true
+supports_text_child = true
+children_before_render = true
+unwrap_children = true
+
+[[component.extra_args]]
+kind = "Text"
+attr = "title"
+
+[[component.props]]
+name = "open"
+setter = "open"
+value = "Bool"
+
+[[component.events]]
+name = "on_close"
+setter = "on_close"
+
+[[component.slots]]
+name = "footer"
+setter = "footer"
+"#;
+        let schema = parse_user_schema(toml).expect("parse succeeds");
+        assert_eq!(schema.len(), 1);
+        let ComponentKind::Leaf(leaf) = schema[0].kind else {
+            panic!("expected Leaf");
+        };
+        assert_eq!(leaf.factory, "my_crate::dialog::dialog");
+        assert!(!leaf.needs_app);
+        assert!(leaf.needs_window);
+        assert!(leaf.supports_text_child);
+        assert!(leaf.children_before_render);
+        assert!(leaf.unwrap_children);
+        assert_eq!(leaf.extra_args.len(), 1);
+        assert_eq!(leaf.extra_args[0].kind, ExtraArgKind::Text);
+        assert_eq!(leaf.extra_args[0].attr, "title");
+        assert_eq!(leaf.slots.len(), 1);
+        assert_eq!(leaf.slots[0].name, "footer");
+        assert_eq!(leaf.slots[0].setter, "footer");
     }
 
     #[test]

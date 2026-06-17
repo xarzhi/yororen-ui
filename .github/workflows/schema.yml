@@ -17,5 +17,7 @@ jobs:
         run: cargo run -p yororen_ui_xml --bin gen-schema -- --check
       - name: cargo check workspace
         run: cargo check --workspace
+      - name: cargo check workspace without default features
+        run: cargo check --workspace --no-default-features
       - name: cargo test yororen_ui_xml
         run: cargo test -p yororen_ui_xml

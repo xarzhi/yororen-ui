@@ -4,8 +4,8 @@ use quote::{format_ident, quote};
 use crate::ast::{AstAttribute, AstElement, AstNode};
 use crate::error::{XmlError, XmlErrorKind};
 use crate::schema::{
-    ComponentDef, ExtraArg, ExtraArgKind, LeafDef, PropValue, RenderMode, is_known_shorthand_method,
-    is_spacing_prefix, is_spacing_shorthand,
+    ComponentDef, ExtraArg, ExtraArgKind, LeafDef, PropValue, RenderMode,
+    is_known_shorthand_method, is_spacing_prefix, is_spacing_shorthand,
 };
 
 use crate::codegen::{
@@ -20,7 +20,8 @@ use crate::codegen::{
     diagnostics::did_you_mean,
     errors::{parse_attr, parse_enum_variant},
     events::{
-        auto_wrap_callback_expr, auto_wrap_event_call, auto_wrap_event_expr, split_event_modifiers,
+        auto_wrap_callback_expr, auto_wrap_event_call, auto_wrap_event_expr,
+        event_is_optional_click, event_signature, split_event_modifiers,
         wrap_event_body_with_modifiers,
     },
     parse_ts,
@@ -52,14 +53,7 @@ pub(crate) fn codegen_leaf(
 
     apply_props_and_events(&mut stmts, element, def, cx)?;
 
-    let remaining_children = apply_slots(
-        &mut stmts,
-        element,
-        def,
-        cx,
-        source_file,
-        user_schema,
-    )?;
+    let remaining_children = apply_slots(&mut stmts, element, def, cx, source_file, user_schema)?;
 
     apply_children_before_render(
         &mut stmts,
@@ -158,7 +152,9 @@ fn resolve_extra_arg(
         ExtraArgKind::HeadingLevel => resolve_heading_level_arg(element, extra, attr),
         ExtraArgKind::IconSource => resolve_icon_source_arg(element, extra, attr),
         ExtraArgKind::ImageSource => resolve_image_source_arg(element, extra, attr),
-        ExtraArgKind::KeybindingInputMode => resolve_keybinding_input_mode_arg(element, extra, attr),
+        ExtraArgKind::KeybindingInputMode => {
+            resolve_keybinding_input_mode_arg(element, extra, attr)
+        }
         ExtraArgKind::Color => resolve_color_arg(element, extra, attr),
     }
 }
@@ -449,7 +445,7 @@ fn apply_props_and_events(
             continue;
         }
 
-        if try_apply_bind(stmts, attr, def, cx)? {
+        if try_apply_bind(stmts, attr, def, cx, &element.tag)? {
             continue;
         }
         if try_apply_prop(stmts, attr, def)? {
@@ -458,7 +454,7 @@ fn apply_props_and_events(
         if try_apply_event(stmts, attr, def, &element.tag)? {
             continue;
         }
-        if try_apply_event_modifier(stmts, attr, def)? {
+        if try_apply_event_modifier(stmts, attr, def, &element.tag)? {
             continue;
         }
 
@@ -499,6 +495,7 @@ fn try_apply_bind(
     attr: &AstAttribute,
     def: LeafDef,
     cx: &TokenStream,
+    tag: &str,
 ) -> Result<bool, XmlError> {
     if attr.name != "bind" {
         return Ok(false);
@@ -529,7 +526,7 @@ fn try_apply_bind(
             attr.byte_offset,
             "@bind requires a brace expression, e.g. `@bind={self.name}`",
         )?;
-        stmts.extend(emit_bind(&parsed, def, cx));
+        stmts.extend(emit_bind(&parsed, def, cx, tag));
         Ok(true)
     } else {
         Err(XmlError::new(
@@ -620,6 +617,7 @@ fn try_apply_event_modifier(
     stmts: &mut Vec<TokenStream>,
     attr: &AstAttribute,
     def: LeafDef,
+    tag: &str,
 ) -> Result<bool, XmlError> {
     // Event modifiers: `on_click.stop={...}` /
     // `on_key_down.enter={...}`. The base name is
@@ -639,18 +637,35 @@ fn try_apply_event_modifier(
     // the `move` closure so the original binding
     // (e.g. `controller`) is not captured and can be
     // reused by other handlers.
-    let (clone_stmt, call_expr) = auto_wrap_event_call(attr, expr);
-    let body = wrap_event_body_with_modifiers(&modifiers, call_expr, attr.span)?;
+    let (clone_stmt, call_expr) = auto_wrap_event_call(attr, expr, base_event, tag);
+    // The closure signature depends on the event + tag so
+    // that `on_toggle` on Checkbox gets four args while
+    // `on_toggle` on TreeItem gets three.
+    let (params, _) = event_signature(base_event, tag);
+    // Toggle components pass `Option<&ClickEvent>` as the
+    // second arg. Modifier checks that inspect the event
+    // need a `&ClickEvent`, so unwrap it when necessary.
+    let optional_click = event_is_optional_click(base_event, tag);
+    let body = if optional_click && modifiers.iter().any(|m| !matches!(*m, "stop" | "prevent")) {
+        let body = wrap_event_body_with_modifiers(&modifiers, call_expr, attr.span, "__ev_ref")?;
+        quote! {
+            if let Some(__ev_ref) = __ev {
+                #body
+            }
+        }
+    } else {
+        wrap_event_body_with_modifiers(&modifiers, call_expr, attr.span, "__ev")?
+    };
     let closure = if let Some(stmt) = clone_stmt {
         quote! {
             {
                 #stmt
-                move |__ev, __window, cx| { #body }
+                move |#params| { #body }
             }
         }
     } else {
         quote! {
-            move |__ev, __window, cx| { #body }
+            move |#params| { #body }
         }
     };
     stmts.push(quote! {
@@ -835,12 +850,8 @@ fn apply_post_render_children(
             while j < remaining_children.len() && is_if_element(&remaining_children[j]) {
                 j += 1;
             }
-            let chain_expr = codegen_if_chain(
-                &remaining_children[i..j],
-                cx,
-                source_file,
-                user_schema,
-            )?;
+            let chain_expr =
+                codegen_if_chain(&remaining_children[i..j], cx, source_file, user_schema)?;
             child_stmts.push(quote! {
                 let __el = ::gpui::ParentElement::child(__el, #chain_expr);
             });
@@ -914,7 +925,12 @@ fn wrap_any(stmts: &mut Vec<TokenStream>, wrap_to_any: bool) {
 }
 
 /// appends both calls to the props builder.
-pub(crate) fn emit_bind(entity: &TokenStream, def: LeafDef, cx: &TokenStream) -> Vec<TokenStream> {
+pub(crate) fn emit_bind(
+    entity: &TokenStream,
+    def: LeafDef,
+    cx: &TokenStream,
+    tag: &str,
+) -> Vec<TokenStream> {
     // Pick the value prop. Prefer `value` (TextInput,
     // SearchInput, NumberInput, …); fall back to
     // `checked` (Checkbox, Switch, ToggleButton); then
@@ -954,63 +970,79 @@ pub(crate) fn emit_bind(entity: &TokenStream, def: LeafDef, cx: &TokenStream) ->
     }
     if let Some((event_attr, setter)) = change_event {
         let m = format_ident!("{}", setter);
-        // Pick the closure signature based on the event
-        // name. on_change takes `(&str, &mut Window,
-        // &mut App)` for text inputs and `(f64, &mut Window,
-        // &mut App)` for number inputs; on_toggle takes
-        // `(bool, Option<&ClickEvent>, &mut Window,
-        // &mut App)`. We use the value setter's type
-        // (Float → f64, anything else → String) to pick
-        // the right `XmlBinding<T>` instantiation.
         let event_name = *event_attr;
-        let value_is_f32 = matches!(value_prop.map(|p| p.value), Some(PropValue::Float32));
-        let value_is_f64 = matches!(value_prop.map(|p| p.value), Some(PropValue::Float64));
-        let value_is_usize = matches!(value_prop.map(|p| p.value), Some(PropValue::UInt));
         let writeback = if event_name == "on_toggle" {
-            quote! {
-                __el = __el.#m({
-                    let __bind = (#entity).clone();
-                    move |__v: bool, _ev: Option<&gpui::ClickEvent>, _window: &mut gpui::Window, cx: &mut gpui::App| {
-                        ::yororen_ui::headless::XmlBinding::<bool>::xml_write(&__bind, __v, cx);
-                    }
-                });
-            }
-        } else if value_is_f64 {
-            quote! {
-                __el = __el.#m({
-                    let __bind = (#entity).clone();
-                    move |__v: f64, _window: &mut gpui::Window, cx: &mut gpui::App| {
-                        ::yororen_ui::headless::XmlBinding::<f64>::xml_write(&__bind, __v, cx);
-                    }
-                });
-            }
-        } else if value_is_f32 {
-            quote! {
-                __el = __el.#m({
-                    let __bind = (#entity).clone();
-                    move |__v: f32, _window: &mut gpui::Window, cx: &mut gpui::App| {
-                        ::yororen_ui::headless::XmlBinding::<f32>::xml_write(&__bind, __v, cx);
-                    }
-                });
-            }
-        } else if value_is_usize {
-            quote! {
-                __el = __el.#m({
-                    let __bind = (#entity).clone();
-                    move |__v: usize, _window: &mut gpui::Window, cx: &mut gpui::App| {
-                        ::yororen_ui::headless::XmlBinding::<usize>::xml_write(&__bind, __v, cx);
-                    }
-                });
+            // `on_toggle` has two incompatible signatures.
+            // Toggle components pass the new boolean state;
+            // click-style components (TreeItem, Disclosure)
+            // just report a click and we have to flip the
+            // bound boolean ourselves.
+            if matches!(tag, "Checkbox" | "Switch" | "Radio" | "ToggleButton") {
+                quote! {
+                    __el = __el.#m({
+                        let __bind = (#entity).clone();
+                        move |__v: bool, _ev: Option<&gpui::ClickEvent>, _window: &mut gpui::Window, cx: &mut gpui::App| {
+                            ::yororen_ui::headless::XmlBinding::<bool>::xml_write(&__bind, __v, cx);
+                        }
+                    });
+                }
+            } else {
+                quote! {
+                    __el = __el.#m({
+                        let __bind = (#entity).clone();
+                        move |__ev: &gpui::ClickEvent, _window: &mut gpui::Window, cx: &mut gpui::App| {
+                            let __current = ::yororen_ui::headless::XmlBinding::<bool>::xml_read(&__bind, cx);
+                            ::yororen_ui::headless::XmlBinding::<bool>::xml_write(&__bind, !__current, cx);
+                        }
+                    });
+                }
             }
         } else {
-            quote! {
-                __el = __el.#m({
-                    let __bind = (#entity).clone();
-                    move |__v: &str, _window: &mut gpui::Window, cx: &mut gpui::App| {
-                        let __new: String = __v.to_string();
-                        ::yororen_ui::headless::XmlBinding::<String>::xml_write(&__bind, __new, cx);
-                    }
-                });
+            // `on_change` and friends pass the new value as
+            // the first closure argument. Map the value prop
+            // type to the right `XmlBinding<T>` instantiation.
+            match value_prop.map(|p| p.value) {
+                Some(PropValue::Bool) => quote! {
+                    __el = __el.#m({
+                        let __bind = (#entity).clone();
+                        move |__v: bool, _window: &mut gpui::Window, cx: &mut gpui::App| {
+                            ::yororen_ui::headless::XmlBinding::<bool>::xml_write(&__bind, __v, cx);
+                        }
+                    });
+                },
+                Some(PropValue::Float64) => quote! {
+                    __el = __el.#m({
+                        let __bind = (#entity).clone();
+                        move |__v: f64, _window: &mut gpui::Window, cx: &mut gpui::App| {
+                            ::yororen_ui::headless::XmlBinding::<f64>::xml_write(&__bind, __v, cx);
+                        }
+                    });
+                },
+                Some(PropValue::Float32) => quote! {
+                    __el = __el.#m({
+                        let __bind = (#entity).clone();
+                        move |__v: f32, _window: &mut gpui::Window, cx: &mut gpui::App| {
+                            ::yororen_ui::headless::XmlBinding::<f32>::xml_write(&__bind, __v, cx);
+                        }
+                    });
+                },
+                Some(PropValue::UInt) => quote! {
+                    __el = __el.#m({
+                        let __bind = (#entity).clone();
+                        move |__v: usize, _window: &mut gpui::Window, cx: &mut gpui::App| {
+                            ::yororen_ui::headless::XmlBinding::<usize>::xml_write(&__bind, __v, cx);
+                        }
+                    });
+                },
+                _ => quote! {
+                    __el = __el.#m({
+                        let __bind = (#entity).clone();
+                        move |__v: &str, _window: &mut gpui::Window, cx: &mut gpui::App| {
+                            let __new: String = __v.to_string();
+                            ::yororen_ui::headless::XmlBinding::<String>::xml_write(&__bind, __new, cx);
+                        }
+                    });
+                },
             }
         };
         out.push(writeback);

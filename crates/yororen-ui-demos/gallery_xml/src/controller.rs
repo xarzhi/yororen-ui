@@ -523,10 +523,7 @@ impl Controller {
 
     pub fn split_button_items(&self, _cx: &App) -> Vec<DropdownItem> {
         vec![
-            DropdownItem::Item(DropdownMenuItem::new(
-                "save",
-                _cx.t("demo.actions.save"),
-            )),
+            DropdownItem::Item(DropdownMenuItem::new("save", _cx.t("demo.actions.save"))),
             DropdownItem::Item(DropdownMenuItem::new(
                 "save_as",
                 _cx.t("demo.actions.save_as"),

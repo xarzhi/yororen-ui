@@ -89,6 +89,74 @@ impl Parse for XmlArgs {
     }
 }
 
+/// Partially apply arguments to a function/method, producing
+/// a standard 3-argument event handler closure.
+///
+/// ```ignore
+/// button("ok", cx)
+///     .on_click(bind!(controller.navigate, Route::Home))
+/// ```
+///
+/// expands to a closure equivalent to:
+///
+/// ```ignore
+/// move |__a0, __a1, __a2| controller.navigate(Route::Home, __a0, __a1, __a2)
+/// ```
+///
+/// The receiver is cloned once outside the closure. For
+/// XML event attributes the XML macro expands `bind!(...)`
+/// inline with the correct event arity; this standalone
+/// macro is provided for headless code that expects the
+/// conventional `(arg0, &mut Window, &mut App)` signature.
+#[proc_macro]
+pub fn bind(input: TokenStream) -> TokenStream {
+    let parser = |stream: ParseStream| {
+        let callee: syn::Expr = stream.parse()?;
+        let _comma: syn::Token![,] = stream.parse()?;
+        let bound: syn::punctuated::Punctuated<syn::Expr, syn::Token![,]> =
+            stream.parse_terminated(syn::Expr::parse, syn::Token![,])?;
+        Ok((callee, bound))
+    };
+    let (callee, bound) = match parser.parse2(input.into()) {
+        Ok(v) => v,
+        Err(e) => return e.to_compile_error().into(),
+    };
+    let bound_args = bound.iter();
+    let ts = match &callee {
+        syn::Expr::Field(field) => {
+            let receiver = &field.base;
+            let member = &field.member;
+            let clone_ident = quote::format_ident!("__auto_clone");
+            quote::quote! {
+                {
+                    let #clone_ident = (#receiver).clone();
+                    move |__a0, __a1, __a2| {
+                        #clone_ident.#member(#(#bound_args),*, __a0, __a1, __a2)
+                    }
+                }
+            }
+        }
+        syn::Expr::MethodCall(call) => {
+            let receiver = &call.receiver;
+            let method = &call.method;
+            let factory_args = call.args.iter();
+            let clone_ident = quote::format_ident!("__auto_clone");
+            quote::quote! {
+                {
+                    let #clone_ident = (#receiver).clone();
+                    #clone_ident.#method(#(#factory_args),*)(#(#bound_args),*, __a0, __a1, __a2)
+                }
+            }
+        }
+        _ => quote::quote! {
+            move |__a0, __a1, __a2| {
+                #callee(#(#bound_args),*, __a0, __a1, __a2)
+            }
+        },
+    };
+    ts.into()
+}
+
 #[proc_macro]
 pub fn xml(input: TokenStream) -> TokenStream {
     let parser = |stream: ParseStream| XmlArgs::parse(stream);
@@ -261,8 +329,7 @@ pub fn xml_file(input: TokenStream) -> TokenStream {
             // Register the top-level XML file itself plus every
             // file pulled in via `<Include src="…">` as a Cargo
             // dependency so edits trigger recompilation.
-            let mut paths: Vec<PathBuf> =
-                included_paths.into_iter().map(absolutize).collect();
+            let mut paths: Vec<PathBuf> = included_paths.into_iter().map(absolutize).collect();
             paths.push(resolved_path);
             let deps = include_dependencies(&paths);
             let ts: TokenStream2 = ts;

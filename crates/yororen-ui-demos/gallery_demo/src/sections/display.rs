@@ -61,22 +61,46 @@ pub fn render(app: &mut GalleryApp, cx: &mut Context<GalleryApp>) -> Div {
         .gap(px(4.))
         .child(cell(
             cx.t("demo.display.cell_heading_h1"),
-            heading("hdg-1", HeadingLevel::H1, cx.t("demo.display.heading_h1"), cx).render(cx),
+            heading(
+                "hdg-1",
+                HeadingLevel::H1,
+                cx.t("demo.display.heading_h1"),
+                cx,
+            )
+            .render(cx),
             cx,
         ))
         .child(cell(
             cx.t("demo.display.cell_heading_h2"),
-            heading("hdg-2", HeadingLevel::H2, cx.t("demo.display.heading_h2"), cx).render(cx),
+            heading(
+                "hdg-2",
+                HeadingLevel::H2,
+                cx.t("demo.display.heading_h2"),
+                cx,
+            )
+            .render(cx),
             cx,
         ))
         .child(cell(
             cx.t("demo.display.cell_heading_h3"),
-            heading("hdg-3", HeadingLevel::H3, cx.t("demo.display.heading_h3"), cx).render(cx),
+            heading(
+                "hdg-3",
+                HeadingLevel::H3,
+                cx.t("demo.display.heading_h3"),
+                cx,
+            )
+            .render(cx),
             cx,
         ))
         .child(cell(
             cx.t("demo.display.cell_heading_h4"),
-            heading("hdg-4", HeadingLevel::H4, cx.t("demo.display.heading_h4"), cx).render(cx),
+            heading(
+                "hdg-4",
+                HeadingLevel::H4,
+                cx.t("demo.display.heading_h4"),
+                cx,
+            )
+            .render(cx),
             cx,
         ));
 

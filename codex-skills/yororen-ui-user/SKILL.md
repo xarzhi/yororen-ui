@@ -117,8 +117,8 @@ the app will either not compile or quietly misbehave.
    render path.
 
 7. **Stable identity.** Every stateful child in a list or a virtualized
-   view needs a stable `.id(...)` / `.key(...)`. List reordering without
-   identity silently desyncs focus and animation state.
+   view needs a stable `.id(...)`. List reordering without identity
+   silently desyncs focus and animation state.
 
 ## 5. Project layout
 

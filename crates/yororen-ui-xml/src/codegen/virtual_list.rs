@@ -148,12 +148,8 @@ pub(crate) fn codegen_virtual_list_kind(
                 .at(element.byte_offset));
             }
             let (item_ident, index_ident) = parse_let_bindings(element, "item", "index");
-            let child_body = codegen_children_as_element(
-                &element.children,
-                cx,
-                source_file,
-                user_schema,
-            )?;
+            let child_body =
+                codegen_children_as_element(&element.children, cx, source_file, user_schema)?;
             // Bind `let item = index;` when `let:item` is requested —
             // gpui hands the row closure a `usize`, so for parity with
             // `<For>` we make the item binding an alias of the index.

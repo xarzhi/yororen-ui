@@ -246,9 +246,9 @@ These are the rules the demos converge on. Violate them and the UI
 becomes hard to maintain or visibly broken.
 
 - **Stable identity.** Every stateful child in a list, virtualized
-  view, or any tree that can be reordered needs `.id(...)` or
-  `.key(...)`. Use the row index as the key when the data is
-  append-only; use the data's primary key when the data is mutable.
+  view, or any tree that can be reordered needs `.id(...)`. Use the
+  row index as the id when the data is append-only; use the data's
+  primary key when the data is mutable.
   Example: `text_input(format!("row-email-{ix}"))` in a virtual list.
 
 - **Render overlays at the scroll root, not inside a section.** A

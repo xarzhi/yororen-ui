@@ -115,4 +115,3 @@ fn build_modal_overlay(
     )
     .with_priority(2)
 }
-

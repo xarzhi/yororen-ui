@@ -1,5 +1,6 @@
 use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote};
+use syn::parse::Parser;
 
 use crate::ast::AstAttribute;
 use crate::error::{XmlError, XmlErrorKind};
@@ -55,38 +56,182 @@ pub(crate) fn auto_wrap_event_expr(
     tag: &str,
 ) -> TokenStream {
     // Closure shape depends on the event and component tag.
-    let (params, call_args): (TokenStream, TokenStream) = match event_name {
-        "on_toggle" if matches!(tag, "Checkbox" | "Switch" | "Radio" | "ToggleButton") => (
-            quote! { __arg0: bool, __ev: Option<&gpui::ClickEvent>, __w: &mut gpui::Window, __cx: &mut gpui::App },
-            quote! { __arg0, __ev, __w, __cx },
-        ),
-        "on_toggle" => (
-            // TreeItem and any future non-toggle component:
-            // on_toggle is conceptually a click on the row /
-            // chevron, so it uses the standard 3-arg click
-            // signature. Auto-wrapped bare methods receive
-            // `&ClickEvent` as the first argument.
-            quote! { __ev: &gpui::ClickEvent, __w: &mut gpui::Window, __cx: &mut gpui::App },
-            quote! { __ev, __w, __cx },
-        ),
-        "on_clear" | "on_start_capture" | "on_cancel_capture" => (
-            quote! { __w: &mut gpui::Window, __cx: &mut gpui::App },
-            quote! { __w, __cx },
-        ),
-        "on_visible_range_change" => (
-            quote! { __range: std::ops::Range<usize>, __total: usize, __w: &mut gpui::Window, __cx: &mut gpui::App },
-            quote! { __range, __total, __w, __cx },
-        ),
-        _ => (
-            quote! { __arg0, __w: &mut gpui::Window, __cx: &mut gpui::App },
-            quote! { __arg0, __w, __cx },
-        ),
-    };
+    let (params, call_args): (TokenStream, TokenStream) = event_signature(event_name, tag);
+
+    // Detect `bind!(callee, bound_args...)` and expand it into a
+    // closure with the right event signature.
+    if let Some(raw) = attr.expr.as_ref() {
+        if let Some((callee, bound_args)) = try_parse_bind_macro(raw) {
+            return emit_bind_closure(&callee, &bound_args, params, call_args);
+        }
+    }
+
     auto_wrap_closure_expr(attr, expr, params, call_args)
 }
+
+/// Returns `(closure_params, call_args)` for the given event
+/// name and component tag. This is the single source of truth
+/// for event callback signatures so that normal events,
+/// modifiers, and `@bind` all stay consistent with the
+/// headless setter they target.
+pub(crate) fn event_signature(event_name: &str, tag: &str) -> (TokenStream, TokenStream) {
+    match event_name {
+        "on_toggle" => on_toggle_signature(tag),
+        "on_clear" | "on_start_capture" | "on_cancel_capture" => (
+            quote! { __window: &mut gpui::Window, cx: &mut gpui::App },
+            quote! { __window, cx },
+        ),
+        "on_visible_range_change" => (
+            quote! { __range: std::ops::Range<usize>, __total: usize, __window: &mut gpui::Window, cx: &mut gpui::App },
+            quote! { __range, __total, __window, cx },
+        ),
+        _ => (
+            // Click-style events (on_click, on_change, …) receive
+            // the event/value as the first argument. The name `__ev`
+            // matches the convention used by event modifiers.
+            quote! { __ev, __window: &mut gpui::Window, cx: &mut gpui::App },
+            quote! { __ev, __window, cx },
+        ),
+    }
+}
+
+/// Signature for `on_toggle`. Toggle components pass the new
+/// boolean state plus an optional click event; all other
+/// components treat it as a click callback.
+pub(crate) fn on_toggle_signature(tag: &str) -> (TokenStream, TokenStream) {
+    if matches!(tag, "Checkbox" | "Switch" | "Radio" | "ToggleButton") {
+        (
+            quote! { __arg0: bool, __ev: Option<&gpui::ClickEvent>, __window: &mut gpui::Window, cx: &mut gpui::App },
+            quote! { __arg0, __ev, __window, cx },
+        )
+    } else {
+        (
+            quote! { __ev: &gpui::ClickEvent, __window: &mut gpui::Window, cx: &mut gpui::App },
+            quote! { __ev, __window, cx },
+        )
+    }
+}
+
+/// True when the event's "event" argument is an
+/// `Option<&ClickEvent>` rather than a bare `&ClickEvent`.
+/// This matters for event modifiers that inspect the event.
+pub(crate) fn event_is_optional_click(event_name: &str, tag: &str) -> bool {
+    matches!(event_name, "on_toggle")
+        && matches!(tag, "Checkbox" | "Switch" | "Radio" | "ToggleButton")
+}
+
+/// If the raw attribute expression is a `bind!(...)` macro
+/// invocation, return the callee expression and the bound
+/// arguments. We support the common XML forms:
+///
+/// ```xml
+/// <Button on_click={bind!(controller.increment, 1)} />
+/// <Button on_click={bind!(handler, arg)} />
+/// ```
+fn try_parse_bind_macro(raw: &str) -> Option<(syn::Expr, Vec<syn::Expr>)> {
+    let parsed = syn::parse_str::<syn::Expr>(raw).ok()?;
+    let syn::Expr::Macro(expr_macro) = parsed else {
+        return None;
+    };
+    if !expr_macro.mac.path.is_ident("bind") {
+        return None;
+    }
+    let punctuated = syn::punctuated::Punctuated::<syn::Expr, syn::Token![,]>::parse_terminated
+        .parse2(expr_macro.mac.tokens)
+        .ok()?;
+    let mut iter = punctuated.into_iter();
+    let callee = iter.next()?;
+    let bound = iter.collect();
+    Some((callee, bound))
+}
+
+/// Build a closure that calls `callee` with `bound_args`
+/// followed by `call_args`. The closure captures any
+/// receiver by clone so it can be used as an event handler.
+fn emit_bind_closure(
+    callee: &syn::Expr,
+    bound_args: &[syn::Expr],
+    params: TokenStream,
+    call_args: TokenStream,
+) -> TokenStream {
+    let clone_ident = format_ident!("__auto_clone", span = Span::mixed_site());
+    match callee {
+        // `controller.method` — clone receiver, call method.
+        syn::Expr::Field(field) => {
+            let receiver = &field.base;
+            let member = &field.member;
+            quote! {
+                {
+                    let #clone_ident = (#receiver).clone();
+                    move |#params| {
+                        #clone_ident.#member(#(#bound_args),*, #call_args)
+                    }
+                }
+            }
+        }
+        // `Module::function` or bare path — no receiver to clone.
+        syn::Expr::Path(_) => quote! {
+            move |#params| {
+                #callee(#(#bound_args),*, #call_args)
+            }
+        },
+        // `controller.method(args)` — a closure factory with
+        // pre-bound args. Clone receiver, call factory, then
+        // call the returned closure with event args.
+        syn::Expr::MethodCall(call) => {
+            let receiver = &call.receiver;
+            let method = &call.method;
+            let factory_args = call.args.iter();
+            quote! {
+                {
+                    let #clone_ident = (#receiver).clone();
+                    #clone_ident.#method(#(#factory_args),*)(#(#bound_args),*, #call_args)
+                }
+            }
+        }
+        // Other callee shapes pass through and let the compiler
+        // complain if they don't fit.
+        _ => quote! {
+            move |#params| {
+                #callee(#(#bound_args),*, #call_args)
+            }
+        },
+    }
+}
+
+/// Build a call expression for `bind!(...)` inside a modifier
+/// wrapper. Returns `(clone_statement, call_expression)`.
+fn emit_bind_call(
+    callee: &syn::Expr,
+    bound_args: &[syn::Expr],
+    call_args: TokenStream,
+) -> (Option<TokenStream>, TokenStream) {
+    let clone_ident = format_ident!("__auto_clone", span = Span::mixed_site());
+    match callee {
+        syn::Expr::Field(field) => {
+            let receiver = &field.base;
+            let member = &field.member;
+            (
+                Some(quote! { let #clone_ident = (#receiver).clone(); }),
+                quote! { #clone_ident.#member(#(#bound_args),*, #call_args) },
+            )
+        }
+        syn::Expr::MethodCall(call) => {
+            let receiver = &call.receiver;
+            let method = &call.method;
+            let factory_args = call.args.iter();
+            (
+                Some(quote! { let #clone_ident = (#receiver).clone(); }),
+                quote! { #clone_ident.#method(#(#factory_args),*)(#(#bound_args),*, #call_args) },
+            )
+        }
+        _ => (None, quote! { #callee(#(#bound_args),*, #call_args) }),
+    }
+}
+
 pub(crate) fn auto_wrap_callback_expr(attr: &AstAttribute, expr: TokenStream) -> TokenStream {
-    let params = quote! { __arg0, __w: &mut gpui::Window, __cx: &mut gpui::App };
-    let call_args = quote! { __arg0, __w, __cx };
+    let params = quote! { __arg0, __window: &mut gpui::Window, cx: &mut gpui::App };
+    let call_args = quote! { __arg0, __window, cx };
     auto_wrap_closure_expr(attr, expr, params, call_args)
 }
 pub(crate) fn auto_wrap_closure_expr(
@@ -177,17 +322,28 @@ pub(crate) fn auto_wrap_closure_expr(
 pub(crate) fn auto_wrap_event_call(
     attr: &AstAttribute,
     expr: TokenStream,
+    event_name: &str,
+    tag: &str,
 ) -> (Option<TokenStream>, TokenStream) {
+    // Event args depend on the event + component tag (e.g.
+    // `on_toggle` has four args on Checkbox but three on
+    // TreeItem).
+    let (_, call_args) = event_signature(event_name, tag);
     let Some(raw) = &attr.expr else {
-        return (None, quote! { #expr(__ev, __window, cx) });
+        return (None, quote! { #expr(#call_args) });
     };
     let trimmed = raw.trim();
     if trimmed.is_empty() {
-        return (None, quote! { #expr(__ev, __window, cx) });
+        return (None, quote! { #expr(#call_args) });
     }
     let Ok(parsed) = syn::parse_str::<syn::Expr>(trimmed) else {
-        return (None, quote! { #expr(__ev, __window, cx) });
+        return (None, quote! { #expr(#call_args) });
     };
+
+    // `bind!(callee, bound_args...)` inside a modifier.
+    if let Some((callee, bound_args)) = try_parse_bind_macro(raw) {
+        return emit_bind_call(&callee, &bound_args, call_args);
+    }
 
     let clone_ident = format_ident!("__auto_clone", span = Span::mixed_site());
     match parsed {
@@ -199,7 +355,7 @@ pub(crate) fn auto_wrap_event_call(
             let method = &call.method;
             let args = call.args.iter();
             let clone = quote! { let #clone_ident = (#receiver).clone(); };
-            let call = quote! { #clone_ident.#method(#(#args),*)(__ev, __window, cx) };
+            let call = quote! { #clone_ident.#method(#(#args),*)(#call_args) };
             (Some(clone), call)
         }
         // `(controller.method)(args)` — field access used as a
@@ -210,7 +366,7 @@ pub(crate) fn auto_wrap_event_call(
                 let member = &field.member;
                 let args = call.args.iter();
                 let clone = quote! { let #clone_ident = (#receiver).clone(); };
-                let call = quote! { #clone_ident.#member(#(#args),*)(__ev, __window, cx) };
+                let call = quote! { #clone_ident.#member(#(#args),*)(#call_args) };
                 (Some(clone), call)
             } else if is_chain_call(&call) {
                 // Already-invoked chain like
@@ -221,7 +377,7 @@ pub(crate) fn auto_wrap_event_call(
             } else {
                 // Factory call (`some_fn()`) whose result is the
                 // event handler. Invoke it with event args.
-                (None, quote! { #expr(__ev, __window, cx) })
+                (None, quote! { #expr(#call_args) })
             }
         }
         // `controller.method` — bare field access.
@@ -229,13 +385,13 @@ pub(crate) fn auto_wrap_event_call(
             let receiver = field.base;
             let member = field.member;
             let clone = quote! { let #clone_ident = (#receiver).clone(); };
-            let call = quote! { #clone_ident.#member(__ev, __window, cx) };
+            let call = quote! { #clone_ident.#member(#call_args) };
             (Some(clone), call)
         }
         // Associated function / bare path — no receiver.
-        syn::Expr::Path(_) => (None, quote! { #expr(__ev, __window, cx) }),
+        syn::Expr::Path(_) => (None, quote! { #expr(#call_args) }),
         // User closures, blocks, macros, references, etc.
-        _ => (None, quote! { #expr(__ev, __window, cx) }),
+        _ => (None, quote! { #expr(#call_args) }),
     }
 }
 
@@ -294,10 +450,12 @@ pub(crate) fn wrap_event_body_with_modifiers(
     modifiers: &[&str],
     inner_call: TokenStream,
     span: Span,
+    event_var: &str,
 ) -> Result<TokenStream, XmlError> {
     if modifiers.is_empty() {
         return Ok(inner_call);
     }
+    let ev = format_ident!("{}", event_var);
     let mut body = inner_call;
     for modifier in modifiers.iter().rev() {
         body = match *modifier {
@@ -319,12 +477,12 @@ pub(crate) fn wrap_event_body_with_modifiers(
             // is accepted as an alias for `.platform` (the
             // macOS Command key) because "cmd" / "meta" is
             // the more familiar name on Windows / Linux.
-            "ctrl" => wrap_modifier_flag_body(body, "control"),
-            "shift" => wrap_modifier_flag_body(body, "shift"),
-            "alt" => wrap_modifier_flag_body(body, "alt"),
-            "platform" | "meta" | "cmd" => wrap_modifier_flag_body(body, "platform"),
-            "secondary" => wrap_modifier_flag_body(body, "secondary"),
-            "function" => wrap_modifier_flag_body(body, "function"),
+            "ctrl" => wrap_modifier_flag_body(body, "control", &ev),
+            "shift" => wrap_modifier_flag_body(body, "shift", &ev),
+            "alt" => wrap_modifier_flag_body(body, "alt", &ev),
+            "platform" | "meta" | "cmd" => wrap_modifier_flag_body(body, "platform", &ev),
+            "secondary" => wrap_modifier_flag_body(body, "secondary", &ev),
+            "function" => wrap_modifier_flag_body(body, "function", &ev),
             // Keyboard filters — gate on the keystroke key.
             // `__ev.keystroke().key` returns the printable
             // name (`"enter"`, `"escape"`, `"tab"`, …) which
@@ -341,7 +499,7 @@ pub(crate) fn wrap_event_body_with_modifiers(
                 }
                 let key_lit = format!("\"{key}\"");
                 quote! {
-                    if __ev.keystroke().key == #key_lit {
+                    if #ev.keystroke().key == #key_lit {
                         #body
                     }
                 }
@@ -350,10 +508,14 @@ pub(crate) fn wrap_event_body_with_modifiers(
     }
     Ok(body)
 }
-pub(crate) fn wrap_modifier_flag_body(body: TokenStream, flag: &str) -> TokenStream {
+pub(crate) fn wrap_modifier_flag_body(
+    body: TokenStream,
+    flag: &str,
+    ev: &proc_macro2::Ident,
+) -> TokenStream {
     let flag_ident = format_ident!("{}", flag);
     quote! {
-        if __ev.modifiers().#flag_ident {
+        if #ev.modifiers().#flag_ident {
             #body
         }
     }

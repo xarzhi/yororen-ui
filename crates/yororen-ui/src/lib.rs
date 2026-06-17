@@ -22,13 +22,13 @@ pub use yororen_ui_core::renderer::{
 pub use yororen_ui_core::theme;
 pub use yororen_ui_core::theme::{ActiveTheme, GlobalTheme, Theme};
 pub use yororen_ui_core::{a11y, animation, assets, headless, i18n, notification, rtl};
+/// Translation helper macros.
+pub use yororen_ui_core::{t, t_named};
 pub use yororen_ui_default_renderer as renderer;
 /// `ActionVariantKind` is re-exported from the renderer
 /// (the canonical home in v0.3). Also reachable via
 /// `yororen_ui::renderer::ActionVariantKind`.
 pub use yororen_ui_default_renderer::renderers::button::ActionVariantKind;
-/// Translation helper macros.
-pub use yororen_ui_core::{t, t_named};
 
 #[cfg(feature = "brutalism")]
 pub use yororen_ui_brutalism_renderer as brutalism_renderer;
@@ -40,7 +40,46 @@ pub use yororen_ui_xml::register_xml_component;
 #[cfg(feature = "xml")]
 pub use yororen_ui_xml::runtime::ComponentDescriptor;
 #[cfg(feature = "xml")]
-pub use yororen_ui_xml_macro::{xml, xml_file};
+pub use yororen_ui_xml_macro::{bind, xml, xml_file};
+
+// When the `xml` feature is disabled (e.g. `default-features = false`),
+// the real proc-macros and runtime types are unavailable. Provide
+// local shims so that the error message tells the user exactly how
+// to enable XML support instead of a generic "cannot find macro".
+#[cfg(not(feature = "xml"))]
+pub mod xml {
+    #![doc = "The `xml` module requires the `xml` feature. Enable it with `features = [\"xml\"]` in Cargo.toml."]
+}
+
+#[cfg(not(feature = "xml"))]
+#[macro_export]
+macro_rules! xml {
+    ($($tt:tt)*) => {
+        ::core::compile_error!(
+            "the `xml` feature is disabled; enable `features = [\"xml\"]` in Cargo.toml to use the `xml!` macro"
+        )
+    };
+}
+
+#[cfg(not(feature = "xml"))]
+#[macro_export]
+macro_rules! xml_file {
+    ($($tt:tt)*) => {
+        ::core::compile_error!(
+            "the `xml` feature is disabled; enable `features = [\"xml\"]` in Cargo.toml to use the `xml_file!` macro"
+        )
+    };
+}
+
+#[cfg(not(feature = "xml"))]
+#[macro_export]
+macro_rules! register_xml_component {
+    ($($tt:tt)*) => {
+        ::core::compile_error!(
+            "the `xml` feature is disabled; enable `features = [\"xml\"]` in Cargo.toml to use `register_xml_component!`"
+        )
+    };
+}
 
 pub use yororen_ui_locale_ar as locale_ar;
 pub use yororen_ui_locale_en as locale_en;

@@ -1,6 +1,18 @@
 # Compile-time schema extension for the gallery_xml demo.
 # This lets the `xml!` macro validate `<CounterWidget>`
 # attributes even though it is not a built-in tag.
+#
+# Supported fields (all optional beyond `tag`/`factory`):
+#   render = "Default" | "Apply"
+#   needs_app = true | false
+#   needs_window = true | false
+#   supports_text_child = true | false
+#   children_before_render = true | false
+#   unwrap_children = true | false
+#   [[component.extra_args]] kind = "Custom" | "Text" | ... ; attr = "..."
+#   [[component.props]] name = "..."; setter = "..."; value = "String" | ...
+#   [[component.events]] name = "..."; setter = "..."
+#   [[component.slots]] name = "..."; setter = "..."
 
 [[component]]
 tag = "CounterWidget"

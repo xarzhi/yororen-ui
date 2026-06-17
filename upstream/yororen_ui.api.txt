@@ -4,6 +4,7 @@ pub use yororen_ui::ActiveTheme
 pub use yororen_ui::BorderSpec
 pub use yororen_ui::BuiltinVariantKey
 pub use yororen_ui::ButtonVariant
+pub use yororen_ui::ComponentDescriptor
 pub use yororen_ui::Edges
 pub use yororen_ui::GlobalTheme
 pub use yororen_ui::GlobalVariantRegistry
@@ -21,6 +22,7 @@ pub use yororen_ui::VariantStyle
 pub use yororen_ui::a11y
 pub use yororen_ui::animation
 pub use yororen_ui::assets
+pub use yororen_ui::bind
 pub use yororen_ui::headless
 pub use yororen_ui::i18n
 pub use yororen_ui::locale_ar
@@ -28,11 +30,15 @@ pub use yororen_ui::locale_en
 pub use yororen_ui::locale_zh_cn
 pub use yororen_ui::markers
 pub use yororen_ui::notification
+pub use yororen_ui::register_xml_component
 pub use yororen_ui::renderer
 pub use yororen_ui::rtl
 pub use yororen_ui::t
 pub use yororen_ui::t_named
 pub use yororen_ui::theme
+pub use yororen_ui::xml
+pub use yororen_ui::xml
+pub use yororen_ui::xml_file
 pub mod yororen_ui::locale
 pub const yororen_ui::locale::SUPPORTED_LOCALE_TAGS: &[&str]
 pub fn yororen_ui::locale::framework_translation_map(&str) -> yororen_ui_core::i18n::runtime::TranslationMap
