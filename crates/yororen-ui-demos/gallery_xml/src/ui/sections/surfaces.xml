@@ -1,8 +1,8 @@
 <!-- Section 3 — Surfaces. -->
-<Column flex col gap="4">
+<Column flex col gap="lg">
     <Heading id="surfaces-title" level="H2" text={t!(cx, "demo.section_surfaces")} />
 
-    <Row flex row flex_wrap items_center gap="3">
+    <Row flex row flex_wrap items_center gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-avatar-status" text={t!(cx, "demo.surfaces.cell_avatar_initials_status")} muted /></Slot>
             <Avatar id="ava-1" initials={t!(cx, "demo.surfaces.avatar_initials_ab")} size={48.0} circle has_status />
@@ -17,11 +17,11 @@
         </Cell>
     </Row>
 
-    <Row flex row flex_wrap items_start gap="3">
+    <Row flex row flex_wrap items_start gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-card" text={t!(cx, "demo.surfaces.cell_card")} muted /></Slot>
             <Card id="crd-1" interactive>
-                <Column flex col gap="2">
+                <Column flex col gap="sm">
                     <Label id="card-title" text={t!(cx, "demo.surfaces.card_title")} strong />
                     <Label id="card-body" text={t!(cx, "demo.surfaces.card_body")} muted />
                     <Button id="card-btn" caption={t!(cx, "demo.surfaces.card_action")}
@@ -48,7 +48,7 @@
         </Cell>
     </Row>
 
-    <Row flex row flex_wrap items_center gap="3">
+    <Row flex row flex_wrap items_center gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-focus-ring" text={t!(cx, "demo.surfaces.cell_focus_ring")} muted /></Slot>
             <FocusRing id="frg-1" handle={&cx.focus_handle()}>
@@ -69,7 +69,7 @@
         </Cell>
     </Row>
 
-    <Row flex row flex_wrap items_center gap="3">
+    <Row flex row flex_wrap items_center gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-kbd-display" text={t!(cx, "demo.surfaces.cell_keybinding_display")} muted /></Slot>
             <KeybindingDisplay id="kbd-1" keys={vec!["Ctrl".to_string(), "S".to_string()]} />

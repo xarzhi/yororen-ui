@@ -146,27 +146,80 @@ pub(crate) fn apply_container_attr(
         }
     }
 
-    // Literal value on a spacing prefix: `gap="3"` →
-    // `::gpui::Styled::gap_3(__el)`.
+    // Literal value on a spacing / sizing prefix:
+    //   - `gap="8"`     → `.gap(px(8.))`        (number = px)
+    //   - `gap="8px"`   → `.gap(px(8.))`
+    //   - `w="50%"`     → `.w(relative(0.5))`
+    //   - `w="2rem"`    → `.w(px(32.))`
+    //   - legacy tailwind suffixes like `gap="0p5"`, `p="full"`
+    //     still map to `.gap_0p5()` / `.p_full()` for compatibility.
     if attr.expr.is_none() && is_spacing_prefix(&attr.name) {
         let value = attr.raw.as_str();
-        // The gpui method name is `<attr>_<value>`. Allow
-        // numeric (`3`, `1p5`, `12`, `0p5`) and textual
-        // (`full`) suffixes — anything else is an error.
+        let method = format_ident!("{}", attr.name);
+
+        // Pure number → px (the unified default).
+        if let Ok(n) = value.parse::<f32>() {
+            stmts.push(quote! {
+                let __el = ::gpui::Styled::#method(__el, ::gpui::px(#n));
+            });
+            return Ok(());
+        }
+
+        // Explicit unit suffixes.
+        if let Some(body) = value.strip_suffix("px") {
+            if let Ok(n) = body.parse::<f32>() {
+                stmts.push(quote! {
+                    let __el = ::gpui::Styled::#method(__el, ::gpui::px(#n));
+                });
+                return Ok(());
+            }
+        }
+        if let Some(body) = value.strip_suffix("rem") {
+            if let Ok(n) = body.parse::<f32>() {
+                stmts.push(quote! {
+                    let __el = ::gpui::Styled::#method(__el, ::gpui::rems(#n));
+                });
+                return Ok(());
+            }
+        }
+        if let Some(body) = value.strip_suffix('%') {
+            if let Ok(n) = body.parse::<f32>() {
+                if !matches!(
+                    attr.name.as_str(),
+                    "w" | "h" | "size" | "min_w" | "min_h" | "max_w" | "max_h"
+                ) {
+                    return Err(XmlError::new(
+                        XmlErrorKind::InvalidExpression,
+                        attr.span,
+                        format!(
+                            "percentage values are only allowed on width/height/size attributes, not `{}`",
+                            attr.name
+                        ),
+                    )
+                    .at(attr.byte_offset));
+                }
+                let ratio = n / 100.0f32;
+                stmts.push(quote! {
+                    let __el = ::gpui::Styled::#method(__el, ::gpui::relative(#ratio));
+                });
+                return Ok(());
+            }
+        }
+
+        // Legacy tailwind-style suffixes (`0p5`, `1p5`, `full`, `1_2`, …).
         if !is_valid_spacing_suffix(value) {
             return Err(XmlError::new(
                 XmlErrorKind::InvalidExpression,
                 attr.span,
                 format!(
-                    "invalid spacing suffix `{value}` for `{}`; expected a number (0, 1, 2, …) or `full`",
+                    "invalid value `{value}` for `{}`; expected a number (px), `Npx`, `Nrem`, `N%`, or a tailwind suffix like `0p5`/`full`",
                     attr.name
                 ),
             )
             .at(attr.byte_offset));
         }
-        // Translate `0p5` (XML) → `0p5` (method name)
-        let method = format!("{}_{}", attr.name, value);
-        let m = format_ident!("{}", method);
+        let method_with_suffix = format!("{}_{}", attr.name, value);
+        let m = format_ident!("{}", method_with_suffix);
         stmts.push(quote! {
             let __el = ::gpui::Styled::#m(__el);
         });

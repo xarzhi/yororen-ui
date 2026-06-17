@@ -103,9 +103,11 @@ fn div_container_flex_col_gap() {
     </Div>"#,
     );
     // Container shorthand attrs should resolve to Styled method calls.
+    // Bare numbers now mean px, so `gap="4"` → `.gap(px(4.))`.
     assert!(s.contains("flex_col"), "{s}");
-    assert!(s.contains("gap_4"), "{s}");
-    assert!(s.contains("p_4"), "{s}");
+    assert!(s.contains("gap"), "{s}");
+    assert!(s.contains("px (4f32)"), "{s}");
+    assert!(s.contains("p"), "{s}");
     // Children should be wired via ParentElement::child.
     let normalised: String = s.chars().filter(|c| !c.is_whitespace()).collect();
     assert_eq!(normalised.matches("child").count(), 2, "{normalised}");
@@ -311,13 +313,14 @@ fn container_flag_with_non_true_literal_is_an_error() {
 
 #[test]
 fn container_spacing_with_bad_suffix_carries_offset() {
-    // `<Div gap="999">` (invalid suffix) must surface a
+    // `<Div gap="999pxx">` (unrecognised suffix) must surface a
     // diagnostic with `at line N, column M:` rather than
     // the single-line fallback. (`Column` is now a Leaf
-    // and accepts any numeric `gap` as `Spacing::Px`.)
-    let err = codegen(r#"<Div gap="999" />"#, Span::call_site(), None, None, &[]).unwrap_err();
+    // and accepts any numeric `gap` as `Spacing::Px`; bare
+    // numbers on `<Div>` are now interpreted as px too.)
+    let err = codegen(r#"<Div gap="999pxx" />"#, Span::call_site(), None, None, &[]).unwrap_err();
     assert!(
-        err.message.contains("invalid spacing suffix"),
+        err.message.contains("invalid value"),
         "{}",
         err.message
     );

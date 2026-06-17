@@ -1,11 +1,11 @@
 <!-- Toolbar: localized title, renderer/theme/locale toggles, toasts. -->
-<Column flex col gap="3">
-    <Row flex items_center gap="3">
+<Column flex col gap="md">
+    <Row flex items_center gap="md">
         <Heading id="title" level="H1" text={t!(cx, "demo.title")} />
         <Label id="xml-badge" text="(XML)" muted />
     </Row>
 
-    <Row flex items_center gap="2" flex_wrap>
+    <Row flex items_center gap="sm" flex_wrap>
         <ToggleButton id="renderer-default" caption={t!(cx, "demo.renderer_default")}
                       selected={controller.snapshot(cx).current_renderer == crate::state::RendererKind::Default}
                       variant="primary"

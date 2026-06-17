@@ -1,5 +1,5 @@
 <!-- Section 6 — Overlays. -->
-<Column flex col gap="4">
+<Column flex col gap="lg">
     <Heading id="overlays-title" level="H2" text={t!(cx, "demo.section_overlays")} />
 
     <Cell>

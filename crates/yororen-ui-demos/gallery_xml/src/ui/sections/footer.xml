@@ -1,5 +1,5 @@
 <!-- Footer: live state counters. -->
-<Column flex col gap="2" mt_4 p_3 rounded_md border_1>
+<Column flex col gap="sm" mt_4 p_3 rounded_md border_1>
     <Label id="footer-title" text={t!(cx, "demo.footer.live_counters")} strong />
     <Label id="footer-form"
            text={controller.footer_form_text(cx)}

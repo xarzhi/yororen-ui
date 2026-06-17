@@ -1,5 +1,5 @@
 <!-- Modal body content. -->
-<Column flex col gap="3">
+<Column flex col gap="md">
     <Heading id="modal-title" level="H2" text={t!(cx, "demo.modal.title")} />
     <Label id="modal-body" text={t!(cx, "demo.modal.body")} />
     <Button id="modal-close" caption={t!(cx, "common.close")} variant="primary"

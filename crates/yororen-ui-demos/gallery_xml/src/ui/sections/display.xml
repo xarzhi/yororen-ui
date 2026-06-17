@@ -1,8 +1,8 @@
 <!-- Section 2 — Display. -->
-<Column flex col gap="4">
+<Column flex col gap="lg">
     <Heading id="display-title" level="H2" text={t!(cx, "demo.section_display")} />
 
-    <Row flex row flex_wrap items_center gap="3">
+    <Row flex row flex_wrap items_center gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-lbl-default" text={t!(cx, "demo.display.cell_label_default")} muted /></Slot>
             <Label id="lbl-default" text={t!(cx, "demo.display.label_default")} />
@@ -21,7 +21,7 @@
         </Cell>
     </Row>
 
-    <Column flex col gap="2">
+    <Column flex col gap="sm">
         <Cell>
             <Slot name="label"><Label id="lbl-heading-h1" text={t!(cx, "demo.display.cell_heading_h1")} muted /></Slot>
             <Heading id="hdg-1" level="H1" text={t!(cx, "demo.display.heading_h1")} />
@@ -40,7 +40,7 @@
         </Cell>
     </Column>
 
-    <Column flex col gap="2">
+    <Column flex col gap="sm">
         <Cell>
             <Slot name="label"><Label id="lbl-divider-h" text={t!(cx, "demo.display.divider_h")} muted /></Slot>
             <Divider id="dvr-h1" />
@@ -51,7 +51,7 @@
         </Cell>
     </Column>
 
-    <Row flex row flex_wrap items_center gap="2">
+    <Row flex row flex_wrap items_center gap="sm">
         <Cell>
             <Slot name="label"><Label id="lbl-badge-neutral" text={t!(cx, "demo.display.badge_neutral")} muted /></Slot>
             <Badge id="bdg-n" text={t!(cx, "demo.display.badge_neutral")}
@@ -79,7 +79,7 @@
         </Cell>
     </Row>
 
-    <Row flex row flex_wrap items_center gap="3">
+    <Row flex row flex_wrap items_center gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-tag-selected" text={t!(cx, "demo.display.cell_tag_selected")} muted /></Slot>
             <Tag id="tag-1" label={t!(cx, "demo.display.tag_toggle")}
@@ -96,7 +96,7 @@
         </Cell>
     </Row>
 
-    <Row flex row flex_wrap items_start gap="3">
+    <Row flex row flex_wrap items_start gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-sk-line" text={t!(cx, "demo.display.cell_skeleton_line")} muted /></Slot>
             <Skeleton id="skl-line" w={gpui::px(180.0)} h={gpui::px(12.0)} />
@@ -111,7 +111,7 @@
         </Cell>
     </Row>
 
-    <Column flex col gap="2">
+    <Column flex col gap="sm">
         <Cell>
             <Slot name="label"><Label id="lbl-progress-det" text={t!(cx, "demo.display.cell_progress_determinate")} muted /></Slot>
             <Progress id="prg-1" value={controller.snapshot(cx).progress_value} max={1.0}
@@ -123,7 +123,7 @@
         </Cell>
     </Column>
 
-    <Row flex row flex_wrap items_center gap="3">
+    <Row flex row flex_wrap items_center gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-text" text={t!(cx, "demo.display.cell_text")} muted /></Slot>
             <Text id="txt-1" text={t!(cx, "demo.display.plain_text")} size={14.0} />

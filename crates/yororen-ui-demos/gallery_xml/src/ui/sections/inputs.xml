@@ -1,5 +1,5 @@
 <!-- Section 4 — Inputs. -->
-<Column flex col gap="4">
+<Column flex col gap="lg">
     <Heading id="inputs-title" level="H2" text={t!(cx, "demo.section_inputs")} />
 
     <InputCell>

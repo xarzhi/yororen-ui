@@ -256,13 +256,24 @@ pub(crate) fn prop_value_tokens(
         }
         PropValue::Spacing => {
             if let Ok(n) = raw.parse::<f32>() {
+                // Bare number = px (unified default).
                 Ok(quote! { ::yororen_ui::headless::layout::Spacing::Px(#n) })
+            } else if let Some(body) = raw.strip_suffix("px") {
+                let n = body.parse::<f32>().map_err(|_| {
+                    invalid_attr_expr(attr, "a number followed by `px`", raw)
+                })?;
+                Ok(quote! { ::yororen_ui::headless::layout::Spacing::Px(#n) })
+            } else if let Some(body) = raw.strip_suffix("rem") {
+                let n = body.parse::<f32>().map_err(|_| {
+                    invalid_attr_expr(attr, "a number followed by `rem`", raw)
+                })?;
+                Ok(quote! { ::yororen_ui::headless::layout::Spacing::Rem(#n) })
             } else {
                 let variant = parse_enum_variant(
                     attr,
                     raw,
                     SPACING_VARIANTS,
-                    "a number (px) or `xs`, `sm`, `md`, `lg`, `xl`, `xxl`",
+                    "a number (px), `Npx`, `Nrem`, or `xs`, `sm`, `md`, `lg`, `xl`, `xxl`",
                 )?;
                 let variant = format_ident!("{variant}");
                 Ok(quote! { ::yororen_ui::headless::layout::Spacing::#variant })
@@ -271,12 +282,22 @@ pub(crate) fn prop_value_tokens(
         PropValue::Inset => {
             if let Ok(n) = raw.parse::<f32>() {
                 Ok(quote! { ::yororen_ui::headless::layout::Inset::Px(#n) })
+            } else if let Some(body) = raw.strip_suffix("px") {
+                let n = body.parse::<f32>().map_err(|_| {
+                    invalid_attr_expr(attr, "a number followed by `px`", raw)
+                })?;
+                Ok(quote! { ::yororen_ui::headless::layout::Inset::Px(#n) })
+            } else if let Some(body) = raw.strip_suffix("rem") {
+                let n = body.parse::<f32>().map_err(|_| {
+                    invalid_attr_expr(attr, "a number followed by `rem`", raw)
+                })?;
+                Ok(quote! { ::yororen_ui::headless::layout::Inset::Rem(#n) })
             } else {
                 let variant = parse_enum_variant(
                     attr,
                     raw,
                     INSET_VARIANTS,
-                    "a number (px) or `xs`, `sm`, `md`, `lg`, `xl`",
+                    "a number (px), `Npx`, `Nrem`, or `xs`, `sm`, `md`, `lg`, `xl`",
                 )?;
                 let variant = format_ident!("{variant}");
                 Ok(quote! { ::yororen_ui::headless::layout::Inset::#variant })
@@ -303,14 +324,34 @@ pub(crate) fn prop_value_tokens(
             Ok(quote! { ::yororen_ui::headless::layout::JustifyContent::#variant })
         }
         PropValue::Length => {
-            let variant = parse_enum_variant(
-                attr,
-                raw,
-                LENGTH_VARIANTS,
-                "`full`, `fit`, or `auto` (use `px(N)` for raw pixels)",
-            )?;
-            let variant = format_ident!("{variant}");
-            Ok(quote! { ::yororen_ui::headless::layout::Length::#variant })
+            if let Ok(n) = raw.parse::<f32>() {
+                // Bare number = px (unified default).
+                Ok(quote! { ::yororen_ui::headless::layout::Length::Px(#n) })
+            } else if let Some(body) = raw.strip_suffix("px") {
+                let n = body.parse::<f32>().map_err(|_| {
+                    invalid_attr_expr(attr, "a number followed by `px`", raw)
+                })?;
+                Ok(quote! { ::yororen_ui::headless::layout::Length::Px(#n) })
+            } else if let Some(body) = raw.strip_suffix("rem") {
+                let n = body.parse::<f32>().map_err(|_| {
+                    invalid_attr_expr(attr, "a number followed by `rem`", raw)
+                })?;
+                Ok(quote! { ::yororen_ui::headless::layout::Length::Rem(#n) })
+            } else if let Some(body) = raw.strip_suffix('%') {
+                let n = body.parse::<f32>().map_err(|_| {
+                    invalid_attr_expr(attr, "a number followed by `%`", raw)
+                })?;
+                Ok(quote! { ::yororen_ui::headless::layout::Length::Pct(#n) })
+            } else {
+                let variant = parse_enum_variant(
+                    attr,
+                    raw,
+                    LENGTH_VARIANTS,
+                    "`full`, `fit`, `auto`, a number (px), `Npx`, `Nrem`, or `N%`",
+                )?;
+                let variant = format_ident!("{variant}");
+                Ok(quote! { ::yororen_ui::headless::layout::Length::#variant })
+            }
         }
         PropValue::Color => {
             // Brace expressions are passed through verbatim above;

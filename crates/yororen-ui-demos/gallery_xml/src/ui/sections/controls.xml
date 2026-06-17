@@ -1,8 +1,8 @@
 <!-- Section 5 — Controls. -->
-<Column flex col gap="4">
+<Column flex col gap="lg">
     <Heading id="controls-title" level="H2" text={t!(cx, "demo.section_controls")} />
 
-    <Row flex row flex_wrap items_center gap="3">
+    <Row flex row flex_wrap items_center gap="md">
         <InputCell>
             <Slot name="name"><Label id="lbl-cb" text={t!(cx, "demo.controls.cell_checkbox")} muted /></Slot>
             <Checkbox id="cbx-main" @bind={controller.checkbox_value_entity(cx)} />

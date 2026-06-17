@@ -1,10 +1,10 @@
 <!-- Section 7 — Lists, Tables, Trees, Forms. -->
-<Column flex col gap="4">
+<Column flex col gap="lg">
     <Heading id="lists-title" level="H2" text={t!(cx, "demo.section_lists")} />
 
     <Cell>
         <Slot name="label"><Label id="lbl-list-items" text={t!(cx, "demo.lists.cell_list")} muted /></Slot>
-        <Column flex col gap="2" w={gpui::px(220.)}>
+        <Column flex col gap="sm" w={gpui::px(220.)}>
             <For each={controller.list_items(cx)} let:item let:index={i} key={i}>
                 <ListItem id={format!("li-{}", i + 1)} title={item.clone()}
                           selected={controller.snapshot(cx).selected_list_item == Some(i)}
@@ -15,7 +15,7 @@
 
     <Cell>
         <Slot name="label"><Label id="lbl-listbox" text={t!(cx, "demo.lists.cell_listbox")} muted /></Slot>
-        <Column flex col gap="3" w={gpui::px(240.)}>
+        <Column flex col gap="md" w={gpui::px(240.)}>
             <Listbox id="lists-listbox" state={controller.listbox_state(cx)} />
             <Label id="lists-listbox-status" text={controller.listbox_status_text(cx)} muted />
         </Column>
@@ -72,7 +72,7 @@
                      on_visible_range_change={controller.on_visible_range_change}
                      row={controller.virtual_list_row(cx)}
                      w={gpui::px(240.)} h={gpui::px(180.)} />
-        <Row flex row gap="2">
+        <Row flex row gap="sm">
             <Button id="btn-vl-top" caption={t!(cx, "demo.common.top")}
                     on_click={controller.virtual_list_scroll_top} />
             <Button id="btn-vl-bottom" caption={t!(cx, "demo.common.bottom")}
@@ -87,7 +87,7 @@
                             controller={controller.uniform_list_controller_entity(cx)}
                             row={controller.uniform_list_row(cx)}
                             w={gpui::px(240.)} h={gpui::px(180.)} />
-        <Row flex row gap="2">
+        <Row flex row gap="sm">
             <Button id="btn-uvl-top" caption={t!(cx, "demo.common.top")}
                     on_click={controller.uniform_list_scroll_top} />
             <Button id="btn-uvl-bottom" caption={t!(cx, "demo.common.bottom")}

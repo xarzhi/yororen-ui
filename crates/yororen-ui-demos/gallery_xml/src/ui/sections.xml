@@ -11,7 +11,7 @@
      level (sibling to the VirtualList) so they are registered once
      at compile time and are never re-evaluated as part of a virtual
      row. Standard rows use the shared `<Section>` template, which
-     applies the modest 16-px `p="4"` inset without repeating the
+     applies a modest 16-px `p="16"` inset without repeating the
      wrapper on every line. -->
 <Fragment>
     <Include src="ui/shared/cell.xml" />

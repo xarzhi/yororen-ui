@@ -1,8 +1,8 @@
 <!-- Section 1 — Actions. -->
-<Column flex col gap="4">
+<Column flex col gap="lg">
     <Heading id="actions-title" level="H2" text={t!(cx, "demo.section_actions")} />
 
-    <Row flex row flex_wrap items_center gap="3">
+    <Row flex row flex_wrap items_center gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-btn-neutral" text={t!(cx, "demo.actions.cell_button_neutral")} muted /></Slot>
             <Button id="btn-neutral" caption={t!(cx, "button.neutral")} variant="neutral"
@@ -25,7 +25,7 @@
         </Cell>
     </Row>
 
-    <Row flex row flex_wrap items_center gap="3">
+    <Row flex row flex_wrap items_center gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-icon-btn" text={t!(cx, "demo.actions.cell_icon_button")} muted /></Slot>
             <IconButton id="ibn-check" icon="check"
@@ -38,7 +38,7 @@
         </Cell>
     </Row>
 
-    <Row flex row flex_wrap items_center gap="3">
+    <Row flex row flex_wrap items_center gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-toggle" text={t!(cx, "demo.actions.cell_toggle_button")} muted /></Slot>
             <ToggleButton id="tgb-1" caption={t!(cx, "demo.actions.press_me")}
@@ -47,7 +47,7 @@
         </Cell>
     </Row>
 
-    <Row flex row flex_wrap items_center gap="3">
+    <Row flex row flex_wrap items_center gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-split" text={t!(cx, "demo.actions.cell_split_button")} muted /></Slot>
             <SplitButton id="spb-1" primary={controller.split_button_primary}
@@ -58,7 +58,7 @@
         </Cell>
     </Row>
 
-    <Row flex row flex_wrap items_center gap="3">
+    <Row flex row flex_wrap items_center gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-group" text={t!(cx, "demo.actions.cell_button_group")} muted /></Slot>
             <ButtonGroup id="btg-1">
