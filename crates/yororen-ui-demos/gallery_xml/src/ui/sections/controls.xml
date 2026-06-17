@@ -2,7 +2,7 @@
 <Column flex col gap="lg">
     <Heading id="controls-title" level="H2" text={t!(cx, "demo.section_controls")} />
 
-    <Row flex row flex_wrap items_center gap="md">
+    <Wrap items="center" gap="md">
         <InputCell>
             <Slot name="name"><Label id="lbl-cb" text={t!(cx, "demo.controls.cell_checkbox")} muted /></Slot>
             <Checkbox id="cbx-main" @bind={controller.checkbox_value_entity(cx)} />
@@ -14,7 +14,7 @@
             <Switch id="swt-main" @bind={controller.switch_value_entity(cx)} />
             <Slot name="status"><Label id="sta-sw" text={t_named!(cx, "demo.input.value", value => controller.snapshot(cx).switch_value)} muted /></Slot>
         </InputCell>
-    </Row>
+    </Wrap>
 
     <InputCell>
         <Slot name="name"><Label id="lbl-rg" text={t!(cx, "demo.controls.cell_radio_group")} muted /></Slot>

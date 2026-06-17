@@ -2,7 +2,7 @@
 <Column flex col gap="lg">
     <Heading id="display-title" level="H2" text={t!(cx, "demo.section_display")} />
 
-    <Row flex row flex_wrap items_center gap="md">
+    <Wrap items="center" gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-lbl-default" text={t!(cx, "demo.display.cell_label_default")} muted /></Slot>
             <Label id="lbl-default" text={t!(cx, "demo.display.label_default")} />
@@ -19,7 +19,7 @@
             <Slot name="label"><Label id="lbl-lbl-mono" text={t!(cx, "demo.display.cell_label_mono")} muted /></Slot>
             <Label id="lbl-mono" text={t!(cx, "demo.display.label_mono")} mono />
         </Cell>
-    </Row>
+    </Wrap>
 
     <Column flex col gap="sm">
         <Cell>
@@ -51,7 +51,7 @@
         </Cell>
     </Column>
 
-    <Row flex row flex_wrap items_center gap="sm">
+    <Wrap items="center" gap="sm">
         <Cell>
             <Slot name="label"><Label id="lbl-badge-neutral" text={t!(cx, "demo.display.badge_neutral")} muted /></Slot>
             <Badge id="bdg-n" text={t!(cx, "demo.display.badge_neutral")}
@@ -77,9 +77,9 @@
             <Badge id="bdg-i" text={t!(cx, "demo.display.badge_info")}
                    variant="info" />
         </Cell>
-    </Row>
+    </Wrap>
 
-    <Row flex row flex_wrap items_center gap="md">
+    <Wrap items="center" gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-tag-selected" text={t!(cx, "demo.display.cell_tag_selected")} muted /></Slot>
             <Tag id="tag-1" label={t!(cx, "demo.display.tag_toggle")}
@@ -94,9 +94,9 @@
                    text={t_named!(cx, "demo.display.tag_close_events", count => controller.snapshot(cx).tag_close_count)}
                    muted />
         </Cell>
-    </Row>
+    </Wrap>
 
-    <Row flex row flex_wrap items_start gap="md">
+    <Wrap items="start" gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-sk-line" text={t!(cx, "demo.display.cell_skeleton_line")} muted /></Slot>
             <Skeleton id="skl-line" w={gpui::px(180.0)} h={gpui::px(12.0)} />
@@ -109,7 +109,7 @@
             <Slot name="label"><Label id="lbl-sk-block-sharp" text={t!(cx, "demo.display.cell_skeleton_block_sharp")} muted /></Slot>
             <Skeleton id="skl-block-sharp" block block_sharp w={gpui::px(180.0)} h={gpui::px(40.0)} />
         </Cell>
-    </Row>
+    </Wrap>
 
     <Column flex col gap="sm">
         <Cell>
@@ -123,7 +123,7 @@
         </Cell>
     </Column>
 
-    <Row flex row flex_wrap items_center gap="md">
+    <Wrap items="center" gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-text" text={t!(cx, "demo.display.cell_text")} muted /></Slot>
             <Text id="txt-1" text={t!(cx, "demo.display.plain_text")} size={14.0} />
@@ -138,5 +138,5 @@
             <Icon id="ico-2" source="search" size={18.0}
                   color={cx.theme().get_color("content.primary").unwrap_or_default()} />
         </Cell>
-    </Row>
+    </Wrap>
 </Column>

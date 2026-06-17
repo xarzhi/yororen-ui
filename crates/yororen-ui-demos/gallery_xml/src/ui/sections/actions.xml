@@ -2,7 +2,7 @@
 <Column flex col gap="lg">
     <Heading id="actions-title" level="H2" text={t!(cx, "demo.section_actions")} />
 
-    <Row flex row flex_wrap items_center gap="md">
+    <Wrap items="center" gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-btn-neutral" text={t!(cx, "demo.actions.cell_button_neutral")} muted /></Slot>
             <Button id="btn-neutral" caption={t!(cx, "button.neutral")} variant="neutral"
@@ -23,9 +23,9 @@
             <Button id="btn-disabled" caption={t!(cx, "button.disabled")} disabled
                     on_click={controller.noop_click} />
         </Cell>
-    </Row>
+    </Wrap>
 
-    <Row flex row flex_wrap items_center gap="md">
+    <Wrap items="center" gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-icon-btn" text={t!(cx, "demo.actions.cell_icon_button")} muted /></Slot>
             <IconButton id="ibn-check" icon="check"
@@ -36,18 +36,18 @@
             <IconButton id="ibn-primary-check" icon="check"
                         variant="primary" on_click={controller.noop_click} />
         </Cell>
-    </Row>
+    </Wrap>
 
-    <Row flex row flex_wrap items_center gap="md">
+    <Wrap items="center" gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-toggle" text={t!(cx, "demo.actions.cell_toggle_button")} muted /></Slot>
             <ToggleButton id="tgb-1" caption={t!(cx, "demo.actions.press_me")}
                           selected={controller.snapshot(cx).toggle_btn_selected}
                           on_toggle={controller.press_toggle_from_event} />
         </Cell>
-    </Row>
+    </Wrap>
 
-    <Row flex row flex_wrap items_center gap="md">
+    <Wrap items="center" gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-split" text={t!(cx, "demo.actions.cell_split_button")} muted /></Slot>
             <SplitButton id="spb-1" primary={controller.split_button_primary}
@@ -56,9 +56,9 @@
                          items={controller.split_button_items(cx)}
                          on_select={controller.split_button_select} />
         </Cell>
-    </Row>
+    </Wrap>
 
-    <Row flex row flex_wrap items_center gap="md">
+    <Wrap items="center" gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-group" text={t!(cx, "demo.actions.cell_button_group")} muted /></Slot>
             <ButtonGroup id="btg-1">
@@ -70,5 +70,5 @@
                         on_click={controller.noop_click} />
             </ButtonGroup>
         </Cell>
-    </Row>
+    </Wrap>
 </Column>

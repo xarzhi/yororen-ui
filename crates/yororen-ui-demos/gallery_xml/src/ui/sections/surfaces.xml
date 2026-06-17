@@ -2,7 +2,7 @@
 <Column flex col gap="lg">
     <Heading id="surfaces-title" level="H2" text={t!(cx, "demo.section_surfaces")} />
 
-    <Row flex row flex_wrap items_center gap="md">
+    <Wrap items="center" gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-avatar-status" text={t!(cx, "demo.surfaces.cell_avatar_initials_status")} muted /></Slot>
             <Avatar id="ava-1" initials={t!(cx, "demo.surfaces.avatar_initials_ab")} size={48.0} circle has_status />
@@ -15,9 +15,9 @@
             <Slot name="label"><Label id="lbl-avatar-name" text={t!(cx, "demo.surfaces.cell_avatar_name")} muted /></Slot>
             <Avatar id="ava-3" name={t!(cx, "demo.surfaces.avatar_name")} size={48.0} />
         </Cell>
-    </Row>
+    </Wrap>
 
-    <Row flex row flex_wrap items_start gap="md">
+    <Wrap items="start" gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-card" text={t!(cx, "demo.surfaces.cell_card")} muted /></Slot>
             <Card id="crd-1" interactive>
@@ -46,9 +46,9 @@
                 <Label id="es-extra" text={t!(cx, "demo.surfaces.empty_custom_child")} muted />
             </EmptyState>
         </Cell>
-    </Row>
+    </Wrap>
 
-    <Row flex row flex_wrap items_center gap="md">
+    <Wrap items="center" gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-focus-ring" text={t!(cx, "demo.surfaces.cell_focus_ring")} muted /></Slot>
             <FocusRing id="frg-1" handle={&cx.focus_handle()}>
@@ -67,9 +67,9 @@
                        alt={t!(cx, "demo.surfaces.image_alt")} />
             </Div>
         </Cell>
-    </Row>
+    </Wrap>
 
-    <Row flex row flex_wrap items_center gap="md">
+    <Wrap items="center" gap="md">
         <Cell>
             <Slot name="label"><Label id="lbl-kbd-display" text={t!(cx, "demo.surfaces.cell_keybinding_display")} muted /></Slot>
             <KeybindingDisplay id="kbd-1" keys={vec!["Ctrl".to_string(), "S".to_string()]} />
@@ -79,5 +79,5 @@
             <ShortcutHint id="sht-1" label={t!(cx, "demo.surfaces.shortcut_save_caption")}
                           keys={vec!["Cmd".to_string(), "S".to_string()]} />
         </Cell>
-    </Row>
+    </Wrap>
 </Column>
