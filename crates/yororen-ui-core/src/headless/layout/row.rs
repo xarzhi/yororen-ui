@@ -83,16 +83,16 @@ impl RowProps {
         self.justify = Some(JustifyContent::Between);
         self
     }
-    pub fn w(mut self, w: Length) -> Self {
-        self.width = Some(w);
+    pub fn w(mut self, w: impl Into<Length>) -> Self {
+        self.width = Some(w.into());
         self
     }
     pub fn w_full(mut self) -> Self {
         self.width = Some(Length::Full);
         self
     }
-    pub fn h(mut self, h: Length) -> Self {
-        self.height = Some(h);
+    pub fn h(mut self, h: impl Into<Length>) -> Self {
+        self.height = Some(h.into());
         self
     }
     pub fn h_full(mut self) -> Self {

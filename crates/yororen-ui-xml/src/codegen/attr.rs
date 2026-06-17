@@ -105,6 +105,46 @@ pub(crate) const KEYBINDING_INPUT_MODE_VARIANTS: &[(&str, &str)] = &[
     ("capturing", "Capturing"),
 ];
 
+pub(crate) const SPACING_VARIANTS: &[(&str, &str)] = &[
+    ("xs", "Xs"),
+    ("sm", "Sm"),
+    ("md", "Md"),
+    ("lg", "Lg"),
+    ("xl", "Xl"),
+    ("xxl", "Xxl"),
+];
+
+pub(crate) const INSET_VARIANTS: &[(&str, &str)] = &[
+    ("xs", "Xs"),
+    ("sm", "Sm"),
+    ("md", "Md"),
+    ("lg", "Lg"),
+    ("xl", "Xl"),
+];
+
+pub(crate) const ALIGN_ITEMS_VARIANTS: &[(&str, &str)] = &[
+    ("start", "Start"),
+    ("end", "End"),
+    ("center", "Center"),
+    ("baseline", "Baseline"),
+    ("stretch", "Stretch"),
+];
+
+pub(crate) const JUSTIFY_CONTENT_VARIANTS: &[(&str, &str)] = &[
+    ("start", "Start"),
+    ("end", "End"),
+    ("center", "Center"),
+    ("between", "Between"),
+    ("around", "Around"),
+    ("evenly", "Evenly"),
+];
+
+pub(crate) const LENGTH_VARIANTS: &[(&str, &str)] = &[
+    ("full", "Full"),
+    ("fit", "Fit"),
+    ("auto", "Auto"),
+];
+
 pub(crate) fn attr_value_tokens(attr: &AstAttribute) -> Result<TokenStream, XmlError> {
     if let Some(expr) = &attr.expr {
         let parsed = parse_ts(
@@ -144,6 +184,11 @@ pub(crate) fn prop_value_tokens(
             | PropValue::IconSource
             | PropValue::ImageSource
             | PropValue::KeybindingInputMode
+            | PropValue::Spacing
+            | PropValue::Inset
+            | PropValue::AlignItems
+            | PropValue::JustifyContent
+            | PropValue::Length
             | PropValue::Color
             | PropValue::Bool
             | PropValue::UInt
@@ -211,6 +256,64 @@ pub(crate) fn prop_value_tokens(
             )?;
             let variant = format_ident!("{variant}");
             Ok(quote! { ::yororen_ui::headless::keybinding_input::KeybindingInputMode::#variant })
+        }
+        PropValue::Spacing => {
+            if let Ok(n) = raw.parse::<f32>() {
+                Ok(quote! { ::yororen_ui::headless::layout::Spacing::Px(#n) })
+            } else {
+                let variant = parse_enum_variant(
+                    attr,
+                    raw,
+                    SPACING_VARIANTS,
+                    "a number (px) or `xs`, `sm`, `md`, `lg`, `xl`, `xxl`",
+                )?;
+                let variant = format_ident!("{variant}");
+                Ok(quote! { ::yororen_ui::headless::layout::Spacing::#variant })
+            }
+        }
+        PropValue::Inset => {
+            if let Ok(n) = raw.parse::<f32>() {
+                Ok(quote! { ::yororen_ui::headless::layout::Inset::Px(#n) })
+            } else {
+                let variant = parse_enum_variant(
+                    attr,
+                    raw,
+                    INSET_VARIANTS,
+                    "a number (px) or `xs`, `sm`, `md`, `lg`, `xl`",
+                )?;
+                let variant = format_ident!("{variant}");
+                Ok(quote! { ::yororen_ui::headless::layout::Inset::#variant })
+            }
+        }
+        PropValue::AlignItems => {
+            let variant = parse_enum_variant(
+                attr,
+                raw,
+                ALIGN_ITEMS_VARIANTS,
+                "`start`, `end`, `center`, `baseline`, or `stretch`",
+            )?;
+            let variant = format_ident!("{variant}");
+            Ok(quote! { ::yororen_ui::headless::layout::AlignItems::#variant })
+        }
+        PropValue::JustifyContent => {
+            let variant = parse_enum_variant(
+                attr,
+                raw,
+                JUSTIFY_CONTENT_VARIANTS,
+                "`start`, `end`, `center`, `between`, `around`, or `evenly`",
+            )?;
+            let variant = format_ident!("{variant}");
+            Ok(quote! { ::yororen_ui::headless::layout::JustifyContent::#variant })
+        }
+        PropValue::Length => {
+            let variant = parse_enum_variant(
+                attr,
+                raw,
+                LENGTH_VARIANTS,
+                "`full`, `fit`, or `auto` (use `px(N)` for raw pixels)",
+            )?;
+            let variant = format_ident!("{variant}");
+            Ok(quote! { ::yororen_ui::headless::layout::Length::#variant })
         }
         PropValue::Color => {
             // Brace expressions are passed through verbatim above;

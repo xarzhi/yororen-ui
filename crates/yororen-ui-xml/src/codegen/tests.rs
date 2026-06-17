@@ -21,18 +21,25 @@ fn render(xml: &str) -> String {
 #[test]
 fn empty_column() {
     let s = render(r#"<Column col />"#);
-    // Must start with `gpui::div()` and contain `flex_col`.
-    assert!(s.contains("gpui :: div ()"), "{s}");
+    // Column is now a Leaf (auto-generated factory).
+    // `col` passes through as `flex_col` via the style
+    // pass-through.
+    assert!(s.contains("layout :: column :: column"), "{s}");
     assert!(s.contains("flex_col"), "{s}");
 }
 
 #[test]
 fn column_with_gap_and_padding() {
     let s = render(r#"<Column flex col gap="3" p="4" />"#);
+    // `gap="3"` resolves to `Spacing::Px(3f32)`,
+    // `p="4"` to `Inset::Px(4f32)`, both via the
+    // layout factory. `flex` and `col` pass through
+    // as `flex` / `flex_col` on the rendered div.
+    assert!(s.contains("layout :: column :: column"), "{s}");
+    assert!(s.contains("Spacing :: Px (3f32)"), "{s}");
+    assert!(s.contains("Inset :: Px (4f32)"), "{s}");
     assert!(s.contains("flex"), "{s}");
     assert!(s.contains("flex_col"), "{s}");
-    assert!(s.contains("gap_3"), "{s}");
-    assert!(s.contains("p_4"), "{s}");
 }
 
 #[test]
@@ -289,9 +296,10 @@ fn container_flag_with_non_true_literal_is_an_error() {
 fn container_spacing_with_bad_suffix_carries_offset() {
     // `<Div gap="999">` (invalid suffix) must surface a
     // diagnostic with `at line N, column M:` rather than
-    // the single-line fallback.
+    // the single-line fallback. (`Column` is now a Leaf
+    // and accepts any numeric `gap` as `Spacing::Px`.)
     let err = codegen(
-        r#"<Column gap="999" />"#,
+        r#"<Div gap="999" />"#,
         Span::call_site(),
         None,
         None,
@@ -1333,9 +1341,9 @@ fn slot_in_root_is_a_no_op_when_no_template_invocation() {
     // `<Slot/>` at the root (outside any template
     // invocation) is meaningless and just disappears —
     // it has no template to be substituted into. The
-    // surrounding Container's child chain is preserved.
+    // surrounding Column's child chain is preserved.
     let s = render(r#"<Column><Slot/></Column>"#);
-    assert!(s.contains("gpui :: div ()"), "{s}");
+    assert!(s.contains("layout :: column :: column"), "{s}");
 }
 
 #[test]
@@ -1638,15 +1646,30 @@ fn generated_schema_has_no_review_needed_comments() {
 fn overrides_provide_containers_and_control_flow() {
     // `BUILTINS_OVERRIDES` (sourced from `overrides.toml`)
     // covers the XML-only tags that the headless source
-    // doesn't have entries for: containers (Column,
-    // Row, Div, Stack) and control flow (If, ElseIf,
-    // Else, For, Fragment).
+    // doesn't have entries for: `Div` (the only Container
+    // left in the hand-written schema) and the control-flow
+    // pseudo-tags (If, ElseIf, Else, For, Fragment, …).
+    //
+    // `Column` / `Row` / `Stack` / `Center` / `Expanded` /
+    // `Wrap` are now auto-generated as Leaf entries from
+    // `headless/layout/*.rs` (see `BUILTINS_GENERATED`).
     for tag in [
-        "Column", "Row", "Div", "Stack", "If", "ElseIf", "Else", "For", "Fragment",
+        "Div", "If", "ElseIf", "Else", "For", "Fragment",
     ] {
         assert!(
             BUILTINS_OVERRIDES.iter().any(|c| c.tag == tag),
             "tag {tag:?} should be in BUILTINS_OVERRIDES"
+        );
+    }
+    // Layout components should be auto-generated as Leaves.
+    for tag in [
+        "Column", "Row", "Stack", "Center", "Expanded", "Wrap",
+    ] {
+        assert!(
+            crate::schema_generated::BUILTINS_GENERATED
+                .iter()
+                .any(|c| c.tag == tag),
+            "tag {tag:?} should be in BUILTINS_GENERATED"
         );
     }
 }
@@ -1812,7 +1835,10 @@ fn unknown_leaf_attribute_suggests_did_you_mean() {
 
 #[test]
 fn unknown_container_attribute_suggests_did_you_mean() {
-    let err = codegen(r#"<Column flx col />"#, Span::call_site(), None, None, &[]).unwrap_err();
+    // `Div` is the remaining Container — use it to test
+    // the did-you-mean suggestion for unknown container
+    // attributes.
+    let err = codegen(r#"<Div flx col />"#, Span::call_site(), None, None, &[]).unwrap_err();
     assert!(
         err.message.contains("did you mean `flex`"),
         "error should suggest flex for flx; got {}",

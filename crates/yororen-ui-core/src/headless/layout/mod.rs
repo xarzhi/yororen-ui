@@ -38,13 +38,13 @@
 pub mod types;
 pub use types::{AlignItems, Gap, Inset, JustifyContent, Length, Spacing};
 
-mod center;
-mod column;
-mod expanded;
-mod row;
-mod spacer;
-mod stack;
-mod wrap;
+pub mod center;
+pub mod column;
+pub mod expanded;
+pub mod row;
+pub mod spacer;
+pub mod stack;
+pub mod wrap;
 
 pub use center::{CenterProps, center};
 pub use column::{ColumnProps, column};

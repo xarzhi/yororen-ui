@@ -218,6 +218,18 @@ enum PropValue {
     ImageSource,
     /// `KeybindingInputMode` setter (e.g. `KeybindingInput::mode`).
     KeybindingInputMode,
+    /// `Spacing` setter (e.g. `Column::gap`). Resolved to a
+    /// theme token at render time.
+    Spacing,
+    /// `Inset` setter (e.g. `Column::p`). Resolved to a theme
+    /// token at render time.
+    Inset,
+    /// `AlignItems` setter (e.g. `Column::items`).
+    AlignItems,
+    /// `JustifyContent` setter (e.g. `Column::justify`).
+    JustifyContent,
+    /// `Length` setter (e.g. `Column::w` / `Column::h`).
+    Length,
     /// A gpui color (`Hsla` / `Rgba`).
     Color,
     /// Zero-arg flag setter (`fn X(self) -> Self`).
@@ -279,43 +291,75 @@ fn main() {
     let overrides_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("overrides.toml");
     let overrides = load_overrides(&overrides_path);
 
-    let dir = match fs::read_dir(&headless_dir) {
-        Ok(d) => d,
-        Err(e) => {
-            eprintln!("could not read {}: {e}", headless_dir.display());
-            std::process::exit(1);
+    // Recursively walk `headless_dir`, collecting every
+    // `*.rs` file (except `mod.rs`). Subdirectory layout
+    // components (e.g. `headless/layout/column.rs`) become
+    // factory paths of the form
+    // `::yororen_ui::headless::layout::column`. The
+    // relative path from `headless_dir` (minus the `.rs`
+    // extension) is the module path.
+    fn collect_rs_files(
+        dir: &Path,
+        prefix: &Path,
+        out: &mut Vec<(PathBuf, String)>,
+    ) -> std::io::Result<()> {
+        for entry in std::fs::read_dir(dir)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.is_dir() {
+                collect_rs_files(&path, prefix, out)?;
+                continue;
+            }
+            if path.extension().and_then(|s| s.to_str()) != Some("rs") {
+                continue;
+            }
+            let stem = match path.file_stem().and_then(|s| s.to_str()) {
+                Some(s) => s.to_string(),
+                None => continue,
+            };
+            if stem == "mod" {
+                continue;
+            }
+            let rel = path
+                .strip_prefix(prefix)
+                .unwrap_or(&path)
+                .with_extension("")
+                .to_string_lossy()
+                .replace(std::path::MAIN_SEPARATOR, "::");
+            out.push((path, rel));
         }
-    };
-    for entry in dir.flatten() {
-        let path = entry.path();
-        if path.extension().and_then(|s| s.to_str()) != Some("rs") {
-            continue;
-        }
-        let stem = match path.file_stem().and_then(|s| s.to_str()) {
-            Some(s) => s.to_string(),
-            None => continue,
-        };
-        if stem == "mod" {
-            continue;
-        }
-        let content = match fs::read_to_string(&path) {
+        Ok(())
+    }
+
+    let mut files: Vec<(PathBuf, String)> = Vec::new();
+    if let Err(e) = collect_rs_files(&headless_dir, &headless_dir, &mut files) {
+        eprintln!("could not read {}: {e}", headless_dir.display());
+        std::process::exit(1);
+    }
+    files.sort_by(|a, b| a.1.cmp(&b.1));
+
+    for (path, module_path) in &files {
+        let content = match fs::read_to_string(path) {
             Ok(c) => c,
             Err(e) => {
-                skipped.push((stem, format!("read error: {e}")));
+                skipped.push((module_path.clone(), format!("read error: {e}")));
                 continue;
             }
         };
         let ast = match syn::parse_file(&content) {
             Ok(a) => a,
             Err(e) => {
-                skipped.push((stem, format!("parse error: {e}")));
+                skipped.push((module_path.clone(), format!("parse error: {e}")));
                 continue;
             }
         };
-        match extract(&ast, &stem) {
+        // `module_name` (used for tag + PascalCase struct lookup)
+        // is the last segment of `module_path`.
+        let module_name = module_path.rsplit("::").next().unwrap_or(module_path);
+        match extract(&ast, module_name, module_path) {
             Ok(Some(e)) => entries.push(e),
-            Ok(None) => skipped.push((stem, "no factory found".to_string())),
-            Err(reason) => skipped.push((stem, reason)),
+            Ok(None) => skipped.push((module_path.clone(), "no factory found".to_string())),
+            Err(reason) => skipped.push((module_path.clone(), reason)),
         }
     }
 
@@ -555,7 +599,7 @@ fn override_to_extracted(o: &OverrideEntry) -> Option<Extracted> {
 
 // -- extraction ----------------------------------------------------------------
 
-fn extract(ast: &syn::File, module_name: &str) -> Result<Option<Extracted>, String> {
+fn extract(ast: &syn::File, module_name: &str, module_path: &str) -> Result<Option<Extracted>, String> {
     // 1. Find the factory function.
     let factory = find_factory(ast, module_name);
     let factory = match factory {
@@ -654,6 +698,16 @@ fn extract(ast: &syn::File, module_name: &str) -> Result<Option<Extracted>, Stri
                     continue;
                 }
 
+                // `child` / `children` are internal builder methods
+                // that store children in the props struct. XML
+                // attributes are not the right surface for them —
+                // children come from XML child nodes (handled by
+                // `apply_post_render_children`). Skip them so they
+                // don't appear in the schema as `Unknown` props.
+                if name == "child" || name == "children" {
+                    continue;
+                }
+
                 if is_self_only {
                     props.push(PropInfo {
                         name: name.clone(),
@@ -705,7 +759,7 @@ fn extract(ast: &syn::File, module_name: &str) -> Result<Option<Extracted>, Stri
 
     Ok(Some(Extracted {
         tag,
-        factory: format!("::yororen_ui::headless::{}::{}", module_name, module_name),
+        factory: format!("::yororen_ui::headless::{}::{}", module_path, module_name),
         extra_args,
         needs_app,
         needs_window,
@@ -860,6 +914,21 @@ fn classify_arg(ty: &Type) -> PropValue {
         if n == "KeybindingInputMode" {
             return PropValue::KeybindingInputMode;
         }
+        if n == "Spacing" {
+            return PropValue::Spacing;
+        }
+        if n == "Inset" {
+            return PropValue::Inset;
+        }
+        if n == "AlignItems" {
+            return PropValue::AlignItems;
+        }
+        if n == "JustifyContent" {
+            return PropValue::JustifyContent;
+        }
+        if n == "Length" {
+            return PropValue::Length;
+        }
     }
     let rendered = ty.to_token_stream().to_string();
     // `impl Into<gpui::Pixels>` / `Pixels` — `f32` works because
@@ -879,6 +948,21 @@ fn classify_arg(ty: &Type) -> PropValue {
     }
     if rendered.contains("KeybindingInputMode") {
         return PropValue::KeybindingInputMode;
+    }
+    if rendered.contains("Spacing") {
+        return PropValue::Spacing;
+    }
+    if rendered.contains("Inset") {
+        return PropValue::Inset;
+    }
+    if rendered.contains("AlignItems") {
+        return PropValue::AlignItems;
+    }
+    if rendered.contains("JustifyContent") {
+        return PropValue::JustifyContent;
+    }
+    if rendered.contains("Length") {
+        return PropValue::Length;
     }
     // Typed containers / custom objects that cannot be
     // expressed as XML literals. These require a brace
@@ -1097,6 +1181,11 @@ fn parse_prop_value(raw: &str) -> Option<PropValue> {
         "IconSource" => Some(PropValue::IconSource),
         "ImageSource" => Some(PropValue::ImageSource),
         "KeybindingInputMode" => Some(PropValue::KeybindingInputMode),
+        "Spacing" => Some(PropValue::Spacing),
+        "Inset" => Some(PropValue::Inset),
+        "AlignItems" => Some(PropValue::AlignItems),
+        "JustifyContent" => Some(PropValue::JustifyContent),
+        "Length" => Some(PropValue::Length),
         "Color" => Some(PropValue::Color),
         "Custom" => Some(PropValue::Custom),
         _ => None,
@@ -1321,6 +1410,11 @@ fn render_props(props: &[PropInfo]) -> String {
             PropValue::IconSource => "PropValue::IconSource",
             PropValue::ImageSource => "PropValue::ImageSource",
             PropValue::KeybindingInputMode => "PropValue::KeybindingInputMode",
+            PropValue::Spacing => "PropValue::Spacing",
+            PropValue::Inset => "PropValue::Inset",
+            PropValue::AlignItems => "PropValue::AlignItems",
+            PropValue::JustifyContent => "PropValue::JustifyContent",
+            PropValue::Length => "PropValue::Length",
             PropValue::Color => "PropValue::Color",
             PropValue::Custom => "PropValue::Custom",
         };

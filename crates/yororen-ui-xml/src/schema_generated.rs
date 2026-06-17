@@ -3,14 +3,15 @@
 //!
 //! Source of truth: `yororen-ui-core/src/headless/*.rs`
 //! plus `yororen-ui-xml/overrides.toml`.
-//! Last regenerated with: 61 entries (30 from overrides), 4 skipped.
+//! Last regenerated with: 67 entries (27 from overrides), 5 skipped.
 //!
 //! Skipped files (need manual schema entry or a schema
 //! extension — see `gen_schema.rs` notes):
+//! - `layout::types`: no factory found
 //! - `list_navigable`: no factory found
-//! - `text_input_element`: no factory found
 //! - `text_area_element`: no factory found
 //! - `text_input_core`: no factory found
+//! - `text_input_element`: no factory found
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
 #![allow(dead_code)]
@@ -129,6 +130,27 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
         doc: "auto-generated from `headless::card`",
     },
     ComponentDef {
+        tag: "Center",
+        kind: ComponentKind::Leaf(LeafDef {
+            factory: "::yororen_ui::headless::layout::center::center",
+            extra_args: &[],
+            render: RenderMode::Default,
+            needs_app: true,
+            needs_window: false,
+            props: &[PropDef { name: "w", setter: "w", value: PropValue::Length },
+            PropDef { name: "w_full", setter: "w_full", value: PropValue::Flag },
+            PropDef { name: "h", setter: "h", value: PropValue::Length },
+            PropDef { name: "h_full", setter: "h_full", value: PropValue::Flag },
+            ],
+            events: &[],
+            supports_text_child: false,
+            children_before_render: false,
+            unwrap_children: false,
+            slots: &[],
+        }),
+        doc: "auto-generated from `headless::center`",
+    },
+    ComponentDef {
         tag: "Checkbox",
         kind: ComponentKind::Leaf(LeafDef {
             factory: "::yororen_ui::headless::checkbox::checkbox",
@@ -148,6 +170,37 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
             slots: &[],
         }),
         doc: "auto-generated from `headless::checkbox`",
+    },
+    ComponentDef {
+        tag: "Column",
+        kind: ComponentKind::Leaf(LeafDef {
+            factory: "::yororen_ui::headless::layout::column::column",
+            extra_args: &[],
+            render: RenderMode::Default,
+            needs_app: true,
+            needs_window: false,
+            props: &[PropDef { name: "gap", setter: "gap", value: PropValue::Spacing },
+            PropDef { name: "p", setter: "p", value: PropValue::Inset },
+            PropDef { name: "px", setter: "px", value: PropValue::Spacing },
+            PropDef { name: "py", setter: "py", value: PropValue::Spacing },
+            PropDef { name: "m", setter: "m", value: PropValue::Inset },
+            PropDef { name: "items", setter: "items", value: PropValue::AlignItems },
+            PropDef { name: "items_center", setter: "items_center", value: PropValue::Flag },
+            PropDef { name: "justify", setter: "justify", value: PropValue::JustifyContent },
+            PropDef { name: "justify_between", setter: "justify_between", value: PropValue::Flag },
+            PropDef { name: "w", setter: "w", value: PropValue::Length },
+            PropDef { name: "w_full", setter: "w_full", value: PropValue::Flag },
+            PropDef { name: "h", setter: "h", value: PropValue::Length },
+            PropDef { name: "h_full", setter: "h_full", value: PropValue::Flag },
+            PropDef { name: "scrollable", setter: "scrollable", value: PropValue::Flag },
+            ],
+            events: &[],
+            supports_text_child: false,
+            children_before_render: false,
+            unwrap_children: false,
+            slots: &[],
+        }),
+        doc: "auto-generated from `headless::column`",
     },
     ComponentDef {
         tag: "ComboBox",
@@ -242,6 +295,23 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
             slots: &[],
         }),
         doc: "auto-generated from `headless::empty_state`",
+    },
+    ComponentDef {
+        tag: "Expanded",
+        kind: ComponentKind::Leaf(LeafDef {
+            factory: "::yororen_ui::headless::layout::expanded::expanded",
+            extra_args: &[],
+            render: RenderMode::Default,
+            needs_app: true,
+            needs_window: false,
+            props: &[],
+            events: &[],
+            supports_text_child: false,
+            children_before_render: false,
+            unwrap_children: false,
+            slots: &[],
+        }),
+        doc: "auto-generated from `headless::expanded`",
     },
     ComponentDef {
         tag: "FilePathInput",
@@ -735,6 +805,37 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
         doc: "auto-generated from `headless::radio_group`",
     },
     ComponentDef {
+        tag: "Row",
+        kind: ComponentKind::Leaf(LeafDef {
+            factory: "::yororen_ui::headless::layout::row::row",
+            extra_args: &[],
+            render: RenderMode::Default,
+            needs_app: true,
+            needs_window: false,
+            props: &[PropDef { name: "gap", setter: "gap", value: PropValue::Spacing },
+            PropDef { name: "p", setter: "p", value: PropValue::Inset },
+            PropDef { name: "px", setter: "px", value: PropValue::Spacing },
+            PropDef { name: "py", setter: "py", value: PropValue::Spacing },
+            PropDef { name: "m", setter: "m", value: PropValue::Inset },
+            PropDef { name: "items", setter: "items", value: PropValue::AlignItems },
+            PropDef { name: "items_center", setter: "items_center", value: PropValue::Flag },
+            PropDef { name: "justify", setter: "justify", value: PropValue::JustifyContent },
+            PropDef { name: "justify_between", setter: "justify_between", value: PropValue::Flag },
+            PropDef { name: "w", setter: "w", value: PropValue::Length },
+            PropDef { name: "w_full", setter: "w_full", value: PropValue::Flag },
+            PropDef { name: "h", setter: "h", value: PropValue::Length },
+            PropDef { name: "h_full", setter: "h_full", value: PropValue::Flag },
+            PropDef { name: "scrollable", setter: "scrollable", value: PropValue::Flag },
+            ],
+            events: &[],
+            supports_text_child: false,
+            children_before_render: false,
+            unwrap_children: false,
+            slots: &[],
+        }),
+        doc: "auto-generated from `headless::row`",
+    },
+    ComponentDef {
         tag: "SearchInput",
         kind: ComponentKind::Leaf(LeafDef {
             factory: "::yororen_ui::headless::search_input::search_input",
@@ -879,6 +980,27 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
         doc: "auto-generated from `headless::split_button`",
     },
     // NOTE: extra_args = 1 entries
+    ComponentDef {
+        tag: "Stack",
+        kind: ComponentKind::Leaf(LeafDef {
+            factory: "::yororen_ui::headless::layout::stack::stack",
+            extra_args: &[],
+            render: RenderMode::Default,
+            needs_app: true,
+            needs_window: false,
+            props: &[PropDef { name: "w", setter: "w", value: PropValue::Length },
+            PropDef { name: "w_full", setter: "w_full", value: PropValue::Flag },
+            PropDef { name: "h", setter: "h", value: PropValue::Length },
+            PropDef { name: "h_full", setter: "h_full", value: PropValue::Flag },
+            ],
+            events: &[],
+            supports_text_child: false,
+            children_before_render: false,
+            unwrap_children: false,
+            slots: &[],
+        }),
+        doc: "auto-generated from `headless::stack`",
+    },
     ComponentDef {
         tag: "Switch",
         kind: ComponentKind::Leaf(LeafDef {
@@ -1103,6 +1225,33 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
         doc: "auto-generated from `headless::tree_item`",
     },
     // NOTE: extra_args = 2 entries
+    ComponentDef {
+        tag: "Wrap",
+        kind: ComponentKind::Leaf(LeafDef {
+            factory: "::yororen_ui::headless::layout::wrap::wrap",
+            extra_args: &[],
+            render: RenderMode::Default,
+            needs_app: true,
+            needs_window: false,
+            props: &[PropDef { name: "gap", setter: "gap", value: PropValue::Spacing },
+            PropDef { name: "row_gap", setter: "row_gap", value: PropValue::Spacing },
+            PropDef { name: "col_gap", setter: "col_gap", value: PropValue::Spacing },
+            PropDef { name: "p", setter: "p", value: PropValue::Inset },
+            PropDef { name: "items", setter: "items", value: PropValue::AlignItems },
+            PropDef { name: "justify", setter: "justify", value: PropValue::JustifyContent },
+            PropDef { name: "w", setter: "w", value: PropValue::Length },
+            PropDef { name: "w_full", setter: "w_full", value: PropValue::Flag },
+            PropDef { name: "h", setter: "h", value: PropValue::Length },
+            PropDef { name: "h_full", setter: "h_full", value: PropValue::Flag },
+            ],
+            events: &[],
+            supports_text_child: false,
+            children_before_render: false,
+            unwrap_children: false,
+            slots: &[],
+        }),
+        doc: "auto-generated from `headless::wrap`",
+    },
 ];
 
 /// Container / control-flow entries sourced from
@@ -1110,31 +1259,7 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
 /// (they're XML-only pseudo-tags or layout containers).
 pub static BUILTINS_OVERRIDES: &[ComponentDef] = &[
     ComponentDef {
-            tag: "Column",
-            kind: ComponentKind::Container(ContainerDef {
-                fixed_methods: &[("col", "flex_col"), ],
-                style_hint: "the gpui Styled trait (`.flex`, `.items_center`, `.gap_3()`, …)",
-            }),
-            doc: "from `overrides.toml`",
-        },
-    ComponentDef {
-            tag: "Row",
-            kind: ComponentKind::Container(ContainerDef {
-                fixed_methods: &[("row", "flex_row"), ],
-                style_hint: "the gpui Styled trait (`.flex`, `.items_center`, `.gap_3()`, …)",
-            }),
-            doc: "from `overrides.toml`",
-        },
-    ComponentDef {
             tag: "Div",
-            kind: ComponentKind::Container(ContainerDef {
-                fixed_methods: &[],
-                style_hint: "the gpui Styled trait (`.flex`, `.items_center`, `.gap_3()`, …)",
-            }),
-            doc: "from `overrides.toml`",
-        },
-    ComponentDef {
-            tag: "Stack",
             kind: ComponentKind::Container(ContainerDef {
                 fixed_methods: &[],
                 style_hint: "the gpui Styled trait (`.flex`, `.items_center`, `.gap_3()`, …)",

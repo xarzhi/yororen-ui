@@ -60,10 +60,10 @@ pub(crate) fn auto_wrap_event_expr(
 
     // Detect `bind!(callee, bound_args...)` and expand it into a
     // closure with the right event signature.
-    if let Some(raw) = attr.expr.as_ref() {
-        if let Some((callee, bound_args)) = try_parse_bind_macro(raw) {
-            return emit_bind_closure(&callee, &bound_args, params, call_args);
-        }
+    if let Some(raw) = attr.expr.as_ref()
+        && let Some((callee, bound_args)) = try_parse_bind_macro(raw)
+    {
+        return emit_bind_closure(&callee, &bound_args, params, call_args);
     }
 
     auto_wrap_closure_expr(attr, expr, params, call_args)

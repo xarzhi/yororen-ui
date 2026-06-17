@@ -23,23 +23,13 @@
 
 # ----- Containers (XML-only; not derived from headless) -----
 
-[[override_]]
-tag = "Column"
-kind = "Container"
-container = { fixed_methods = [["col", "flex_col"]] }
-
-[[override_]]
-tag = "Row"
-kind = "Container"
-container = { fixed_methods = [["row", "flex_row"]] }
+# `Column` / `Row` / `Stack` / `Center` / `Expanded` / `Wrap`
+# are auto-generated as `Leaf` entries from
+# `headless/layout/*.rs`. Only `Div` remains as a `Container`
+# (the plain `gpui::div()` escape hatch).
 
 [[override_]]
 tag = "Div"
-kind = "Container"
-container = { fixed_methods = [] }
-
-[[override_]]
-tag = "Stack"
 kind = "Container"
 container = { fixed_methods = [] }
 

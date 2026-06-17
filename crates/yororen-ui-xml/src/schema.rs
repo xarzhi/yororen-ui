@@ -174,6 +174,21 @@ pub enum PropValue {
     ImageSource,
     /// `yororen_ui::headless::keybinding_input::KeybindingInputMode`.
     KeybindingInputMode,
+    /// `yororen_ui::headless::layout::Spacing` — gap/p/px/py
+    /// token (named `xs`/`sm`/`md`/`lg`/`xl`/`xxl`).
+    Spacing,
+    /// `yororen_ui::headless::layout::Inset` — padding/margin
+    /// token (named `xs`/`sm`/`md`/`lg`/`xl`).
+    Inset,
+    /// `yororen_ui::headless::layout::AlignItems` — flex
+    /// cross-axis alignment.
+    AlignItems,
+    /// `yororen_ui::headless::layout::JustifyContent` — flex
+    /// main-axis distribution.
+    JustifyContent,
+    /// `yororen_ui::headless::layout::Length` — width/height
+    /// (`full`/`fit`/`auto`/`px(N)`/`rem(N)`/`pct(N)`).
+    Length,
     /// A gpui color (`Hsla` / `Rgba`). String literals may be
     /// hex (`#rrggbb` / `#rrggbbaa`); brace expressions are
     /// passed through verbatim.
@@ -396,20 +411,12 @@ pub static BUILTINS: &[ComponentDef] = &[
         doc: "Equal-height virtual list with an auto-persisted controller — `<UniformVirtualList id=\"…\" item_count={n} let:index={i}>…</UniformVirtualList>`.",
     },
     ComponentDef {
-        tag: "Column",
-        kind: ComponentKind::Container(ContainerDef {
-            fixed_methods: &[("col", "flex_col")],
-            style_hint: "the gpui Styled trait (`.flex`, `.items_center`, `.gap_3()`, …)",
-        }),
-        doc: "Vertical flex container — `div().flex().flex_col()`.",
-    },
-    ComponentDef {
         tag: "Div",
         kind: ComponentKind::Container(ContainerDef {
             fixed_methods: &[],
             style_hint: "the gpui Styled trait (`.flex`, `.gap_3()`, …)",
         }),
-        doc: "Plain `div()` — no flex by default.",
+        doc: "Plain `div()` — no flex by default. Escape hatch for raw gpui styling.",
     },
     ComponentDef {
         tag: "Else",
@@ -451,27 +458,15 @@ pub static BUILTINS: &[ComponentDef] = &[
         kind: ComponentKind::ControlFlow(ControlFlowDef::If),
         doc: "Conditional rendering: `<If condition={cond}>…</If>`.",
     },
-    ComponentDef {
-        tag: "Row",
-        kind: ComponentKind::Container(ContainerDef {
-            fixed_methods: &[("row", "flex_row")],
-            style_hint: "the gpui Styled trait (`.flex`, `.items_center`, `.gap_3()`, …)",
-        }),
-        doc: "Horizontal flex container — `div().flex().flex_row()`.",
-    },
-    ComponentDef {
-        tag: "Stack",
-        kind: ComponentKind::Container(ContainerDef {
-            fixed_methods: &[],
-            style_hint: "the gpui Styled trait (`.relative()`, `.absolute()`, …)",
-        }),
-        doc: "Plain `div()` — use `.relative()` / `.absolute()` for stacking.",
-    },
     // NOTE: `UniformVirtualList` and `VirtualList` are ControlFlow
     // tags (see `ControlFlowDef`), not Leaves — they have a row-
     // template body and an auto-persisted controller. The codegen
     // arms live in `codegen_virtual_list` /
     // `codegen_uniform_virtual_list`.
+    //
+    // NOTE: `Column` / `Row` / `Stack` / `Center` / `Expanded` /
+    // `Wrap` are auto-generated as `Leaf` entries from
+    // `headless/layout/*.rs` (see `BUILTINS_GENERATED`).
 ];
 
 /// Reserved XML attribute names consumed by the macro itself
@@ -866,6 +861,11 @@ fn parse_prop_value(raw: &str) -> Result<PropValue, String> {
         "IconSource" => Ok(PropValue::IconSource),
         "ImageSource" => Ok(PropValue::ImageSource),
         "KeybindingInputMode" => Ok(PropValue::KeybindingInputMode),
+        "Spacing" => Ok(PropValue::Spacing),
+        "Inset" => Ok(PropValue::Inset),
+        "AlignItems" => Ok(PropValue::AlignItems),
+        "JustifyContent" => Ok(PropValue::JustifyContent),
+        "Length" => Ok(PropValue::Length),
         "Color" => Ok(PropValue::Color),
         "Flag" => Ok(PropValue::Flag),
         "Unknown" => Ok(PropValue::Unknown),

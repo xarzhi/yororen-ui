@@ -92,19 +92,39 @@ pub(crate) fn codegen_leaf(
 }
 
 fn resolve_id(element: &AstElement) -> Result<TokenStream, XmlError> {
-    let id_attr = element
-        .attributes
-        .iter()
-        .find(|a| a.name == "id")
-        .ok_or_else(|| {
-            XmlError::new(
-                XmlErrorKind::UnknownAttribute,
-                element.span,
-                format!("<{}> requires an `id` attribute", element.tag),
-            )
-            .at(element.byte_offset)
-        })?;
-    attr_value_tokens(id_attr)
+    let id_attr = element.attributes.iter().find(|a| a.name == "id");
+    match id_attr {
+        Some(a) => attr_value_tokens(a),
+        None => {
+            // Layout containers (Column/Row/Stack/Center/
+            // Expanded/Wrap) and Div don't need an `id` — the
+            // gpui `ElementId` is only used to anchor stateful
+            // children (focus, scroll, etc.). For these tags we
+            // synthesise a unique id from the source span so
+            // siblings don't collide.
+            if is_layout_container(&element.tag) {
+                let key = element.byte_offset as u64;
+                Ok(quote! { gpui::ElementId::Integer(#key) })
+            } else {
+                Err(XmlError::new(
+                    XmlErrorKind::UnknownAttribute,
+                    element.span,
+                    format!("<{}> requires an `id` attribute", element.tag),
+                )
+                .at(element.byte_offset))
+            }
+        }
+    }
+}
+
+/// Tags whose `id` is optional. These are non-interactive
+/// layout containers — the `id` is only useful when a child
+/// needs to anchor stateful behaviour.
+fn is_layout_container(tag: &str) -> bool {
+    matches!(
+        tag,
+        "Column" | "Row" | "Stack" | "Center" | "Expanded" | "Wrap" | "Div"
+    )
 }
 
 fn resolve_factory_args(
@@ -805,7 +825,16 @@ fn apply_style_passthrough(
         if !is_leaf_style_attr(&attr.name, &def) {
             continue;
         }
-        apply_container_attr(stmts, attr, style_container_def, element)?;
+        // `col` → `flex_col`, `row` → `flex_row` (XML aliases
+        // for the gpui Styled methods).
+        let actual_attr = match attr.name.as_str() {
+            "col" => "flex_col".to_string(),
+            "row" => "flex_row".to_string(),
+            other => other.to_string(),
+        };
+        let mut rewritten = attr.clone();
+        rewritten.name = actual_attr;
+        apply_container_attr(stmts, &rewritten, style_container_def, element)?;
     }
     Ok(())
 }
@@ -1050,8 +1079,14 @@ pub(crate) fn emit_bind(
     out
 }
 pub(crate) fn is_leaf_style_attr(name: &str, def: &LeafDef) -> bool {
-    let is_style =
-        is_known_shorthand_method(name) || is_spacing_prefix(name) || is_spacing_shorthand(name);
+    // `col` and `row` are XML aliases for `flex_col` /
+    // `flex_row`. They're not real gpui methods, so we
+    // treat them as a special case here.
+    let is_alias = matches!(name, "col" | "row");
+    let is_style = is_alias
+        || is_known_shorthand_method(name)
+        || is_spacing_prefix(name)
+        || is_spacing_shorthand(name);
     if !is_style {
         return false;
     }

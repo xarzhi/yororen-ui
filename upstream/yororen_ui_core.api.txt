@@ -1803,6 +1803,163 @@ impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::labe
 impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::label::LabelProps
 pub fn yororen_ui_core::headless::label::label(impl core::convert::Into<gpui::window::ElementId>, impl core::convert::Into<alloc::string::String>, &mut gpui::app::App) -> yororen_ui_core::headless::label::LabelProps
 pub mod yororen_ui_core::headless::layout
+pub mod yororen_ui_core::headless::layout::center
+pub struct yororen_ui_core::headless::layout::center::CenterProps
+pub yororen_ui_core::headless::layout::center::CenterProps::children: alloc::vec::Vec<gpui::element::AnyElement>
+pub yororen_ui_core::headless::layout::center::CenterProps::height: core::option::Option<yororen_ui_core::headless::layout::types::Length>
+pub yororen_ui_core::headless::layout::center::CenterProps::id: gpui::window::ElementId
+pub yororen_ui_core::headless::layout::center::CenterProps::width: core::option::Option<yororen_ui_core::headless::layout::types::Length>
+impl yororen_ui_core::headless::layout::center::CenterProps
+pub fn yororen_ui_core::headless::layout::center::CenterProps::child(self, impl gpui::element::IntoElement) -> Self
+pub fn yororen_ui_core::headless::layout::center::CenterProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
+pub fn yororen_ui_core::headless::layout::center::CenterProps::h(self, yororen_ui_core::headless::layout::types::Length) -> Self
+pub fn yororen_ui_core::headless::layout::center::CenterProps::h_full(self) -> Self
+pub fn yororen_ui_core::headless::layout::center::CenterProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::layout::center::CenterProps::w(self, yororen_ui_core::headless::layout::types::Length) -> Self
+pub fn yororen_ui_core::headless::layout::center::CenterProps::w_full(self) -> Self
+impl core::marker::Freeze for yororen_ui_core::headless::layout::center::CenterProps
+impl !core::marker::Send for yororen_ui_core::headless::layout::center::CenterProps
+impl !core::marker::Sync for yororen_ui_core::headless::layout::center::CenterProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::center::CenterProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::center::CenterProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::center::CenterProps
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::center::CenterProps
+pub fn yororen_ui_core::headless::layout::center::center(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::center::CenterProps
+pub mod yororen_ui_core::headless::layout::column
+pub struct yororen_ui_core::headless::layout::column::ColumnProps
+pub yororen_ui_core::headless::layout::column::ColumnProps::children: alloc::vec::Vec<gpui::element::AnyElement>
+pub yororen_ui_core::headless::layout::column::ColumnProps::gap: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
+pub yororen_ui_core::headless::layout::column::ColumnProps::height: core::option::Option<yororen_ui_core::headless::layout::types::Length>
+pub yororen_ui_core::headless::layout::column::ColumnProps::id: gpui::window::ElementId
+pub yororen_ui_core::headless::layout::column::ColumnProps::items: core::option::Option<yororen_ui_core::headless::layout::types::AlignItems>
+pub yororen_ui_core::headless::layout::column::ColumnProps::justify: core::option::Option<yororen_ui_core::headless::layout::types::JustifyContent>
+pub yororen_ui_core::headless::layout::column::ColumnProps::margin: core::option::Option<yororen_ui_core::headless::layout::types::Inset>
+pub yororen_ui_core::headless::layout::column::ColumnProps::padding: core::option::Option<yororen_ui_core::headless::layout::types::Inset>
+pub yororen_ui_core::headless::layout::column::ColumnProps::px: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
+pub yororen_ui_core::headless::layout::column::ColumnProps::py: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
+pub yororen_ui_core::headless::layout::column::ColumnProps::scrollable: bool
+pub yororen_ui_core::headless::layout::column::ColumnProps::width: core::option::Option<yororen_ui_core::headless::layout::types::Length>
+impl yororen_ui_core::headless::layout::column::ColumnProps
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::child(self, impl gpui::element::IntoElement) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::h(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Length>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::h_full(self) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::items(self, yororen_ui_core::headless::layout::types::AlignItems) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::items_center(self) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::justify(self, yororen_ui_core::headless::layout::types::JustifyContent) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::justify_between(self) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::m(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::p(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::px(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::py(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::scrollable(self) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::w(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Length>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::w_full(self) -> Self
+impl core::marker::Freeze for yororen_ui_core::headless::layout::column::ColumnProps
+impl !core::marker::Send for yororen_ui_core::headless::layout::column::ColumnProps
+impl !core::marker::Sync for yororen_ui_core::headless::layout::column::ColumnProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::column::ColumnProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::column::ColumnProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::column::ColumnProps
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::column::ColumnProps
+pub fn yororen_ui_core::headless::layout::column::column(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::column::ColumnProps
+pub mod yororen_ui_core::headless::layout::expanded
+pub struct yororen_ui_core::headless::layout::expanded::ExpandedProps
+pub yororen_ui_core::headless::layout::expanded::ExpandedProps::children: alloc::vec::Vec<gpui::element::AnyElement>
+pub yororen_ui_core::headless::layout::expanded::ExpandedProps::id: gpui::window::ElementId
+impl yororen_ui_core::headless::layout::expanded::ExpandedProps
+pub fn yororen_ui_core::headless::layout::expanded::ExpandedProps::child(self, impl gpui::element::IntoElement) -> Self
+pub fn yororen_ui_core::headless::layout::expanded::ExpandedProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
+pub fn yororen_ui_core::headless::layout::expanded::ExpandedProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl core::marker::Freeze for yororen_ui_core::headless::layout::expanded::ExpandedProps
+impl !core::marker::Send for yororen_ui_core::headless::layout::expanded::ExpandedProps
+impl !core::marker::Sync for yororen_ui_core::headless::layout::expanded::ExpandedProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::expanded::ExpandedProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::expanded::ExpandedProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::expanded::ExpandedProps
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::expanded::ExpandedProps
+pub fn yororen_ui_core::headless::layout::expanded::expanded(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::expanded::ExpandedProps
+pub mod yororen_ui_core::headless::layout::row
+pub struct yororen_ui_core::headless::layout::row::RowProps
+pub yororen_ui_core::headless::layout::row::RowProps::children: alloc::vec::Vec<gpui::element::AnyElement>
+pub yororen_ui_core::headless::layout::row::RowProps::gap: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
+pub yororen_ui_core::headless::layout::row::RowProps::height: core::option::Option<yororen_ui_core::headless::layout::types::Length>
+pub yororen_ui_core::headless::layout::row::RowProps::id: gpui::window::ElementId
+pub yororen_ui_core::headless::layout::row::RowProps::items: core::option::Option<yororen_ui_core::headless::layout::types::AlignItems>
+pub yororen_ui_core::headless::layout::row::RowProps::justify: core::option::Option<yororen_ui_core::headless::layout::types::JustifyContent>
+pub yororen_ui_core::headless::layout::row::RowProps::margin: core::option::Option<yororen_ui_core::headless::layout::types::Inset>
+pub yororen_ui_core::headless::layout::row::RowProps::padding: core::option::Option<yororen_ui_core::headless::layout::types::Inset>
+pub yororen_ui_core::headless::layout::row::RowProps::px: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
+pub yororen_ui_core::headless::layout::row::RowProps::py: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
+pub yororen_ui_core::headless::layout::row::RowProps::scrollable: bool
+pub yororen_ui_core::headless::layout::row::RowProps::width: core::option::Option<yororen_ui_core::headless::layout::types::Length>
+impl yororen_ui_core::headless::layout::row::RowProps
+pub fn yororen_ui_core::headless::layout::row::RowProps::child(self, impl gpui::element::IntoElement) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::h(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Length>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::h_full(self) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::items(self, yororen_ui_core::headless::layout::types::AlignItems) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::items_center(self) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::justify(self, yororen_ui_core::headless::layout::types::JustifyContent) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::justify_between(self) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::m(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::p(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::px(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::py(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::layout::row::RowProps::scrollable(self) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::w(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Length>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::w_full(self) -> Self
+impl core::marker::Freeze for yororen_ui_core::headless::layout::row::RowProps
+impl !core::marker::Send for yororen_ui_core::headless::layout::row::RowProps
+impl !core::marker::Sync for yororen_ui_core::headless::layout::row::RowProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::row::RowProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::row::RowProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::row::RowProps
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::row::RowProps
+pub fn yororen_ui_core::headless::layout::row::row(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::row::RowProps
+pub mod yororen_ui_core::headless::layout::spacer
+pub struct yororen_ui_core::headless::layout::spacer::SpacerProps
+pub yororen_ui_core::headless::layout::spacer::SpacerProps::id: gpui::window::ElementId
+impl yororen_ui_core::headless::layout::spacer::SpacerProps
+pub fn yororen_ui_core::headless::layout::spacer::SpacerProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl core::clone::Clone for yororen_ui_core::headless::layout::spacer::SpacerProps
+pub fn yororen_ui_core::headless::layout::spacer::SpacerProps::clone(&self) -> yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::fmt::Debug for yororen_ui_core::headless::layout::spacer::SpacerProps
+pub fn yororen_ui_core::headless::layout::spacer::SpacerProps::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Freeze for yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::marker::Send for yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::marker::Sync for yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::spacer::SpacerProps
+pub fn yororen_ui_core::headless::layout::spacer::spacer(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::spacer::SpacerProps
+pub mod yororen_ui_core::headless::layout::stack
+pub struct yororen_ui_core::headless::layout::stack::StackProps
+pub yororen_ui_core::headless::layout::stack::StackProps::children: alloc::vec::Vec<gpui::element::AnyElement>
+pub yororen_ui_core::headless::layout::stack::StackProps::height: core::option::Option<yororen_ui_core::headless::layout::types::Length>
+pub yororen_ui_core::headless::layout::stack::StackProps::id: gpui::window::ElementId
+pub yororen_ui_core::headless::layout::stack::StackProps::width: core::option::Option<yororen_ui_core::headless::layout::types::Length>
+impl yororen_ui_core::headless::layout::stack::StackProps
+pub fn yororen_ui_core::headless::layout::stack::StackProps::child(self, impl gpui::element::IntoElement) -> Self
+pub fn yororen_ui_core::headless::layout::stack::StackProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
+pub fn yororen_ui_core::headless::layout::stack::StackProps::h(self, yororen_ui_core::headless::layout::types::Length) -> Self
+pub fn yororen_ui_core::headless::layout::stack::StackProps::h_full(self) -> Self
+pub fn yororen_ui_core::headless::layout::stack::StackProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::layout::stack::StackProps::w(self, yororen_ui_core::headless::layout::types::Length) -> Self
+pub fn yororen_ui_core::headless::layout::stack::StackProps::w_full(self) -> Self
+impl core::marker::Freeze for yororen_ui_core::headless::layout::stack::StackProps
+impl !core::marker::Send for yororen_ui_core::headless::layout::stack::StackProps
+impl !core::marker::Sync for yororen_ui_core::headless::layout::stack::StackProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::stack::StackProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::stack::StackProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::stack::StackProps
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::stack::StackProps
+pub fn yororen_ui_core::headless::layout::stack::stack(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::stack::StackProps
 pub mod yororen_ui_core::headless::layout::types
 pub enum yororen_ui_core::headless::layout::types::AlignItems
 pub yororen_ui_core::headless::layout::types::AlignItems::Baseline
@@ -1842,6 +1999,8 @@ impl core::convert::From<f32> for yororen_ui_core::headless::layout::types::Inse
 pub fn yororen_ui_core::headless::layout::types::Inset::from(f32) -> Self
 impl core::convert::From<f64> for yororen_ui_core::headless::layout::types::Inset
 pub fn yororen_ui_core::headless::layout::types::Inset::from(f64) -> Self
+impl core::convert::From<gpui::geometry::Pixels> for yororen_ui_core::headless::layout::types::Inset
+pub fn yororen_ui_core::headless::layout::types::Inset::from(gpui::geometry::Pixels) -> Self
 impl core::fmt::Debug for yororen_ui_core::headless::layout::types::Inset
 pub fn yororen_ui_core::headless::layout::types::Inset::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
 impl core::marker::Copy for yororen_ui_core::headless::layout::types::Inset
@@ -1886,6 +2045,12 @@ impl core::clone::Clone for yororen_ui_core::headless::layout::types::Length
 pub fn yororen_ui_core::headless::layout::types::Length::clone(&self) -> yororen_ui_core::headless::layout::types::Length
 impl core::cmp::PartialEq for yororen_ui_core::headless::layout::types::Length
 pub fn yororen_ui_core::headless::layout::types::Length::eq(&self, &yororen_ui_core::headless::layout::types::Length) -> bool
+impl core::convert::From<f32> for yororen_ui_core::headless::layout::types::Length
+pub fn yororen_ui_core::headless::layout::types::Length::from(f32) -> Self
+impl core::convert::From<f64> for yororen_ui_core::headless::layout::types::Length
+pub fn yororen_ui_core::headless::layout::types::Length::from(f64) -> Self
+impl core::convert::From<gpui::geometry::Pixels> for yororen_ui_core::headless::layout::types::Length
+pub fn yororen_ui_core::headless::layout::types::Length::from(gpui::geometry::Pixels) -> Self
 impl core::fmt::Debug for yororen_ui_core::headless::layout::types::Length
 pub fn yororen_ui_core::headless::layout::types::Length::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
 impl core::marker::Copy for yororen_ui_core::headless::layout::types::Length
@@ -1916,6 +2081,8 @@ impl core::convert::From<f32> for yororen_ui_core::headless::layout::types::Spac
 pub fn yororen_ui_core::headless::layout::types::Spacing::from(f32) -> Self
 impl core::convert::From<f64> for yororen_ui_core::headless::layout::types::Spacing
 pub fn yororen_ui_core::headless::layout::types::Spacing::from(f64) -> Self
+impl core::convert::From<gpui::geometry::Pixels> for yororen_ui_core::headless::layout::types::Spacing
+pub fn yororen_ui_core::headless::layout::types::Spacing::from(gpui::geometry::Pixels) -> Self
 impl core::fmt::Debug for yororen_ui_core::headless::layout::types::Spacing
 pub fn yororen_ui_core::headless::layout::types::Spacing::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
 impl core::marker::Copy for yororen_ui_core::headless::layout::types::Spacing
@@ -1930,6 +2097,40 @@ impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout:
 pub fn yororen_ui_core::headless::layout::types::apply_height<S: gpui::styled::Styled>(S, yororen_ui_core::headless::layout::types::Length) -> S
 pub fn yororen_ui_core::headless::layout::types::apply_width<S: gpui::styled::Styled>(S, yororen_ui_core::headless::layout::types::Length) -> S
 pub type yororen_ui_core::headless::layout::types::Gap = yororen_ui_core::headless::layout::types::Spacing
+pub mod yororen_ui_core::headless::layout::wrap
+pub struct yororen_ui_core::headless::layout::wrap::WrapProps
+pub yororen_ui_core::headless::layout::wrap::WrapProps::children: alloc::vec::Vec<gpui::element::AnyElement>
+pub yororen_ui_core::headless::layout::wrap::WrapProps::col_gap: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
+pub yororen_ui_core::headless::layout::wrap::WrapProps::gap: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
+pub yororen_ui_core::headless::layout::wrap::WrapProps::height: core::option::Option<yororen_ui_core::headless::layout::types::Length>
+pub yororen_ui_core::headless::layout::wrap::WrapProps::id: gpui::window::ElementId
+pub yororen_ui_core::headless::layout::wrap::WrapProps::items: core::option::Option<yororen_ui_core::headless::layout::types::AlignItems>
+pub yororen_ui_core::headless::layout::wrap::WrapProps::justify: core::option::Option<yororen_ui_core::headless::layout::types::JustifyContent>
+pub yororen_ui_core::headless::layout::wrap::WrapProps::padding: core::option::Option<yororen_ui_core::headless::layout::types::Inset>
+pub yororen_ui_core::headless::layout::wrap::WrapProps::row_gap: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
+pub yororen_ui_core::headless::layout::wrap::WrapProps::width: core::option::Option<yororen_ui_core::headless::layout::types::Length>
+impl yororen_ui_core::headless::layout::wrap::WrapProps
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::child(self, impl gpui::element::IntoElement) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::col_gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::h(self, yororen_ui_core::headless::layout::types::Length) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::h_full(self) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::items(self, yororen_ui_core::headless::layout::types::AlignItems) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::justify(self, yororen_ui_core::headless::layout::types::JustifyContent) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::p(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::row_gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::w(self, yororen_ui_core::headless::layout::types::Length) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::w_full(self) -> Self
+impl core::marker::Freeze for yororen_ui_core::headless::layout::wrap::WrapProps
+impl !core::marker::Send for yororen_ui_core::headless::layout::wrap::WrapProps
+impl !core::marker::Sync for yororen_ui_core::headless::layout::wrap::WrapProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::wrap::WrapProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::wrap::WrapProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::wrap::WrapProps
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::wrap::WrapProps
+pub fn yororen_ui_core::headless::layout::wrap::wrap(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::wrap::WrapProps
 pub enum yororen_ui_core::headless::layout::AlignItems
 pub yororen_ui_core::headless::layout::AlignItems::Baseline
 pub yororen_ui_core::headless::layout::AlignItems::Center
@@ -1968,6 +2169,8 @@ impl core::convert::From<f32> for yororen_ui_core::headless::layout::types::Inse
 pub fn yororen_ui_core::headless::layout::types::Inset::from(f32) -> Self
 impl core::convert::From<f64> for yororen_ui_core::headless::layout::types::Inset
 pub fn yororen_ui_core::headless::layout::types::Inset::from(f64) -> Self
+impl core::convert::From<gpui::geometry::Pixels> for yororen_ui_core::headless::layout::types::Inset
+pub fn yororen_ui_core::headless::layout::types::Inset::from(gpui::geometry::Pixels) -> Self
 impl core::fmt::Debug for yororen_ui_core::headless::layout::types::Inset
 pub fn yororen_ui_core::headless::layout::types::Inset::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
 impl core::marker::Copy for yororen_ui_core::headless::layout::types::Inset
@@ -2012,6 +2215,12 @@ impl core::clone::Clone for yororen_ui_core::headless::layout::types::Length
 pub fn yororen_ui_core::headless::layout::types::Length::clone(&self) -> yororen_ui_core::headless::layout::types::Length
 impl core::cmp::PartialEq for yororen_ui_core::headless::layout::types::Length
 pub fn yororen_ui_core::headless::layout::types::Length::eq(&self, &yororen_ui_core::headless::layout::types::Length) -> bool
+impl core::convert::From<f32> for yororen_ui_core::headless::layout::types::Length
+pub fn yororen_ui_core::headless::layout::types::Length::from(f32) -> Self
+impl core::convert::From<f64> for yororen_ui_core::headless::layout::types::Length
+pub fn yororen_ui_core::headless::layout::types::Length::from(f64) -> Self
+impl core::convert::From<gpui::geometry::Pixels> for yororen_ui_core::headless::layout::types::Length
+pub fn yororen_ui_core::headless::layout::types::Length::from(gpui::geometry::Pixels) -> Self
 impl core::fmt::Debug for yororen_ui_core::headless::layout::types::Length
 pub fn yororen_ui_core::headless::layout::types::Length::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
 impl core::marker::Copy for yororen_ui_core::headless::layout::types::Length
@@ -2042,6 +2251,8 @@ impl core::convert::From<f32> for yororen_ui_core::headless::layout::types::Spac
 pub fn yororen_ui_core::headless::layout::types::Spacing::from(f32) -> Self
 impl core::convert::From<f64> for yororen_ui_core::headless::layout::types::Spacing
 pub fn yororen_ui_core::headless::layout::types::Spacing::from(f64) -> Self
+impl core::convert::From<gpui::geometry::Pixels> for yororen_ui_core::headless::layout::types::Spacing
+pub fn yororen_ui_core::headless::layout::types::Spacing::from(gpui::geometry::Pixels) -> Self
 impl core::fmt::Debug for yororen_ui_core::headless::layout::types::Spacing
 pub fn yororen_ui_core::headless::layout::types::Spacing::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
 impl core::marker::Copy for yororen_ui_core::headless::layout::types::Spacing
@@ -2058,21 +2269,21 @@ pub yororen_ui_core::headless::layout::CenterProps::children: alloc::vec::Vec<gp
 pub yororen_ui_core::headless::layout::CenterProps::height: core::option::Option<yororen_ui_core::headless::layout::types::Length>
 pub yororen_ui_core::headless::layout::CenterProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::layout::CenterProps::width: core::option::Option<yororen_ui_core::headless::layout::types::Length>
-impl yororen_ui_core::headless::layout::CenterProps
-pub fn yororen_ui_core::headless::layout::CenterProps::child(self, impl gpui::element::IntoElement) -> Self
-pub fn yororen_ui_core::headless::layout::CenterProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
-pub fn yororen_ui_core::headless::layout::CenterProps::h(self, yororen_ui_core::headless::layout::types::Length) -> Self
-pub fn yororen_ui_core::headless::layout::CenterProps::h_full(self) -> Self
-pub fn yororen_ui_core::headless::layout::CenterProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-pub fn yororen_ui_core::headless::layout::CenterProps::w(self, yororen_ui_core::headless::layout::types::Length) -> Self
-pub fn yororen_ui_core::headless::layout::CenterProps::w_full(self) -> Self
-impl core::marker::Freeze for yororen_ui_core::headless::layout::CenterProps
-impl !core::marker::Send for yororen_ui_core::headless::layout::CenterProps
-impl !core::marker::Sync for yororen_ui_core::headless::layout::CenterProps
-impl core::marker::Unpin for yororen_ui_core::headless::layout::CenterProps
-impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::CenterProps
-impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::CenterProps
-impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::CenterProps
+impl yororen_ui_core::headless::layout::center::CenterProps
+pub fn yororen_ui_core::headless::layout::center::CenterProps::child(self, impl gpui::element::IntoElement) -> Self
+pub fn yororen_ui_core::headless::layout::center::CenterProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
+pub fn yororen_ui_core::headless::layout::center::CenterProps::h(self, yororen_ui_core::headless::layout::types::Length) -> Self
+pub fn yororen_ui_core::headless::layout::center::CenterProps::h_full(self) -> Self
+pub fn yororen_ui_core::headless::layout::center::CenterProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::layout::center::CenterProps::w(self, yororen_ui_core::headless::layout::types::Length) -> Self
+pub fn yororen_ui_core::headless::layout::center::CenterProps::w_full(self) -> Self
+impl core::marker::Freeze for yororen_ui_core::headless::layout::center::CenterProps
+impl !core::marker::Send for yororen_ui_core::headless::layout::center::CenterProps
+impl !core::marker::Sync for yororen_ui_core::headless::layout::center::CenterProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::center::CenterProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::center::CenterProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::center::CenterProps
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::center::CenterProps
 pub struct yororen_ui_core::headless::layout::ColumnProps
 pub yororen_ui_core::headless::layout::ColumnProps::children: alloc::vec::Vec<gpui::element::AnyElement>
 pub yororen_ui_core::headless::layout::ColumnProps::gap: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
@@ -2086,45 +2297,45 @@ pub yororen_ui_core::headless::layout::ColumnProps::px: core::option::Option<yor
 pub yororen_ui_core::headless::layout::ColumnProps::py: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
 pub yororen_ui_core::headless::layout::ColumnProps::scrollable: bool
 pub yororen_ui_core::headless::layout::ColumnProps::width: core::option::Option<yororen_ui_core::headless::layout::types::Length>
-impl yororen_ui_core::headless::layout::ColumnProps
-pub fn yororen_ui_core::headless::layout::ColumnProps::child(self, impl gpui::element::IntoElement) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::h(self, yororen_ui_core::headless::layout::types::Length) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::h_full(self) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::items(self, yororen_ui_core::headless::layout::types::AlignItems) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::items_center(self) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::justify(self, yororen_ui_core::headless::layout::types::JustifyContent) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::justify_between(self) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::m(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::p(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::px(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::py(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-pub fn yororen_ui_core::headless::layout::ColumnProps::scrollable(self) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::w(self, yororen_ui_core::headless::layout::types::Length) -> Self
-pub fn yororen_ui_core::headless::layout::ColumnProps::w_full(self) -> Self
-impl core::marker::Freeze for yororen_ui_core::headless::layout::ColumnProps
-impl !core::marker::Send for yororen_ui_core::headless::layout::ColumnProps
-impl !core::marker::Sync for yororen_ui_core::headless::layout::ColumnProps
-impl core::marker::Unpin for yororen_ui_core::headless::layout::ColumnProps
-impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::ColumnProps
-impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::ColumnProps
-impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::ColumnProps
+impl yororen_ui_core::headless::layout::column::ColumnProps
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::child(self, impl gpui::element::IntoElement) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::h(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Length>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::h_full(self) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::items(self, yororen_ui_core::headless::layout::types::AlignItems) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::items_center(self) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::justify(self, yororen_ui_core::headless::layout::types::JustifyContent) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::justify_between(self) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::m(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::p(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::px(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::py(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::scrollable(self) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::w(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Length>) -> Self
+pub fn yororen_ui_core::headless::layout::column::ColumnProps::w_full(self) -> Self
+impl core::marker::Freeze for yororen_ui_core::headless::layout::column::ColumnProps
+impl !core::marker::Send for yororen_ui_core::headless::layout::column::ColumnProps
+impl !core::marker::Sync for yororen_ui_core::headless::layout::column::ColumnProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::column::ColumnProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::column::ColumnProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::column::ColumnProps
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::column::ColumnProps
 pub struct yororen_ui_core::headless::layout::ExpandedProps
 pub yororen_ui_core::headless::layout::ExpandedProps::children: alloc::vec::Vec<gpui::element::AnyElement>
 pub yororen_ui_core::headless::layout::ExpandedProps::id: gpui::window::ElementId
-impl yororen_ui_core::headless::layout::ExpandedProps
-pub fn yororen_ui_core::headless::layout::ExpandedProps::child(self, impl gpui::element::IntoElement) -> Self
-pub fn yororen_ui_core::headless::layout::ExpandedProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
-pub fn yororen_ui_core::headless::layout::ExpandedProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-impl core::marker::Freeze for yororen_ui_core::headless::layout::ExpandedProps
-impl !core::marker::Send for yororen_ui_core::headless::layout::ExpandedProps
-impl !core::marker::Sync for yororen_ui_core::headless::layout::ExpandedProps
-impl core::marker::Unpin for yororen_ui_core::headless::layout::ExpandedProps
-impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::ExpandedProps
-impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::ExpandedProps
-impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::ExpandedProps
+impl yororen_ui_core::headless::layout::expanded::ExpandedProps
+pub fn yororen_ui_core::headless::layout::expanded::ExpandedProps::child(self, impl gpui::element::IntoElement) -> Self
+pub fn yororen_ui_core::headless::layout::expanded::ExpandedProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
+pub fn yororen_ui_core::headless::layout::expanded::ExpandedProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl core::marker::Freeze for yororen_ui_core::headless::layout::expanded::ExpandedProps
+impl !core::marker::Send for yororen_ui_core::headless::layout::expanded::ExpandedProps
+impl !core::marker::Sync for yororen_ui_core::headless::layout::expanded::ExpandedProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::expanded::ExpandedProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::expanded::ExpandedProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::expanded::ExpandedProps
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::expanded::ExpandedProps
 pub struct yororen_ui_core::headless::layout::RowProps
 pub yororen_ui_core::headless::layout::RowProps::children: alloc::vec::Vec<gpui::element::AnyElement>
 pub yororen_ui_core::headless::layout::RowProps::gap: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
@@ -2138,66 +2349,66 @@ pub yororen_ui_core::headless::layout::RowProps::px: core::option::Option<yorore
 pub yororen_ui_core::headless::layout::RowProps::py: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
 pub yororen_ui_core::headless::layout::RowProps::scrollable: bool
 pub yororen_ui_core::headless::layout::RowProps::width: core::option::Option<yororen_ui_core::headless::layout::types::Length>
-impl yororen_ui_core::headless::layout::RowProps
-pub fn yororen_ui_core::headless::layout::RowProps::child(self, impl gpui::element::IntoElement) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::h(self, yororen_ui_core::headless::layout::types::Length) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::h_full(self) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::items(self, yororen_ui_core::headless::layout::types::AlignItems) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::items_center(self) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::justify(self, yororen_ui_core::headless::layout::types::JustifyContent) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::justify_between(self) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::m(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::p(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::px(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::py(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-pub fn yororen_ui_core::headless::layout::RowProps::scrollable(self) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::w(self, yororen_ui_core::headless::layout::types::Length) -> Self
-pub fn yororen_ui_core::headless::layout::RowProps::w_full(self) -> Self
-impl core::marker::Freeze for yororen_ui_core::headless::layout::RowProps
-impl !core::marker::Send for yororen_ui_core::headless::layout::RowProps
-impl !core::marker::Sync for yororen_ui_core::headless::layout::RowProps
-impl core::marker::Unpin for yororen_ui_core::headless::layout::RowProps
-impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::RowProps
-impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::RowProps
-impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::RowProps
+impl yororen_ui_core::headless::layout::row::RowProps
+pub fn yororen_ui_core::headless::layout::row::RowProps::child(self, impl gpui::element::IntoElement) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::h(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Length>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::h_full(self) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::items(self, yororen_ui_core::headless::layout::types::AlignItems) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::items_center(self) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::justify(self, yororen_ui_core::headless::layout::types::JustifyContent) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::justify_between(self) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::m(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::p(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::px(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::py(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::layout::row::RowProps::scrollable(self) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::w(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Length>) -> Self
+pub fn yororen_ui_core::headless::layout::row::RowProps::w_full(self) -> Self
+impl core::marker::Freeze for yororen_ui_core::headless::layout::row::RowProps
+impl !core::marker::Send for yororen_ui_core::headless::layout::row::RowProps
+impl !core::marker::Sync for yororen_ui_core::headless::layout::row::RowProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::row::RowProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::row::RowProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::row::RowProps
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::row::RowProps
 pub struct yororen_ui_core::headless::layout::SpacerProps
 pub yororen_ui_core::headless::layout::SpacerProps::id: gpui::window::ElementId
-impl yororen_ui_core::headless::layout::SpacerProps
-pub fn yororen_ui_core::headless::layout::SpacerProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-impl core::clone::Clone for yororen_ui_core::headless::layout::SpacerProps
-pub fn yororen_ui_core::headless::layout::SpacerProps::clone(&self) -> yororen_ui_core::headless::layout::SpacerProps
-impl core::fmt::Debug for yororen_ui_core::headless::layout::SpacerProps
-pub fn yororen_ui_core::headless::layout::SpacerProps::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::marker::Freeze for yororen_ui_core::headless::layout::SpacerProps
-impl core::marker::Send for yororen_ui_core::headless::layout::SpacerProps
-impl core::marker::Sync for yororen_ui_core::headless::layout::SpacerProps
-impl core::marker::Unpin for yororen_ui_core::headless::layout::SpacerProps
-impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::SpacerProps
-impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::SpacerProps
-impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::SpacerProps
+impl yororen_ui_core::headless::layout::spacer::SpacerProps
+pub fn yororen_ui_core::headless::layout::spacer::SpacerProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+impl core::clone::Clone for yororen_ui_core::headless::layout::spacer::SpacerProps
+pub fn yororen_ui_core::headless::layout::spacer::SpacerProps::clone(&self) -> yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::fmt::Debug for yororen_ui_core::headless::layout::spacer::SpacerProps
+pub fn yororen_ui_core::headless::layout::spacer::SpacerProps::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::Freeze for yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::marker::Send for yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::marker::Sync for yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::spacer::SpacerProps
+impl core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::spacer::SpacerProps
 pub struct yororen_ui_core::headless::layout::StackProps
 pub yororen_ui_core::headless::layout::StackProps::children: alloc::vec::Vec<gpui::element::AnyElement>
 pub yororen_ui_core::headless::layout::StackProps::height: core::option::Option<yororen_ui_core::headless::layout::types::Length>
 pub yororen_ui_core::headless::layout::StackProps::id: gpui::window::ElementId
 pub yororen_ui_core::headless::layout::StackProps::width: core::option::Option<yororen_ui_core::headless::layout::types::Length>
-impl yororen_ui_core::headless::layout::StackProps
-pub fn yororen_ui_core::headless::layout::StackProps::child(self, impl gpui::element::IntoElement) -> Self
-pub fn yororen_ui_core::headless::layout::StackProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
-pub fn yororen_ui_core::headless::layout::StackProps::h(self, yororen_ui_core::headless::layout::types::Length) -> Self
-pub fn yororen_ui_core::headless::layout::StackProps::h_full(self) -> Self
-pub fn yororen_ui_core::headless::layout::StackProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-pub fn yororen_ui_core::headless::layout::StackProps::w(self, yororen_ui_core::headless::layout::types::Length) -> Self
-pub fn yororen_ui_core::headless::layout::StackProps::w_full(self) -> Self
-impl core::marker::Freeze for yororen_ui_core::headless::layout::StackProps
-impl !core::marker::Send for yororen_ui_core::headless::layout::StackProps
-impl !core::marker::Sync for yororen_ui_core::headless::layout::StackProps
-impl core::marker::Unpin for yororen_ui_core::headless::layout::StackProps
-impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::StackProps
-impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::StackProps
-impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::StackProps
+impl yororen_ui_core::headless::layout::stack::StackProps
+pub fn yororen_ui_core::headless::layout::stack::StackProps::child(self, impl gpui::element::IntoElement) -> Self
+pub fn yororen_ui_core::headless::layout::stack::StackProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
+pub fn yororen_ui_core::headless::layout::stack::StackProps::h(self, yororen_ui_core::headless::layout::types::Length) -> Self
+pub fn yororen_ui_core::headless::layout::stack::StackProps::h_full(self) -> Self
+pub fn yororen_ui_core::headless::layout::stack::StackProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::layout::stack::StackProps::w(self, yororen_ui_core::headless::layout::types::Length) -> Self
+pub fn yororen_ui_core::headless::layout::stack::StackProps::w_full(self) -> Self
+impl core::marker::Freeze for yororen_ui_core::headless::layout::stack::StackProps
+impl !core::marker::Send for yororen_ui_core::headless::layout::stack::StackProps
+impl !core::marker::Sync for yororen_ui_core::headless::layout::stack::StackProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::stack::StackProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::stack::StackProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::stack::StackProps
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::stack::StackProps
 pub struct yororen_ui_core::headless::layout::WrapProps
 pub yororen_ui_core::headless::layout::WrapProps::children: alloc::vec::Vec<gpui::element::AnyElement>
 pub yororen_ui_core::headless::layout::WrapProps::col_gap: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
@@ -2209,34 +2420,34 @@ pub yororen_ui_core::headless::layout::WrapProps::justify: core::option::Option<
 pub yororen_ui_core::headless::layout::WrapProps::padding: core::option::Option<yororen_ui_core::headless::layout::types::Inset>
 pub yororen_ui_core::headless::layout::WrapProps::row_gap: core::option::Option<yororen_ui_core::headless::layout::types::Spacing>
 pub yororen_ui_core::headless::layout::WrapProps::width: core::option::Option<yororen_ui_core::headless::layout::types::Length>
-impl yororen_ui_core::headless::layout::WrapProps
-pub fn yororen_ui_core::headless::layout::WrapProps::child(self, impl gpui::element::IntoElement) -> Self
-pub fn yororen_ui_core::headless::layout::WrapProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
-pub fn yororen_ui_core::headless::layout::WrapProps::col_gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
-pub fn yororen_ui_core::headless::layout::WrapProps::gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
-pub fn yororen_ui_core::headless::layout::WrapProps::h(self, yororen_ui_core::headless::layout::types::Length) -> Self
-pub fn yororen_ui_core::headless::layout::WrapProps::h_full(self) -> Self
-pub fn yororen_ui_core::headless::layout::WrapProps::items(self, yororen_ui_core::headless::layout::types::AlignItems) -> Self
-pub fn yororen_ui_core::headless::layout::WrapProps::justify(self, yororen_ui_core::headless::layout::types::JustifyContent) -> Self
-pub fn yororen_ui_core::headless::layout::WrapProps::p(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
-pub fn yororen_ui_core::headless::layout::WrapProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
-pub fn yororen_ui_core::headless::layout::WrapProps::row_gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
-pub fn yororen_ui_core::headless::layout::WrapProps::w(self, yororen_ui_core::headless::layout::types::Length) -> Self
-pub fn yororen_ui_core::headless::layout::WrapProps::w_full(self) -> Self
-impl core::marker::Freeze for yororen_ui_core::headless::layout::WrapProps
-impl !core::marker::Send for yororen_ui_core::headless::layout::WrapProps
-impl !core::marker::Sync for yororen_ui_core::headless::layout::WrapProps
-impl core::marker::Unpin for yororen_ui_core::headless::layout::WrapProps
-impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::WrapProps
-impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::WrapProps
-impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::WrapProps
-pub fn yororen_ui_core::headless::layout::center(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::CenterProps
-pub fn yororen_ui_core::headless::layout::column(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::ColumnProps
-pub fn yororen_ui_core::headless::layout::expanded(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::ExpandedProps
-pub fn yororen_ui_core::headless::layout::row(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::RowProps
-pub fn yororen_ui_core::headless::layout::spacer(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::SpacerProps
-pub fn yororen_ui_core::headless::layout::stack(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::StackProps
-pub fn yororen_ui_core::headless::layout::wrap(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::WrapProps
+impl yororen_ui_core::headless::layout::wrap::WrapProps
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::child(self, impl gpui::element::IntoElement) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::children(self, impl core::iter::traits::collect::IntoIterator<Item = impl gpui::element::IntoElement>) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::col_gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::h(self, yororen_ui_core::headless::layout::types::Length) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::h_full(self) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::items(self, yororen_ui_core::headless::layout::types::AlignItems) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::justify(self, yororen_ui_core::headless::layout::types::JustifyContent) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::p(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Inset>) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::render(self, &gpui::app::App) -> gpui::elements::div::Stateful<gpui::elements::div::Div>
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::row_gap(self, impl core::convert::Into<yororen_ui_core::headless::layout::types::Spacing>) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::w(self, yororen_ui_core::headless::layout::types::Length) -> Self
+pub fn yororen_ui_core::headless::layout::wrap::WrapProps::w_full(self) -> Self
+impl core::marker::Freeze for yororen_ui_core::headless::layout::wrap::WrapProps
+impl !core::marker::Send for yororen_ui_core::headless::layout::wrap::WrapProps
+impl !core::marker::Sync for yororen_ui_core::headless::layout::wrap::WrapProps
+impl core::marker::Unpin for yororen_ui_core::headless::layout::wrap::WrapProps
+impl core::marker::UnsafeUnpin for yororen_ui_core::headless::layout::wrap::WrapProps
+impl !core::panic::unwind_safe::RefUnwindSafe for yororen_ui_core::headless::layout::wrap::WrapProps
+impl !core::panic::unwind_safe::UnwindSafe for yororen_ui_core::headless::layout::wrap::WrapProps
+pub fn yororen_ui_core::headless::layout::center(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::center::CenterProps
+pub fn yororen_ui_core::headless::layout::column(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::column::ColumnProps
+pub fn yororen_ui_core::headless::layout::expanded(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::expanded::ExpandedProps
+pub fn yororen_ui_core::headless::layout::row(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::row::RowProps
+pub fn yororen_ui_core::headless::layout::spacer(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::spacer::SpacerProps
+pub fn yororen_ui_core::headless::layout::stack(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::stack::StackProps
+pub fn yororen_ui_core::headless::layout::wrap(impl core::convert::Into<gpui::window::ElementId>, &mut gpui::app::App) -> yororen_ui_core::headless::layout::wrap::WrapProps
 pub type yororen_ui_core::headless::layout::Gap = yororen_ui_core::headless::layout::types::Spacing
 pub mod yororen_ui_core::headless::list_item
 pub struct yororen_ui_core::headless::list_item::ListItemProps

@@ -79,6 +79,12 @@ impl From<f64> for Spacing {
     }
 }
 
+impl From<gpui::Pixels> for Spacing {
+    fn from(p: gpui::Pixels) -> Self {
+        Spacing::Px(f32::from(p))
+    }
+}
+
 /// Padding / margin inset. Maps to `tokens.spacing.inset_X` tokens.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Inset {
@@ -118,6 +124,12 @@ impl From<f64> for Inset {
     }
 }
 
+impl From<gpui::Pixels> for Inset {
+    fn from(p: gpui::Pixels) -> Self {
+        Inset::Px(f32::from(p))
+    }
+}
+
 /// Length for width / height. Does NOT need theme access.
 ///
 /// | Variant  | Maps to                              |
@@ -141,6 +153,24 @@ pub enum Length {
     Rem(f32),
     /// Percentage (0-100). `Pct(50.0)` → 50% of the parent.
     Pct(f32),
+}
+
+impl From<f32> for Length {
+    fn from(v: f32) -> Self {
+        Length::Px(v)
+    }
+}
+
+impl From<f64> for Length {
+    fn from(v: f64) -> Self {
+        Length::Px(v as f32)
+    }
+}
+
+impl From<gpui::Pixels> for Length {
+    fn from(p: gpui::Pixels) -> Self {
+        Length::Px(f32::from(p))
+    }
 }
 
 /// Apply a `Length` as width to any `Styled` element.
