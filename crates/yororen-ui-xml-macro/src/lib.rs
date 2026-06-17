@@ -10,6 +10,7 @@
 
 use proc_macro::TokenStream;
 use proc_macro2::{Literal, Span, TokenStream as TokenStream2};
+use yororen_ui_core::headless::layout::{Inset, Spacing};
 use std::path::PathBuf;
 use syn::parse::{Parse, ParseStream, Parser, Result as SynResult};
 use yororen_ui_xml::schema::ComponentDef;
@@ -161,8 +162,7 @@ pub fn bind(input: TokenStream) -> TokenStream {
 pub fn xml(input: TokenStream) -> TokenStream {
     let parser = |stream: ParseStream| XmlArgs::parse(stream);
     let args = match parser.parse2(input.into()) {
-        Ok(a) => a,
-        Err(e) => return e.to_compile_error().into(),
+        Ok(a) => a,        Err(e) => return e.to_compile_error().into(),
     };
     let outer_span = Span::call_site();
     let cx_expr = args.cx.map(|e| quote::quote! { #e });
@@ -418,4 +418,143 @@ struct XmlFileArgs {
     path: String,
     path_span: Span,
     source_file: String,
+}
+
+/// `classes!` — parse a Tailwind-like class string at compile
+/// time and emit a `Vec<LayoutClass>` for use with
+/// `ColumnProps::classes()`, `RowProps::classes()`, etc.
+///
+/// ```ignore
+/// use yororen_ui::headless::layout::{column, classes};
+/// column("root", cx).classes(classes!("flex gap-md p-md")).render(cx);
+/// ```
+///
+/// Unknown class tokens are reported as a compile error at
+/// the call site, with a hint listing valid options.
+#[proc_macro]
+pub fn classes(input: TokenStream) -> TokenStream {
+    let span = proc_macro2::Span::call_site();
+    // The input is a string literal. Parse it via `syn::LitStr`.
+    let lit: syn::LitStr = match syn::parse2(input.into()) {
+        Ok(l) => l,
+        Err(e) => return e.to_compile_error().into(),
+    };
+    let raw = lit.value();
+    let parsed = match yororen_ui_xml::class::parse_class_string(&raw) {
+        Ok(v) => v,
+        Err(e) => {
+            let msg = format!("{e} (in `{}`)", raw);
+            return syn::Error::new(span, msg).to_compile_error().into();
+        }
+    };
+    // Emit a `vec![LayoutClass::Variant, ...]` literal.
+    let mut elems = proc_macro2::TokenStream::new();
+    for c in &parsed {
+        let ts = layout_class_to_tokens(c);
+        elems.extend(quote::quote! { #ts, });
+    }
+    let out = quote::quote! {
+        ::std::vec::Vec::<::yororen_ui::headless::layout::LayoutClass>::from([
+            #elems
+        ])
+    };
+    out.into()
+}
+
+/// Convert a `LayoutClass` into a `TokenStream` that
+/// constructs it. Used by the `classes!` proc-macro to
+/// generate the `vec![…]` literal.
+fn layout_class_to_tokens(c: &yororen_ui_core::headless::layout::LayoutClass) -> proc_macro2::TokenStream {
+    use yororen_ui_core::headless::layout::LayoutClass as L;
+    let l = quote::quote! { ::yororen_ui::headless::layout::LayoutClass };
+    match c {
+        L::Flex => quote::quote! { #l::Flex },
+        L::FlexCol => quote::quote! { #l::FlexCol },
+        L::FlexRow => quote::quote! { #l::FlexRow },
+        L::FlexWrap => quote::quote! { #l::FlexWrap },
+        L::Flex1 => quote::quote! { #l::Flex1 },
+        L::ItemsStart => quote::quote! { #l::ItemsStart },
+        L::ItemsEnd => quote::quote! { #l::ItemsEnd },
+        L::ItemsCenter => quote::quote! { #l::ItemsCenter },
+        L::ItemsBaseline => quote::quote! { #l::ItemsBaseline },
+        L::ItemsStretch => quote::quote! { #l::ItemsStretch },
+        L::JustifyStart => quote::quote! { #l::JustifyStart },
+        L::JustifyEnd => quote::quote! { #l::JustifyEnd },
+        L::JustifyCenter => quote::quote! { #l::JustifyCenter },
+        L::JustifyBetween => quote::quote! { #l::JustifyBetween },
+        L::JustifyAround => quote::quote! { #l::JustifyAround },
+        L::JustifyEvenly => quote::quote! { #l::JustifyEvenly },
+        L::Gap(s) => spacing_to_tokens(s).wrap_variant(&l, "Gap"),
+        L::P(i) => inset_to_tokens(i).wrap_variant(&l, "P"),
+        L::Px(s) => spacing_to_tokens(s).wrap_variant(&l, "Px"),
+        L::Py(s) => spacing_to_tokens(s).wrap_variant(&l, "Py"),
+        L::M(i) => inset_to_tokens(i).wrap_variant(&l, "M"),
+        L::Mx(i) => inset_to_tokens(i).wrap_variant(&l, "Mx"),
+        L::My(i) => inset_to_tokens(i).wrap_variant(&l, "My"),
+        L::WFull => quote::quote! { #l::WFull },
+        L::HFull => quote::quote! { #l::HFull },
+        L::SizeFull => quote::quote! { #l::SizeFull },
+        L::Relative => quote::quote! { #l::Relative },
+        L::Absolute => quote::quote! { #l::Absolute },
+        L::Top0 => quote::quote! { #l::Top0 },
+        L::Right0 => quote::quote! { #l::Right0 },
+        L::Bottom0 => quote::quote! { #l::Bottom0 },
+        L::Left0 => quote::quote! { #l::Left0 },
+        L::Inset0 => quote::quote! { #l::Inset0 },
+        L::OverflowHidden => quote::quote! { #l::OverflowHidden },
+        L::OverflowScroll => quote::quote! { #l::OverflowScroll },
+        L::Border => quote::quote! { #l::Border },
+        L::Border1 => quote::quote! { #l::Border1 },
+        L::Rounded => quote::quote! { #l::Rounded },
+        L::RoundedMd => quote::quote! { #l::RoundedMd },
+        L::RoundedLg => quote::quote! { #l::RoundedLg },
+        L::ShadowMd => quote::quote! { #l::ShadowMd },
+        L::ShadowLg => quote::quote! { #l::ShadowLg },
+    }
+}
+
+trait WrapVariant {
+    fn wrap_variant(&self, l: &proc_macro2::TokenStream, variant: &str) -> proc_macro2::TokenStream;
+}
+
+impl WrapVariant for proc_macro2::TokenStream {
+    fn wrap_variant(&self, l: &proc_macro2::TokenStream, variant: &str) -> proc_macro2::TokenStream {
+        let v = proc_macro2::Ident::new(variant, proc_macro2::Span::call_site());
+        quote::quote! { #l::#v(#self) }
+    }
+}
+
+fn spacing_to_tokens(s: &Spacing) -> proc_macro2::TokenStream {
+    let p = quote::quote! { ::yororen_ui::headless::layout::Spacing };
+    match s {
+        Spacing::Xs => quote::quote! { #p::Xs },
+        Spacing::Sm => quote::quote! { #p::Sm },
+        Spacing::Md => quote::quote! { #p::Md },
+        Spacing::Lg => quote::quote! { #p::Lg },
+        Spacing::Xl => quote::quote! { #p::Xl },
+        Spacing::Xxl => quote::quote! { #p::Xxl },
+        Spacing::Px(v) => {
+            let lit = proc_macro2::Literal::f32_suffixed(*v);
+            quote::quote! { #p::Px(#lit) }
+        }
+        Spacing::Rem(v) => {
+            let lit = proc_macro2::Literal::f32_suffixed(*v);
+            quote::quote! { #p::Rem(#lit) }
+        }
+    }
+}
+
+fn inset_to_tokens(i: &Inset) -> proc_macro2::TokenStream {
+    let p = quote::quote! { ::yororen_ui::headless::layout::Inset };
+    match i {
+        Inset::Xs => quote::quote! { #p::Xs },
+        Inset::Sm => quote::quote! { #p::Sm },
+        Inset::Md => quote::quote! { #p::Md },
+        Inset::Lg => quote::quote! { #p::Lg },
+        Inset::Xl => quote::quote! { #p::Xl },
+        Inset::Px(v) => {
+            let lit = proc_macro2::Literal::f32_suffixed(*v);
+            quote::quote! { #p::Px(#lit) }
+        }
+    }
 }

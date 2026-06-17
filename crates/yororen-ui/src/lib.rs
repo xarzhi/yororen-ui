@@ -40,7 +40,7 @@ pub use yororen_ui_xml::register_xml_component;
 #[cfg(feature = "xml")]
 pub use yororen_ui_xml::runtime::ComponentDescriptor;
 #[cfg(feature = "xml")]
-pub use yororen_ui_xml_macro::{bind, xml, xml_file};
+pub use yororen_ui_xml_macro::{bind, classes, xml, xml_file};
 
 // When the `xml` feature is disabled (e.g. `default-features = false`),
 // the real proc-macros and runtime types are unavailable. Provide

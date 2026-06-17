@@ -23,6 +23,7 @@ pub use yororen_ui::a11y
 pub use yororen_ui::animation
 pub use yororen_ui::assets
 pub use yororen_ui::bind
+pub use yororen_ui::classes
 pub use yororen_ui::headless
 pub use yororen_ui::i18n
 pub use yororen_ui::locale_ar

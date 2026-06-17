@@ -1,35 +1,16 @@
 //! yororen-ui Counter Component
 //!
-//! Demonstrates the headless + default-renderer split: each
-//! `headless::button` is built with `DefaultButton::default_render(cx)`
-//! which returns a pre-styled `Stateful<Div>`. The renderer paints the
-//! container (background, padding, radius, min-height, etc.)
-//! from the registered `ButtonRenderer`; the caller chains
-//! `.child("...")` on the result to add the button's text
-//! content.
-//!
-//! For full visual control (custom `div()` composition):
-//!
-//! ```ignore
-//! button("id", cx).on_click(...).apply(div().bg(red).child("Save"))
-//! ```
-//!
-//! — the headless path lets the caller own the entire div,
-//! including content.
-//!
-//! ## `&mut App` from `&mut Context<T>`
-//!
-//! Headless factories like `button(id, cx)` need `&mut App`
-//! to mint a fresh `FocusHandle`. Inside a `Render::render`
-//! closure the caller only has `&mut Context<Self>`. The
-//! conversion is sound: `Context<T>: DerefMut<Target = App>`,
-//! so `&mut **cx` is a `&mut App`. We use it inline at each
-//! call site (as a temporary borrow) so it does not collide
-//! with later uses of `cx` (e.g. `default_render(cx)`).
+//! Migrated to the new `headless::layout::*` API: instead of
+//! hand-writing `div().flex().flex_col().items_center()…`
+//! chains, the body uses `center` / `column` / `row` layout
+//! primitives that read spacing and inset values from the
+//! active theme. The result is the same DOM but the code is
+//! declarative and theme-aware.
 
-use gpui::{Context, IntoElement, ParentElement, Render, Styled, Window, div};
+use gpui::{Context, IntoElement, ParentElement, Render, Styled, Window};
 use yororen_ui::headless::button::button;
 use yororen_ui::headless::label::label;
+use yororen_ui::headless::layout::{Inset, Spacing, center, column, row};
 
 use crate::state::CounterState;
 
@@ -39,22 +20,15 @@ impl Render for CounterApp {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let state = cx.global::<CounterState>();
         let count = state.counter.read(cx).value;
-        // Three separate clones of the same `Entity<CounterValue>`
-        // handle — each `move` closure owns its own. The names are
-        // a hint at which button uses which, not a sign of three
-        // different entities.
         let inc_entity = state.counter.clone();
         let dec_entity = state.counter.clone();
         let reset_entity = state.counter.clone();
 
-        div()
-            .size_full()
-            .flex()
-            .flex_col()
+        let card = column("card", cx)
+            .gap(Spacing::Lg)
+            .p(Inset::Lg)
             .items_center()
             .justify_center()
-            .gap_3()
-            .p_4()
             .child(
                 label("subtitle", "Counter Demo", cx)
                     .strong(true)
@@ -69,9 +43,8 @@ impl Render for CounterApp {
                     .into_any_element(),
             )
             .child(
-                div()
-                    .flex()
-                    .gap_2()
+                row("buttons", cx)
+                    .gap(Spacing::Sm)
                     .child(
                         button("decrease", cx)
                             .on_click(move |_, _, cx| {
@@ -104,7 +77,15 @@ impl Render for CounterApp {
                             })
                             .render(cx)
                             .child("+"),
-                    ),
+                    )
+                    .render(cx),
             )
+            .render(cx);
+
+        center("root", cx)
+            .w_full()
+            .h_full()
+            .child(card)
+            .render(cx)
     }
 }

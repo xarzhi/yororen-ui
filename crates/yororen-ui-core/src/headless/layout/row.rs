@@ -27,6 +27,7 @@ pub struct RowProps {
     pub height: Option<Length>,
     pub scrollable: bool,
     pub children: Vec<gpui::AnyElement>,
+    pub extra_classes: Vec<super::class::LayoutClass>,
 }
 
 pub fn row(id: impl Into<ElementId>, _cx: &mut App) -> RowProps {
@@ -43,6 +44,7 @@ pub fn row(id: impl Into<ElementId>, _cx: &mut App) -> RowProps {
         height: None,
         scrollable: false,
         children: Vec::new(),
+        extra_classes: Vec::new(),
     }
 }
 
@@ -83,6 +85,10 @@ impl RowProps {
         self.justify = Some(JustifyContent::Between);
         self
     }
+    pub fn justify_center(mut self) -> Self {
+        self.justify = Some(JustifyContent::Center);
+        self
+    }
     pub fn w(mut self, w: impl Into<Length>) -> Self {
         self.width = Some(w.into());
         self
@@ -110,6 +116,12 @@ impl RowProps {
     pub fn children(mut self, children: impl IntoIterator<Item = impl IntoElement>) -> Self {
         self.children
             .extend(children.into_iter().map(|c| c.into_any_element()));
+        self
+    }
+    /// Apply a list of `LayoutClass` tokens on top of the
+    /// row's own settings. See [`ColumnProps::classes`].
+    pub fn classes(mut self, classes: impl IntoIterator<Item = super::class::LayoutClass>) -> Self {
+        self.extra_classes.extend(classes);
         self
     }
 
@@ -159,6 +171,9 @@ impl RowProps {
         }
         if self.scrollable {
             el = el.overflow_scroll();
+        }
+        for c in &self.extra_classes {
+            el = c.apply(cx, el);
         }
         for child in self.children {
             el = el.child(child);

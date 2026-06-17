@@ -39,6 +39,7 @@ pub mod types;
 pub use types::{AlignItems, Gap, Inset, JustifyContent, Length, Spacing};
 
 pub mod center;
+pub mod class;
 pub mod column;
 pub mod expanded;
 pub mod row;
@@ -47,6 +48,7 @@ pub mod stack;
 pub mod wrap;
 
 pub use center::{CenterProps, center};
+pub use class::{LayoutClass, apply_all, classes_vec};
 pub use column::{ColumnProps, column};
 pub use expanded::{ExpandedProps, expanded};
 pub use row::{RowProps, row};

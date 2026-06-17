@@ -28,6 +28,7 @@ pub struct ColumnProps {
     pub height: Option<Length>,
     pub scrollable: bool,
     pub children: Vec<gpui::AnyElement>,
+    pub extra_classes: Vec<super::class::LayoutClass>,
 }
 
 pub fn column(id: impl Into<ElementId>, _cx: &mut App) -> ColumnProps {
@@ -44,6 +45,7 @@ pub fn column(id: impl Into<ElementId>, _cx: &mut App) -> ColumnProps {
         height: None,
         scrollable: false,
         children: Vec::new(),
+        extra_classes: Vec::new(),
     }
 }
 
@@ -84,6 +86,10 @@ impl ColumnProps {
         self.justify = Some(JustifyContent::Between);
         self
     }
+    pub fn justify_center(mut self) -> Self {
+        self.justify = Some(JustifyContent::Center);
+        self
+    }
     pub fn w(mut self, w: impl Into<Length>) -> Self {
         self.width = Some(w.into());
         self
@@ -111,6 +117,14 @@ impl ColumnProps {
     pub fn children(mut self, children: impl IntoIterator<Item = impl IntoElement>) -> Self {
         self.children
             .extend(children.into_iter().map(|c| c.into_any_element()));
+        self
+    }
+    /// Apply a list of `LayoutClass` tokens (from `classes!` or
+    /// the XML `class` attribute) on top of the column's own
+    /// settings. The order is: column base styles → own
+    /// attributes → classes.
+    pub fn classes(mut self, classes: impl IntoIterator<Item = super::class::LayoutClass>) -> Self {
+        self.extra_classes.extend(classes);
         self
     }
 
@@ -160,6 +174,10 @@ impl ColumnProps {
         }
         if self.scrollable {
             el = el.overflow_scroll();
+        }
+        // Apply classes (parsed from `classes!` or XML `class=`).
+        for c in &self.extra_classes {
+            el = c.apply(cx, el);
         }
         for child in self.children {
             el = el.child(child);

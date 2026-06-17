@@ -465,6 +465,53 @@ fn apply_props_and_events(
             continue;
         }
 
+        // `class="…"` is a compile-time Tailwind-like class
+        // string. The codegen parses it and emits a
+        // `.classes(…)` call. Layout Leaf components expose
+        // this setter; non-layout leaves (e.g. `Button`)
+        // ignore it for now (the prop will be rejected
+        // later by the `accepted_leaf_attrs` check).
+        if attr.name == "class"
+            && let Some(expr) = &attr.expr
+        {
+            // Brace expression: pass through as raw tokens
+            // and trust the caller. The `classes!` macro
+            // is the compile-time-friendly alternative.
+            let parsed = parse_ts(
+                expr,
+                attr.span,
+                attr.byte_offset,
+                "attribute `class`",
+            )?;
+            stmts.push(quote! { __el = __el.classes(#parsed); });
+            continue;
+        }
+        if attr.name == "class" {
+            // Literal string: parse at compile time.
+            let parsed_classes = match crate::class::parse_class_string(&attr.raw) {
+                Ok(v) => v,
+                Err(e) => {
+                    return Err(XmlError::new(
+                        XmlErrorKind::InvalidExpression,
+                        attr.span,
+                        format!("invalid `class` attribute: {e}"),
+                    )
+                    .at(attr.byte_offset));
+                }
+            };
+            let mut class_elems = TokenStream::new();
+            for c in &parsed_classes {
+                let path = quote::quote! { ::yororen_ui::headless::layout::LayoutClass };
+                class_elems.extend(crate::codegen::class_token::layout_class_to_tokens(
+                    c, &path,
+                ));
+            }
+            stmts.push(quote! {
+                __el = __el.classes(::std::vec::Vec::<::yororen_ui::headless::layout::LayoutClass>::from([#class_elems]));
+            });
+            continue;
+        }
+
         if try_apply_bind(stmts, attr, def, cx, &element.tag)? {
             continue;
         }

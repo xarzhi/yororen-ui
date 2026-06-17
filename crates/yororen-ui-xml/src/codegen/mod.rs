@@ -55,6 +55,7 @@ use crate::schema::{ComponentDef, ComponentKind};
 
 // Submodules
 pub(crate) mod attr;
+pub(crate) mod class_token;
 pub(crate) mod color;
 pub(crate) mod container;
 pub(crate) mod control_flow;
