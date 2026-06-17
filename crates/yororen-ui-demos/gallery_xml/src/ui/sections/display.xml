@@ -47,7 +47,9 @@
         </Cell>
         <Cell>
             <Slot name="label"><Label id="lbl-divider-v" text={t!(cx, "demo.display.divider_v")} muted /></Slot>
-            <Divider id="dvr-v1" vertical />
+            <Div h="24">
+                <Divider id="dvr-v1" vertical />
+            </Div>
         </Cell>
     </Column>
 
