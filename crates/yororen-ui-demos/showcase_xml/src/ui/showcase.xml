@@ -46,7 +46,7 @@
     <Wrap gap_4 items="start">
 
         <!-- SECTION: Counter -->
-        <Div w={gpui::px(360.)} rounded_md border_1 p_4>
+        <Div w="360" rounded_md border_1 p_4>
             <Column flex col gap_3>
                 <Label id="count_label" text="Counter" strong />
                 <Row flex gap_2 items_center>
@@ -60,7 +60,7 @@
         </Div>
 
         <!-- SECTION: Two-way bindings (each toggle independent) -->
-        <Div w={gpui::px(360.)} rounded_md border_1 p_4>
+        <Div w="360" rounded_md border_1 p_4>
             <Column flex col gap_3>
                 <Label id="bindings_label" text="Two-way bindings (@bind)" strong />
                 <Row flex gap_2 items_center>
@@ -84,7 +84,7 @@
         </Div>
 
         <!-- SECTION: TextInput (dynamic id, flex_1 width) -->
-        <Div w={gpui::px(360.)} rounded_md border_1 p_4>
+        <Div w="360" rounded_md border_1 p_4>
             <Column flex col gap_3>
                 <Label id="input_label" text="TextInput (@bind + Clear)" strong />
                 <Row flex gap_2 items_center w_full>
@@ -110,7 +110,7 @@
         </Div>
 
         <!-- SECTION: Match / Case over a Rust enum -->
-        <Div w={gpui::px(360.)} rounded_md border_1 p_4>
+        <Div w="360" rounded_md border_1 p_4>
             <Column flex col gap_3>
                 <Label id="match_label" text="Match / Case (status enum)" strong />
                 <Match on={connection}>
@@ -133,7 +133,7 @@
         </Div>
 
         <!-- SECTION: For (per-row @bind, dynamic id) -->
-        <Div w={gpui::px(360.)} rounded_md border_1 p_4>
+        <Div w="360" rounded_md border_1 p_4>
             <Column flex col gap_3>
                 <Label id="todos_label" text="For (per-row @bind, dynamic id)" strong />
                 <!-- `let:index={i}` exposes the row index so
@@ -152,7 +152,7 @@
         </Div>
 
         <!-- SECTION: State (local Entity, re-minted every render) -->
-        <Div w={gpui::px(360.)} rounded_md border_1 p_4>
+        <Div w="360" rounded_md border_1 p_4>
             <Column flex col gap_3>
                 <Label id="state_label"
                        text="State (local Entity, default = outer × 7)" strong />
@@ -173,7 +173,7 @@
         </Div>
 
         <!-- SECTION: Layout primitives (Center, Stack, Wrap, Spacer) -->
-        <Div w={gpui::px(360.)} rounded_md border_1 p_4>
+        <Div w="360" rounded_md border_1 p_4>
             <Column flex col gap_3>
                 <Label id="layout_label" text="Layout primitives" strong />
                 <Row flex gap_3 items_start>
@@ -200,7 +200,7 @@
         </Div>
 
         <!-- SECTION: Custom runtime-registered tag -->
-        <Div w={gpui::px(360.)} rounded_md border_1 p_4>
+        <Div w="360" rounded_md border_1 p_4>
             <Column flex col gap_3>
                 <Label id="custom_label" text="Custom (register_xml_component!)" strong />
                 <CustomWidget id="custom" />
