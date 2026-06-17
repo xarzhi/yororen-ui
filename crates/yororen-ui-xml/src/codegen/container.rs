@@ -194,6 +194,18 @@ pub(crate) fn apply_container_attr(
                     let __el = ::gpui::StatefulInteractiveElement::#m(__el);
                 });
             } else {
+                // gpui's `flex_col()` / `flex_row()` / `flex_wrap()`
+                // only set `flex_direction` / `flex_wrap`; they do
+                // NOT turn `display` into `flex`. Without `.flex()`
+                // first, the container stays `display: Block` and
+                // `gap`/`direction` are ignored, so children collapse
+                // together. Auto-emit `.flex()` for any flex-layout
+                // flag so `<Div flex_col gap="8">` just works.
+                if is_flex_layout_flag(&attr.name) {
+                    stmts.push(quote! {
+                        let __el = ::gpui::Styled::flex(__el);
+                    });
+                }
                 stmts.push(quote! {
                     let __el = ::gpui::Styled::#m(__el);
                 });
@@ -266,6 +278,18 @@ const TEXTUAL_SPACING_SUFFIX: &[&str] = &[
 
 pub(crate) fn is_valid_spacing_suffix(s: &str) -> bool {
     NUMERIC_SPACING_SUFFIX.contains(&s) || TEXTUAL_SPACING_SUFFIX.contains(&s)
+}
+
+/// Flex-layout shorthand flags whose gpui method only mutates
+/// `flex_direction` / `flex_wrap`. They require `display: flex`
+/// to actually take effect, so the dispatcher emits `.flex()`
+/// before them.
+pub(crate) fn is_flex_layout_flag(name: &str) -> bool {
+    matches!(
+        name,
+        "flex_col" | "flex_col_reverse" | "flex_row" | "flex_row_reverse" | "flex_wrap"
+            | "flex_wrap_reverse" | "flex_nowrap"
+    )
 }
 pub(crate) fn accepted_container_attrs(def: &ContainerDef) -> String {
     let mut parts = vec!["id".to_string()];

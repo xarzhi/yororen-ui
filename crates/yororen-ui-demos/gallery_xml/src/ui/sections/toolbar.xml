@@ -2,6 +2,7 @@
 <Column flex col gap="3">
     <Row flex items_center gap="3">
         <Heading id="title" level="H1" text={t!(cx, "demo.title")} />
+        <Label id="xml-badge" text="(XML)" muted />
     </Row>
 
     <Row flex items_center gap="2" flex_wrap>

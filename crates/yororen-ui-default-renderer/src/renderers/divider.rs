@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use gpui::{App, Div, Hsla, Pixels, Styled, div};
+use gpui::{AlignSelf, App, Div, Hsla, Pixels, Styled, div};
 
 use yororen_ui_core::headless::divider::DividerProps;
 use yororen_ui_core::theme::Theme;
@@ -35,11 +35,21 @@ impl DividerRenderer for TokenDividerRenderer {
         };
         let color = self.color(&state, theme);
         let thickness = self.thickness(&state, theme);
-        let mut el = div().bg(color);
+        let mut el = div().bg(color).flex_shrink_0();
         if props.horizontal {
-            el = el.w_full().h(thickness);
+            // `min_h` guarantees the line stays visible inside a flex
+            // container whose main axis is vertical — `h` alone can be
+            // collapsed by flex-basis sizing when the item has no
+            // content to derive a base size from.
+            // `align_self: stretch` forces the cross-axis size (width
+            // in a flex column) to match the container, so the divider
+            // spans the full section even when the parent's width is
+            // content-derived and `w_full()` would resolve to zero.
+            el.style().align_self = Some(AlignSelf::Stretch);
+            el = el.w_full().h(thickness).min_h(thickness);
         } else {
-            el = el.h_full().w(thickness);
+            el.style().align_self = Some(AlignSelf::Stretch);
+            el = el.h_full().w(thickness).min_w(thickness);
         }
         el
     }

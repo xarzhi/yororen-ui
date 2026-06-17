@@ -95,6 +95,23 @@ fn nested_row_inside_column() {
 }
 
 #[test]
+fn div_container_flex_col_gap() {
+    let s = render(
+        r#"<Div flex_col gap="4" p="4">
+        <Label id="a" text="A" />
+        <Label id="b" text="B" />
+    </Div>"#,
+    );
+    // Container shorthand attrs should resolve to Styled method calls.
+    assert!(s.contains("flex_col"), "{s}");
+    assert!(s.contains("gap_4"), "{s}");
+    assert!(s.contains("p_4"), "{s}");
+    // Children should be wired via ParentElement::child.
+    let normalised: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+    assert_eq!(normalised.matches("child").count(), 2, "{normalised}");
+}
+
+#[test]
 fn if_without_else() {
     let s = render(r#"<Column><If condition={show}><Label id="x" text="hi" /></If></Column>"#);
     assert!(s.contains("if"), "{s}");

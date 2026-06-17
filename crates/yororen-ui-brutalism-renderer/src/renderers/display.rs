@@ -3,10 +3,10 @@
 //! `EmptyState`.
 
 use gpui::{
-    AbsoluteLength, App, BorderStyle, Bounds, BoxShadow, Corners, CursorStyle, DefiniteLength, Div,
-    Edges, Element, ElementId, FontWeight, GlobalElementId, Hsla, InspectorElementId,
-    InteractiveElement, IntoElement, LayoutId, Length, Pixels, Position, SharedString, Stateful,
-    StatefulInteractiveElement, Style, Styled, Window, hsla, point, px,
+    AbsoluteLength, AlignSelf, App, BorderStyle, Bounds, BoxShadow, Corners, CursorStyle,
+    DefiniteLength, Div, Edges, Element, ElementId, FontWeight, GlobalElementId, Hsla,
+    InspectorElementId, InteractiveElement, IntoElement, LayoutId, Length, Pixels, Position,
+    SharedString, Stateful, StatefulInteractiveElement, Style, Styled, Window, hsla, point, px,
 };
 use std::sync::OnceLock;
 use std::time::Instant;
@@ -188,11 +188,13 @@ impl DividerRenderer for BrutalDividerRenderer {
         };
         let color = self.color(&state, theme);
         let thickness = self.thickness(&state, theme);
-        let mut el = gpui::div().bg(color);
+        let mut el = gpui::div().bg(color).flex_shrink_0();
         if props.horizontal {
-            el = el.w_full().h(thickness);
+            el.style().align_self = Some(AlignSelf::Stretch);
+            el = el.w_full().h(thickness).min_h(thickness);
         } else {
-            el = el.h_full().w(thickness);
+            el.style().align_self = Some(AlignSelf::Stretch);
+            el = el.h_full().w(thickness).min_w(thickness);
         }
         el
     }
