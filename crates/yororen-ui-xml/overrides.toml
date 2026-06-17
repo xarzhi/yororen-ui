@@ -91,6 +91,14 @@ control_flow = "UniformVirtualList"
 
 # ----- Custom modifications -----
 
+# The legacy `headless::spacer` goes through a `SpacerRenderer`
+# trait; the new `headless::layout::spacer` is a zero-overhead
+# layout primitive. XML `<Spacer>` should use the latter.
+[[override_]]
+tag = "Spacer"
+kind = "Leaf"
+factory = "::yororen_ui::headless::layout::spacer::spacer"
+
 # `Button` has a `caption` setter that the generator uses
 # to infer `supports_text_child`. Keep this here as a
 # safety net: if the generator ever loses that heuristic,

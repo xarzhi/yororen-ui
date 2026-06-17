@@ -60,6 +60,15 @@ struct OverridesFile {
 struct OverrideEntry {
     tag: String,
     kind: String,
+    /// Override the auto-detected factory path.
+    ///
+    /// Use this when two headless modules expose the same tag
+    /// (e.g. the legacy `headless::spacer` and the new
+    /// `headless::layout::spacer` both become `<Spacer>`), or
+    /// when a tag's factory lives outside the scanned headless
+    /// directory.
+    #[serde(default)]
+    factory: Option<String>,
     /// When `kind == "Container"`: container definition.
     #[serde(default)]
     container: Option<ContainerOverride>,
@@ -472,6 +481,9 @@ fn apply_overrides(entries: Vec<Extracted>, overrides: &[OverrideEntry]) -> Vec<
         .into_iter()
         .map(|(tag, mut e)| {
             if let Some(o) = overrides.iter().find(|o| o.tag == tag) {
+                if let Some(factory) = &o.factory {
+                    e.factory = factory.clone();
+                }
                 if let Some(true) = o.supports_text_child {
                     e.supports_text_child = true;
                 }

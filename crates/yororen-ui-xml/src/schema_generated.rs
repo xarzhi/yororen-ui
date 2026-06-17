@@ -3,7 +3,7 @@
 //!
 //! Source of truth: `yororen-ui-core/src/headless/*.rs`
 //! plus `yororen-ui-xml/overrides.toml`.
-//! Last regenerated with: 67 entries (27 from overrides), 5 skipped.
+//! Last regenerated with: 67 entries (28 from overrides), 5 skipped.
 //!
 //! Skipped files (need manual schema entry or a schema
 //! extension — see `gen_schema.rs` notes):
@@ -946,7 +946,7 @@ pub static BUILTINS_GENERATED: &[ComponentDef] = &[
     ComponentDef {
         tag: "Spacer",
         kind: ComponentKind::Leaf(LeafDef {
-            factory: "::yororen_ui::headless::spacer::spacer",
+            factory: "::yororen_ui::headless::layout::spacer::spacer",
             extra_args: &[],
             render: RenderMode::Default,
             needs_app: true,
