@@ -228,6 +228,18 @@ pub(crate) fn apply_container_attr(
         return Ok(());
     }
 
+    // Literal hex colour for `border_color`
+    // (`border_color="#rrggbb"` / `#rrggbbaa`). This keeps
+    // containers on par with leaf props and avoids forcing
+    // users into brace expressions just to set a stroke colour.
+    if attr.expr.is_none() && attr.name == "border_color" {
+        let value = crate::codegen::color::parse_hex_color(attr.raw.as_str(), attr)?;
+        stmts.push(quote! {
+            let __el = ::gpui::Styled::border_color(__el, #value);
+        });
+        return Ok(());
+    }
+
     // Bare method name on a container (`flex`, `flex_col`,
     // `w_full`, …). These are all zero-arg gpui flags in
     // [`is_known_shorthand_method`] / [`is_spacing_shorthand`],
