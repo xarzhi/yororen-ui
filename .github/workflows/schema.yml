@@ -11,6 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install system dependencies (GPUI / X11)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libx11-xcb-dev \
+            libxcb-render0-dev \
+            libxcb-shape0-dev \
+            libxcb-xfixes0-dev \
+            libxkbcommon-dev \
+            libxkbcommon-x11-dev \
+            libwayland-dev \
+            libfontconfig1-dev \
+            libssl-dev
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
       - name: Check generated schema is up to date
