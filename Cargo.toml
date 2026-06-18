@@ -32,6 +32,11 @@ version = "0.3.0"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/MeowLynxSea/yororen-ui"
+# crates.io discoverability — applied to every publishable crate.
+# `categories` and `keywords` are restricted to the allow-list published
+# at <https://crates.io/category_slugs> / <https://crates.io/keyword_slugs>.
+keywords = ["gui", "ui", "headless", "gpui", "components"]
+categories = ["gui", "accessibility"]
 
 # Workspace lints — every member inherits these via
 # `[lints] workspace = true` in its `Cargo.toml`. Enforce
