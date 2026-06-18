@@ -58,7 +58,9 @@ pub fn parse(
         // `InvalidXmlPrefixUri`, return a position with row=0).
         let pos = e.pos();
         let line_starts = LocationTracker::compute(&normalized);
-        let line_idx = (pos.row as usize).saturating_sub(1).min(line_starts.len().saturating_sub(1));
+        let line_idx = (pos.row as usize)
+            .saturating_sub(1)
+            .min(line_starts.len().saturating_sub(1));
         let offset = if line_idx < line_starts.len() {
             line_starts[line_idx] + (pos.col as usize).saturating_sub(1)
         } else {

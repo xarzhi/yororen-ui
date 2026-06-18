@@ -259,14 +259,14 @@ pub(crate) fn prop_value_tokens(
                 // Bare number = px (unified default).
                 Ok(quote! { ::yororen_ui::headless::layout::Spacing::Px(#n) })
             } else if let Some(body) = raw.strip_suffix("px") {
-                let n = body.parse::<f32>().map_err(|_| {
-                    invalid_attr_expr(attr, "a number followed by `px`", raw)
-                })?;
+                let n = body
+                    .parse::<f32>()
+                    .map_err(|_| invalid_attr_expr(attr, "a number followed by `px`", raw))?;
                 Ok(quote! { ::yororen_ui::headless::layout::Spacing::Px(#n) })
             } else if let Some(body) = raw.strip_suffix("rem") {
-                let n = body.parse::<f32>().map_err(|_| {
-                    invalid_attr_expr(attr, "a number followed by `rem`", raw)
-                })?;
+                let n = body
+                    .parse::<f32>()
+                    .map_err(|_| invalid_attr_expr(attr, "a number followed by `rem`", raw))?;
                 Ok(quote! { ::yororen_ui::headless::layout::Spacing::Rem(#n) })
             } else {
                 let variant = parse_enum_variant(
@@ -283,14 +283,14 @@ pub(crate) fn prop_value_tokens(
             if let Ok(n) = raw.parse::<f32>() {
                 Ok(quote! { ::yororen_ui::headless::layout::Inset::Px(#n) })
             } else if let Some(body) = raw.strip_suffix("px") {
-                let n = body.parse::<f32>().map_err(|_| {
-                    invalid_attr_expr(attr, "a number followed by `px`", raw)
-                })?;
+                let n = body
+                    .parse::<f32>()
+                    .map_err(|_| invalid_attr_expr(attr, "a number followed by `px`", raw))?;
                 Ok(quote! { ::yororen_ui::headless::layout::Inset::Px(#n) })
             } else if let Some(body) = raw.strip_suffix("rem") {
-                let n = body.parse::<f32>().map_err(|_| {
-                    invalid_attr_expr(attr, "a number followed by `rem`", raw)
-                })?;
+                let n = body
+                    .parse::<f32>()
+                    .map_err(|_| invalid_attr_expr(attr, "a number followed by `rem`", raw))?;
                 Ok(quote! { ::yororen_ui::headless::layout::Inset::Rem(#n) })
             } else {
                 let variant = parse_enum_variant(
@@ -328,19 +328,19 @@ pub(crate) fn prop_value_tokens(
                 // Bare number = px (unified default).
                 Ok(quote! { ::yororen_ui::headless::layout::Length::Px(#n) })
             } else if let Some(body) = raw.strip_suffix("px") {
-                let n = body.parse::<f32>().map_err(|_| {
-                    invalid_attr_expr(attr, "a number followed by `px`", raw)
-                })?;
+                let n = body
+                    .parse::<f32>()
+                    .map_err(|_| invalid_attr_expr(attr, "a number followed by `px`", raw))?;
                 Ok(quote! { ::yororen_ui::headless::layout::Length::Px(#n) })
             } else if let Some(body) = raw.strip_suffix("rem") {
-                let n = body.parse::<f32>().map_err(|_| {
-                    invalid_attr_expr(attr, "a number followed by `rem`", raw)
-                })?;
+                let n = body
+                    .parse::<f32>()
+                    .map_err(|_| invalid_attr_expr(attr, "a number followed by `rem`", raw))?;
                 Ok(quote! { ::yororen_ui::headless::layout::Length::Rem(#n) })
             } else if let Some(body) = raw.strip_suffix('%') {
-                let n = body.parse::<f32>().map_err(|_| {
-                    invalid_attr_expr(attr, "a number followed by `%`", raw)
-                })?;
+                let n = body
+                    .parse::<f32>()
+                    .map_err(|_| invalid_attr_expr(attr, "a number followed by `%`", raw))?;
                 Ok(quote! { ::yororen_ui::headless::layout::Length::Pct(#n) })
             } else {
                 let variant = parse_enum_variant(

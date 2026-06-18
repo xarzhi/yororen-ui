@@ -318,12 +318,15 @@ fn container_spacing_with_bad_suffix_carries_offset() {
     // the single-line fallback. (`Column` is now a Leaf
     // and accepts any numeric `gap` as `Spacing::Px`; bare
     // numbers on `<Div>` are now interpreted as px too.)
-    let err = codegen(r#"<Div gap="999pxx" />"#, Span::call_site(), None, None, &[]).unwrap_err();
-    assert!(
-        err.message.contains("invalid value"),
-        "{}",
-        err.message
-    );
+    let err = codegen(
+        r#"<Div gap="999pxx" />"#,
+        Span::call_site(),
+        None,
+        None,
+        &[],
+    )
+    .unwrap_err();
+    assert!(err.message.contains("invalid value"), "{}", err.message);
     assert!(
         err.offset.is_some(),
         "spacing suffix error should carry byte_offset; got {:?}",

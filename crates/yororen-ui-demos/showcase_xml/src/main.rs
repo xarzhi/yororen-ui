@@ -40,8 +40,8 @@ mod state;
 mod view;
 
 use gpui::{
-    App, AppContext, Application, InteractiveElement, IntoElement, WindowBounds, WindowOptions,
-    px, size,
+    App, AppContext, Application, InteractiveElement, IntoElement, WindowBounds, WindowOptions, px,
+    size,
 };
 
 use yororen_ui::assets::UiAsset;

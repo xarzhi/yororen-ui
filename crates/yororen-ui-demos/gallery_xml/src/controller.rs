@@ -9,9 +9,7 @@
 use std::collections::{BTreeSet, HashMap};
 use std::ops::Range;
 
-use gpui::{
-    App, ClickEvent, Entity, IntoElement, SharedString, Window,
-};
+use gpui::{App, ClickEvent, Entity, IntoElement, SharedString, Window};
 
 use yororen_ui::headless::dropdown_menu::{DropdownItem, DropdownMenuItem};
 use yororen_ui::headless::keybinding_input::KeybindingInputMode;
@@ -249,10 +247,7 @@ impl Controller {
     /// `on_select` writes `dropdown_demo_value` and closes the
     /// dropdown, so the popover and dropdown summaries stay
     /// independent.
-    pub fn dropdown_menu_state(
-        &self,
-        cx: &App,
-    ) -> Entity<yororen_ui::headless::menu::MenuState> {
+    pub fn dropdown_menu_state(&self, cx: &App) -> Entity<yororen_ui::headless::menu::MenuState> {
         self.state.read(cx).dropdown_menu_state.clone()
     }
 

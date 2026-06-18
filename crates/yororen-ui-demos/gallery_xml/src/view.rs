@@ -60,8 +60,7 @@ impl Render for GalleryApp {
         //    fully owned by the registry global.
         let current_renderer = self.controller.current_renderer(cx);
         let current_dark = self.controller.dark_mode(cx);
-        if self.last_renderer != Some(current_renderer)
-            || self.last_dark_mode != Some(current_dark)
+        if self.last_renderer != Some(current_renderer) || self.last_dark_mode != Some(current_dark)
         {
             install_renderer(&mut **cx, current_renderer, current_dark);
             self.last_renderer = Some(current_renderer);

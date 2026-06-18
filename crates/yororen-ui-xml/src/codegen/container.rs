@@ -361,8 +361,13 @@ pub(crate) fn is_valid_spacing_suffix(s: &str) -> bool {
 pub(crate) fn is_flex_layout_flag(name: &str) -> bool {
     matches!(
         name,
-        "flex_col" | "flex_col_reverse" | "flex_row" | "flex_row_reverse" | "flex_wrap"
-            | "flex_wrap_reverse" | "flex_nowrap"
+        "flex_col"
+            | "flex_col_reverse"
+            | "flex_row"
+            | "flex_row_reverse"
+            | "flex_wrap"
+            | "flex_wrap_reverse"
+            | "flex_nowrap"
     )
 }
 pub(crate) fn accepted_container_attrs(def: &ContainerDef) -> String {
