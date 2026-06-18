@@ -126,7 +126,7 @@ fn main() {
         let options = WindowOptions {
             window_bounds: Some(WindowBounds::Windowed(gpui::Bounds::centered(
                 None,
-                size(px(1500.0), px(500.0)),
+                size(px(800.0), px(600.0)),
                 cx,
             ))),
             ..Default::default()
