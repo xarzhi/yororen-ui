@@ -86,7 +86,27 @@ publish_one() {
     echo "============================================================"
     echo "[publish] $pkg"
     echo "============================================================"
-    cargo_publish "$pkg"
+    # Run cargo publish; capture stderr so we can detect the "already
+    # exists" case and skip rather than abort. Without this guard, the
+    # second invocation aborts on the first crate that is already on
+    # crates.io (e.g. after a partial successful run).
+    local log
+    log="$(mktemp)"
+    trap "rm -f '$log'" EXIT
+    if cargo_publish "$pkg" 2>&1 | tee "$log"; then
+        trap - EXIT
+        return 0
+    fi
+    trap - EXIT
+    if grep -q 'already exists on crates.io index' "$log"; then
+        # Extract "crate@version" from the error line for a clearer log.
+        local existing
+        existing="$(grep -oE '[a-zA-Z0-9_-]+@[0-9]+\.[0-9]+\.[0-9]+' "$log" | head -1)"
+        echo "[publish] $existing already on crates.io — skipping"
+        return 0
+    fi
+    # Real failure: surface it.
+    return 1
 }
 
 # Resolve which crates to publish.
