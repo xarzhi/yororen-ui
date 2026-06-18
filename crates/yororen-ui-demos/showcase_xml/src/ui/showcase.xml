@@ -186,7 +186,7 @@
                             <Label id="stack_front" text="Front" strong />
                         </Stack>
                     </Div>
-                    <Div flex_1 h="64" rounded_md border_1 border_color="#2A2A2F" p_2 flex_col justify_center>
+                    <Div flex_1 rounded_md border_1 border_color="#2A2A2F" p_2 flex_col justify_center>
                         <Wrap gap_2 items="center">
                             <Label id="wrap_1" text="Wrap 1" />
                             <Label id="wrap_2" text="Wrap 2" />
