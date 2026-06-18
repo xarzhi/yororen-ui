@@ -69,16 +69,20 @@ git commit -m "docs(readme): add installation instructions"
 1. Fork the repository and create a branch
 2. Make your changes and commit
 3. Ensure all tests and checks pass
-4. Submit a Pull Request
+4. Submit a Pull Request — the [PR template](../.github/PULL_REQUEST_TEMPLATE.md) will be pre-filled; please complete all sections
 5. Wait for code review
 
 ### PR Checklist
 
-- [ ] `cargo build` succeeds
-- [ ] All `cargo test` pass
-- [ ] `cargo clippy` has no warnings
-- [ ] Code is formatted (`cargo fmt`)
-- [ ] Documentation is added/updated
+Before requesting a review, make sure:
+
+- [ ] `cargo build --workspace` succeeds
+- [ ] `cargo test --workspace` passes
+- [ ] `cargo clippy --workspace -- -D warnings` passes
+- [ ] `cargo fmt --all -- --check` passes
+- [ ] Documentation is added/updated for public API changes
+- [ ] For visual changes, screenshots or a short recording are included in the PR description
+- [ ] Breaking changes are clearly described in the PR description
 
 ## Code of Conduct
 
